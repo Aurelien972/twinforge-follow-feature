@@ -297,6 +297,33 @@ const ScanCTA: React.FC = () => {
                 }}
               />
             )}
+
+            {/* Particules orbitales animées - visible uniquement quand à jour (status up_to_date) */}
+            {scanStatus.status === 'up_to_date' && (
+              <>
+                {[...Array(6)].map((_, i) => {
+                  const angle = (i * 360) / 6;
+                  const radius = 60;
+                  const x = Math.cos((angle * Math.PI) / 180) * radius;
+                  const y = Math.sin((angle * Math.PI) / 180) * radius;
+
+                  return (
+                    <div
+                      key={i}
+                      className={`absolute w-2 h-2 rounded-full dynamic-particle-css dynamic-particle-css--${i + 1}`}
+                      style={{
+                        background: scanStatus.color,
+                        boxShadow: `0 0 12px color-mix(in srgb, ${scanStatus.color} 70%, transparent)`,
+                        '--particle-x': `${x * 0.4}px`,
+                        '--particle-y': `${y * 0.4}px`,
+                        '--particle-x-end': `${x}px`,
+                        '--particle-y-end': `${y}px`
+                      } as React.CSSProperties}
+                    />
+                  );
+                })}
+              </>
+            )}
           </motion.div>
 
           {/* Status Message */}
