@@ -184,6 +184,7 @@ const FastingPage: React.FC = () => {
         defaultValue="daily"
         className="w-full min-w-0 fasting-tabs"
         onValueChange={handleTabChange}
+        forgeContext="fasting"
       >
         <Tabs.List role="tablist" aria-label="Sections du jeûne" className="mb-6 w-full">
           <Tabs.Trigger value="daily" icon="Calendar">

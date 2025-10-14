@@ -10,12 +10,13 @@ import { Variants } from 'framer-motion';
  * Utilisé pour le fond dégradé et l'icône active
  */
 export const TAB_COLORS: Record<string, string> = {
-  // Profil
-  'identity': '#60A5FA',    // Bleu pour identité
-  'nutrition': '#10B981',   // Vert pour nutrition
-  'health': '#EF4444',      // Rouge pour santé
-  'fasting': '#F59E0B',     // Orange pour jeûne
-  'preferences': '#18E3FF', // Cyan pour training
+  // Profil - Utilise le contexte "profile"
+  'profile:identity': '#60A5FA',    // Bleu pour identité
+  'profile:nutrition': '#10B981',   // Vert pour nutrition
+  'profile:health': '#EF4444',      // Rouge pour santé
+  'profile:fasting': '#F59E0B',     // Orange pour jeûne
+  'profile:preferences': '#18E3FF', // Cyan pour training
+  'profile:avatar': '#A855F7',      // Violet pour avatar
 
   // Atelier de Recettes (Fridge)
   'inventaire': '#06B6D4',  // Cyan pour inventaire
@@ -23,34 +24,37 @@ export const TAB_COLORS: Record<string, string> = {
   'plan': '#8B5CF6',        // Violet pour plan
   'courses': '#F59E0B',     // Orange pour courses
 
-  // Meals (Forge Nutritionnelle)
-  'daily': '#10B981',       // Vert pour aujourd'hui (nutrition quotidienne)
-  'insights': '#F59E0B',    // Orange pour insights nutritionnels
-  'progression': '#06B6D4', // Cyan pour progression nutritionnelle
-  'history': '#8B5CF6',     // Violet pour historique nutritionnel
-  'journal': '#10B981',     // Vert pour journal (legacy)
-  'statistiques': '#06B6D4', // Cyan pour statistiques (legacy)
+  // Meals (Forge Nutritionnelle) - Utilise le contexte "meals"
+  'meals:daily': '#10B981',       // Vert pour aujourd'hui (nutrition quotidienne)
+  'meals:insights': '#F59E0B',    // Orange pour insights nutritionnels
+  'meals:progression': '#06B6D4', // Cyan pour progression nutritionnelle
+  'meals:history': '#8B5CF6',     // Violet pour historique nutritionnel
+  'journal': '#10B981',           // Vert pour journal (legacy)
+  'statistiques': '#06B6D4',      // Cyan pour statistiques (legacy)
 
-  // Fasting (Forge du Temps)
-  'timer': '#F59E0B',       // Orange pour timer
-  'protocoles': '#06B6D4',  // Cyan pour protocoles
+  // Fasting (Forge du Temps) - Utilise le contexte "fasting"
+  'fasting:daily': '#F59E0B',     // Orange pour aujourd'hui
+  'fasting:insights': '#8B5CF6',  // Violet pour insights
+  'fasting:progression': '#06B6D4', // Cyan pour progression
+  'fasting:history': '#8B5CF6',   // Violet pour historique
+  'timer': '#F59E0B',             // Orange pour timer (legacy)
+  'protocoles': '#06B6D4',        // Cyan pour protocoles (legacy)
 
-  // Activity (Forge Énergétique)
-  'dailyActivity': '#3B82F6',       // Bleu pour récap du jour activité
-  'input': '#3B82F6',       // Bleu pour saisie
-  'insightsActivity': '#F59E0B',    // Orange pour insights énergétiques
-  'progressionActivity': '#10B981', // Vert pour progression énergétique
-  'historyActivity': '#8B5CF6',     // Violet pour historique énergétique
+  // Activity (Forge Énergétique) - Utilise le contexte "activity"
+  'activity:daily': '#3B82F6',       // Bleu pour aujourd'hui activité
+  'activity:insights': '#F59E0B',    // Orange pour insights énergétiques
+  'activity:progression': '#10B981', // Vert pour progression énergétique
+  'activity:history': '#8B5CF6',     // Violet pour historique énergétique
+  'activity:input': '#3B82F6',       // Bleu pour saisie (legacy)
 
-  // Body Scan (Forge Corporelle)
-  'scanCta': '#8B5CF6',     // Violet pour scanner (nouvelle couleur)
-  'scanner': '#8B5CF6',     // Violet pour scanner (nouvelle couleur)
-  'avatar': '#06B6D4',      // Cyan pour avatar
-  'projection': '#10B981',  // Vert pour projection
-  'insightsAvatar': '#F59E0B', // Orange pour insights avatar (distinct de insights activity)
-  'historyAvatar': '#8B5CF6',  // Violet pour historique avatar (distinct de history activity)
-  'face': '#EC4899',        // Rose pour visage
-  'comparaison': '#A855F7', // Violet pour comparaison
+  // Body Scan (Forge Corporelle) - Utilise le contexte "avatar"
+  'avatar:scanCta': '#8B5CF6',     // Violet pour scanner
+  'avatar:avatar': '#06B6D4',      // Cyan pour avatar
+  'avatar:projection': '#10B981',  // Vert pour projection
+  'avatar:insights': '#F59E0B',    // Orange pour insights avatar
+  'avatar:history': '#8B5CF6',     // Violet pour historique avatar
+  'avatar:face': '#EC4899',        // Rose pour visage
+  'avatar:comparaison': '#A855F7', // Violet pour comparaison
 
   // Training (Atelier de Training)
   'aujourd hui': '#18E3FF', // Cyan pour aujourd'hui

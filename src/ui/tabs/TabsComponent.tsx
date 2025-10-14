@@ -11,6 +11,7 @@ const Tabs: React.FC<{
   className?: string;
   children: ReactNode;
   onValueChange?: (value: string) => void;
+  forgeContext?: string;
 }> & {
   List: React.FC<{
     role?: string;
@@ -27,10 +28,10 @@ const Tabs: React.FC<{
     value: string;
     children: ReactNode;
   }>;
-} = ({ defaultValue, className = '', children, onValueChange }) => {
+} = ({ defaultValue, className = '', children, onValueChange, forgeContext }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Derive activeTab from URL hash, fallback to defaultValue
   const activeTab = React.useMemo(() => {
     const hash = location.hash.replace('#', '');
@@ -38,7 +39,7 @@ const Tabs: React.FC<{
     const decodedHash = hash ? decodeURIComponent(hash) : '';
     return decodedHash || defaultValue;
   }, [location.hash, defaultValue]);
-  
+
   // Handle tab change by updating URL hash
   const setActiveTab = React.useCallback((value: string) => {
     navigate({ hash: value });
@@ -46,7 +47,7 @@ const Tabs: React.FC<{
   }, [navigate, onValueChange]);
 
   return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
+    <TabsContext.Provider value={{ activeTab, setActiveTab, forgeContext }}>
       <div className={`tabs w-full ${className}`}>
         {children}
       </div>
@@ -189,30 +190,39 @@ const TabsTrigger: React.FC<{
   listRef?: React.RefObject<HTMLDivElement>;
   hasOverflow?: boolean;
 }> = ({ value, icon, children, listRef, hasOverflow }) => {
-  const { activeTab, setActiveTab } = useTabs();
+  const { activeTab, setActiveTab, forgeContext } = useTabs();
   const isActive = activeTab === value;
   const IconComponent = icon ? ICONS[icon] : null;
   const triggerRef = React.useRef<HTMLButtonElement>(null);
 
-  // Récupération de la couleur depuis la configuration centralisée
-  const getTabIconColor = (tabValue: string, isActive: boolean) => {
-    if (!isActive) return undefined; // Couleur par défaut pour les onglets inactifs
+  // Récupération de la couleur depuis la configuration centralisée avec contexte de forge
+  const getTabIconColor = (tabValue: string, isActive: boolean, forgeCtx?: string) => {
+    if (!isActive) return undefined;
+
+    // Try with forge context first (e.g., "activity:daily")
+    if (forgeCtx) {
+      const contextualKey = `${forgeCtx}:${tabValue}`;
+      const contextualColor = getTabColor(contextualKey);
+      if (contextualColor) return contextualColor;
+    }
+
+    // Fallback to direct value
     return getTabColor(tabValue);
   };
 
   const handleClick = () => {
     setActiveTab(value);
-    
+
     // Auto-scroll functionality for mobile when there's overflow
     if (hasOverflow && listRef?.current && triggerRef.current) {
-      triggerRef.current.scrollIntoView({ 
-        behavior: 'smooth', 
+      triggerRef.current.scrollIntoView({
+        behavior: 'smooth',
         block: 'nearest',
         inline: 'center'
       });
     }
   };
-  const iconColor = getTabIconColor(value, isActive);
+  const iconColor = getTabIconColor(value, isActive, forgeContext);
   return (
     <button
       ref={triggerRef}
@@ -227,8 +237,8 @@ const TabsTrigger: React.FC<{
       } as React.CSSProperties}
     >
       {IconComponent && (
-        <IconComponent 
-          className="tab-icon" 
+        <IconComponent
+          className="tab-icon"
           color={iconColor}
           style={iconColor ? { color: iconColor } : undefined}
         />

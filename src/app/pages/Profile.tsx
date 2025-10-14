@@ -128,6 +128,7 @@ const Profile: React.FC = () => {
         value={activeTab}
         className="w-full min-w-0 profile-tabs"
         onValueChange={handleTabChange}
+        forgeContext="profile"
       >
         <Tabs.List role="tablist" aria-label="Sections du profil" className="mb-6 w-full">
           <Tabs.Trigger value="identity" icon="User">

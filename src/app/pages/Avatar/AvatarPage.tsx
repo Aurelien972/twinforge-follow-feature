@@ -122,6 +122,7 @@ const AvatarPage: React.FC = () => {
         defaultValue="scanCta"
         className="w-full min-w-0 avatar-tabs"
         onValueChange={handleTabChange}
+        forgeContext="avatar"
       >
         <Tabs.List
           role="tablist"

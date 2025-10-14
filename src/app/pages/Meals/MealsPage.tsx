@@ -183,10 +183,11 @@ const MealsPage: React.FC = () => {
         iconColor={headerContent.color}
       />
       
-      <Tabs 
-        defaultValue="daily" 
+      <Tabs
+        defaultValue="daily"
         className="w-full min-w-0 meals-tabs"
         onValueChange={handleTabChange}
+        forgeContext="meals"
       >
         <Tabs.List role="tablist" aria-label="Sections des repas" className="mb-6 w-full">
           <Tabs.Trigger value="daily" icon="Calendar">

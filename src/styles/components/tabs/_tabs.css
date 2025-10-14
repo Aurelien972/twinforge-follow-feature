@@ -449,30 +449,6 @@
   }
 }
 
-/* Contextual icon accents - Enhanced with button color */
-.tabs-trigger[aria-selected="true"] .tab-icon{
-  filter:drop-shadow(0 0 8px currentColor) drop-shadow(0 0 16px currentColor) !important;
-}
-.body-scan-tabs .tabs-trigger[value="capture"][aria-selected="true"] .tab-icon{ color:#60A5FA !important; filter:drop-shadow(0 0 6px #60A5FA) !important; }
-.body-scan-tabs .tabs-trigger[value="history"][aria-selected="true"] .tab-icon{ color:#8B5CF6 !important; filter:drop-shadow(0 0 6px #8B5CF6) !important; }
-.body-scan-tabs .tabs-trigger[value="face-scan"][aria-selected="true"] .tab-icon{ color:#F59E0B !important; filter:drop-shadow(0 0 6px #F59E0B) !important; }
-
-.meals-tabs .tabs-trigger[value="daily"][aria-selected="true"] .tab-icon{ color:#10B981 !important; filter:drop-shadow(0 0 6px #10B981) !important; }
-.meals-tabs .tabs-trigger[value="insights"][aria-selected="true"] .tab-icon{ color:#8B5CF6 !important; filter:drop-shadow(0 0 6px #8B5CF6) !important; }
-.meals-tabs .tabs-trigger[value="progression"][aria-selected="true"] .tab-icon{ color:#06B6D4 !important; filter:drop-shadow(0 0 6px #06B6D4) !important; }
-.meals-tabs .tabs-trigger[value="history"][aria-selected="true"] .tab-icon{ color:#8B5CF6 !important; filter:drop-shadow(0 0 6px #8B5CF6) !important; }
-
-/* Fasting tabs contextual colors */
-.fasting-tabs .tabs-trigger[value="daily"][aria-selected="true"] .tab-icon{ color:#F59E0B !important; filter:drop-shadow(0 0 6px #F59E0B) !important; }
-.fasting-tabs .tabs-trigger[value="insights"][aria-selected="true"] .tab-icon{ color:#8B5CF6 !important; filter:drop-shadow(0 0 6px #8B5CF6) !important; }
-.fasting-tabs .tabs-trigger[value="progression"][aria-selected="true"] .tab-icon{ color:#06B6D4 !important; filter:drop-shadow(0 0 6px #06B6D4) !important; }
-.fasting-tabs .tabs-trigger[value="history"][aria-selected="true"] .tab-icon{ color:#8B5CF6 !important; filter:drop-shadow(0 0 6px #8B5CF6) !important; }
-
-/* Activity tabs contextual colors */
-.activity-tabs .tabs-trigger[value="daily"][aria-selected="true"] .tab-icon{ color:#3B82F6 !important; filter:drop-shadow(0 0 6px #3B82F6) !important; }
-.activity-tabs .tabs-trigger[value="insights"][aria-selected="true"] .tab-icon{ color:#06B6D4 !important; filter:drop-shadow(0 0 6px #06B6D4) !important; }
-.activity-tabs .tabs-trigger[value="progression"][aria-selected="true"] .tab-icon{ color:#8B5CF6 !important; filter:drop-shadow(0 0 6px #8B5CF6) !important; }
-.activity-tabs .tabs-trigger[value="history"][aria-selected="true"] .tab-icon{ color:#8B5CF6 !important; filter:drop-shadow(0 0 6px #8B5CF6) !important; }
 
 /* Touch feedback - Liquid Glass Premium */
 @media (hover:none), (pointer:coarse){

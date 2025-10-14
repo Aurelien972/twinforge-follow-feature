@@ -93,7 +93,7 @@ const ActivityPage: React.FC = () => {
         iconColor={headerContent.color}
       />
 
-      <Tabs defaultValue="daily" className="w-full" onValueChange={handleTabChange}>
+      <Tabs defaultValue="daily" className="w-full" onValueChange={handleTabChange} forgeContext="activity">
         <Tabs.List>
           <Tabs.Trigger value="daily">Aujourd'hui</Tabs.Trigger>
           <Tabs.Trigger value="insights">Insights</Tabs.Trigger>
