@@ -135,6 +135,7 @@ const FastingInsightsTab: React.FC<FastingInsightsTabProps> = ({ onLoadingChange
             missingData={missingData}
             analysisType="insights IA"
             onDismiss={() => setShowDataAlert(false)}
+            color="#10B981"
           />
         )}
       </AnimatePresence>
@@ -180,7 +181,7 @@ const FastingInsightsTab: React.FC<FastingInsightsTabProps> = ({ onLoadingChange
           {insightsData.insights.length > 0 && (
             <div className="space-y-4">
               <h3 className="text-white font-semibold text-lg flex items-center gap-2">
-                <SpatialIcon Icon={ICONS.Lightbulb} size={18} className="text-purple-400" />
+                <SpatialIcon Icon={ICONS.Lightbulb} size={18} style={{ color: '#10B981' }} />
                 Insights Détaillés ({insightsData.insights.length})
               </h3>
               
@@ -199,9 +200,12 @@ const FastingInsightsTab: React.FC<FastingInsightsTabProps> = ({ onLoadingChange
           {/* Data Quality Indicator */}
           <div className="text-center">
             <div className="flex items-center justify-center gap-4 flex-wrap">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-400/20">
-                <SpatialIcon Icon={ICONS.Shield} size={12} className="text-purple-400" />
-                <span className="text-purple-300 text-sm font-medium">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full" style={{
+                background: 'color-mix(in srgb, #10B981 10%, transparent)',
+                border: '1px solid color-mix(in srgb, #10B981 20%, transparent)'
+              }}>
+                <SpatialIcon Icon={ICONS.Shield} size={12} style={{ color: '#10B981' }} />
+                <span className="text-sm font-medium" style={{ color: '#10B981' }}>
                   Qualité : {
                     insightsData.dataQuality === 'excellent' ? 'Excellente' :
                     insightsData.dataQuality === 'good' ? 'Bonne' :
@@ -211,9 +215,12 @@ const FastingInsightsTab: React.FC<FastingInsightsTabProps> = ({ onLoadingChange
               </div>
               
               {insightsData.aiModel && (
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-400/20">
-                  <SpatialIcon Icon={ICONS.Zap} size={12} className="text-cyan-400" />
-                  <span className="text-cyan-300 text-sm font-medium">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full" style={{
+                  background: 'color-mix(in srgb, #10B981 10%, transparent)',
+                  border: '1px solid color-mix(in srgb, #10B981 20%, transparent)'
+                }}>
+                  <SpatialIcon Icon={ICONS.Zap} size={12} style={{ color: '#10B981' }} />
+                  <span className="text-sm font-medium" style={{ color: '#10B981' }}>
                     {insightsData.aiModel} • {insightsData.tokensUsed} tokens
                     {insightsData.cached && ' • Mis en cache'}
                   </span>
@@ -228,20 +235,20 @@ const FastingInsightsTab: React.FC<FastingInsightsTabProps> = ({ onLoadingChange
       {insightsData && insightsData.insights.length === 0 && !isLoading && (
         <GlassCard className="p-8 text-center" style={{
           background: `
-            radial-gradient(circle at 30% 20%, color-mix(in srgb, #06B6D4 8%, transparent) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, color-mix(in srgb, #10B981 8%, transparent) 0%, transparent 60%),
             var(--glass-opacity)
           `,
-          borderColor: 'color-mix(in srgb, #06B6D4 20%, transparent)'
+          borderColor: 'color-mix(in srgb, #10B981 20%, transparent)'
         }}>
           <div className="space-y-4">
-            <div 
+            <div
               className="w-16 h-16 mx-auto rounded-full flex items-center justify-center"
               style={{
-                background: 'color-mix(in srgb, #06B6D4 15%, transparent)',
-                border: '2px solid color-mix(in srgb, #06B6D4 25%, transparent)'
+                background: 'color-mix(in srgb, #10B981 15%, transparent)',
+                border: '2px solid color-mix(in srgb, #10B981 25%, transparent)'
               }}
             >
-              <SpatialIcon Icon={ICONS.Timer} size={32} style={{ color: '#06B6D4' }} />
+              <SpatialIcon Icon={ICONS.Timer} size={32} style={{ color: '#10B981' }} />
             </div>
 
             <div>

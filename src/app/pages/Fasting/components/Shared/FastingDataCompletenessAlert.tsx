@@ -11,6 +11,7 @@ interface FastingDataCompletenessAlertProps {
   analysisType?: string;
   onDismiss?: () => void;
   className?: string;
+  color?: string; // Couleur principale: '#F59E0B' (orange) ou '#10B981' (vert)
 }
 
 /**
@@ -21,7 +22,8 @@ const FastingDataCompletenessAlert: React.FC<FastingDataCompletenessAlertProps> 
   missingData,
   analysisType = "analyse IA",
   onDismiss,
-  className = ''
+  className = '',
+  color = '#F59E0B' // Orange par défaut
 }) => {
   const navigate = useNavigate();
   const { click } = useFeedback();
@@ -50,47 +52,47 @@ const FastingDataCompletenessAlert: React.FC<FastingDataCompletenessAlertProps> 
         className="p-5"
         style={{
           background: `
-            radial-gradient(circle at 30% 20%, color-mix(in srgb, #F59E0B 12%, transparent) 0%, transparent 60%),
-            radial-gradient(circle at 70% 80%, color-mix(in srgb, #EF4444 8%, transparent) 0%, transparent 50%),
+            radial-gradient(circle at 30% 20%, color-mix(in srgb, ${color} 12%, transparent) 0%, transparent 60%),
+            radial-gradient(circle at 70% 80%, color-mix(in srgb, ${color} 8%, transparent) 0%, transparent 50%),
             var(--glass-opacity)
           `,
-          borderColor: 'color-mix(in srgb, #F59E0B 30%, transparent)',
+          borderColor: `color-mix(in srgb, ${color} 30%, transparent)`,
           boxShadow: `
             0 12px 40px rgba(0, 0, 0, 0.25),
-            0 0 30px color-mix(in srgb, #F59E0B 20%, transparent),
+            0 0 30px color-mix(in srgb, ${color} 20%, transparent),
             inset 0 2px 0 rgba(255, 255, 255, 0.15)
           `,
           backdropFilter: 'blur(20px) saturate(160%)'
         }}
       >
         <div className="flex items-start gap-4">
-          <div 
+          <div
             className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
             style={{
               background: `
                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                linear-gradient(135deg, color-mix(in srgb, #F59E0B 35%, transparent), color-mix(in srgb, #F59E0B 25%, transparent))
+                linear-gradient(135deg, color-mix(in srgb, ${color} 35%, transparent), color-mix(in srgb, ${color} 25%, transparent))
               `,
-              border: '2px solid color-mix(in srgb, #F59E0B 50%, transparent)',
-              boxShadow: '0 0 20px color-mix(in srgb, #F59E0B 30%, transparent)'
+              border: `2px solid color-mix(in srgb, ${color} 50%, transparent)`,
+              boxShadow: `0 0 20px color-mix(in srgb, ${color} 30%, transparent)`
             }}
           >
-            <SpatialIcon Icon={ICONS.AlertTriangle} size={20} style={{ color: '#F59E0B' }} />
+            <SpatialIcon Icon={ICONS.AlertTriangle} size={20} style={{ color }} />
           </div>
           
           <div className="flex-1">
-            <h4 className="text-orange-300 font-bold text-lg mb-2">
+            <h4 className="font-bold text-lg mb-2" style={{ color }}>
               Optimisez votre {analysisType}
             </h4>
-            <p className="text-orange-200 text-sm mb-4 leading-relaxed">
+            <p className="text-white text-sm mb-4 leading-relaxed">
               Pour une {analysisType} plus précise et personnalisée de la Forge Spatiale, complétez les informations manquantes :
             </p>
             
             <div className="space-y-2 mb-4">
               {missingData.map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
-                  <span className="text-orange-200 text-sm">{item}</span>
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
+                  <span className="text-white text-sm">{item}</span>
                 </div>
               ))}
             </div>

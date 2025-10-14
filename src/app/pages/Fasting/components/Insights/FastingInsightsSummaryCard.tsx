@@ -91,16 +91,16 @@ const FastingInsightsSummaryCard: React.FC<FastingInsightsSummaryCardProps> = ({
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
-                    linear-gradient(135deg, color-mix(in srgb, ${theme.color} 40%, transparent), color-mix(in srgb, ${theme.color} 30%, transparent))
+                    linear-gradient(135deg, color-mix(in srgb, #10B981 40%, transparent), color-mix(in srgb, #10B981 30%, transparent))
                   `,
-                  border: `2px solid color-mix(in srgb, ${theme.color} 60%, transparent)`,
-                  boxShadow: `0 0 25px color-mix(in srgb, ${theme.color} 50%, transparent)`
+                  border: `2px solid color-mix(in srgb, #10B981 60%, transparent)`,
+                  boxShadow: `0 0 25px color-mix(in srgb, #10B981 50%, transparent)`
                 }}
               >
                 <SpatialIcon
-                  Icon={ICONS[theme.icon]}
+                  Icon={ICONS.Sparkles}
                   size={20}
-                  style={{ color: theme.color }}
+                  style={{ color: '#10B981' }}
                   variant="pure"
                 />
               </div>
@@ -140,7 +140,7 @@ const FastingInsightsSummaryCard: React.FC<FastingInsightsSummaryCardProps> = ({
           {/* Découvertes Clés */}
           <div>
             <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
-              <SpatialIcon Icon={ICONS.Search} size={16} style={{ color: theme.color }} />
+              <SpatialIcon Icon={ICONS.Search} size={16} style={{ color: '#10B981' }} />
               Découvertes Clés
             </h4>
             <div className="space-y-2">
@@ -186,17 +186,17 @@ const FastingInsightsSummaryCard: React.FC<FastingInsightsSummaryCardProps> = ({
             transition={{ duration: 0.6, delay: 0.5 }}
           >
             <div className="flex items-start gap-3">
-              <div 
+              <div
                 className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                 style={{
-                  background: `color-mix(in srgb, ${theme.color} 20%, transparent)`,
-                  border: `1px solid color-mix(in srgb, ${theme.color} 30%, transparent)`
+                  background: `color-mix(in srgb, #10B981 20%, transparent)`,
+                  border: `1px solid color-mix(in srgb, #10B981 30%, transparent)`
                 }}
               >
-                <SpatialIcon Icon={ICONS.Lightbulb} size={14} style={{ color: theme.color }} />
+                <SpatialIcon Icon={ICONS.Lightbulb} size={14} style={{ color: '#10B981' }} />
               </div>
               <div>
-                <h5 className="font-semibold mb-2" style={{ color: theme.color }}>
+                <h5 className="font-semibold mb-2" style={{ color: '#10B981' }}>
                   Recommandation Principale
                 </h5>
                 <p className="text-white/90 text-sm leading-relaxed">
