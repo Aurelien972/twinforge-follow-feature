@@ -11,6 +11,7 @@ import {
 } from '@/lib/nutrition/fastingPhases';
 import { formatElapsedTime } from '@/app/pages/Fasting/utils/fastingUtils';
 import { useFastingElapsedSeconds, useFastingProgressPercentage } from '../../hooks/useFastingPipeline';
+import { useFastingTimer, formatTimeHM } from '@/hooks/useFastingTimer';
 
 interface FastingSession {
   id?: string;
@@ -37,10 +38,13 @@ const FastingCurrentSessionCard: React.FC<FastingCurrentSessionCardProps> = ({
   session,
   userWeight = 70
 }) => {
+  // Enable real-time timer updates
+  useFastingTimer();
+
   // Use dynamic selectors for real-time updates
   const elapsedSeconds = useFastingElapsedSeconds();
   const progressPercentage = useFastingProgressPercentage();
-  
+
   const elapsedHours = elapsedSeconds / 3600;
   const currentPhase = getCurrentFastingPhase(elapsedHours);
   const phaseProgress = getPhaseProgress(elapsedHours, currentPhase);
@@ -80,21 +84,21 @@ const FastingCurrentSessionCard: React.FC<FastingCurrentSessionCardProps> = ({
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
-                    linear-gradient(135deg, color-mix(in srgb, ${currentPhase.color} 40%, transparent), color-mix(in srgb, ${currentPhase.color} 30%, transparent))
+                    linear-gradient(135deg, color-mix(in srgb, #F59E0B 40%, transparent), color-mix(in srgb, #F59E0B 30%, transparent))
                   `,
-                  border: `2px solid color-mix(in srgb, ${currentPhase.color} 60%, transparent)`,
-                  boxShadow: `0 0 25px color-mix(in srgb, ${currentPhase.color} 50%, transparent)`
+                  border: `2px solid color-mix(in srgb, #F59E0B 60%, transparent)`,
+                  boxShadow: `0 0 25px color-mix(in srgb, #F59E0B 50%, transparent)`
                 }}
               >
                 <SpatialIcon
-                  Icon={ICONS[currentPhase.icon]}
+                  Icon={ICONS.Timer}
                   size={20}
-                  style={{ color: currentPhase.color }}
+                  style={{ color: '#F59E0B' }}
                   variant="pure"
                 />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Session Active</h3>
+                <h3 className="text-xl font-bold" style={{ color: '#F59E0B' }}>Session Active</h3>
                 <p className="text-white/80 text-sm mt-0.5">
                   Phase {currentPhase.name} • {session.protocol}
                 </p>
@@ -119,7 +123,7 @@ const FastingCurrentSessionCard: React.FC<FastingCurrentSessionCardProps> = ({
           <div className="text-center space-y-4">
             <div>
               <div className="text-5xl font-black text-white mb-2">
-                {formatElapsedTime(elapsedSeconds)}
+                {formatTimeHM(elapsedSeconds)}
               </div>
               <p className="text-white/70 text-lg">
                 Objectif : {session.targetHours}h • {progressPercentage.toFixed(1)}% accompli

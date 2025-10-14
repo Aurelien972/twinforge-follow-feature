@@ -5,6 +5,7 @@ import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import { useExitModalStore } from '@/system/store/exitModalStore';
+import { useFastingTimer, formatTimeHM } from '@/hooks/useFastingTimer';
 
 interface FastingSession {
   id?: string;
@@ -39,6 +40,9 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
   onStopFasting,
   formatElapsedTime
 }) => {
+  // Enable real-time timer updates
+  useFastingTimer();
+
   const { showModal: showExitModal } = useExitModalStore();
 
   const handleStopFasting = () => {
@@ -106,10 +110,10 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
               Icon={ICONS.Timer}
               size={64}
               style={{
-                color: '#EF4444',
+                color: '#F59E0B',
                 filter: `
-                  drop-shadow(0 0 16px color-mix(in srgb, #EF4444 90%, transparent))
-                  drop-shadow(0 0 32px color-mix(in srgb, #EF4444 70%, transparent))
+                  drop-shadow(0 0 16px color-mix(in srgb, #F59E0B 90%, transparent))
+                  drop-shadow(0 0 32px color-mix(in srgb, #F59E0B 70%, transparent))
                   drop-shadow(0 0 48px color-mix(in srgb, #F59E0B 50%, transparent))
                 `
               }}
@@ -137,12 +141,12 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
 
         {/* Temps Écoulé */}
         <div className="space-y-3">
-          <h2 className="text-3xl font-bold text-white">Session Active</h2>
-          <div className="text-6xl font-black text-red-400">
-            {formatElapsedTime(elapsedSeconds)}
+          <h2 className="text-3xl font-bold" style={{ color: '#F59E0B' }}>Session Active</h2>
+          <div className="text-6xl font-black" style={{ color: '#F59E0B' }}>
+            {formatTimeHM(elapsedSeconds)}
           </div>
           <p className="text-white/80 text-lg">
-            Objectif : {session?.targetHours}h • Progression : {progressPercentage?.toFixed(2) || '0.00'}%
+            Objectif : {session?.targetHours}h • {progressPercentage?.toFixed(1) || '0.0'}% accompli
           </p>
           
           {/* Barre de Progression */}

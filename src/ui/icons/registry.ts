@@ -212,6 +212,16 @@ export const ICONS = {
   Layers: L.Layers,
   Disc: L.Disc,
   Type: L.Type,
+  Hourglass: L.Hourglass,
+  BadgeCheck: L.BadgeCheck,
+  Beef: L.Beef,
+  Fish: L.Fish,
+  Wheat: L.Wheat,
+  Salad: L.Salad,
+  BatteryCharging: L.BatteryCharging,
+  Dna: L.Dna,
+  Atom: L.Atom,
+  Bolt: L.Bolt,
 } as const;
 
 export type IconName = keyof typeof ICONS;

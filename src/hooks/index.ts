@@ -24,3 +24,4 @@ export {
 } from './useUnifiedActivityStats';
 export { useChartDimensions } from './useChartDimensions';
 export { useLatestBodyScanMorphs } from './useLatestBodyScanMorphs';
+export { useFastingTimer, formatTimeHMS, formatTimeHM } from './useFastingTimer';

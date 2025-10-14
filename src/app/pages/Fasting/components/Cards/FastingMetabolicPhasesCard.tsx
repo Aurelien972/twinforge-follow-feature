@@ -3,15 +3,16 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
-import { 
-  getCurrentFastingPhase, 
-  getPhaseProgress, 
+import {
+  getCurrentFastingPhase,
+  getPhaseProgress,
   getNextFastingPhase,
   estimateCaloriesBurnedInPhase,
   getMotivationalMessage,
   FASTING_PHASES,
-  type FastingPhase 
+  type FastingPhase
 } from '@/lib/nutrition/fastingPhases';
+import { useFastingTimer } from '@/hooks/useFastingTimer';
 
 interface FastingMetabolicPhasesCardProps {
   elapsedSeconds: number;
@@ -28,6 +29,9 @@ const FastingMetabolicPhasesCard: React.FC<FastingMetabolicPhasesCardProps> = ({
   targetHours,
   userWeight = 70
 }) => {
+  // Enable real-time timer updates
+  useFastingTimer();
+
   const elapsedHours = elapsedSeconds / 3600;
   const currentPhase = getCurrentFastingPhase(elapsedHours);
   const phaseProgress = getPhaseProgress(elapsedHours, currentPhase);
@@ -38,10 +42,9 @@ const FastingMetabolicPhasesCard: React.FC<FastingMetabolicPhasesCardProps> = ({
   // Calculer le temps restant jusqu'à la prochaine phase
   const getTimeToNextPhase = (): string => {
     if (!nextPhase) return '';
-    const [, maxHours] = currentPhase.durationRange;
-    const hoursToNext = maxHours - elapsedHours;
+    const hoursToNext = currentPhase.endHours - elapsedHours;
     if (hoursToNext <= 0) return '';
-    
+
     const hours = Math.floor(hoursToNext);
     const minutes = Math.floor((hoursToNext - hours) * 60);
     return `${hours}h ${minutes}m`;
@@ -90,7 +93,12 @@ const FastingMetabolicPhasesCard: React.FC<FastingMetabolicPhasesCardProps> = ({
               />
             </div>
             <div>
-              <h3 className="text-white font-bold text-xl">{currentPhase.name}</h3>
+              <h3
+                className="font-bold text-xl"
+                style={{ color: currentPhase.id === 'anabolic' ? '#F59E0B' : currentPhase.color }}
+              >
+                {currentPhase.name}
+              </h3>
               <p className="text-white/70 text-sm">{currentPhase.metabolicState}</p>
             </div>
           </div>
@@ -152,22 +160,18 @@ const FastingMetabolicPhasesCard: React.FC<FastingMetabolicPhasesCardProps> = ({
             <div className="text-white/50 text-xs mt-1">Brûlées</div>
           </div>
 
-          {/* Taux de Combustion */}
+          {/* Progression de la Phase */}
           <div className="text-center p-4 rounded-xl" style={{
             background: `color-mix(in srgb, ${currentPhase.color} 10%, transparent)`,
             border: `1px solid color-mix(in srgb, ${currentPhase.color} 20%, transparent)`
           }}>
-            <div className="text-lg font-bold text-white mb-1">
-              {currentPhase.caloriesBurnRate === 'low' ? '🔥' :
-               currentPhase.caloriesBurnRate === 'medium' ? '🔥🔥' :
-               currentPhase.caloriesBurnRate === 'high' ? '🔥🔥🔥' : '🔥🔥🔥🔥'}
+            <div className="text-2xl font-bold text-white mb-1">
+              {Math.round(phaseProgress)}%
             </div>
             <div className="text-sm font-medium" style={{ color: currentPhase.color }}>
-              {currentPhase.caloriesBurnRate === 'low' ? 'Faible' :
-               currentPhase.caloriesBurnRate === 'medium' ? 'Modéré' :
-               currentPhase.caloriesBurnRate === 'high' ? 'Élevé' : 'Maximal'}
+              Phase
             </div>
-            <div className="text-white/50 text-xs mt-1">Taux</div>
+            <div className="text-white/50 text-xs mt-1">Progression</div>
           </div>
 
           {/* Prochaine Phase */}

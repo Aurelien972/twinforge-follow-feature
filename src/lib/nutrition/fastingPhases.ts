@@ -11,6 +11,8 @@ export interface FastingPhase {
   description: string;
   benefits: string[];
   color: string;
+  icon: string;
+  metabolicState: string;
 }
 
 /**
@@ -28,7 +30,9 @@ export const FASTING_PHASES: FastingPhase[] = [
       'Stockage des nutriments',
       'Anabolisme musculaire'
     ],
-    color: '#10B981'
+    color: '#10B981',
+    icon: 'Sprout',
+    metabolicState: 'Anabolisme'
   },
   {
     id: 'postabsorptive',
@@ -41,7 +45,9 @@ export const FASTING_PHASES: FastingPhase[] = [
       'Début du catabolisme',
       'Utilisation des réserves de glycogène'
     ],
-    color: '#F59E0B'
+    color: '#F59E0B',
+    icon: 'BatteryCharging',
+    metabolicState: 'Transition'
   },
   {
     id: 'gluconeogenesis',
@@ -54,7 +60,9 @@ export const FASTING_PHASES: FastingPhase[] = [
       'Épargne musculaire progressive',
       'Début de la cétose'
     ],
-    color: '#EF4444'
+    color: '#EF4444',
+    icon: 'Flame',
+    metabolicState: 'Gluconéogenèse'
   },
   {
     id: 'ketosis',
@@ -68,7 +76,9 @@ export const FASTING_PHASES: FastingPhase[] = [
       'Clarté mentale',
       'Énergie stable'
     ],
-    color: '#8B5CF6'
+    color: '#8B5CF6',
+    icon: 'Zap',
+    metabolicState: 'Cétose'
   },
   {
     id: 'deep_ketosis',
@@ -82,7 +92,9 @@ export const FASTING_PHASES: FastingPhase[] = [
       'Maximisation de la perte de graisse',
       'Boost de l\'hormone de croissance'
     ],
-    color: '#EC4899'
+    color: '#EC4899',
+    icon: 'Sparkles',
+    metabolicState: 'Cétose Profonde'
   },
   {
     id: 'extended',
@@ -96,7 +108,9 @@ export const FASTING_PHASES: FastingPhase[] = [
       'Régénération du système immunitaire',
       'Neurogenèse'
     ],
-    color: '#06B6D4'
+    color: '#06B6D4',
+    icon: 'Dna',
+    metabolicState: 'Jeûne Étendu'
   }
 ];
 
@@ -117,8 +131,8 @@ export function getCurrentFastingPhase(elapsedHours: number): FastingPhase {
 /**
  * Get progress percentage within current phase
  */
-export function getPhaseProgress(elapsedHours: number): number {
-  const currentPhase = getCurrentFastingPhase(elapsedHours);
+export function getPhaseProgress(elapsedHours: number, phase?: FastingPhase): number {
+  const currentPhase = phase || getCurrentFastingPhase(elapsedHours);
 
   if (currentPhase.endHours === Infinity) {
     return 100;
@@ -133,10 +147,8 @@ export function getPhaseProgress(elapsedHours: number): number {
 /**
  * Get the next fasting phase
  */
-export function getNextFastingPhase(elapsedHours: number): FastingPhase | null {
-  const currentPhaseIndex = FASTING_PHASES.findIndex(phase =>
-    elapsedHours >= phase.startHours && elapsedHours < phase.endHours
-  );
+export function getNextFastingPhase(phase: FastingPhase): FastingPhase | null {
+  const currentPhaseIndex = FASTING_PHASES.findIndex(p => p.id === phase.id);
 
   if (currentPhaseIndex === -1 || currentPhaseIndex === FASTING_PHASES.length - 1) {
     return null;
@@ -150,6 +162,7 @@ export function getNextFastingPhase(elapsedHours: number): FastingPhase | null {
  */
 export function estimateCaloriesBurnedInPhase(
   phase: FastingPhase,
+  elapsedHours: number,
   weightKg: number = 70
 ): number {
   const baseMetabolicRate = 1.2; // kcal per kg per hour (resting)
@@ -175,9 +188,7 @@ export function estimateCaloriesBurnedInPhase(
 /**
  * Get motivational message based on current phase
  */
-export function getMotivationalMessage(elapsedHours: number): string {
-  const phase = getCurrentFastingPhase(elapsedHours);
-
+export function getMotivationalMessage(phase: FastingPhase, elapsedHours: number): string {
   const messages: Record<string, string> = {
     anabolic: 'La digestion est en cours. Votre corps assimile les nutriments.',
     postabsorptive: 'Transition métabolique en cours. Votre corps commence à puiser dans ses réserves.',
