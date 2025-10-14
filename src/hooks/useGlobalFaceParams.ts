@@ -68,7 +68,15 @@ export function useGlobalFaceParams() {
     logger.info('USE_GLOBAL_FACE_PARAMS', 'Face params updated locally', {
       userId: profile.userId,
       paramsCount: Object.keys(normalizedParams).length,
+      sampleKeys: Object.keys(normalizedParams).slice(0, 5),
+      sampleValues: Object.keys(normalizedParams).slice(0, 5).map(k => ({ [k]: normalizedParams[k] })),
       philosophy: 'local_update'
+    });
+
+    // Force trigger for debugging
+    console.log('🔄 useGlobalFaceParams: Updated face params', {
+      totalKeys: Object.keys(normalizedParams).length,
+      sampleKeys: Object.keys(normalizedParams).slice(0, 5)
     });
   }, [profile, setProfile]);
 

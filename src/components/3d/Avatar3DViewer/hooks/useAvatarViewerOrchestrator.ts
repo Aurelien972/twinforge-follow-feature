@@ -819,44 +819,66 @@ export function useAvatarViewerOrchestrator(
   // CRITICAL: Watch for faceMorphData changes and update morphs in real-time (for face adjustments)
   const lastFaceMorphHashRef = useRef<string>('');
   const faceMorphUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const faceMorphRevisionRef = useRef<number>(0);
 
   useLayoutEffect(() => {
     // Skip if not fully initialized
     if (!isFullyInitializedRef.current) {
-      return;
-    }
-
-    // Skip if already applying update
-    if (isApplyingMorphUpdateRef.current) {
+      logger.debug('ORCHESTRATOR', 'Skipping face morph update - not initialized', {
+        philosophy: 'not_initialized_skip'
+      });
       return;
     }
 
     // Skip if model is not loaded yet
-    if (!modelLifecycle.model || !modelLifecycle.modelRef.current || !viewerState.isViewerReady) {
+    if (!modelLifecycle.model || !modelLifecycle.modelRef.current) {
+      logger.debug('ORCHESTRATOR', 'Skipping face morph update - model not loaded', {
+        hasModel: !!modelLifecycle.model,
+        hasModelRef: !!modelLifecycle.modelRef.current,
+        philosophy: 'model_not_loaded_skip'
+      });
       return;
     }
 
     // Skip if no face morph data provided
     if (!props.faceMorphData || Object.keys(props.faceMorphData).length === 0) {
+      logger.debug('ORCHESTRATOR', 'Skipping face morph update - no face morph data', {
+        hasFaceMorphData: !!props.faceMorphData,
+        keyCount: props.faceMorphData ? Object.keys(props.faceMorphData).length : 0,
+        philosophy: 'no_face_data_skip'
+      });
       return;
     }
 
-    // Skip if morphology mapping not available
+    // Skip if morphology mapping not available (but queue for retry)
     if (!morphologyMapping) {
+      logger.warn('ORCHESTRATOR', 'Morphology mapping not available yet, will retry when available', {
+        philosophy: 'morphology_mapping_pending'
+      });
       return;
     }
 
-    // Create hash for face morph data
-    const faceMorphHash = JSON.stringify(props.faceMorphData);
+    // Create hash for face morph data - use sorted keys for consistent hashing
+    const sortedKeys = Object.keys(props.faceMorphData).sort();
+    const faceMorphHash = JSON.stringify(sortedKeys.map(k => [k, props.faceMorphData![k]]));
 
     // Check if face morphs changed
     if (faceMorphHash === lastFaceMorphHashRef.current) {
+      logger.debug('ORCHESTRATOR', 'Face morphs unchanged, skipping update', {
+        revision: faceMorphRevisionRef.current,
+        philosophy: 'no_change_skip'
+      });
       return; // No change
     }
 
+    // Increment revision counter
+    faceMorphRevisionRef.current++;
+
     logger.info('ORCHESTRATOR', '👤 Face morph data changed, updating viewer', {
       faceMorphKeyCount: Object.keys(props.faceMorphData).length,
+      revision: faceMorphRevisionRef.current,
       faceOnly: props.faceOnly,
+      sampleKeys: sortedKeys.slice(0, 5),
       philosophy: 'face_morph_change_detected'
     });
 
@@ -865,8 +887,25 @@ export function useAvatarViewerOrchestrator(
       clearTimeout(faceMorphUpdateTimeoutRef.current);
     }
 
-    // Debounce the update (100ms for responsive UI)
+    // Debounce the update (50ms for more responsive UI)
     faceMorphUpdateTimeoutRef.current = setTimeout(async () => {
+      // CRITICAL: Don't block if already applying - queue instead
+      const currentRevision = faceMorphRevisionRef.current;
+
+      // Wait for any in-progress update to complete (with timeout)
+      let waitAttempts = 0;
+      while (isApplyingMorphUpdateRef.current && waitAttempts < 20) {
+        await new Promise(resolve => setTimeout(resolve, 10));
+        waitAttempts++;
+      }
+
+      if (isApplyingMorphUpdateRef.current) {
+        logger.warn('ORCHESTRATOR', 'Previous morph update still in progress, forcing update anyway', {
+          revision: currentRevision,
+          philosophy: 'force_update_despite_lock'
+        });
+      }
+
       isApplyingMorphUpdateRef.current = true;
 
       try {
@@ -874,6 +913,13 @@ export function useAvatarViewerOrchestrator(
 
         // Get current body morphs if available
         const bodyMorphData = props.morphData || {};
+
+        logger.info('ORCHESTRATOR', 'Applying face morphs to model', {
+          revision: currentRevision,
+          faceMorphKeys: Object.keys(props.faceMorphData).length,
+          bodyMorphKeys: Object.keys(bodyMorphData).length,
+          philosophy: 'face_morph_application_start'
+        });
 
         // Apply morphs with both body and face data
         await morphLifecycle.applyMorphs(
@@ -884,19 +930,21 @@ export function useAvatarViewerOrchestrator(
         );
 
         logger.info('ORCHESTRATOR', '✅ Face morphs updated successfully', {
+          revision: currentRevision,
           philosophy: 'face_morph_update_complete'
         });
       } catch (error) {
         logger.error('ORCHESTRATOR', 'Error updating face morphs', {
           error: error instanceof Error ? error.message : 'Unknown error',
+          revision: currentRevision,
           philosophy: 'face_morph_update_error'
         });
       } finally {
         isApplyingMorphUpdateRef.current = false;
       }
-    }, 100);
+    }, 50);
 
-  }, [props.faceMorphData, modelLifecycle.model, viewerState.isViewerReady, morphologyMapping, props.faceOnly, props.morphData, morphLifecycle]);
+  }, [props.faceMorphData, modelLifecycle.model, morphologyMapping, props.faceOnly, props.morphData, morphLifecycle]);
 
   // CRITICAL: Watch for override morph data changes and update morphs in real-time with throttling
   // This effect is COMPLETELY ISOLATED from initialization - it only updates morphs, never reinitializes

@@ -82,6 +82,7 @@ export async function applyMorphTargetsToMesh(
 
   // Track skipped face morphs for detailed logging
   const skippedFaceMorphs: Array<{key: string; reason: string}> = [];
+  const appliedFaceMorphs: Array<{key: string; value: number; blenderKey: string}> = [];
 
   // PHASE A.6: Apply each morph parameter with strict DB validation
   Object.entries(combinedMorphData).forEach(([morphKey, value]) => { // MODIFIED: Itérer sur les morphs combinés
@@ -145,6 +146,11 @@ export async function applyMorphTargetsToMesh(
 
       morphTargetInfluences[targetIndex] = finalValue;
       appliedCount++;
+
+      // Track applied face morphs
+      if (isFaceMorph) {
+        appliedFaceMorphs.push({ key: morphKey, value: finalValue, blenderKey });
+      }
     } else {
       skippedCount++;
       if (isFaceMorph) skippedFaceMorphs.push({key: morphKey, reason: 'blender_key_not_found_in_mesh'});
@@ -217,8 +223,18 @@ export async function applyMorphTargetsToMesh(
     faceKeysApplied: faceKeysApplied,
     faceKeysTotal: faceMorphData ? Object.keys(faceMorphData).length : 0,
     faceApplicationRate: faceMorphData ? `${((faceKeysApplied / Object.keys(faceMorphData).length) * 100).toFixed(1)}%` : 'N/A',
+    appliedFaceMorphsSample: appliedFaceMorphs.slice(0, 10),
+    totalAppliedFaceMorphs: appliedFaceMorphs.length,
     philosophy: 'morph_application_complete_with_face_tracking'
   });
+
+  // Log applied face morphs for debugging
+  if (appliedFaceMorphs.length > 0) {
+    console.log('✅ MORPH_TARGET_APPLIER: Applied face morphs', {
+      count: appliedFaceMorphs.length,
+      morphs: appliedFaceMorphs.slice(0, 10)
+    });
+  }
 }
 
 /**

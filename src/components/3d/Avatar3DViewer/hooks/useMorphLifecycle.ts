@@ -73,17 +73,27 @@ export function useMorphLifecycle({
     }
 
     // Generate hash for deduplication
-    const morphHash = JSON.stringify(Object.keys(morphData).sort().map(k => [k, morphData[k]]));
+    const morphHash = JSON.stringify(Object.keys(morphData || {}).sort().map(k => [k, (morphData || {})[k]]));
     const faceMorphHash = JSON.stringify(Object.keys(faceMorphData || {}).sort().map(k => [k, (faceMorphData || {})[k]])); // ADDED
     const combinedHash = `${morphHash}-${faceMorphHash}`; // ADDED
-    
+
     if (lastAppliedHashRef.current === combinedHash) { // MODIFIED
       logger.debug('MORPH_LIFECYCLE', 'Skipping morph application - same data', {
         serverScanId,
+        combinedHash: combinedHash.substring(0, 100),
         philosophy: 'deduplication'
       });
       return;
     }
+
+    logger.info('MORPH_LIFECYCLE', 'Hash changed, proceeding with morph application', {
+      previousHash: lastAppliedHashRef.current.substring(0, 100),
+      newHash: combinedHash.substring(0, 100),
+      morphKeys: Object.keys(morphData || {}).length,
+      faceKeys: Object.keys(faceMorphData || {}).length,
+      serverScanId,
+      philosophy: 'hash_changed_apply_morphs'
+    });
 
     setIsApplying(true);
     setError(null);
