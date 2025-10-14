@@ -13,6 +13,8 @@ import logger from '../../../../lib/utils/logger';
 
 const MAX_MIGRATION_ATTEMPTS = 3;
 const MIGRATION_SKIPPED_KEY = 'health_migration_skipped';
+const MIGRATION_FAILED_KEY = 'health_migration_failed_timestamp';
+const MIGRATION_RETRY_DELAY_MS = 5000; // 5 seconds
 
 export function useHealthDataMigration() {
   const { profile, setProfile } = useUserStore();
@@ -98,6 +100,16 @@ export function useHealthDataMigration() {
           userId: profile.userId,
           attempt: attemptCountRef.current,
         });
+
+        // Si erreur PGRST204 (colonne manquante), suggérer skip immédiat
+        if (updateError.code === 'PGRST204') {
+          logger.warn('HEALTH_MIGRATION', 'Schema cache error detected (PGRST204)', {
+            hint: 'Database schema might be out of sync. User can skip migration.',
+          });
+          setCanSkip(true);
+          throw new Error(`Erreur de synchronisation du schéma (${updateError.code}). Vous pouvez continuer sans migrer.`);
+        }
+
         throw new Error(`Migration update failed: ${updateError.message} (Code: ${updateError.code})`);
       }
 
@@ -149,9 +161,11 @@ export function useHealthDataMigration() {
         willRetry: attemptCountRef.current < MAX_MIGRATION_ATTEMPTS,
       });
 
-      // Enable skip option if max attempts reached
-      if (attemptCountRef.current >= MAX_MIGRATION_ATTEMPTS) {
+      // Enable skip option if max attempts reached OR schema error
+      if (attemptCountRef.current >= MAX_MIGRATION_ATTEMPTS || err.message.includes('PGRST204')) {
         setCanSkip(true);
+        // Store failed timestamp to avoid constant retries
+        localStorage.setItem(MIGRATION_FAILED_KEY, Date.now().toString());
       }
     } finally {
       setMigrating(false);
@@ -162,6 +176,21 @@ export function useHealthDataMigration() {
   useEffect(() => {
     // Only attempt migration once automatically
     if (!migrationComplete && !migrating && !migrationError && attemptCountRef.current === 0) {
+      // Check if migration recently failed (within last 5 minutes)
+      const lastFailedStr = localStorage.getItem(MIGRATION_FAILED_KEY);
+      if (lastFailedStr) {
+        const lastFailed = parseInt(lastFailedStr, 10);
+        const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+        if (lastFailed > fiveMinutesAgo) {
+          logger.info('HEALTH_MIGRATION', 'Skipping auto-migration due to recent failure', {
+            lastFailed: new Date(lastFailed).toISOString(),
+          });
+          setMigrationComplete(true); // Allow access to UI
+          setCanSkip(true);
+          return;
+        }
+      }
+
       checkAndMigrate();
     }
   }, [checkAndMigrate, migrationComplete, migrating, migrationError]);
@@ -180,9 +209,22 @@ export function useHealthDataMigration() {
 
     logger.info('HEALTH_MIGRATION', 'User chose to skip migration', { userId: profile.userId });
     localStorage.setItem(MIGRATION_SKIPPED_KEY, profile.userId);
+    localStorage.removeItem(MIGRATION_FAILED_KEY); // Clear failed timestamp
     setMigrationComplete(true);
     setMigrationError(null);
     setCanSkip(false);
+  }, [profile?.userId]);
+
+  const forceSkip = useCallback(() => {
+    if (!profile?.userId) return;
+
+    logger.warn('HEALTH_MIGRATION', 'User forced skip migration', { userId: profile.userId });
+    localStorage.setItem(MIGRATION_SKIPPED_KEY, profile.userId);
+    localStorage.removeItem(MIGRATION_FAILED_KEY);
+    setMigrationComplete(true);
+    setMigrationError(null);
+    setCanSkip(false);
+    attemptCountRef.current = MAX_MIGRATION_ATTEMPTS; // Prevent further auto-retries
   }, [profile?.userId]);
 
   return {
@@ -191,6 +233,7 @@ export function useHealthDataMigration() {
     migrationError,
     retryMigration,
     skipMigration,
+    forceSkip,
     canSkip,
     attemptsRemaining: Math.max(0, MAX_MIGRATION_ATTEMPTS - attemptCountRef.current),
   };

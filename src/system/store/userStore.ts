@@ -611,6 +611,8 @@ function mapProfileUpdatesToDb(updates: Partial<Profile>, currentProfile: Profil
     'goals', 'constraints', 'preferences', 'emotion_baseline', 'role',
     'emotions', 'nutrition', 'health', 'avatar_onboarding_completed',
     'portrait_url', 'portrait_source',
+    // Health V2 system columns
+    'health_schema_version', 'country_health_cache', 'health_enriched_at',
     // Enhanced nutrition preferences for Recipe Workshop
     'household_details', 'meal_prep_preferences', 'kitchen_equipment',
     'food_preferences', 'sensory_preferences', 'macro_targets', 'shopping_preferences'

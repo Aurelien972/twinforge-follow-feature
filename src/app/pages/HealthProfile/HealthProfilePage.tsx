@@ -16,10 +16,11 @@ import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import { motion } from 'framer-motion';
+import logger from '../../../lib/utils/logger';
 
 const HealthProfilePage: React.FC = () => {
   const { activeTab, globalCompletion, updateTabCompletion } = useHealthProfileNavigation();
-  const { migrating, migrationComplete, migrationError, retryMigration, skipMigration, canSkip, attemptsRemaining } = useHealthDataMigration();
+  const { migrating, migrationComplete, migrationError, retryMigration, skipMigration, forceSkip, canSkip, attemptsRemaining } = useHealthDataMigration();
   const { profile } = useUserStore();
 
   // Get health data and calculate completions
@@ -156,19 +157,36 @@ const HealthProfilePage: React.FC = () => {
                           <span>Continuer sans migrer</span>
                         </div>
                       </button>
-                      <button
-                        onClick={retryMigration}
-                        className="btn-glass px-6 py-2 w-full"
-                        style={{
-                          background: 'rgba(100, 116, 139, 0.1)',
-                          borderColor: 'rgba(100, 116, 139, 0.3)',
-                        }}
-                      >
-                        <div className="flex items-center justify-center gap-2">
-                          <SpatialIcon Icon={ICONS.RefreshCw} size={16} />
-                          <span>Réessayer quand même</span>
-                        </div>
-                      </button>
+                      {attemptsRemaining > 0 && (
+                        <button
+                          onClick={retryMigration}
+                          className="btn-glass px-6 py-2 w-full"
+                          style={{
+                            background: 'rgba(100, 116, 139, 0.1)',
+                            borderColor: 'rgba(100, 116, 139, 0.3)',
+                          }}
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            <SpatialIcon Icon={ICONS.RefreshCw} size={16} />
+                            <span>Réessayer quand même</span>
+                          </div>
+                        </button>
+                      )}
+                      {attemptsRemaining === 0 && (
+                        <button
+                          onClick={forceSkip}
+                          className="btn-glass px-6 py-2 w-full"
+                          style={{
+                            background: 'rgba(71, 85, 105, 0.1)',
+                            borderColor: 'rgba(71, 85, 105, 0.3)',
+                          }}
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            <SpatialIcon Icon={ICONS.XCircle} size={16} />
+                            <span>Ignorer définitivement</span>
+                          </div>
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
@@ -185,12 +203,64 @@ const HealthProfilePage: React.FC = () => {
     );
   }
 
-  if (!migrationComplete) {
+  // Mode dégradé : Permettre l'accès même si la migration n'est pas terminée après 10 secondes
+  const [degradedMode, setDegradedMode] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!migrationComplete && !migrating && !migrationError) {
+      const timer = setTimeout(() => {
+        logger.warn('HEALTH_PROFILE', 'Entering degraded mode after timeout');
+        setDegradedMode(true);
+      }, 10000); // 10 secondes
+
+      return () => clearTimeout(timer);
+    }
+  }, [migrationComplete, migrating, migrationError]);
+
+  if (!migrationComplete && !degradedMode) {
     return null;
   }
 
   return (
     <HealthProfileLayout globalCompletion={globalCompletion}>
+      {/* Bandeau d'avertissement si mode dégradé ou erreur */}
+      {(degradedMode || (migrationError && !canSkip)) && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <GlassCard className="p-4" style={{
+            background: 'rgba(245, 158, 11, 0.1)',
+            borderColor: 'rgba(245, 158, 11, 0.3)',
+          }}>
+            <div className="flex items-start gap-3">
+              <SpatialIcon Icon={ICONS.AlertTriangle} size={20} className="text-orange-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="text-orange-300 font-semibold mb-1">Mode Dégradé</h3>
+                <p className="text-white/70 text-sm">
+                  {degradedMode
+                    ? "La migration automatique n'a pas pu se terminer. Vous pouvez utiliser le profil santé, mais certaines fonctionnalités avancées peuvent être limitées."
+                    : "Une erreur temporaire empêche la migration automatique. Vous pouvez continuer à utiliser le système normalement."}
+                </p>
+              </div>
+              {migrationError && canSkip && (
+                <button
+                  onClick={skipMigration}
+                  className="btn-glass px-4 py-2 text-sm flex-shrink-0"
+                  style={{
+                    background: 'rgba(245, 158, 11, 0.2)',
+                    borderColor: 'rgba(245, 158, 11, 0.4)',
+                  }}
+                >
+                  Ignorer
+                </button>
+              )}
+            </div>
+          </GlassCard>
+        </motion.div>
+      )}
+
       {activeTab === 'overview' && <HealthOverviewTab />}
       {activeTab === 'basic' && <BasicHealthTab />}
       {activeTab === 'medical-history' && <PlaceholderTab title="Historique Médical" icon="FileText" />}
