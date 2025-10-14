@@ -84,13 +84,9 @@ export function playEnhancedSound(
   try {
     const audioContext = getAudioContext();
     
-    // Skip audio if context is not running
+    // Skip audio if context is not running (silently)
     if (!isAudioContextReady()) {
-      console.warn('AUDIO_FEEDBACK_WARNING', 'AudioContext not running, skipping layered audio', {
-        contextState: audioContext.state,
-        layersCount: soundDef.layers.length,
-        timestamp: new Date().toISOString()
-      });
+      // AudioContext is suspended until first user interaction - this is normal
       return;
     }
     
