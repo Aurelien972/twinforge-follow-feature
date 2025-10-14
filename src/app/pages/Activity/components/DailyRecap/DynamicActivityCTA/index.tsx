@@ -144,14 +144,20 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
   const navigate = useNavigate();
   const { click } = useFeedback();
   const reduceMotion = usePreferredMotion() === 'reduced';
-  
+
   const urgencyConfig = getUrgencyConfig(todayStats);
   const message = getCTAMessage(urgencyConfig, todayStats);
   const contextualMetrics = getContextualMetrics(todayStats, urgencyConfig);
+  const hasActivities = (todayStats?.activitiesCount || 0) > 0;
 
   const handleActivityInput = () => {
     click();
     navigate('/activity/input');
+  };
+
+  const handleViewInsights = () => {
+    click();
+    navigate('/activity#insights');
   };
 
   const cardStyles = {
@@ -172,22 +178,6 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
     border: `2px solid color-mix(in srgb, ${urgencyConfig.color} 55%, transparent)`,
     boxShadow: `0 0 30px color-mix(in srgb, ${urgencyConfig.color} 40%, transparent)`,
     '--icon-color': urgencyConfig.color
-  } as React.CSSProperties;
-
-  const buttonColorMap = {
-    '#3B82F6': { light: '#60A5FA', base: '#3B82F6', dark: '#2563EB' },
-    '#06B6D4': { light: '#22D3EE', base: '#06B6D4', dark: '#0891B2' },
-    '#22C55E': { light: '#4ADE80', base: '#22C55E', dark: '#16A34A' }
-  };
-
-  const buttonColors = buttonColorMap[urgencyConfig.color as keyof typeof buttonColorMap] || buttonColorMap['#3B82F6'];
-
-  const buttonStyles = {
-    '--btn-color-light': buttonColors.light,
-    '--btn-color-base': buttonColors.base,
-    '--btn-color-dark': buttonColors.dark,
-    '--btn-shadow': `color-mix(in srgb, ${urgencyConfig.color} 60%, transparent)`,
-    '--btn-glow': `color-mix(in srgb, ${urgencyConfig.color} 80%, transparent)`
   } as React.CSSProperties;
 
   return (
@@ -220,13 +210,15 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                 rotate: i % 2 === 0 ? 45 : -45
               }}
               animate={{
-                rotate: i % 2 === 0 ? [45, 405] : [-45, -405]
+                scale: [1, 1.3, 1],
+                opacity: [0.6, 1, 0.6],
+                rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
               }}
               transition={{
-                duration: 20,
+                duration: 3,
                 repeat: Infinity,
-                ease: 'linear',
-                delay: i * 0.5
+                delay: i * 0.2,
+                ease: [0.4, 0, 0.2, 1]
               }}
             />
           ))}
@@ -318,32 +310,98 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
             </div>
           )}
 
-          <div className="flex justify-center">
-            <button
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            {/* Primary CTA - Enregistrer une activité */}
+            <motion.button
               onClick={handleActivityInput}
-              className={`dynamic-cta-button-3d ${
-                urgencyConfig.priority === 'high' ? 'dynamic-cta-button-3d-high' :
-                urgencyConfig.priority === 'medium' ? 'dynamic-cta-button-3d-medium' :
-                'dynamic-cta-button-3d-low'
-              } ${
-                urgencyConfig.animation === 'pulse' && !reduceMotion ? 'btn-breathing-css' : ''
-              }`}
-              style={buttonStyles}
+              className="px-8 py-4 rounded-full font-bold text-lg text-white relative overflow-hidden min-h-[64px]"
+              style={{
+                background: `
+                  linear-gradient(135deg,
+                    color-mix(in srgb, ${urgencyConfig.color} 85%, transparent),
+                    color-mix(in srgb, ${urgencyConfig.color} 70%, transparent)
+                  )
+                `,
+                border: `2px solid ${urgencyConfig.color}`,
+                boxShadow: `
+                  0 12px 40px color-mix(in srgb, ${urgencyConfig.color} 40%, transparent),
+                  0 0 60px color-mix(in srgb, ${urgencyConfig.color} 30%, transparent),
+                  inset 0 3px 0 rgba(255, 255, 255, 0.4)
+                `,
+                backdropFilter: 'blur(20px) saturate(160%)'
+              }}
+              whileHover={{
+                scale: 1.02,
+                y: -2,
+                boxShadow: `
+                  0 16px 50px color-mix(in srgb, ${urgencyConfig.color} 50%, transparent),
+                  0 0 80px color-mix(in srgb, ${urgencyConfig.color} 40%, transparent),
+                  inset 0 3px 0 rgba(255, 255, 255, 0.5)
+                `
+              }}
+              whileTap={{ scale: 0.98 }}
             >
-              <div>
+              {/* Shimmer Effect */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                  animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
+                  borderRadius: 'inherit'
+                }}
+              />
+
+              <div className="relative z-10 flex items-center justify-center gap-3">
                 <SpatialIcon
                   Icon={ICONS[urgencyConfig.icon]}
                   size={24}
-                  className="text-white"
+                  style={{
+                    color: 'white',
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+                  }}
+                  variant="pure"
                 />
-                <span>{message.buttonText}</span>
+                <span style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                  {message.buttonText}
+                </span>
               </div>
+            </motion.button>
 
-              {urgencyConfig.priority === 'medium' && !reduceMotion && (
-                <div className="dynamic-cta-shimmer" />
-              )}
-            </button>
-          </div>
+            {/* Secondary CTA - View Insights (only if activities exist) */}
+            {hasActivities && (
+              <motion.button
+                onClick={handleViewInsights}
+                className="px-6 py-4 rounded-full font-medium text-white/90 transition-all duration-200 min-h-[64px]"
+                style={{
+                  background: `color-mix(in srgb, ${urgencyConfig.color} 8%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${urgencyConfig.color} 20%, transparent)`,
+                  backdropFilter: 'blur(12px) saturate(130%)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = `color-mix(in srgb, ${urgencyConfig.color} 12%, transparent)`;
+                  e.currentTarget.style.borderColor = `color-mix(in srgb, ${urgencyConfig.color} 30%, transparent)`;
+                  e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = `color-mix(in srgb, ${urgencyConfig.color} 8%, transparent)`;
+                  e.currentTarget.style.borderColor = `color-mix(in srgb, ${urgencyConfig.color} 20%, transparent)`;
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                }}
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <SpatialIcon Icon={ICONS.Zap} size={20} color="white" variant="pure" />
+                  <span>Voir mes Insights</span>
+                </div>
+              </motion.button>
+            )}
+          </motion.div>
         </div>
       </GlassCard>
     </div>

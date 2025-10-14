@@ -141,7 +141,7 @@ const ScanCTA: React.FC = () => {
       timestamp: new Date().toISOString()
     });
 
-    navigate('/avatar#avatar');
+    navigate('/avatar#insights');
   };
 
   if (isLoading) {
