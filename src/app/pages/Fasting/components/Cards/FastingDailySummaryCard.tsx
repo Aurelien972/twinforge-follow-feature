@@ -5,6 +5,7 @@ import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import { useTodayFastingSessions, type TodayFastingStats } from '@/app/pages/Fasting/hooks/useTodayFastingSessions';
+import { getFastingTabColor } from '@/app/pages/Fasting/hooks/useFastingTabColor';
 
 interface FastingDailySummaryCardProps {
   className?: string;
@@ -123,13 +124,13 @@ const FastingDailySummaryCard: React.FC<FastingDailySummaryCardProps> = ({ class
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, color-mix(in srgb, ${theme.color} 35%, transparent), color-mix(in srgb, ${theme.color} 25%, transparent))
+                    linear-gradient(135deg, color-mix(in srgb, #F59E0B 35%, transparent), color-mix(in srgb, #F59E0B 25%, transparent))
                   `,
-                  border: `2px solid color-mix(in srgb, ${theme.color} 50%, transparent)`,
-                  boxShadow: `0 0 20px color-mix(in srgb, ${theme.color} 30%, transparent)`
+                  border: `2px solid color-mix(in srgb, #F59E0B 50%, transparent)`,
+                  boxShadow: `0 0 20px color-mix(in srgb, #F59E0B 30%, transparent)`
                 }}
               >
-                <SpatialIcon Icon={ICONS[theme.icon]} size={20} style={{ color: theme.color }} />
+                <SpatialIcon Icon={ICONS.TrendingUp} size={20} style={{ color: '#F59E0B' }} />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white">Résumé du Jour</h3>
@@ -211,8 +212,8 @@ const FastingDailySummaryCard: React.FC<FastingDailySummaryCardProps> = ({ class
             }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <SpatialIcon Icon={ICONS.Lightbulb} size={14} style={{ color: theme.color }} />
-              <span className="text-sm font-semibold" style={{ color: theme.color }}>
+              <SpatialIcon Icon={ICONS.Lightbulb} size={14} style={{ color: '#F59E0B' }} />
+              <span className="text-sm font-semibold" style={{ color: '#F59E0B' }}>
                 Motivation du Jour
               </span>
             </div>

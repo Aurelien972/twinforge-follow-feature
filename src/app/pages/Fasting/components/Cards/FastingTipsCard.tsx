@@ -49,22 +49,22 @@ const FastingTipsCard: React.FC = () => {
     >
       <div className="space-y-4">
         <div className="flex items-center gap-3 mb-4">
-          <div 
+          <div
             className="w-10 h-10 rounded-full flex items-center justify-center"
             style={{
               background: `
                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-                linear-gradient(135deg, color-mix(in srgb, #10B981 30%, transparent), color-mix(in srgb, #10B981 20%, transparent))
+                linear-gradient(135deg, color-mix(in srgb, #F59E0B 30%, transparent), color-mix(in srgb, #F59E0B 20%, transparent))
               `,
-              border: '2px solid color-mix(in srgb, #10B981 40%, transparent)',
-              boxShadow: '0 0 20px color-mix(in srgb, #10B981 30%, transparent)'
+              border: '2px solid color-mix(in srgb, #F59E0B 40%, transparent)',
+              boxShadow: '0 0 20px color-mix(in srgb, #F59E0B 30%, transparent)'
             }}
           >
-            <SpatialIcon Icon={ICONS.Heart} size={16} style={{ color: '#10B981' }} />
+            <SpatialIcon Icon={ICONS.Heart} size={16} style={{ color: '#F59E0B' }} />
           </div>
           <div>
-            <h4 className="text-green-300 font-semibold text-lg">Conseils de Jeûne</h4>
-            <p className="text-green-200 text-sm">Optimisez votre session</p>
+            <h4 className="font-semibold text-lg" style={{ color: '#F59E0B' }}>Conseils de Jeûne</h4>
+            <p className="text-white text-sm">Optimisez votre session</p>
           </div>
         </div>
 
@@ -99,18 +99,18 @@ const FastingTipsCard: React.FC = () => {
         </div>
 
         {/* Encouragement */}
-        <div 
+        <div
           className="p-4 rounded-xl text-center"
           style={{
-            background: `color-mix(in srgb, #22C55E 8%, transparent)`,
-            border: `1px solid color-mix(in srgb, #22C55E 20%, transparent)`
+            background: `color-mix(in srgb, #F59E0B 8%, transparent)`,
+            border: `1px solid color-mix(in srgb, #F59E0B 20%, transparent)`
           }}
         >
           <div className="flex items-center justify-center gap-2 mb-2">
-            <SpatialIcon Icon={ICONS.Zap} size={14} style={{ color: '#22C55E' }} />
-            <span className="text-green-300 font-semibold text-sm">Vous êtes sur la bonne voie !</span>
+            <SpatialIcon Icon={ICONS.Zap} size={14} style={{ color: '#F59E0B' }} />
+            <span className="font-semibold text-sm" style={{ color: '#F59E0B' }}>Vous êtes sur la bonne voie !</span>
           </div>
-          <p className="text-green-200 text-xs">
+          <p className="text-white text-xs">
             Chaque minute de jeûne optimise votre métabolisme et votre bien-être
           </p>
         </div>
