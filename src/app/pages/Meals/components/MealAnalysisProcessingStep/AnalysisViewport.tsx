@@ -54,37 +54,74 @@ const AnalysisViewport: React.FC<AnalysisViewportProps> = ({
       }}
     >
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-white font-semibold flex items-center gap-2">
-          <SpatialIcon 
-            Icon={ICONS.Scan} 
-            size={18} 
-            style={{ 
-              color: analysisColor,
-              filter: 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.6))'
-            }} 
-          />
-          <span className="text-lg">Forge Nutritionnelle</span>
-        </h4>
-        <div 
-          className="capture-status-badge capture-status-badge--analyzing flex items-center gap-2"
-          style={{ 
+        {/* Titre avec icône sur fond coloré */}
+        <div className="flex items-center gap-3">
+          {/* Icône sur fond coloré */}
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: `
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(5, 150, 105, 0.3))
+              `,
+              border: '2px solid rgba(16, 185, 129, 0.6)',
+              boxShadow: `
+                0 0 24px rgba(16, 185, 129, 0.5),
+                inset 0 2px 0 rgba(255,255,255,0.3),
+                inset 0 -2px 0 rgba(0,0,0,0.2)
+              `
+            }}
+          >
+            <SpatialIcon
+              Icon={ICONS.Scan}
+              size={20}
+              style={{
+                color: '#fff',
+                filter: 'drop-shadow(0 2px 6px rgba(16, 185, 129, 0.8))'
+              }}
+            />
+          </div>
+          <h4 className="text-white font-bold text-lg" style={{
+            textShadow: '0 2px 8px rgba(16, 185, 129, 0.4), 0 0 4px rgba(0,0,0,0.3)'
+          }}>
+            Forge Nutritionnelle
+          </h4>
+        </div>
+
+        {/* Bouton de résumé dynamique - Beau bouton arrondi */}
+        <div
+          className="flex items-center gap-2 px-4 py-2"
+          style={{
             background: `
-              linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.15)),
-              rgba(255, 255, 255, 0.05)
+              linear-gradient(135deg,
+                rgba(16, 185, 129, 0.25),
+                rgba(34, 197, 94, 0.2)
+              )
             `,
-            borderColor: 'rgba(16, 185, 129, 0.4)',
-            color: analysisColor,
-            border: '1px solid',
-            backdropFilter: 'blur(12px) saturate(130%)',
-            boxShadow: '0 0 16px rgba(16, 185, 129, 0.3)'
+            border: '2px solid rgba(16, 185, 129, 0.5)',
+            borderRadius: '20px',
+            backdropFilter: 'blur(16px) saturate(140%)',
+            boxShadow: `
+              0 4px 20px rgba(16, 185, 129, 0.3),
+              0 0 30px rgba(16, 185, 129, 0.2),
+              inset 0 1px 0 rgba(255,255,255,0.25)
+            `
           }}
         >
-          <motion.div 
-            className="w-2 h-2 rounded-full" 
-            style={{ backgroundColor: analysisColor }}
+          <motion.div
+            className="w-2.5 h-2.5 rounded-full"
+            style={{
+              backgroundColor: analysisColor,
+              boxShadow: `0 0 12px ${analysisColor}`
+            }}
             animate={reduceMotion ? {} : {
-              scale: [1, 1.3, 1],
-              opacity: [0.8, 1, 0.8]
+              scale: [1, 1.4, 1],
+              opacity: [0.7, 1, 0.7]
             }}
             transition={{
               duration: 1.5,
@@ -92,7 +129,13 @@ const AnalysisViewport: React.FC<AnalysisViewportProps> = ({
               ease: "easeInOut"
             }}
           />
-          <span className="capture-status-text font-medium">
+          <span
+            className="font-bold text-sm"
+            style={{
+              color: '#fff',
+              textShadow: '0 1px 4px rgba(0,0,0,0.3)'
+            }}
+          >
             {currentPhase === 'detection' ? 'Détection' :
              currentPhase === 'analysis' ? 'Analyse' : 'Calcul'}
           </span>
