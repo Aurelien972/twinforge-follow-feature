@@ -5,6 +5,7 @@ import CapturedPhotoDisplay from './CapturedPhotoDisplay';
 import ReadyForProcessing from './ReadyForProcessing';
 import NavigationControls from './NavigationControls';
 import MealProgressHeader from '../MealProgressHeader';
+import BenefitsInfoCard, { Benefit } from '../../../../../ui/cards/BenefitsInfoCard';
 
 interface CapturedMealPhoto {
   file: File;
@@ -51,6 +52,30 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  const mealScanBenefits: Benefit[] = [
+    {
+      id: 'nutrition-tracking',
+      icon: 'TrendingUp',
+      color: '#22C55E',
+      title: 'Suivi Nutritionnel',
+      description: 'Analysez vos apports en macronutriments et calories'
+    },
+    {
+      id: 'ai-detection',
+      icon: 'Zap',
+      color: '#10B981',
+      title: 'Détection IA',
+      description: 'Identification automatique des aliments et portions'
+    },
+    {
+      id: 'personalized-insights',
+      icon: 'Target',
+      color: '#059669',
+      title: 'Conseils Personnalisés',
+      description: 'Recommandations adaptées à vos objectifs'
+    }
+  ];
 
   const handleCameraClick = () => {
     fileInputRef.current?.click();
@@ -145,8 +170,8 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
 
         {/* Ready for Processing */}
         {capturedPhoto && (
-          <div 
-            ref={readyForProcessingRef} 
+          <div
+            ref={readyForProcessingRef}
             className="mt-8"
           >
             <ReadyForProcessing
@@ -154,6 +179,15 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
               isProcessingInProgress={isProcessingInProgress}
             />
           </div>
+        )}
+
+        {/* Benefits Info Card - Show only when no photo captured */}
+        {!capturedPhoto && (
+          <BenefitsInfoCard
+            benefits={mealScanBenefits}
+            themeColor="#10B981"
+            title="Pourquoi scanner mes repas ?"
+          />
         )}
       </div>
 

@@ -195,33 +195,42 @@ const MealScanFlowPage: React.FC = () => {
           timestamp: new Date().toISOString()
         });
 
-        const uploadResult = await uploadMealPhoto(
-          scanFlowState.capturedPhoto.file,
-          userId
-        );
+        try {
+          const uploadResult = await uploadMealPhoto(
+            scanFlowState.capturedPhoto.file,
+            userId
+          );
 
-        if (uploadResult.success && uploadResult.publicUrl) {
-          photoUrl = uploadResult.publicUrl;
-          logger.info('MEAL_SCAN_SAVE', 'Photo uploaded successfully', {
-            publicUrl: photoUrl,
-            uploadPath: uploadResult.uploadPath,
+          if (uploadResult.success && uploadResult.publicUrl) {
+            photoUrl = uploadResult.publicUrl;
+            logger.info('MEAL_SCAN_SAVE', 'Photo uploaded successfully', {
+              publicUrl: photoUrl,
+              uploadPath: uploadResult.uploadPath,
+              userId,
+              timestamp: new Date().toISOString()
+            });
+          } else {
+            logger.warn('MEAL_SCAN_SAVE', 'Photo upload failed, continuing without photo', {
+              error: uploadResult.error,
+              userId,
+              timestamp: new Date().toISOString()
+            });
+
+            // Show user-friendly message about photo upload failure
+            showToast({
+              type: 'warning',
+              title: 'Photo non sauvegardée',
+              message: uploadResult.error || 'La photo n\'a pas pu être sauvegardée, mais votre repas sera enregistré.',
+              duration: 4000,
+            });
+          }
+        } catch (uploadError) {
+          logger.error('MEAL_SCAN_SAVE', 'Photo upload exception', {
+            error: uploadError instanceof Error ? uploadError.message : String(uploadError),
             userId,
             timestamp: new Date().toISOString()
           });
-        } else {
-          logger.warn('MEAL_SCAN_SAVE', 'Photo upload failed, continuing without photo', {
-            error: uploadResult.error,
-            userId,
-            timestamp: new Date().toISOString()
-          });
-          
-          // Show user-friendly message about photo upload failure
-          showToast({
-            type: 'warning',
-            title: 'Photo non sauvegardée',
-            message: uploadResult.error || 'La photo n\'a pas pu être sauvegardée, mais votre repas sera enregistré.',
-            duration: 4000,
-          });
+          // Continue without photo
         }
       }
 
@@ -307,16 +316,37 @@ const MealScanFlowPage: React.FC = () => {
   const handleSaveAndExit = async () => {
     try {
       if (scanFlowState.analysisResults) {
+        logger.info('MEAL_SCAN_EXIT', 'Saving meal before exit', {
+          hasResults: !!scanFlowState.analysisResults,
+          timestamp: new Date().toISOString()
+        });
+
         await handleSaveMealAndReset();
-      }
-      setShowExitConfirmation(false);
-      if (pendingNavigation) {
-        pendingNavigation();
+
+        logger.info('MEAL_SCAN_EXIT', 'Meal saved successfully, closing modal', {
+          timestamp: new Date().toISOString()
+        });
+
+        // La navigation est gérée dans handleSaveMealAndReset
+        // Fermer la modal et nettoyer les états
+        setShowExitConfirmation(false);
         setPendingNavigation(null);
+      } else {
+        // Pas de résultats, juste quitter
+        setShowExitConfirmation(false);
+        if (pendingNavigation) {
+          pendingNavigation();
+          setPendingNavigation(null);
+        }
       }
     } catch (error) {
-      logger.error('MEAL_SCAN_EXIT', 'Failed to save before exit', { error });
+      logger.error('MEAL_SCAN_EXIT', 'Failed to save before exit', {
+        error: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString()
+      });
       showToast('Erreur lors de la sauvegarde', 'error');
+      // En cas d'erreur, laisser l'utilisateur réessayer ou quitter
+      setShowExitConfirmation(false);
     }
   };
 
