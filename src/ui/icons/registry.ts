@@ -224,6 +224,7 @@ export const ICONS = {
   Dna: L.Dna,
   Atom: L.Atom,
   Bolt: L.Bolt,
+  XCircle: L.XCircle,
 } as const;
 
 export type IconName = keyof typeof ICONS;

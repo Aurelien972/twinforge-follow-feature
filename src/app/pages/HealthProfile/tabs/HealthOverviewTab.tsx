@@ -207,14 +207,14 @@ export const HealthOverviewTab: React.FC = () => {
           </div>
           <div className="space-y-3">
             <UpdateItem
-              icon={ICONS.Check}
+              icon="Check"
               text="Profil santé créé"
               date={new Date().toLocaleDateString('fr-FR')}
               color="#10B981"
             />
             {profile?.country && (
               <UpdateItem
-                icon={ICONS.MapPin}
+                icon="MapPin"
                 text={`Contexte sanitaire: ${profile.country}`}
                 date={new Date().toLocaleDateString('fr-FR')}
                 color="#06B6D4"
@@ -243,17 +243,17 @@ export const HealthOverviewTab: React.FC = () => {
           </div>
           <div className="space-y-2">
             <QuickLinkButton
-              icon={ICONS.Activity}
+              icon="Activity"
               label="Constantes Vitales"
               onClick={() => navigateToTab('vital-signs')}
             />
             <QuickLinkButton
-              icon={ICONS.Shield}
+              icon="Shield"
               label="Vaccinations"
               onClick={() => navigateToTab('vaccinations')}
             />
             <QuickLinkButton
-              icon={ICONS.FileText}
+              icon="FileText"
               label="Historique Médical"
               onClick={() => navigateToTab('medical-history')}
             />
@@ -284,7 +284,7 @@ export const HealthOverviewTab: React.FC = () => {
   );
 };
 
-const UpdateItem: React.FC<{ icon: string; text: string; date: string; color: string }> = ({
+const UpdateItem: React.FC<{ icon: keyof typeof ICONS; text: string; date: string; color: string }> = ({
   icon,
   text,
   date,
@@ -292,14 +292,14 @@ const UpdateItem: React.FC<{ icon: string; text: string; date: string; color: st
 }) => (
   <div className="flex items-center justify-between">
     <div className="flex items-center gap-2">
-      <SpatialIcon Icon={ICONS[icon as keyof typeof ICONS]} size={14} style={{ color }} />
+      <SpatialIcon Icon={ICONS[icon]} size={14} style={{ color }} />
       <span className="text-white/80 text-sm">{text}</span>
     </div>
     <span className="text-white/50 text-xs">{date}</span>
   </div>
 );
 
-const QuickLinkButton: React.FC<{ icon: string; label: string; onClick: () => void }> = ({
+const QuickLinkButton: React.FC<{ icon: keyof typeof ICONS; label: string; onClick: () => void }> = ({
   icon,
   label,
   onClick,
@@ -309,7 +309,7 @@ const QuickLinkButton: React.FC<{ icon: string; label: string; onClick: () => vo
     className="w-full flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
   >
     <div className="flex items-center gap-3">
-      <SpatialIcon Icon={ICONS[icon as keyof typeof ICONS]} size={16} className="text-white/70" />
+      <SpatialIcon Icon={ICONS[icon]} size={16} className="text-white/70" />
       <span className="text-white/90 text-sm">{label}</span>
     </div>
     <SpatialIcon Icon={ICONS.ChevronRight} size={14} className="text-white/50" />

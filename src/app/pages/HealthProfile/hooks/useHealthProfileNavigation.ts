@@ -14,11 +14,7 @@ export type HealthProfileTab =
   | 'lifestyle'
   | 'vaccinations'
   | 'mental-health'
-  | 'reproductive-health'
-  | 'emergency-contacts'
-  | 'history'
-  | 'insights'
-  | 'import-export';
+  | 'reproductive-health';
 
 export interface TabConfig {
   id: HealthProfileTab;
@@ -94,38 +90,6 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     color: '#EC4899',
     requiredForAI: false,
   },
-  {
-    id: 'emergency-contacts',
-    label: 'Contacts d\'Urgence',
-    icon: 'Phone',
-    description: 'Informations critiques',
-    color: '#EF4444',
-    requiredForAI: false,
-  },
-  {
-    id: 'history',
-    label: 'Historique',
-    icon: 'Clock',
-    description: 'Évolution temporelle',
-    color: '#6366F1',
-    requiredForAI: false,
-  },
-  {
-    id: 'insights',
-    label: 'Analyses IA',
-    icon: 'Sparkles',
-    description: 'Intelligence artificielle préventive',
-    color: '#F59E0B',
-    requiredForAI: false,
-  },
-  {
-    id: 'import-export',
-    label: 'Import/Export',
-    icon: 'Download',
-    description: 'Gestion des données',
-    color: '#64748B',
-    requiredForAI: false,
-  },
 ];
 
 export function useHealthProfileNavigation() {
@@ -146,10 +110,6 @@ export function useHealthProfileNavigation() {
     'vaccinations': 0,
     'mental-health': 0,
     'reproductive-health': 0,
-    'emergency-contacts': 0,
-    'history': 100,
-    'insights': 100,
-    'import-export': 100,
   });
 
   const navigateToTab = useCallback((tabId: HealthProfileTab) => {

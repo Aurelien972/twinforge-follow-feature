@@ -48,7 +48,6 @@ const HealthProfilePage: React.FC = () => {
       updateTabCompletion('vaccinations', completion.vaccinations);
       updateTabCompletion('mental-health', completion.mentalHealth);
       updateTabCompletion('reproductive-health', completion.reproductiveHealth);
-      updateTabCompletion('emergency-contacts', completion.emergencyContacts);
     }
   }, [completion, updateTabCompletion]);
 
@@ -236,41 +235,6 @@ const HealthProfilePage: React.FC = () => {
         subtitle="Médecine préventive par intelligence artificielle"
         circuit="health"
         iconColor="#EF4444"
-        actions={
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-cyan-400" style={{ boxShadow: '0 0 8px rgba(6, 182, 212, 0.6)' }} />
-                <span className="text-white font-bold text-lg">{globalCompletion}%</span>
-              </div>
-              <span className="text-white/60 text-xs">Complété</span>
-            </div>
-            <div className="w-16 h-16 relative">
-              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  className="text-white/10"
-                  strokeWidth="3"
-                  stroke="currentColor"
-                  fill="none"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                />
-                <motion.path
-                  className="text-cyan-400"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeDasharray="100"
-                  strokeDashoffset={100 - globalCompletion}
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  initial={{ strokeDashoffset: 100 }}
-                  animate={{ strokeDashoffset: 100 - globalCompletion }}
-                  transition={{ duration: 1, ease: 'easeOut' }}
-                />
-              </svg>
-            </div>
-          </div>
-        }
       />
 
       {/* Bandeau d'avertissement si mode dégradé ou erreur */}
@@ -354,22 +318,6 @@ const HealthProfilePage: React.FC = () => {
 
         <Tabs.Panel value="reproductive-health">
           <PlaceholderTab title="Santé Reproductive" icon="Heart" />
-        </Tabs.Panel>
-
-        <Tabs.Panel value="emergency-contacts">
-          <PlaceholderTab title="Contacts d'Urgence" icon="Phone" />
-        </Tabs.Panel>
-
-        <Tabs.Panel value="history">
-          <PlaceholderTab title="Historique" icon="Clock" />
-        </Tabs.Panel>
-
-        <Tabs.Panel value="insights">
-          <PlaceholderTab title="Analyses IA" icon="Sparkles" />
-        </Tabs.Panel>
-
-        <Tabs.Panel value="import-export">
-          <PlaceholderTab title="Import/Export" icon="Download" />
         </Tabs.Panel>
       </Tabs>
     </div>
