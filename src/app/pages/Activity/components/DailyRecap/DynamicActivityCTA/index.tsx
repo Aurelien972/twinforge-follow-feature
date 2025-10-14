@@ -318,19 +318,65 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
             </div>
           )}
 
-          <div className="flex justify-center">
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button
               onClick={handleActivityInput}
-              className={`dynamic-cta-button-3d ${
-                urgencyConfig.priority === 'high' ? 'dynamic-cta-button-3d-high' :
-                urgencyConfig.priority === 'medium' ? 'dynamic-cta-button-3d-medium' :
-                'dynamic-cta-button-3d-low'
-              } ${
-                urgencyConfig.animation === 'pulse' && !reduceMotion ? 'btn-breathing-css' : ''
-              }`}
-              style={buttonStyles}
+              className="training-cta-button px-8 py-4 rounded-2xl font-bold text-lg text-white relative overflow-hidden min-h-[64px]"
+              style={{
+                background: `
+                  linear-gradient(165deg,
+                    var(--btn-color-light, #60A5FA) 0%,
+                    var(--btn-color-base, #3B82F6) 50%,
+                    var(--btn-color-dark, #2563EB) 100%
+                  )
+                `,
+                boxShadow: `
+                  0 1px 0 0 rgba(255, 255, 255, 0.4) inset,
+                  0 -1px 0 0 rgba(0, 0, 0, 0.2) inset,
+                  0 20px 50px -12px var(--btn-shadow, rgba(59, 130, 246, 0.6)),
+                  0 10px 30px -8px rgba(0, 0, 0, 0.5),
+                  0 2px 12px 0 var(--btn-glow, rgba(59, 130, 246, 0.8))
+                `,
+                border: 'none',
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                ...buttonStyles
+              }}
             >
-              <div>
+              {/* Top Glass Layer */}
+              <div
+                className="absolute top-0 left-0 right-0 pointer-events-none"
+                style={{
+                  height: '50%',
+                  background: `
+                    linear-gradient(180deg,
+                      rgba(255, 255, 255, 0.25) 0%,
+                      rgba(255, 255, 255, 0.08) 50%,
+                      transparent 100%
+                    )
+                  `,
+                  borderRadius: 'inherit'
+                }}
+              />
+
+              {/* Shine Effect */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: `
+                    linear-gradient(135deg,
+                      transparent 0%,
+                      transparent 40%,
+                      rgba(255, 255, 255, 0.4) 50%,
+                      transparent 60%,
+                      transparent 100%
+                    )
+                  `,
+                  animation: 'training-button-shine 4s ease-in-out infinite',
+                  borderRadius: 'inherit'
+                }}
+              />
+
+              <div className="relative z-10 flex items-center justify-center gap-3">
                 <SpatialIcon
                   Icon={ICONS[urgencyConfig.icon]}
                   size={24}
@@ -338,10 +384,73 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                 />
                 <span>{message.buttonText}</span>
               </div>
+            </button>
 
-              {urgencyConfig.priority === 'medium' && !reduceMotion && (
-                <div className="dynamic-cta-shimmer" />
-              )}
+            <button
+              onClick={() => navigate('/activity/progress')}
+              className="training-cta-button px-8 py-4 rounded-2xl font-bold text-lg text-white relative overflow-hidden min-h-[64px]"
+              style={{
+                background: `
+                  linear-gradient(165deg,
+                    var(--btn-color-light, #60A5FA) 0%,
+                    var(--btn-color-base, #3B82F6) 50%,
+                    var(--btn-color-dark, #2563EB) 100%
+                  )
+                `,
+                boxShadow: `
+                  0 1px 0 0 rgba(255, 255, 255, 0.4) inset,
+                  0 -1px 0 0 rgba(0, 0, 0, 0.2) inset,
+                  0 20px 50px -12px var(--btn-shadow, rgba(59, 130, 246, 0.6)),
+                  0 10px 30px -8px rgba(0, 0, 0, 0.5),
+                  0 2px 12px 0 var(--btn-glow, rgba(59, 130, 246, 0.8))
+                `,
+                border: 'none',
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                ...buttonStyles
+              }}
+            >
+              {/* Top Glass Layer */}
+              <div
+                className="absolute top-0 left-0 right-0 pointer-events-none"
+                style={{
+                  height: '50%',
+                  background: `
+                    linear-gradient(180deg,
+                      rgba(255, 255, 255, 0.25) 0%,
+                      rgba(255, 255, 255, 0.08) 50%,
+                      transparent 100%
+                    )
+                  `,
+                  borderRadius: 'inherit'
+                }}
+              />
+
+              {/* Shine Effect */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: `
+                    linear-gradient(135deg,
+                      transparent 0%,
+                      transparent 40%,
+                      rgba(255, 255, 255, 0.4) 50%,
+                      transparent 60%,
+                      transparent 100%
+                    )
+                  `,
+                  animation: 'training-button-shine 4s ease-in-out infinite',
+                  borderRadius: 'inherit'
+                }}
+              />
+
+              <div className="relative z-10 flex items-center justify-center gap-3">
+                <SpatialIcon
+                  Icon={ICONS.TrendingUp}
+                  size={24}
+                  className="text-white"
+                />
+                <span>Voir mes Insights</span>
+              </div>
             </button>
           </div>
         </div>
