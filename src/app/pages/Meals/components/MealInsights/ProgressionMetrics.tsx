@@ -229,7 +229,7 @@ const ProgressionMetrics: React.FC<ProgressionMetricsProps> = ({
 
           {/* Header néo-onglo intégré */}
           <div className="flex items-center gap-3 mb-6">
-            <div 
+            <div
               className="w-12 h-12 rounded-full flex items-center justify-center"
               style={{
                 background: `

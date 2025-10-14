@@ -131,28 +131,37 @@ const MealHistoryTab: React.FC = () => {
   if (!meals || meals.length === 0) {
     return (
       <div className="space-y-6">
-        <GlassCard className="p-8 text-center">
-          <div className="flex items-center gap-4 mb-6">
-            <div 
+        <GlassCard
+          className="p-8 text-center"
+          style={{
+            background: `
+              radial-gradient(circle at 30% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
+              var(--glass-opacity)
+            `,
+            borderColor: 'rgba(139, 92, 246, 0.25)'
+          }}
+        >
+          <div className="flex items-center gap-4 mb-6 justify-center">
+            <div
               className="w-16 h-16 rounded-full flex items-center justify-center"
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-                  linear-gradient(135deg, color-mix(in srgb, var(--nutrition-primary) 30%, transparent), color-mix(in srgb, var(--nutrition-primary) 20%, transparent))
+                  linear-gradient(135deg, color-mix(in srgb, #8B5CF6 30%, transparent), color-mix(in srgb, #8B5CF6 20%, transparent))
                 `,
-                border: '2px solid color-mix(in srgb, var(--nutrition-primary) 40%, transparent)',
-                boxShadow: '0 0 30px color-mix(in srgb, var(--nutrition-primary) 30%, transparent)'
+                border: '2px solid color-mix(in srgb, #8B5CF6 40%, transparent)',
+                boxShadow: '0 0 30px color-mix(in srgb, #8B5CF6 30%, transparent)'
               }}
             >
-              <SpatialIcon Icon={ICONS.History} size={28} style={{ color: 'var(--nutrition-primary)' }} />
+              <SpatialIcon Icon={ICONS.History} size={28} className="text-purple-400" />
             </div>
             <div className="text-left">
               <h3 className="text-2xl font-bold text-white">Forge Vierge</h3>
-              <p className="text-white/70 text-base">Votre historique nutritionnel vous attend</p>
+              <p className="text-purple-200 text-base">Votre historique nutritionnel vous attend</p>
             </div>
           </div>
           <p className="text-white/70 text-base max-w-lg mx-auto leading-relaxed">
-            Aucun repas scanné pour le moment. Commencez à scanner vos repas 
+            Aucun repas scanné pour le moment. Commencez à scanner vos repas
             pour construire votre historique nutritionnel.
           </p>
         </GlassCard>
@@ -168,36 +177,41 @@ const MealHistoryTab: React.FC = () => {
             key={date}
             className="meal-group-enter"
           >
-            <GlassCard 
+            <GlassCard
               className="p-6"
               style={{
                 background: `
-                  radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+                  radial-gradient(circle at 30% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
                   var(--glass-opacity)
                 `,
-                borderColor: 'rgba(16, 185, 129, 0.2)',
-                backdropFilter: 'blur(16px) saturate(140%)'
+                borderColor: 'rgba(139, 92, 246, 0.25)',
+                backdropFilter: 'blur(16px) saturate(140%)',
+                boxShadow: `
+                  0 8px 32px rgba(0, 0, 0, 0.2),
+                  0 0 20px rgba(139, 92, 246, 0.1),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.12)
+                `
               }}
             >
               {/* En-tête du jour */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div 
+                  <div
                     className="w-12 h-12 rounded-full flex items-center justify-center"
                     style={{
                       background: `
                         radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-                        linear-gradient(135deg, color-mix(in srgb, var(--nutrition-primary) 30%, transparent), color-mix(in srgb, var(--nutrition-primary) 20%, transparent))
+                        linear-gradient(135deg, color-mix(in srgb, #8B5CF6 30%, transparent), color-mix(in srgb, #8B5CF6 20%, transparent))
                       `,
-                      border: '2px solid color-mix(in srgb, var(--nutrition-primary) 40%, transparent)',
-                      boxShadow: '0 0 20px color-mix(in srgb, var(--nutrition-primary) 30%, transparent)'
+                      border: '2px solid color-mix(in srgb, #8B5CF6 40%, transparent)',
+                      boxShadow: '0 0 20px color-mix(in srgb, #8B5CF6 30%, transparent)'
                     }}
                   >
-                    <SpatialIcon Icon={ICONS.Calendar} size={18} style={{ color: 'var(--nutrition-primary)' }} />
+                    <SpatialIcon Icon={ICONS.Calendar} size={18} className="text-purple-400" />
                   </div>
                   <div>
                     <h4 className="text-white font-bold text-xl">{formatDateLabel(date)}</h4>
-                    <p className="text-green-200 text-sm">Forge nutritionnelle de la journée</p>
+                    <p className="text-purple-200 text-sm">Forge nutritionnelle de la journée</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -220,20 +234,21 @@ const MealHistoryTab: React.FC = () => {
                     <div
                       className="p-5 rounded-xl cursor-pointer transition-all duration-200 hover:scale-[1.02] meal-item-enter"
                       style={{
-                        background: `color-mix(in srgb, var(--nutrition-primary) 4%, transparent)`,
-                        border: '1px solid color-mix(in srgb, var(--nutrition-primary) 12%, transparent)',
+                        background: `color-mix(in srgb, #8B5CF6 6%, transparent)`,
+                        border: '1px solid color-mix(in srgb, #8B5CF6 15%, transparent)',
                         backdropFilter: 'blur(8px) saturate(120%)',
-                        animationDelay: `${index * 0.1}s`
+                        animationDelay: `${index * 0.1}s`,
+                        boxShadow: '0 2px 8px rgba(139, 92, 246, 0.1)'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = `color-mix(in srgb, var(--nutrition-primary) 8%, transparent)`;
-                        e.currentTarget.style.borderColor = `color-mix(in srgb, var(--nutrition-primary) 20%, transparent)`;
-                        e.currentTarget.style.boxShadow = '0 4px 16px color-mix(in srgb, var(--nutrition-primary) 15%, transparent)';
+                        e.currentTarget.style.background = `color-mix(in srgb, #8B5CF6 12%, transparent)`;
+                        e.currentTarget.style.borderColor = `color-mix(in srgb, #8B5CF6 25%, transparent)`;
+                        e.currentTarget.style.boxShadow = '0 4px 20px rgba(139, 92, 246, 0.2)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = `color-mix(in srgb, var(--nutrition-primary) 4%, transparent)`;
-                        e.currentTarget.style.borderColor = `color-mix(in srgb, var(--nutrition-primary) 12%, transparent)`;
-                        e.currentTarget.style.boxShadow = 'none';
+                        e.currentTarget.style.background = `color-mix(in srgb, #8B5CF6 6%, transparent)`;
+                        e.currentTarget.style.borderColor = `color-mix(in srgb, #8B5CF6 15%, transparent)`;
+                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(139, 92, 246, 0.1)';
                       }}
                       onClick={() => {
                         click(); // Enhanced glass click for meal details
@@ -242,18 +257,18 @@ const MealHistoryTab: React.FC = () => {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div 
+                          <div
                             className="w-12 h-12 rounded-full flex items-center justify-center"
                             style={{
                               background: `
                                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12) 0%, transparent 60%),
-                                linear-gradient(135deg, color-mix(in srgb, var(--nutrition-primary) 25%, transparent), color-mix(in srgb, var(--nutrition-primary) 15%, transparent))
+                                linear-gradient(135deg, color-mix(in srgb, #8B5CF6 25%, transparent), color-mix(in srgb, #8B5CF6 15%, transparent))
                               `,
-                              border: '1px solid color-mix(in srgb, var(--nutrition-primary) 30%, transparent)',
-                              boxShadow: '0 0 12px color-mix(in srgb, var(--nutrition-primary) 20%, transparent)'
+                              border: '1px solid color-mix(in srgb, #8B5CF6 30%, transparent)',
+                              boxShadow: '0 0 12px color-mix(in srgb, #8B5CF6 20%, transparent)'
                             }}
                           >
-                            <SpatialIcon Icon={ICONS.Utensils} size={18} style={{ color: 'var(--nutrition-primary)' }} />
+                            <SpatialIcon Icon={ICONS.Utensils} size={18} className="text-purple-400" />
                           </div>
                           <div>
                             <div className="text-white font-semibold text-lg">

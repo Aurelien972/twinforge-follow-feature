@@ -1,5 +1,5 @@
 import React from 'react';
-import { useReducedMotion } from 'framer-motion';
+import { useReducedMotion, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
@@ -95,12 +95,48 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
 
   return (
     <div className="dynamic-scan-cta meal-capture-enter">
-      <GlassCard 
-        className="p-6 md:p-8 text-center relative overflow-visible cursor-pointer"
+      <GlassCard
+        className="p-6 md:p-8 text-center relative overflow-hidden cursor-pointer"
         onClick={handleScanMeal}
         interactive
         style={cardStyles}
       >
+        {/* Carrés tournants aux coins - Style harmonisé avec les autres forges */}
+        <div className="training-hero-corners" aria-hidden="true">
+          {[0, 1, 2, 3].map((i) => (
+            <motion.div
+              key={i}
+              className="corner-particle"
+              style={{
+                position: 'absolute',
+                width: '8px',
+                height: '8px',
+                borderRadius: '2px',
+                background: `linear-gradient(135deg, ${urgencyConfig.color}, rgba(255, 255, 255, 0.8))`,
+                boxShadow: `0 0 20px ${urgencyConfig.color}`,
+                top: i < 2 ? '12px' : 'auto',
+                bottom: i >= 2 ? '12px' : 'auto',
+                left: i % 2 === 0 ? '12px' : 'auto',
+                right: i % 2 === 1 ? '12px' : 'auto'
+              }}
+              initial={{
+                rotate: i % 2 === 0 ? 45 : -45
+              }}
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.6, 1, 0.6],
+                rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                delay: i * 0.2,
+                ease: [0.4, 0, 0.2, 1]
+              }}
+            />
+          ))}
+        </div>
+
         {/* Halo de Forge Dynamique */}
         {urgencyConfig.priority === 'high' && !reduceMotion && (
           <div

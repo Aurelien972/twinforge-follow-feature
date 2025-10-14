@@ -112,14 +112,14 @@ const MacroDistributionChart: React.FC<MacroDistributionChartProps> = ({
         className="p-6"
         style={{
           background: `
-            radial-gradient(circle at 30% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
-            radial-gradient(circle at 70% 80%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
+            radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 60%),
+            radial-gradient(circle at 70% 80%, rgba(249, 115, 22, 0.06) 0%, transparent 50%),
             var(--glass-opacity)
           `,
-          borderColor: 'rgba(139, 92, 246, 0.25)',
+          borderColor: 'rgba(245, 158, 11, 0.25)',
           boxShadow: `
             0 8px 32px rgba(0, 0, 0, 0.2),
-            0 0 20px rgba(139, 92, 246, 0.1),
+            0 0 20px rgba(245, 158, 11, 0.1),
             inset 0 1px 0 rgba(255, 255, 255, 0.12)
           `
         }}
@@ -127,22 +127,22 @@ const MacroDistributionChart: React.FC<MacroDistributionChartProps> = ({
         {/* Header néo-onglo intégré */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div 
+            <div
               className="w-12 h-12 rounded-full flex items-center justify-center"
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-                  linear-gradient(135deg, color-mix(in srgb, #8B5CF6 30%, transparent), color-mix(in srgb, #8B5CF6 20%, transparent))
+                  linear-gradient(135deg, color-mix(in srgb, #F59E0B 30%, transparent), color-mix(in srgb, #F59E0B 20%, transparent))
                 `,
-                border: '2px solid color-mix(in srgb, #8B5CF6 40%, transparent)',
-                boxShadow: '0 0 20px color-mix(in srgb, #8B5CF6 30%, transparent)'
+                border: '2px solid color-mix(in srgb, #F59E0B 40%, transparent)',
+                boxShadow: '0 0 20px color-mix(in srgb, #F59E0B 30%, transparent)'
               }}
             >
-              <SpatialIcon Icon={ICONS.BarChart3} size={20} className="text-purple-400" />
+              <SpatialIcon Icon={ICONS.BarChart3} size={20} className="text-orange-400" />
             </div>
             <div>
               <h3 className="text-white font-bold text-xl">Distribution Nutritionnelle</h3>
-              <p className="text-purple-200 text-sm">Répartition de vos macronutriments</p>
+              <p className="text-orange-200 text-sm">Répartition de vos macronutriments</p>
             </div>
           </div>
           

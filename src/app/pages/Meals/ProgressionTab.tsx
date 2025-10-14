@@ -99,17 +99,17 @@ const ProgressionTab: React.FC = () => {
     return (
       <div className="space-y-6">
         <GlassCard className="p-8 text-center">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-purple-500/20 flex items-center justify-center">
-            <SpatialIcon Icon={ICONS.TrendingUp} size={40} className="text-purple-400" />
+          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-cyan-500/20 flex items-center justify-center">
+            <SpatialIcon Icon={ICONS.TrendingUp} size={40} className="text-cyan-400" />
           </div>
           <h3 className="text-2xl font-bold text-white mb-4">
             Analyse Avancée en Préparation
           </h3>
           <p className="text-white/70 text-lg mb-6 max-w-md mx-auto leading-relaxed">
-            Scannez au moins 3 repas pour débloquer l'analyse complète 
+            Scannez au moins 3 repas pour débloquer l'analyse complète
             et vos graphiques de tendances nutritionnelles.
           </p>
-          <div className="text-purple-300 text-sm mb-6">
+          <div className="text-cyan-300 text-sm mb-6">
             {weekMeals?.length || 0} / 3 repas minimum
           </div>
           
@@ -120,19 +120,19 @@ const ProgressionTab: React.FC = () => {
               className="btn-glass--primary px-8 py-4 text-lg font-semibold"
               style={{
                 background: `
-                  linear-gradient(135deg, 
-                    color-mix(in srgb, #8B5CF6 80%, transparent), 
-                    color-mix(in srgb, #A855F7 60%, transparent)
+                  linear-gradient(135deg,
+                    color-mix(in srgb, #06B6D4 80%, transparent),
+                    color-mix(in srgb, #0891B2 60%, transparent)
                   )
                 `,
                 backdropFilter: 'blur(20px) saturate(160%)',
                 boxShadow: `
-                  0 12px 40px color-mix(in srgb, #8B5CF6 40%, transparent),
-                  0 0 60px color-mix(in srgb, #8B5CF6 30%, transparent),
+                  0 12px 40px color-mix(in srgb, #06B6D4 40%, transparent),
+                  0 0 60px color-mix(in srgb, #06B6D4 30%, transparent),
                   inset 0 3px 0 rgba(255,255,255,0.4),
                   inset 0 -3px 0 rgba(0,0,0,0.2)
                 `,
-                border: '2px solid color-mix(in srgb, #8B5CF6 60%, transparent)',
+                border: '2px solid color-mix(in srgb, #06B6D4 60%, transparent)',
               }}
             >
               <div className="flex items-center gap-3">

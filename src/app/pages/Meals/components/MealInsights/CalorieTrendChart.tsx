@@ -78,14 +78,14 @@ const CalorieTrendChart: React.FC<CalorieTrendChartProps> = ({
         className="p-6"
         style={{
           background: `
-            radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
-            radial-gradient(circle at 70% 80%, rgba(34, 197, 94, 0.06) 0%, transparent 50%),
+            radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 60%),
+            radial-gradient(circle at 70% 80%, rgba(8, 145, 178, 0.06) 0%, transparent 50%),
             var(--glass-opacity)
           `,
-          borderColor: 'rgba(16, 185, 129, 0.25)',
+          borderColor: 'rgba(6, 182, 212, 0.25)',
           boxShadow: `
             0 8px 32px rgba(0, 0, 0, 0.2),
-            0 0 20px rgba(16, 185, 129, 0.1),
+            0 0 20px rgba(6, 182, 212, 0.1),
             inset 0 1px 0 rgba(255, 255, 255, 0.12)
           `
         }}
@@ -93,22 +93,22 @@ const CalorieTrendChart: React.FC<CalorieTrendChartProps> = ({
         {/* Header néo-onglo intégré */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div 
+            <div
               className="w-12 h-12 rounded-full flex items-center justify-center"
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-                  linear-gradient(135deg, color-mix(in srgb, #10B981 30%, transparent), color-mix(in srgb, #10B981 20%, transparent))
+                  linear-gradient(135deg, color-mix(in srgb, #06B6D4 30%, transparent), color-mix(in srgb, #06B6D4 20%, transparent))
                 `,
-                border: '2px solid color-mix(in srgb, #10B981 40%, transparent)',
-                boxShadow: '0 0 20px color-mix(in srgb, #10B981 30%, transparent)'
+                border: '2px solid color-mix(in srgb, #06B6D4 40%, transparent)',
+                boxShadow: '0 0 20px color-mix(in srgb, #06B6D4 30%, transparent)'
               }}
             >
-              <SpatialIcon Icon={ICONS.LineChart} size={20} className="text-green-400" />
+              <SpatialIcon Icon={ICONS.LineChart} size={20} className="text-cyan-400" />
             </div>
             <div>
               <h3 className="text-white font-bold text-xl">Tendances Nutritionnelles</h3>
-              <p className="text-green-200 text-sm">Évolution de vos habitudes alimentaires</p>
+              <p className="text-cyan-200 text-sm">Évolution de vos habitudes alimentaires</p>
             </div>
           </div>
           

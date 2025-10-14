@@ -24,19 +24,23 @@ export const TAB_COLORS: Record<string, string> = {
   'courses': '#F59E0B',     // Orange pour courses
 
   // Meals (Forge Nutritionnelle)
-  'journal': '#10B981',     // Vert pour journal
-  'statistiques': '#06B6D4', // Cyan pour statistiques
+  'daily': '#10B981',       // Vert pour aujourd'hui (nutrition quotidienne)
+  'insights': '#F59E0B',    // Orange pour insights nutritionnels
+  'progression': '#06B6D4', // Cyan pour progression nutritionnelle
+  'history': '#8B5CF6',     // Violet pour historique nutritionnel
+  'journal': '#10B981',     // Vert pour journal (legacy)
+  'statistiques': '#06B6D4', // Cyan pour statistiques (legacy)
 
   // Fasting (Forge du Temps)
   'timer': '#F59E0B',       // Orange pour timer
   'protocoles': '#06B6D4',  // Cyan pour protocoles
 
   // Activity (Forge Énergétique)
-  'daily': '#3B82F6',       // Bleu pour récap du jour
+  'dailyActivity': '#3B82F6',       // Bleu pour récap du jour activité
   'input': '#3B82F6',       // Bleu pour saisie
-  'insights': '#F59E0B',    // Orange pour insights énergétiques
-  'progression': '#10B981', // Vert pour progression énergétique
-  'history': '#8B5CF6',     // Violet pour historique énergétique
+  'insightsActivity': '#F59E0B',    // Orange pour insights énergétiques
+  'progressionActivity': '#10B981', // Vert pour progression énergétique
+  'historyActivity': '#8B5CF6',     // Violet pour historique énergétique
 
   // Body Scan (Forge Corporelle)
   'scanCta': '#8B5CF6',     // Violet pour scanner (nouvelle couleur)

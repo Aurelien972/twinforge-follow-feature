@@ -53,18 +53,18 @@ const CalorieProgressCard: React.FC<CalorieProgressCardProps> = ({
       }}
     >
       <div className="flex items-center gap-3 mb-6">
-        <div 
+        <div
           className="w-12 h-12 rounded-full flex items-center justify-center"
           style={{
             background: `
               radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-              linear-gradient(135deg, color-mix(in srgb, ${calorieStatus.color} 30%, transparent), color-mix(in srgb, ${calorieStatus.color} 20%, transparent))
+              linear-gradient(135deg, color-mix(in srgb, #10B981 30%, transparent), color-mix(in srgb, #10B981 20%, transparent))
             `,
-            border: `2px solid color-mix(in srgb, ${calorieStatus.color} 40%, transparent)`,
-            boxShadow: `0 0 20px color-mix(in srgb, ${calorieStatus.color} 30%, transparent)`
+            border: `2px solid color-mix(in srgb, #10B981 40%, transparent)`,
+            boxShadow: `0 0 20px color-mix(in srgb, #10B981 30%, transparent)`
           }}
         >
-          <SpatialIcon Icon={ICONS.Target} size={20} style={{ color: calorieStatus.color }} />
+          <SpatialIcon Icon={ICONS.Target} size={20} style={{ color: '#10B981' }} />
         </div>
         <div className="flex-1">
           <h3 className="text-white font-bold text-xl">Progression Énergétique</h3>

@@ -32,7 +32,7 @@ function getTabHeaderContent(activeTab: string) {
         title: 'Insights Nutritionnels',
         subtitle: 'Analyses et conseils personnalisés avancés',
         circuit: 'meals' as const,
-        color: '#8B5CF6', // Violet pour IA
+        color: '#F59E0B', // Orange pour insights nutritionnels
       };
     case 'progression':
       return {
