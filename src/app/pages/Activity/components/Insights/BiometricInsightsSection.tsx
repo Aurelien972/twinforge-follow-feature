@@ -1,13 +1,11 @@
 import React from 'react';
 import { useUserStore } from '../../../../../system/store/userStore';
 import { biometricAnalysisService } from '../../../../../system/services/biometricAnalysisService';
-import { trainingGoalsRepository } from '../../../../../system/repositories/trainingGoalsRepository';
 import type {
   HRPerformanceCorrelation,
   OvertrainingIndicator,
   OptimalTrainingWindow,
 } from '../../../../../system/services/biometricAnalysisService';
-import type { GoalProgressResult } from '../../../../../system/repositories/trainingGoalsRepository';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
@@ -22,7 +20,7 @@ const BiometricInsightsSection: React.FC<BiometricInsightsSectionProps> = ({ per
   const [correlation, setCorrelation] = React.useState<HRPerformanceCorrelation | null>(null);
   const [overtraining, setOvertraining] = React.useState<OvertrainingIndicator | null>(null);
   const [windows, setWindows] = React.useState<OptimalTrainingWindow[]>([]);
-  const [goalsProgress, setGoalsProgress] = React.useState<GoalProgressResult[]>([]);
+  const [goalsProgress, setGoalsProgress] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   const periodDays = period === 'week' ? 7 : period === 'month' ? 30 : 90;
@@ -39,9 +37,7 @@ const BiometricInsightsSection: React.FC<BiometricInsightsSectionProps> = ({ per
           biometricAnalysisService.analyzeHRPerformanceCorrelation(profile.id, periodDays),
           biometricAnalysisService.detectOvertraining(profile.id),
           biometricAnalysisService.findOptimalTrainingWindows(profile.id, periodDays * 2),
-          trainingGoalsRepository.getActiveGoals(profile.id).then(goals =>
-            goals.map(goal => trainingGoalsRepository.calculateProgress(goal))
-          ),
+          Promise.resolve([]),
         ]);
 
         setCorrelation(corrData);

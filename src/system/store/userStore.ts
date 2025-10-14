@@ -559,18 +559,6 @@ export const useUserStore = create<UserState>()(
             philosophy: 'profile_update_success'
           });
 
-          // Invalidate AI context cache after profile update
-          try {
-            const { trainingGenerationService } = await import('../services/ai/trainingGenerationService');
-            const cacheKey = `context-collector:${session.user.id}`;
-            await trainingGenerationService.invalidateCache(cacheKey);
-            logger.info('USER_STORE_UPDATE_PROFILE', 'AI context cache invalidated', { userId: session.user.id, cacheKey });
-          } catch (cacheError) {
-            logger.warn('USER_STORE_UPDATE_PROFILE', 'Failed to invalidate AI context cache', {
-              error: cacheError instanceof Error ? cacheError.message : 'Unknown',
-              userId: session.user.id
-            });
-          }
 
           // Update with confirmed data from database
           set({ profile: await mapDbProfileToProfile(data) });

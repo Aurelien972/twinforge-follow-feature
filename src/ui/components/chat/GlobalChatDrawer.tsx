@@ -16,7 +16,6 @@ import { Haptics } from '../../../utils/haptics';
 import logger from '../../../lib/utils/logger';
 import { chatAIService } from '../../../system/services/chatAiService';
 import { chatConversationService } from '../../../system/services/chatConversationService';
-import { useTrainingChatContext } from '../../../hooks/useTrainingChatContext';
 
 interface GlobalChatDrawerProps {
   chatButtonRef?: React.RefObject<HTMLButtonElement>;
@@ -42,8 +41,6 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
   } = useGlobalChatStore();
 
   const set = useGlobalChatStore.setState;
-  const trainingContext = useTrainingChatContext();
-
   const { navClose } = useFeedback();
   const previousPathRef = useRef(location.pathname);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -190,9 +187,6 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
 
       let systemPrompt = modeConfig.systemPrompt;
 
-      if (currentMode === 'training' && trainingContext.isInTrainingMode && trainingContext.contextPrompt) {
-        systemPrompt = `${systemPrompt}\n\n${trainingContext.contextPrompt}`;
-      }
 
       const conversationMessages = messages.slice(-10);
 

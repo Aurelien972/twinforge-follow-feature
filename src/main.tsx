@@ -34,7 +34,6 @@ const FaceScanReviewWithHeader = lazy(() => import('./app/pages/FaceScan/FaceSca
 const ActivityInputPage = lazy(() => import('./app/pages/Activity/ActivityInputPage'));
 const FastingInputPage = lazy(() => import('./app/pages/Fasting/FastingInputPage'));
 const FridgeScanPage = lazy(() => import('./app/pages/FridgeScanPage'));
-const TrainingPipelinePage = lazy(() => import('./app/pages/Training/Pipeline/TrainingPipelinePage'));
 const DevCachePage = lazy(() => import('./app/pages/DevCachePage'));
 const LogoGalleryPage = lazy(() => import('./app/pages/LogoGalleryPage'));
 
@@ -161,10 +160,6 @@ const router = createBrowserRouter([
       {
         path: "training",
         element: <Suspense fallback={<LoadingFallback />}><TrainingPage /></Suspense>
-      },
-      {
-        path: "training/pipeline",
-        element: <Suspense fallback={<LoadingFallback />}><TrainingPipelinePage /></Suspense>
       },
       {
         path: "settings",

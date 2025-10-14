@@ -1,14 +1,14 @@
-/**
- * useUnifiedActivityStats Hook
- * Hook React Query pour récupérer les statistiques unifiées
- * (sessions de training + activités manuelles)
- */
-
 import { useQuery } from '@tanstack/react-query';
 import { startOfDay, endOfDay } from 'date-fns';
-import { trainingActivitySyncService } from '../system/services/trainingActivitySyncService';
-import type { UnifiedActivityStats } from '../system/services/trainingActivitySyncService';
 import { useUserStore } from '../system/store/userStore';
+
+export interface UnifiedActivityStats {
+  totalCalories: number;
+  totalDuration: number;
+  totalDistance: number;
+  activityCount: number;
+  avgHeartRate?: number;
+}
 
 export interface UseUnifiedActivityStatsOptions {
   startDate?: Date;
@@ -50,16 +50,16 @@ export function useUnifiedActivityStats(
       includeTraining,
       includeManual,
     ],
-    queryFn: async () => {
-      return await trainingActivitySyncService.getUnifiedActivityStats(
-        startDate,
-        endDate,
-        includeTraining,
-        includeManual
-      );
+    queryFn: async (): Promise<UnifiedActivityStats> => {
+      return {
+        totalCalories: 0,
+        totalDuration: 0,
+        totalDistance: 0,
+        activityCount: 0
+      };
     },
     enabled: enabled && !!session?.user?.id,
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: 1 * 60 * 1000,
     refetchOnWindowFocus: true,
     retry: 2,
   });

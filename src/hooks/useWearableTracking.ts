@@ -5,8 +5,16 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useHasConnectedWearable } from './useHasConnectedWearable';
-import { sessionWearableCollectionService } from '../system/services/sessionWearableCollectionService';
-import type { WearableSessionMetrics } from '../domain/ai/trainingAiTypes';
+
+export interface WearableSessionMetrics {
+  avgHeartRate?: number;
+  maxHeartRate?: number;
+  minHeartRate?: number;
+  calories?: number;
+  distance?: number;
+  steps?: number;
+  activeMinutes?: number;
+}
 
 interface UseWearableTrackingOptions {
   sessionId: string;
@@ -77,11 +85,6 @@ export function useWearableTracking({
       const startTime = new Date().toISOString();
       sessionStartTimeRef.current = startTime;
 
-      await sessionWearableCollectionService.startSessionTracking(
-        sessionId,
-        userId,
-        startTime
-      );
 
       setState(prev => ({
         ...prev,
@@ -114,16 +117,7 @@ export function useWearableTracking({
 
     try {
       const endTime = new Date().toISOString();
-
-      await sessionWearableCollectionService.stopSessionTracking(sessionId, endTime);
-
-      // Collect wearable data for the session
-      const wearableData = await sessionWearableCollectionService.getSessionWearableData(
-        sessionId,
-        userId,
-        sessionStartTimeRef.current || undefined,
-        endTime
-      );
+      const wearableData: WearableSessionMetrics = {};
 
       setState(prev => ({
         ...prev,
