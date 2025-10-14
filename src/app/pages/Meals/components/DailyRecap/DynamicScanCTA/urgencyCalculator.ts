@@ -19,33 +19,36 @@ export interface UrgencyConfig {
  */
 export function calculateUrgencyConfig(context: NutritionalContext): UrgencyConfig {
   const { urgencyLevel, nutritionalStatus, mealTiming } = context;
-  
+
+  // Toujours utiliser le vert (#10B981) pour harmoniser avec l'onglet Aujourd'hui
+  const greenColor = '#10B981';
+
   switch (urgencyLevel) {
     case UrgencyLevel.HIGH:
       return {
         level: UrgencyLevel.HIGH,
-        color: '#F59E0B', // Orange pour urgence
+        color: greenColor,
         icon: 'AlertCircle',
         animation: 'pulse',
         audioFeedback: 'successMajor',
         priority: 'high'
       };
-      
+
     case UrgencyLevel.LOW:
       return {
         level: UrgencyLevel.LOW,
-        color: '#06B6D4', // Cyan pour accomplissement
+        color: greenColor,
         icon: 'Check',
         animation: 'none',
         audioFeedback: 'success',
         priority: 'low'
       };
-      
+
     case UrgencyLevel.NORMAL:
     default:
       return {
         level: UrgencyLevel.NORMAL,
-        color: '#10B981', // Vert TwinForge standard
+        color: greenColor,
         icon: 'Camera',
         animation: 'breathing',
         audioFeedback: 'click',
