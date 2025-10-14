@@ -51,7 +51,7 @@ const BOTTOM_BAR_BUTTONS = [
     id: 'body',
     label: 'Corps',
     icon: 'Scan' as const,
-    route: '/body-scan',
+    route: '/avatar',
     color: '#A855F7', // Violet
   },
 ];
