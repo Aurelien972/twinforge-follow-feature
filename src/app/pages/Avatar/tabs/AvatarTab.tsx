@@ -291,32 +291,42 @@ const AvatarTab: React.FC = () => {
         />
       )}
 
-      {/* Nouveau Scan Button - GlassCard Cyan */}
+      {/* Nouveau Scan Button - GlassCard Violet avec effet de respiration */}
       <GlassCard
-        className="p-0 overflow-hidden"
+        className="p-0 overflow-hidden relative"
         interactive
         style={{
           background: `
-            radial-gradient(circle at 30% 30%, rgba(6, 182, 212, 0.15) 0%, transparent 60%),
-            radial-gradient(circle at 70% 70%, rgba(6, 182, 212, 0.10) 0%, transparent 50%),
+            radial-gradient(circle at 30% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 60%),
+            radial-gradient(circle at 70% 70%, rgba(139, 92, 246, 0.10) 0%, transparent 50%),
             var(--glass-opacity-base)
           `,
-          borderColor: 'rgba(6, 182, 212, 0.4)',
+          borderColor: 'rgba(139, 92, 246, 0.4)',
           boxShadow: `
             0 12px 40px rgba(0, 0, 0, 0.25),
-            0 0 40px rgba(6, 182, 212, 0.25),
+            0 0 40px rgba(139, 92, 246, 0.25),
             inset 0 2px 0 rgba(255, 255, 255, 0.2)
           `
         }}
       >
+        {/* Effet de respiration en fond */}
+        <div
+          className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
+          style={{
+            background: `radial-gradient(circle at center, color-mix(in srgb, #8B5CF6 8%, transparent) 0%, transparent 70%)`,
+            filter: 'blur(20px)',
+            transform: 'scale(1.2)',
+            zIndex: 0
+          }}
+        />
         <motion.button
           onClick={() => navigate('/body-scan')}
-          className="w-full px-8 py-4 rounded-2xl font-bold text-lg text-white relative overflow-hidden min-h-[64px]"
+          className="w-full px-8 py-4 rounded-2xl font-bold text-lg text-white relative overflow-hidden min-h-[64px] z-10"
           style={{
             background: `
               linear-gradient(135deg,
-                rgba(6, 182, 212, 0.25),
-                rgba(6, 182, 212, 0.15)
+                rgba(139, 92, 246, 0.25),
+                rgba(139, 92, 246, 0.15)
               )
             `,
             border: 'none',
@@ -332,7 +342,7 @@ const AvatarTab: React.FC = () => {
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.4), transparent)',
+              background: 'linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent)',
               animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
               borderRadius: 'inherit'
             }}
@@ -343,13 +353,13 @@ const AvatarTab: React.FC = () => {
               Icon={ICONS.Scan}
               size={24}
               style={{
-                color: '#06B6D4',
-                filter: 'drop-shadow(0 2px 6px rgba(6, 182, 212, 0.5))'
+                color: '#8B5CF6',
+                filter: 'drop-shadow(0 2px 6px rgba(139, 92, 246, 0.5))'
               }}
               variant="pure"
             />
             <span style={{
-              textShadow: '0 2px 8px rgba(6, 182, 212, 0.6)',
+              textShadow: '0 2px 8px rgba(139, 92, 246, 0.6)',
               color: 'white'
             }}>
               Nouveau scan corporel
