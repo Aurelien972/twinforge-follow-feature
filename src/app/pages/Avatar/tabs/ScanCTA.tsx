@@ -38,17 +38,17 @@ function getScanStatus(daysSince: number): {
     return {
       status: 'never_scanned',
       urgency: 'high',
-      color: '#8B5CF6',
+      color: '#06B6D4', // Cyan pour premier scan
       message: 'Créez votre premier avatar',
       subtitle: 'Commencez votre parcours de transformation corporelle'
     };
   }
-  
+
   if (daysSince <= 7) {
     return {
       status: 'up_to_date',
       urgency: 'low',
-      color: '#8B5CF6',
+      color: '#06B6D4', // Cyan pour statut à jour
       message: 'Vous êtes à jour !',
       subtitle: `Dernier scan il y a ${daysSince} jour${daysSince > 1 ? 's' : ''}`
     };
@@ -345,61 +345,72 @@ const ScanCTA: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            {/* Primary CTA - New Scan */}
-            <motion.button
-              onClick={handleStartNewScan}
-              className="px-8 py-4 rounded-full font-bold text-lg text-white relative overflow-hidden min-h-[64px]"
+            {/* Primary CTA - New Scan - GlassCard avec thème cyan/bleu */}
+            <GlassCard
+              className="p-0 overflow-hidden"
+              interactive
               style={{
                 background: `
-                  linear-gradient(135deg, 
-                    color-mix(in srgb, ${scanStatus.color} 85%, transparent), 
-                    color-mix(in srgb, ${scanStatus.color} 70%, transparent)
-                  )
+                  radial-gradient(circle at 30% 30%, rgba(6, 182, 212, 0.15) 0%, transparent 60%),
+                  radial-gradient(circle at 70% 70%, rgba(6, 182, 212, 0.10) 0%, transparent 50%),
+                  var(--glass-opacity-base)
                 `,
-                border: `2px solid ${scanStatus.color}`,
+                borderColor: 'rgba(6, 182, 212, 0.4)',
                 boxShadow: `
-                  0 12px 40px color-mix(in srgb, ${scanStatus.color} 40%, transparent),
-                  0 0 60px color-mix(in srgb, ${scanStatus.color} 30%, transparent),
-                  inset 0 3px 0 rgba(255, 255, 255, 0.4)
-                `,
-                backdropFilter: 'blur(20px) saturate(160%)'
-              }}
-              whileHover={{ 
-                scale: 1.02,
-                y: -2,
-                boxShadow: `
-                  0 16px 50px color-mix(in srgb, ${scanStatus.color} 50%, transparent),
-                  0 0 80px color-mix(in srgb, ${scanStatus.color} 40%, transparent),
-                  inset 0 3px 0 rgba(255, 255, 255, 0.5)
+                  0 12px 40px rgba(0, 0, 0, 0.25),
+                  0 0 40px rgba(6, 182, 212, 0.25),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.2)
                 `
               }}
-              whileTap={{ scale: 0.98 }}
             >
-              {/* Shimmer Effect */}
-              <div 
-                className="absolute inset-0 pointer-events-none"
+              <motion.button
+                onClick={handleStartNewScan}
+                className="w-full px-8 py-4 rounded-2xl font-bold text-lg text-white relative overflow-hidden min-h-[64px]"
                 style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-                  animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
-                  borderRadius: 'inherit'
+                  background: `
+                    linear-gradient(135deg,
+                      rgba(6, 182, 212, 0.25),
+                      rgba(6, 182, 212, 0.15)
+                    )
+                  `,
+                  border: 'none',
+                  backdropFilter: 'blur(20px) saturate(160%)'
                 }}
-              />
-              
-              <div className="relative z-10 flex items-center justify-center gap-3">
-                <SpatialIcon 
-                  Icon={ICONS.Scan} 
-                  size={24} 
-                  style={{ 
-                    color: 'white',
-                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+                whileHover={{
+                  scale: 1.01,
+                  y: -1
+                }}
+                whileTap={{ scale: 0.99 }}
+              >
+                {/* Shimmer Effect */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.4), transparent)',
+                    animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
+                    borderRadius: 'inherit'
                   }}
-                  variant="pure"
                 />
-                <span style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-                  {scanStatus.status === 'never_scanned' ? 'Créer mon Avatar 3D' : 'Nouveau Scan'}
-                </span>
-              </div>
-            </motion.button>
+
+                <div className="relative z-10 flex items-center justify-center gap-3">
+                  <SpatialIcon
+                    Icon={ICONS.Scan}
+                    size={24}
+                    style={{
+                      color: '#06B6D4',
+                      filter: 'drop-shadow(0 2px 6px rgba(6, 182, 212, 0.5))'
+                    }}
+                    variant="pure"
+                  />
+                  <span style={{
+                    textShadow: '0 2px 8px rgba(6, 182, 212, 0.6)',
+                    color: 'white'
+                  }}>
+                    {scanStatus.status === 'never_scanned' ? 'Créer mon Avatar 3D' : 'Nouveau Scan Corporel'}
+                  </span>
+                </div>
+              </motion.button>
+            </GlassCard>
 
             {/* Secondary CTA - View Insights (only if scans exist) */}
             {scanStatus.status !== 'never_scanned' && (
