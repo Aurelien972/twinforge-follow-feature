@@ -275,16 +275,21 @@ const MealScanFlowPage: React.FC = () => {
         timestamp: new Date().toISOString()
       });
 
-      // CRITIQUE: Réinitialiser complètement l'état du scan AVANT la navigation
-      setScanFlowState(initialScanFlowState);
-      clientScanIdRef.current = null;
-      processingGuardRef.current = false;
-      
-      // Attendre un tick pour que l'état soit mis à jour
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
-      // Navigation vers la page des repas
-      navigate('/meals');
+      // CRITIQUE: Ne pas naviguer ici si on est dans un contexte d'exit modal
+      // La navigation sera gérée par handleSaveAndExit
+      // Si on est dans le flux normal (bouton "Sauvegarder"), on navigue
+      if (!showExitConfirmation) {
+        // Réinitialiser complètement l'état du scan AVANT la navigation
+        setScanFlowState(initialScanFlowState);
+        clientScanIdRef.current = null;
+        processingGuardRef.current = false;
+
+        // Attendre un tick pour que l'état soit mis à jour
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // Navigation vers la page des repas
+        navigate('/meals');
+      }
       
     } catch (error) {
       errorSound();
@@ -321,31 +326,48 @@ const MealScanFlowPage: React.FC = () => {
           timestamp: new Date().toISOString()
         });
 
-        await handleSaveMealAndReset();
+        // Fermer la modal immédiatement pour éviter les double-appels
+        setShowExitConfirmation(false);
 
-        logger.info('MEAL_SCAN_EXIT', 'Meal saved successfully, closing modal', {
-          timestamp: new Date().toISOString()
+        // Réinitialiser l'état de blocage pour permettre la navigation
+        setScanFlowState(initialScanFlowState);
+        clientScanIdRef.current = null;
+        processingGuardRef.current = false;
+
+        // Procéder à la navigation en attente
+        if (pendingNavigation) {
+          pendingNavigation();
+          setPendingNavigation(null);
+        }
+
+        // Sauvegarder le repas (sans bloquer la navigation)
+        // On laisse la sauvegarde se faire en arrière-plan
+        handleSaveMealAndReset().catch(error => {
+          logger.error('MEAL_SCAN_EXIT', 'Background save failed', {
+            error: error instanceof Error ? error.message : String(error),
+            timestamp: new Date().toISOString()
+          });
         });
 
-        // La navigation est gérée dans handleSaveMealAndReset
-        // Fermer la modal et nettoyer les états
-        setShowExitConfirmation(false);
-        setPendingNavigation(null);
+        logger.info('MEAL_SCAN_EXIT', 'Navigation allowed, saving in background', {
+          timestamp: new Date().toISOString()
+        });
       } else {
         // Pas de résultats, juste quitter
         setShowExitConfirmation(false);
+        setScanFlowState(initialScanFlowState);
+        clientScanIdRef.current = null;
         if (pendingNavigation) {
           pendingNavigation();
           setPendingNavigation(null);
         }
       }
     } catch (error) {
-      logger.error('MEAL_SCAN_EXIT', 'Failed to save before exit', {
+      logger.error('MEAL_SCAN_EXIT', 'Failed to exit', {
         error: error instanceof Error ? error.message : String(error),
         timestamp: new Date().toISOString()
       });
-      showToast('Erreur lors de la sauvegarde', 'error');
-      // En cas d'erreur, laisser l'utilisateur réessayer ou quitter
+      showToast('Erreur lors de la sortie', 'error');
       setShowExitConfirmation(false);
     }
   };
@@ -357,12 +379,16 @@ const MealScanFlowPage: React.FC = () => {
       hasResults: !!scanFlowState.analysisResults,
       timestamp: new Date().toISOString()
     });
-    
+
     // Nettoyer l'état du scan
     setScanFlowState(initialScanFlowState);
     clientScanIdRef.current = null;
-    
+    processingGuardRef.current = false;
+
+    // Fermer la modal
     setShowExitConfirmation(false);
+
+    // Procéder à la navigation
     if (pendingNavigation) {
       pendingNavigation();
       setPendingNavigation(null);
