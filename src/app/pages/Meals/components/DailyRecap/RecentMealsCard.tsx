@@ -37,34 +37,38 @@ const RecentMealsCard: React.FC<RecentMealsCardProps> = ({
   if (todayStats.mealsCount > 0) {
     return (
       <div>
-        <GlassCard 
+        <GlassCard
           className="p-6 glass-card--summary"
           style={{
-            '--recommendation-color': 'var(--nutrition-primary)',
             background: `
-              radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--nutrition-primary) 6%, transparent) 0%, transparent 60%),
+              radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
               var(--glass-opacity)
             `,
-            borderColor: `color-mix(in srgb, var(--nutrition-primary) 15%, transparent)`
+            borderColor: 'rgba(16, 185, 129, 0.25)',
+            boxShadow: `
+              0 8px 32px rgba(0, 0, 0, 0.2),
+              0 0 20px rgba(16, 185, 129, 0.1),
+              inset 0 1px 0 rgba(255, 255, 255, 0.12)
+            `
           }}
         >
           <div className="flex items-center gap-3 mb-6">
-            <div 
+            <div
               className="w-12 h-12 rounded-full flex items-center justify-center"
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-                  linear-gradient(135deg, color-mix(in srgb, var(--nutrition-primary) 30%, transparent), color-mix(in srgb, var(--nutrition-primary) 20%, transparent))
+                  linear-gradient(135deg, color-mix(in srgb, #10B981 30%, transparent), color-mix(in srgb, #10B981 20%, transparent))
                 `,
-                border: '2px solid color-mix(in srgb, var(--nutrition-primary) 40%, transparent)',
-                boxShadow: '0 0 20px color-mix(in srgb, var(--nutrition-primary) 30%, transparent)'
+                border: '2px solid color-mix(in srgb, #10B981 40%, transparent)',
+                boxShadow: '0 0 20px color-mix(in srgb, #10B981 30%, transparent)'
               }}
             >
-              <SpatialIcon Icon={ICONS.History} size={20} style={{ color: 'var(--nutrition-primary)' }} />
+              <SpatialIcon Icon={ICONS.History} size={20} className="text-green-400" />
             </div>
             <div>
               <h3 className="text-white font-bold text-xl">Forge du Jour</h3>
-              <p className="text-white/60 text-sm">Vos repas analysés aujourd'hui</p>
+              <p className="text-green-200 text-sm">Vos repas analysés aujourd'hui</p>
             </div>
           </div>
           
@@ -77,26 +81,27 @@ const RecentMealsCard: React.FC<RecentMealsCardProps> = ({
                 <div
                   className="flex items-center justify-between p-4 rounded-xl glass-nested-card hover:scale-[1.02] transition-transform duration-200 meal-item-enter cursor-pointer"
                   style={{
-                    background: `color-mix(in srgb, var(--nutrition-primary) 4%, transparent)`,
-                    borderColor: `color-mix(in srgb, var(--nutrition-primary) 12%, transparent)`,
+                    background: `color-mix(in srgb, #10B981 6%, transparent)`,
+                    border: '1px solid color-mix(in srgb, #10B981 15%, transparent)',
                     backdropFilter: 'blur(8px) saturate(120%)',
+                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.1)',
                     animationDelay: `${index * 0.1}s`
                   }}
                   onClick={() => onMealClick(meal)}
                 >
                   <div className="flex items-center gap-3">
-                    <div 
+                    <div
                       className="w-10 h-10 rounded-full flex items-center justify-center"
                       style={{
                         background: `
                           radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12) 0%, transparent 60%),
-                          linear-gradient(135deg, color-mix(in srgb, var(--nutrition-primary) 25%, transparent), color-mix(in srgb, var(--nutrition-primary) 15%, transparent))
+                          linear-gradient(135deg, color-mix(in srgb, #10B981 25%, transparent), color-mix(in srgb, #10B981 15%, transparent))
                         `,
-                        border: '1px solid color-mix(in srgb, var(--nutrition-primary) 30%, transparent)',
-                        boxShadow: '0 0 12px color-mix(in srgb, var(--nutrition-primary) 20%, transparent)'
+                        border: '1px solid color-mix(in srgb, #10B981 30%, transparent)',
+                        boxShadow: '0 0 12px color-mix(in srgb, #10B981 20%, transparent)'
                       }}
                     >
-                      <SpatialIcon Icon={ICONS.Utensils} size={16} style={{ color: 'var(--nutrition-primary)' }} />
+                      <SpatialIcon Icon={ICONS.Utensils} size={16} className="text-green-400" />
                     </div>
                     <div>
                       <div className="text-white font-semibold">
@@ -154,29 +159,38 @@ const RecentMealsCard: React.FC<RecentMealsCardProps> = ({
 
   // État Vide - Message adapté selon l'historique
   return (
-    <GlassCard 
+    <GlassCard
       className="p-8 text-center glass-card--summary"
       style={{
-        '--recommendation-color': 'var(--nutrition-primary)'
+        background: `
+          radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+          var(--glass-opacity)
+        `,
+        borderColor: 'rgba(16, 185, 129, 0.25)',
+        boxShadow: `
+          0 8px 32px rgba(0, 0, 0, 0.2),
+          0 0 20px rgba(16, 185, 129, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.12)
+        `
       }}
     >
-      <div className="flex items-center gap-4 mb-6">
-        <div 
+      <div className="flex items-center gap-4 mb-6 justify-center">
+        <div
           className="w-16 h-16 rounded-full flex items-center justify-center"
           style={{
             background: `
               radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-              linear-gradient(135deg, color-mix(in srgb, var(--nutrition-primary) 30%, transparent), color-mix(in srgb, var(--nutrition-secondary) 20%, transparent))
+              linear-gradient(135deg, color-mix(in srgb, #10B981 30%, transparent), color-mix(in srgb, #10B981 20%, transparent))
             `,
-            border: '2px solid color-mix(in srgb, var(--nutrition-primary) 40%, transparent)',
-            boxShadow: '0 0 30px color-mix(in srgb, var(--nutrition-primary) 30%, transparent)'
+            border: '2px solid color-mix(in srgb, #10B981 40%, transparent)',
+            boxShadow: '0 0 30px color-mix(in srgb, #10B981 30%, transparent)'
           }}
         >
-          <SpatialIcon Icon={ICONS.Utensils} size={28} style={{ color: 'var(--nutrition-primary)' }} />
+          <SpatialIcon Icon={ICONS.Utensils} size={28} className="text-green-400" />
         </div>
         <div className="text-left">
           <h3 className="text-2xl font-bold text-white">{hasAnyMealHistory ? 'Nouvelle Journée Nutritionnelle' : 'Première Forge Nutritionnelle'}</h3>
-          <p className="text-white/70 text-base">{hasAnyMealHistory ? 'Commencez votre suivi du jour' : 'Démarrez votre analyse IA personnalisée'}</p>
+          <p className="text-green-200 text-base">{hasAnyMealHistory ? 'Commencez votre suivi du jour' : 'Démarrez votre analyse IA personnalisée'}</p>
         </div>
       </div>
       
