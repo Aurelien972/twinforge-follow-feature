@@ -38,15 +38,94 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
       }}
     >
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-white font-semibold flex items-center gap-2">
-          <SpatialIcon Icon={ICONS.Camera} size={16} className="text-green-400" />
-          Photo de votre repas
-        </h4>
-        <div className="capture-status-badge capture-status-badge--pending">
-          <div className="capture-status-icon">
-            <SpatialIcon Icon={ICONS.Clock} size={12} className="text-blue-400" />
+        {/* Titre avec icône lumineuse */}
+        <div className="flex items-center gap-3">
+          {/* Icône sur fond coloré lumineux */}
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: `
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
+                linear-gradient(135deg, rgba(16, 185, 129, 0.45), rgba(5, 150, 105, 0.35))
+              `,
+              border: '2px solid rgba(16, 185, 129, 0.6)',
+              boxShadow: `
+                0 0 20px rgba(16, 185, 129, 0.6),
+                0 0 40px rgba(16, 185, 129, 0.3),
+                inset 0 2px 0 rgba(255,255,255,0.35),
+                inset 0 -2px 0 rgba(0,0,0,0.2)
+              `
+            }}
+          >
+            <SpatialIcon
+              Icon={ICONS.Camera}
+              size={18}
+              style={{
+                color: '#fff',
+                filter: 'drop-shadow(0 2px 8px rgba(16, 185, 129, 0.9)) drop-shadow(0 0 4px rgba(255,255,255,0.5))'
+              }}
+            />
           </div>
-          <span className="capture-status-text">En attente</span>
+          <h4
+            className="text-white font-bold text-base"
+            style={{
+              textShadow: '0 2px 8px rgba(16, 185, 129, 0.4), 0 0 4px rgba(0,0,0,0.3)'
+            }}
+          >
+            Photo de votre repas
+          </h4>
+        </div>
+
+        {/* Joli bouton "En attente" */}
+        <div
+          className="flex items-center gap-2 px-3 py-1.5"
+          style={{
+            background: `
+              linear-gradient(135deg,
+                rgba(59, 130, 246, 0.2),
+                rgba(37, 99, 235, 0.15)
+              )
+            `,
+            border: '2px solid rgba(59, 130, 246, 0.4)',
+            borderRadius: '16px',
+            backdropFilter: 'blur(12px) saturate(130%)',
+            boxShadow: `
+              0 4px 16px rgba(59, 130, 246, 0.25),
+              0 0 24px rgba(59, 130, 246, 0.15),
+              inset 0 1px 0 rgba(255,255,255,0.2)
+            `
+          }}
+        >
+          <motion.div
+            className="w-2 h-2 rounded-full"
+            style={{
+              backgroundColor: '#3B82F6',
+              boxShadow: '0 0 10px #3B82F6'
+            }}
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.7, 1, 0.7]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <span
+            className="text-xs font-semibold"
+            style={{
+              color: '#fff',
+              textShadow: '0 1px 4px rgba(0,0,0,0.3)'
+            }}
+          >
+            En attente
+          </span>
         </div>
       </div>
       
