@@ -48,8 +48,8 @@
     radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--nutrition-secondary) 10%, transparent) 0%, transparent 60%),
     radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--nutrition-accent) 8%, transparent) 0%, transparent 50%),
     var(--glass-opacity);
-  border: 1px solid color-mix(in srgb, var(--nutrition-secondary) 30%, transparent);
-  border-radius: var(--glass-radius-lg);
+  border: 2px solid color-mix(in srgb, var(--nutrition-secondary) 30%, transparent);
+  border-radius: 24px;
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.25),
     0 0 30px color-mix(in srgb, var(--nutrition-secondary) 15%, transparent),
@@ -227,8 +227,8 @@
     radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--nutrition-accent) 12%, transparent) 0%, transparent 60%),
     radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--nutrition-secondary) 8%, transparent) 0%, transparent 50%),
     var(--glass-opacity);
-  border: 1px solid color-mix(in srgb, var(--nutrition-accent) 30%, transparent);
-  border-radius: var(--glass-radius-lg);
+  border: 2px solid color-mix(in srgb, var(--nutrition-accent) 30%, transparent);
+  border-radius: 24px;
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.25),
     0 0 30px color-mix(in srgb, var(--nutrition-accent) 15%, transparent),
@@ -301,6 +301,7 @@
 /* Bouton principal - Sauvegarder le repas */
 .btn-save-meal-cta {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
   width: 100%;
   padding: 16px 24px;
@@ -355,8 +356,10 @@
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
   animation: ctaShimmer 3s ease-in-out infinite;
-  border-radius: inherit;
+  border-radius: 999px;
   pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
 }
 
 @keyframes ctaShimmer {
