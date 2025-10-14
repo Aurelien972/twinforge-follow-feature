@@ -17,7 +17,11 @@ import FastingTipsCard from '../Cards/FastingTipsCard';
  * Fasting Daily Tab - Onglet Aujourd'hui de la Forge du Temps
  * Affiche le statut actuel du jeûne et les sessions de la journée
  */
-const FastingDailyTab: React.FC = () => {
+interface FastingDailyTabProps {
+  onLoadingChange?: (isLoading: boolean) => void;
+}
+
+const FastingDailyTab: React.FC<FastingDailyTabProps> = ({ onLoadingChange }) => {
   const { profile, session } = useUserStore();
   const { isActive, session: fastingSession } = useFastingPipeline();
 

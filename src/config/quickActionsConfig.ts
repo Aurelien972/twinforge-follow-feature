@@ -54,7 +54,7 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
         label: 'Scanner de Repas',
         subtitle: 'Capturez et analysez vos repas',
         icon: 'Camera',
-        route: '/meals',
+        route: '/meals/scan',
         color: '#10B981', // Vert nutrition
         available: true,
         description: 'Analyser un repas avec précision'

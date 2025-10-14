@@ -18,7 +18,8 @@ const Home = lazy(() => import('./app/pages/Home'));
 const Profile = lazy(() => import('./app/pages/Profile'));
 const ActivityPage = lazy(() => import('./app/pages/ActivityPage'));
 const FastingPage = lazy(() => import('./app/pages/Fasting/FastingPage'));
-const MealsPage = lazy(() => import('./app/pages/MealsPage'));
+const MealsPage = lazy(() => import('./app/pages/Meals/MealsPage'));
+const MealScanFlowPage = lazy(() => import('./app/pages/Meals/MealScanFlowPage'));
 const FridgePage = lazy(() => import('./app/pages/FridgePage'));
 const TrainingPage = lazy(() => import('./app/pages/TrainingPage'));
 const SettingsPage = lazy(() => import('./app/pages/SettingsPage'));
@@ -125,13 +126,11 @@ const router = createBrowserRouter([
       },
       {
         path: "meals",
-        element: <Suspense fallback={<LoadingFallback />}><MealsPage /></Suspense>,
-        children: [
-          {
-            path: "scan",
-            element: <MealsPage />
-          }
-        ]
+        element: <Suspense fallback={<LoadingFallback />}><MealsPage /></Suspense>
+      },
+      {
+        path: "meals/scan",
+        element: <Suspense fallback={<LoadingFallback />}><MealScanFlowPage /></Suspense>
       },
       {
         path: "activity",

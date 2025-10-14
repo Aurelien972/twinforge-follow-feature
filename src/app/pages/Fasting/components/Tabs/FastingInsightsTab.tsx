@@ -32,7 +32,11 @@ const getInsightsMinSessions = (period: number): number => {
  * Fasting Insights Tab - Onglet Insights de la Forge du Temps
  * Conseils IA personnalisés basés sur les patterns de jeûne
  */
-const FastingInsightsTab: React.FC = () => {
+interface FastingInsightsTabProps {
+  onLoadingChange?: (isLoading: boolean) => void;
+}
+
+const FastingInsightsTab: React.FC<FastingInsightsTabProps> = ({ onLoadingChange }) => {
   const { profile } = useUserStore();
   const { showModal: showExitModal } = useExitModalStore();
   const { showToast } = useToast();
@@ -51,12 +55,17 @@ const FastingInsightsTab: React.FC = () => {
   const availableSessionsCount = historyData?.sessions?.filter(s => s.status === 'completed').length || 0;
   
   // Generate insights for selected period
-  const { 
-    data: insightsData, 
-    isLoading, 
-    error 
+  const {
+    data: insightsData,
+    isLoading,
+    error
   } = useFastingInsightsGenerator(selectedPeriod);
-  
+
+  // Notify parent about loading state changes
+  React.useEffect(() => {
+    onLoadingChange?.(isLoading);
+  }, [isLoading, onLoadingChange]);
+
   // Block navigation during insights generation
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) => {

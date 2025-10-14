@@ -34,7 +34,11 @@ const getProgressionMinSessions = (period: number): number => {
  * Fasting Progression Tab - Onglet Progression de la Forge du Temps
  * Analyse de l'évolution des performances de jeûne
  */
-const FastingProgressionTab: React.FC = () => {
+interface FastingProgressionTabProps {
+  onLoadingChange?: (isLoading: boolean) => void;
+}
+
+const FastingProgressionTab: React.FC<FastingProgressionTabProps> = ({ onLoadingChange }) => {
   const { profile, session } = useUserStore();
   const navigate = useNavigate();
   const [selectedPeriod, setSelectedPeriod] = useState(7);
@@ -49,7 +53,12 @@ const FastingProgressionTab: React.FC = () => {
     isLoading,
     error
   } = useFastingProgressionData(selectedPeriod);
-  
+
+  // Notify parent about loading state changes
+  React.useEffect(() => {
+    onLoadingChange?.(isLoading);
+  }, [isLoading, onLoadingChange]);
+
   // Check data completeness for AI analysis
   const missingData = useMemo(() => {
     const missing: string[] = [];
