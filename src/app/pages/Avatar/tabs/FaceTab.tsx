@@ -25,7 +25,6 @@ const FaceTab: React.FC = () => {
   const { click, success } = useFeedback();
   const [isLoadingData, setIsLoadingData] = React.useState(true);
   const [showControls, setShowControls] = React.useState(false);
-  const [morphUpdateKey, setMorphUpdateKey] = React.useState(0);
 
   // Hook pour gérer les paramètres faciaux globalement
   const {
@@ -35,14 +34,6 @@ const FaceTab: React.FC = () => {
     isSaving,
     error: saveError
   } = useGlobalFaceParams();
-
-  // Create a wrapped update function that forces re-render
-  const handleUpdateFaceParams = React.useCallback((newParams: Record<string, number>) => {
-    console.log('🎯 FaceTab: Updating face params and triggering re-render', { paramsCount: Object.keys(newParams).length });
-    updateFaceParams(newParams);
-    // Increment key to force FaceViewer3D to detect the change
-    setMorphUpdateKey(prev => prev + 1);
-  }, [updateFaceParams]);
 
   // Récupérer les données du scan facial depuis le profil (memoized to prevent recalculations)
   const hasFaceScan = React.useMemo(() => !!profile?.preferences?.face?.final_face_params, [profile?.preferences?.face?.final_face_params]);
@@ -56,10 +47,9 @@ const FaceTab: React.FC = () => {
 
   // Utiliser les paramètres faciaux actuels (incluant les ajustements en temps réel)
   // Memoized to prevent unnecessary recalculations
-  // TOUJOURS utiliser currentFaceParams pour les ajustements en temps réel
   const activeFaceMorphData = React.useMemo(
-    () => currentFaceParams,
-    [currentFaceParams]
+    () => showControls ? currentFaceParams : faceMorphData,
+    [showControls, currentFaceParams, faceMorphData]
   );
 
   // Fusionner les données faciales avec les clés corporelles pertinentes
@@ -462,7 +452,6 @@ const FaceTab: React.FC = () => {
 
         <div className="h-[400px] sm:h-[500px] lg:h-[600px] rounded-xl bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-400/20 relative overflow-hidden">
           <FaceViewer3D
-            key={`face-viewer-${morphUpdateKey}`}
             faceMorphData={mergedFaceMorphData}
             faceSkinTone={faceSkinTone}
             userProfile={profile}
@@ -559,7 +548,7 @@ const FaceTab: React.FC = () => {
         >
           <FaceShapeControls
             currentValues={currentFaceParams}
-            onValuesChange={handleUpdateFaceParams}
+            onValuesChange={updateFaceParams}
             onSave={async () => {
               const result = await saveFaceParams();
               if (result.success) {

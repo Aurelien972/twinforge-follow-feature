@@ -5,7 +5,6 @@ import { useUserStore } from '../system/store/userStore';
 import { supabase } from '../system/supabase/client';
 import logger from '../lib/utils/logger';
 import { normalizeFaceShapeValue } from '../config/faceShapeKeysMapping';
-import { useQueryClient } from '@tanstack/react-query';
 
 /**
  * Hook global pour gérer les paramètres faciaux
@@ -13,23 +12,14 @@ import { useQueryClient } from '@tanstack/react-query';
  */
 export function useGlobalFaceParams() {
   const { profile, setProfile } = useUserStore();
-  const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [localFaceParams, setLocalFaceParams] = useState<Record<string, number>>({});
 
   // Récupérer les paramètres faciaux actuels (memoized to prevent reference changes)
   const currentFaceParams = React.useMemo(
     () => profile?.preferences?.face?.final_face_params || {},
     [profile?.preferences?.face?.final_face_params]
   );
-
-  // Initialize local params from profile
-  useEffect(() => {
-    if (profile?.preferences?.face?.final_face_params) {
-      setLocalFaceParams(profile.preferences.face.final_face_params);
-    }
-  }, [profile?.preferences?.face?.final_face_params]);
 
   /**
    * Mettre à jour les paramètres faciaux localement (sans sauvegarder)
@@ -48,10 +38,7 @@ export function useGlobalFaceParams() {
       normalizedParams[key] = normalizeFaceShapeValue(key, value);
     });
 
-    // Mettre à jour l'état local immédiatement pour l'UI
-    setLocalFaceParams(normalizedParams);
-
-    // Mettre à jour le profil localement pour les viewers
+    // Mettre à jour le profil localement
     const updatedProfile = {
       ...profile,
       preferences: {
@@ -68,15 +55,7 @@ export function useGlobalFaceParams() {
     logger.info('USE_GLOBAL_FACE_PARAMS', 'Face params updated locally', {
       userId: profile.userId,
       paramsCount: Object.keys(normalizedParams).length,
-      sampleKeys: Object.keys(normalizedParams).slice(0, 5),
-      sampleValues: Object.keys(normalizedParams).slice(0, 5).map(k => ({ [k]: normalizedParams[k] })),
       philosophy: 'local_update'
-    });
-
-    // Force trigger for debugging
-    console.log('🔄 useGlobalFaceParams: Updated face params', {
-      totalKeys: Object.keys(normalizedParams).length,
-      sampleKeys: Object.keys(normalizedParams).slice(0, 5)
     });
   }, [profile, setProfile]);
 
@@ -142,14 +121,9 @@ export function useGlobalFaceParams() {
       };
       setProfile(updatedProfile);
 
-      // Invalider le cache React Query pour forcer le rechargement dans tous les composants
-      await queryClient.invalidateQueries({ queryKey: ['profile-face-data'] });
-      await queryClient.invalidateQueries({ queryKey: ['user-profile'] });
-
       logger.info('USE_GLOBAL_FACE_PARAMS', 'Face params saved successfully', {
         userId: profile.userId,
         paramsCount: Object.keys(normalizedParams).length,
-        cacheInvalidated: true,
         philosophy: 'supabase_save_success'
       });
 

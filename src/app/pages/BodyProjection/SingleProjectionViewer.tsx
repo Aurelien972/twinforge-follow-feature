@@ -13,8 +13,6 @@ interface SingleProjectionViewerProps {
   projectedLimbMasses?: Record<string, number>;
   projectedSkinTone?: any;
   projectedGender?: 'male' | 'female';
-  faceMorphData?: Record<string, number>;
-  faceSkinTone?: any;
   isLoading?: boolean;
   onViewerReady?: () => void;
 }
@@ -100,8 +98,6 @@ const SingleProjectionViewerComponent: React.FC<SingleProjectionViewerProps> = (
   projectedLimbMasses,
   projectedSkinTone,
   projectedGender,
-  faceMorphData,
-  faceSkinTone,
   isLoading = false,
   onViewerReady
 }) => {
@@ -198,8 +194,6 @@ const SingleProjectionViewerComponent: React.FC<SingleProjectionViewerProps> = (
             overrideLimbMasses={displayLimbMasses}
             overrideSkinTone={displaySkinTone}
             overrideGender={displayGender}
-            faceMorphData={faceMorphData}
-            faceSkinTone={faceSkinTone}
             showControls={true}
             className="w-full h-full"
             onViewerReady={onViewerReady}

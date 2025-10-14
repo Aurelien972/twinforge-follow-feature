@@ -37,7 +37,6 @@ const FaceShapeControls: React.FC<FaceShapeControlsProps> = ({
   // Update local values when currentValues change from external source
   React.useEffect(() => {
     setLocalValues(currentValues);
-    setHasChanges(false); // Reset hasChanges when receiving new external values (e.g., after save)
   }, [currentValues]);
 
   // Gérer le changement d'une valeur avec debouncing pour les performances
@@ -52,9 +51,8 @@ const FaceShapeControls: React.FC<FaceShapeControlsProps> = ({
       clearTimeout(debounceTimerRef.current);
     }
     debounceTimerRef.current = setTimeout(() => {
-      console.log('🔄 FaceShapeControls: Triggering morph update', { key, value, totalKeys: Object.keys(newValues).length });
       onValuesChange(newValues);
-    }, 50); // 50ms debounce - more responsive for real-time adjustments
+    }, 100); // 100ms debounce - responsive but not overwhelming
   }, [localValues, onValuesChange]);
 
   // Cleanup debounce timer on unmount
@@ -85,17 +83,14 @@ const FaceShapeControls: React.FC<FaceShapeControlsProps> = ({
         newValues[keyConfig.key] = keyConfig.default;
       });
     });
-    console.log('🔄 FaceShapeControls: Resetting all values', { totalKeys: Object.keys(newValues).length });
-    setLocalValues(newValues);
     onValuesChange(newValues);
     setHasChanges(true);
   }, [onValuesChange]);
 
   // Sauvegarder
-  const handleSave = useCallback(async () => {
-    await onSave();
-    // Ne réinitialiser hasChanges que si la sauvegarde est réussie
-    // (géré par l'appelant via le reset du callback après succès)
+  const handleSave = useCallback(() => {
+    onSave();
+    setHasChanges(false);
   }, [onSave]);
 
   // Basculer l'expansion d'une catégorie
