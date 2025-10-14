@@ -18,6 +18,10 @@ import { ICONS } from '../../../ui/icons/registry';
 import PageHeader from '../../../ui/page/PageHeader';
 import Tabs from '../../../ui/tabs/TabsComponent';
 import { HealthOverviewTab } from './tabs/HealthOverviewTab';
+import { BasicHealthTab } from './tabs/BasicHealthTab';
+import { VitalSignsTab } from './tabs/VitalSignsTab';
+import { LifestyleTab } from './tabs/LifestyleTab';
+import { FamilyHistoryTab } from './tabs/FamilyHistoryTab';
 import logger from '../../../lib/utils/logger';
 
 const HealthProfilePage: React.FC = () => {
@@ -41,6 +45,7 @@ const HealthProfilePage: React.FC = () => {
   // Update tab completion percentages when data changes
   React.useEffect(() => {
     if (completion) {
+      updateTabCompletion('basic-info', completion.basicInfo || 0);
       updateTabCompletion('medical-history', completion.medicalHistory);
       updateTabCompletion('family-history', completion.familyHistory);
       updateTabCompletion('vital-signs', completion.vitalSigns);
@@ -292,20 +297,24 @@ const HealthProfilePage: React.FC = () => {
           <HealthOverviewTab />
         </Tabs.Panel>
 
+        <Tabs.Panel value="basic-info">
+          <BasicHealthTab />
+        </Tabs.Panel>
+
         <Tabs.Panel value="medical-history">
           <PlaceholderTab title="Historique Médical" icon="FileText" />
         </Tabs.Panel>
 
         <Tabs.Panel value="family-history">
-          <PlaceholderTab title="Antécédents Familiaux" icon="Users" />
+          <FamilyHistoryTab />
         </Tabs.Panel>
 
         <Tabs.Panel value="vital-signs">
-          <PlaceholderTab title="Constantes Vitales" icon="Activity" />
+          <VitalSignsTab />
         </Tabs.Panel>
 
         <Tabs.Panel value="lifestyle">
-          <PlaceholderTab title="Style de Vie" icon="Coffee" />
+          <LifestyleTab />
         </Tabs.Panel>
 
         <Tabs.Panel value="vaccinations">

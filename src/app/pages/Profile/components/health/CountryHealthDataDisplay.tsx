@@ -89,7 +89,7 @@ export const CountryHealthDataDisplay: React.FC<CountryHealthDataDisplayProps> =
           {countryData.endemic_diseases && countryData.endemic_diseases.length > 0 && (
             <div className="p-4 rounded-xl bg-orange-500/10 border border-orange-400/20">
               <div className="flex items-center gap-2 mb-3">
-                <SpatialIcon Icon={ICONS.AlertTriangle} size={16} className="text-orange-400" />
+                <SpatialIcon Icon={ICONS.Biohazard} size={16} className="text-orange-400" />
                 <h4 className="text-white/90 font-medium text-sm">Maladies Endémiques</h4>
               </div>
               <div className="space-y-1">
@@ -106,7 +106,7 @@ export const CountryHealthDataDisplay: React.FC<CountryHealthDataDisplayProps> =
           {countryData.vaccination_requirements && (
             <div className="p-4 rounded-xl bg-green-500/10 border border-green-400/20">
               <div className="flex items-center gap-2 mb-3">
-                <SpatialIcon Icon={ICONS.Shield} size={16} className="text-green-400" />
+                <SpatialIcon Icon={ICONS.Syringe} size={16} className="text-green-400" />
                 <h4 className="text-white/90 font-medium text-sm">Vaccinations Recommandées</h4>
               </div>
               <div className="space-y-1">
@@ -176,7 +176,7 @@ export const CountryHealthDataDisplay: React.FC<CountryHealthDataDisplayProps> =
         {countryData.health_risks && (
           <div className="mt-4 p-4 rounded-xl bg-red-500/10 border border-red-400/20">
             <div className="flex items-center gap-2 mb-3">
-              <SpatialIcon Icon={ICONS.AlertOctagon} size={16} className="text-red-400" />
+              <SpatialIcon Icon={ICONS.Bug} size={16} className="text-red-400" />
               <h4 className="text-white/90 font-medium text-sm">Risques Sanitaires Spécifiques</h4>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

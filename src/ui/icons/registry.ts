@@ -147,6 +147,15 @@ export const ICONS = {
   Grid3X3: L.Grid3X3,
   DollarSign: L.DollarSign,
 
+  Syringe: L.Syringe,
+  Bug: L.Bug,
+  Stethoscope: L.Stethoscope,
+  Microscope: L.Microscope,
+  Biohazard: L.Biohazard,
+  Cigarette: L.Cigarette,
+  Wine: L.Wine,
+  Pill: L.Pill,
+
   Play: L.Play,
   MapPin: L.MapPin,
   Map: L.Map,

@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 import type { HealthProfileV2 } from '../../../../domain/health';
 
 interface HealthCompletionBreakdown {
+  basicInfo: number;
   basic: number;
   medicalHistory: number;
   familyHistory: number;
@@ -23,6 +24,7 @@ export function useHealthCompletion(health?: HealthProfileV2): HealthCompletionB
   return useMemo(() => {
     if (!health) {
       return {
+        basicInfo: 0,
         basic: 0,
         medicalHistory: 0,
         familyHistory: 0,
@@ -120,6 +122,7 @@ export function useHealthCompletion(health?: HealthProfileV2): HealthCompletionB
     );
 
     return {
+      basicInfo: basicCompletion,
       basic: basicCompletion,
       medicalHistory: medicalHistoryCompletion,
       familyHistory: familyHistoryCompletion,

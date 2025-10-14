@@ -8,6 +8,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 export type HealthProfileTab =
   | 'overview'
+  | 'basic-info'
   | 'medical-history'
   | 'family-history'
   | 'vital-signs'
@@ -33,6 +34,14 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     description: 'Tableau de bord et métriques clés',
     color: '#06B6D4',
     requiredForAI: false,
+  },
+  {
+    id: 'basic-info',
+    label: 'Infos de Base',
+    icon: 'Scale',
+    description: 'Groupe sanguin, taille, poids, IMC',
+    color: '#06B6D4',
+    requiredForAI: true,
   },
   {
     id: 'medical-history',
@@ -103,6 +112,7 @@ export function useHealthProfileNavigation() {
 
   const [completionByTab, setCompletionByTab] = useState<Record<HealthProfileTab, number>>({
     'overview': 100,
+    'basic-info': 0,
     'medical-history': 0,
     'family-history': 0,
     'vital-signs': 0,
