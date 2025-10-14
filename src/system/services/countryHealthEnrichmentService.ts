@@ -51,7 +51,7 @@ export class CountryHealthEnrichmentService {
       const countryCode = await this.getCountryCode(countryName);
       if (!countryCode) {
         logger.warn('COUNTRY_HEALTH_ENRICHMENT', 'Country code not found', { countryName });
-        return null;
+        return this.getStaticCountryData(countryName);
       }
 
       const basicInfo = await this.fetchRestCountriesData(countryName);
@@ -80,7 +80,7 @@ export class CountryHealthEnrichmentService {
         countryName,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
-      return null;
+      return this.getStaticCountryData(countryName);
     }
   }
 
@@ -93,6 +93,10 @@ export class CountryHealthEnrichmentService {
         .maybeSingle();
 
       if (error) {
+        if (error.code === 'PGRST205' || error.message?.includes('does not exist')) {
+          logger.warn('COUNTRY_HEALTH_CACHE', 'Table does not exist yet', { countryName });
+          return null;
+        }
         logger.error('COUNTRY_HEALTH_CACHE', 'Cache read error', { error: error.message });
         return null;
       }
@@ -145,6 +149,33 @@ export class CountryHealthEnrichmentService {
       'Afrique du Sud': 'ZA',
       'Inde': 'IN',
       'Singapour': 'SG',
+      // Territoires français d'outre-mer
+      'Martinique': 'MQ',
+      'Guadeloupe': 'GP',
+      'Guyane': 'GF',
+      'Guyane française': 'GF',
+      'Mayotte': 'YT',
+      'Saint-Martin': 'MF',
+      'Saint-Barthélemy': 'BL',
+      'Saint-Pierre-et-Miquelon': 'PM',
+      'Wallis-et-Futuna': 'WF',
+      'Polynésie française': 'PF',
+      'Nouvelle-Calédonie': 'NC',
+      // Autres pays francophones
+      'Bénin': 'BJ',
+      'Togo': 'TG',
+      'Guinée': 'GN',
+      'Centrafrique': 'CF',
+      'République centrafricaine': 'CF',
+      'Rwanda': 'RW',
+      'Burundi': 'BI',
+      'Djibouti': 'DJ',
+      'Comores': 'KM',
+      'Seychelles': 'SC',
+      'Vanuatu': 'VU',
+      'Liban': 'LB',
+      'Mauritanie': 'MR',
+      'Guinée équatoriale': 'GQ',
     };
 
     return countryMap[countryName] || null;
@@ -264,6 +295,31 @@ export class CountryHealthEnrichmentService {
     return deficiencies[region] || ['Vitamin D', 'Iron'];
   }
 
+  private getStaticCountryData(countryName: string): CountryHealthData | null {
+    logger.info('COUNTRY_HEALTH_ENRICHMENT', 'Using static fallback data', { countryName });
+
+    return {
+      country_code: 'UNKNOWN',
+      country_name: countryName,
+      endemic_diseases: [],
+      vaccination_requirements: {
+        required: [],
+        recommended: ['Hepatitis A', 'Hepatitis B', 'Tetanus-Diphtheria'],
+        seasonal: [],
+      },
+      health_risks: {
+        vector_borne_diseases: [],
+        waterborne_diseases: [],
+        foodborne_risks: ['Traveler\'s Diarrhea', 'Food Poisoning'],
+        environmental_hazards: [],
+      },
+      common_deficiencies: ['Vitamin D', 'Iron'],
+      climate_data: {},
+      last_updated: new Date().toISOString(),
+      data_source: 'static_fallback',
+    };
+  }
+
   private inferClimateData(latlng?: [number, number]) {
     if (!latlng) return {};
 
@@ -316,6 +372,10 @@ export class CountryHealthEnrichmentService {
         );
 
       if (error) {
+        if (error.code === 'PGRST205' || error.message?.includes('does not exist')) {
+          logger.warn('COUNTRY_HEALTH_SAVE', 'Table does not exist, skipping save', { country: data.country_name });
+          return;
+        }
         logger.error('COUNTRY_HEALTH_SAVE', 'Save failed', { error: error.message });
       }
     } catch (error) {

@@ -50,10 +50,11 @@ export function useCountryHealthData(): UseCountryHealthDataReturn {
         logger.info('COUNTRY_HEALTH_HOOK', 'Country data loaded', {
           country: data.country_name,
           lastUpdated: data.last_updated,
+          source: data.data_source,
         });
       } else {
         setCountryData(null);
-        logger.warn('COUNTRY_HEALTH_HOOK', 'No country data available', {
+        logger.info('COUNTRY_HEALTH_HOOK', 'No country data available', {
           country: profile.country,
         });
       }
@@ -65,6 +66,7 @@ export function useCountryHealthData(): UseCountryHealthDataReturn {
         userId: profile.userId,
         country: profile.country,
       });
+      setCountryData(null);
     } finally {
       setLoading(false);
     }
