@@ -19,7 +19,7 @@ import { motion } from 'framer-motion';
 
 const HealthProfilePage: React.FC = () => {
   const { activeTab, globalCompletion, updateTabCompletion } = useHealthProfileNavigation();
-  const { migrating, migrationComplete, migrationError, retryMigration } = useHealthDataMigration();
+  const { migrating, migrationComplete, migrationError, retryMigration, skipMigration, canSkip, attemptsRemaining } = useHealthDataMigration();
   const { profile } = useUserStore();
 
   // Get health data and calculate completions
@@ -86,40 +86,97 @@ const HealthProfilePage: React.FC = () => {
           transition={{ duration: 0.3 }}
         >
           <GlassCard className="p-8 max-w-md" style={{
-            background: 'rgba(239, 68, 68, 0.1)',
-            borderColor: 'rgba(239, 68, 68, 0.3)',
+            background: canSkip ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+            borderColor: canSkip ? 'rgba(245, 158, 11, 0.3)' : 'rgba(239, 68, 68, 0.3)',
           }}>
             <div className="flex flex-col items-center gap-4">
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center"
                 style={{
-                  background: `
-                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2))
-                  `,
-                  border: '2px solid rgba(239, 68, 68, 0.5)',
-                  boxShadow: '0 0 30px rgba(239, 68, 68, 0.4)',
+                  background: canSkip
+                    ? `
+                      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                      linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.2))
+                    `
+                    : `
+                      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                      linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2))
+                    `,
+                  border: canSkip ? '2px solid rgba(245, 158, 11, 0.5)' : '2px solid rgba(239, 68, 68, 0.5)',
+                  boxShadow: canSkip ? '0 0 30px rgba(245, 158, 11, 0.4)' : '0 0 30px rgba(239, 68, 68, 0.4)',
                 }}
               >
-                <SpatialIcon Icon={ICONS.AlertCircle} size={32} className="text-red-400" />
+                <SpatialIcon
+                  Icon={canSkip ? ICONS.AlertTriangle : ICONS.AlertCircle}
+                  size={32}
+                  className={canSkip ? 'text-amber-400' : 'text-red-400'}
+                />
               </div>
               <div className="text-center">
-                <h2 className="text-white font-semibold text-xl mb-2">Erreur de migration</h2>
-                <p className="text-white/70 text-sm mb-4">
-                  Une erreur est survenue lors de la mise à jour de votre profil santé.
+                <h2 className="text-white font-semibold text-xl mb-2">
+                  {canSkip ? 'Migration optionnelle' : 'Erreur de migration'}
+                </h2>
+                <p className="text-white/70 text-sm mb-2">
+                  {canSkip
+                    ? 'La migration automatique a échoué après plusieurs tentatives.'
+                    : 'Une erreur est survenue lors de la mise à jour de votre profil santé.'}
                 </p>
-                <p className="text-red-300 text-xs mb-4">
+                {attemptsRemaining > 0 && (
+                  <p className="text-white/50 text-xs mb-3">
+                    Tentatives restantes: {attemptsRemaining}
+                  </p>
+                )}
+                <p className={`text-xs mb-4 ${canSkip ? 'text-amber-300' : 'text-red-300'}`}>
                   {migrationError.message}
                 </p>
-                <button
-                  onClick={retryMigration}
-                  className="btn-glass px-6 py-2"
-                >
-                  <div className="flex items-center gap-2">
-                    <SpatialIcon Icon={ICONS.RefreshCw} size={16} />
-                    <span>Réessayer</span>
-                  </div>
-                </button>
+                <div className="flex flex-col gap-2">
+                  {!canSkip && attemptsRemaining > 0 && (
+                    <button
+                      onClick={retryMigration}
+                      className="btn-glass px-6 py-2 w-full"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <SpatialIcon Icon={ICONS.RefreshCw} size={16} />
+                        <span>Réessayer ({attemptsRemaining} restantes)</span>
+                      </div>
+                    </button>
+                  )}
+                  {canSkip && (
+                    <>
+                      <button
+                        onClick={skipMigration}
+                        className="btn-glass px-6 py-2 w-full"
+                        style={{
+                          background: 'rgba(6, 182, 212, 0.2)',
+                          borderColor: 'rgba(6, 182, 212, 0.4)',
+                        }}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <SpatialIcon Icon={ICONS.ArrowRight} size={16} />
+                          <span>Continuer sans migrer</span>
+                        </div>
+                      </button>
+                      <button
+                        onClick={retryMigration}
+                        className="btn-glass px-6 py-2 w-full"
+                        style={{
+                          background: 'rgba(100, 116, 139, 0.1)',
+                          borderColor: 'rgba(100, 116, 139, 0.3)',
+                        }}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <SpatialIcon Icon={ICONS.RefreshCw} size={16} />
+                          <span>Réessayer quand même</span>
+                        </div>
+                      </button>
+                    </>
+                  )}
+                </div>
+                {canSkip && (
+                  <p className="text-white/40 text-xs mt-3">
+                    Vous pourrez toujours migrer plus tard depuis les paramètres.
+                  </p>
+                )}
               </div>
             </div>
           </GlassCard>
