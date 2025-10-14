@@ -169,11 +169,40 @@ export function calculateFastingCompletion(profile: UserProfile | null): number 
 
 /**
  * Complétion de l'onglet Santé
+ * Supports both V1 (basic) and V2 (enriched) schemas
  */
 export function calculateHealthCompletion(profile: UserProfile | null): number {
   if (!profile) return 0;
 
-  const healthFields = [
+  const health = (profile as any).health;
+
+  if (!health) {
+    return 0;
+  }
+
+  if (health.version === '2.0') {
+    const v2Fields = [
+      'health.basic.bloodType',
+      'health.medical_history.conditions',
+      'health.medical_history.medications',
+      'health.medical_history.family_history',
+      'health.vital_signs.blood_pressure_systolic',
+      'health.vital_signs.resting_heart_rate',
+      'health.lifestyle.smoking_status',
+      'health.lifestyle.alcohol_frequency',
+      'health.lifestyle.sleep_hours_avg',
+      'health.lifestyle.stress_level',
+      'health.lifestyle.physical_activity_level',
+      'health.vaccinations.up_to_date',
+      'health.physical_limitations',
+      'health.last_checkup_date',
+    ];
+
+    const completedFields = v2Fields.filter((field) => hasValidValue(profile, field));
+    return Math.round((completedFields.length / v2Fields.length) * 100);
+  }
+
+  const v1Fields = [
     'health.bloodType',
     'health.conditions',
     'health.medications',
@@ -181,8 +210,8 @@ export function calculateHealthCompletion(profile: UserProfile | null): number {
     'constraints',
   ];
 
-  const completedFields = healthFields.filter((field) => hasValidValue(profile, field));
-  return Math.round((completedFields.length / healthFields.length) * 100);
+  const completedFields = v1Fields.filter((field) => hasValidValue(profile, field));
+  return Math.round((completedFields.length / v1Fields.length) * 100);
 }
 
 

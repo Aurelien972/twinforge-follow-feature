@@ -2,15 +2,16 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Session, User } from '@supabase/supabase-js';
 import type { UserProfile } from '../../domain/profile';
-import type { 
-  HouseholdDetails, 
-  MealPrepPreferences, 
-  KitchenEquipment, 
-  FoodPreferences, 
-  SensoryPreferences, 
-  MacroTargets, 
-  ShoppingPreferences 
+import type {
+  HouseholdDetails,
+  MealPrepPreferences,
+  KitchenEquipment,
+  FoodPreferences,
+  SensoryPreferences,
+  MacroTargets,
+  ShoppingPreferences
 } from '../../domain/recipe';
+import type { HealthProfile, CountryHealthData } from '../../domain/health';
 import logger from '../../lib/utils/logger';
 
 type Role = 'user' | 'coach' | 'admin';
@@ -95,6 +96,12 @@ type Profile = UserProfile & {
     mealsPerDay?: number;
     protocol?: string;
   };
+  // Health data structure - supports both V1 (basic) and V2 (enriched)
+  health?: HealthProfile;
+  // Country health data cache
+  country_health_cache?: CountryHealthData;
+  health_enriched_at?: string;
+  health_schema_version?: '1.0' | '2.0';
 };
 
 type UserState = {
