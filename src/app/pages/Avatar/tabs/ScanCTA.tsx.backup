@@ -15,12 +15,12 @@ import logger from '../../../../lib/utils/logger';
  */
 function calculateDaysSinceLastScan(lastScanDate: string | null): number {
   if (!lastScanDate) return Infinity;
-
+  
   const now = new Date();
   const scanDate = new Date(lastScanDate);
   const diffTime = Math.abs(now.getTime() - scanDate.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+  
   return diffDays;
 }
 
@@ -38,7 +38,7 @@ function getScanStatus(daysSince: number): {
     return {
       status: 'never_scanned',
       urgency: 'high',
-      color: '#8B5CF6',
+      color: '#06B6D4', // Cyan pour premier scan
       message: 'Créez votre premier avatar',
       subtitle: 'Commencez votre parcours de transformation corporelle'
     };
@@ -48,12 +48,12 @@ function getScanStatus(daysSince: number): {
     return {
       status: 'up_to_date',
       urgency: 'low',
-      color: '#8B5CF6',
+      color: '#06B6D4', // Cyan pour statut à jour
       message: 'Vous êtes à jour !',
       subtitle: `Dernier scan il y a ${daysSince} jour${daysSince > 1 ? 's' : ''}`
     };
   }
-
+  
   if (daysSince <= 10) {
     return {
       status: 'due_soon',
@@ -63,7 +63,7 @@ function getScanStatus(daysSince: number): {
       subtitle: `Dernier scan il y a ${daysSince} jours`
     };
   }
-
+  
   return {
     status: 'overdue',
     urgency: 'high',
@@ -83,7 +83,7 @@ async function fetchLatestBodyScan(userId: string) {
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(1);
-
+    
   if (error) {
     logger.error('SCAN_CTA', 'Failed to fetch latest body scan', {
       error: error.message,
@@ -92,7 +92,7 @@ async function fetchLatestBodyScan(userId: string) {
     });
     throw error;
   }
-
+  
   return data && data.length > 0 ? data[0] : null;
 }
 
@@ -120,34 +120,34 @@ const ScanCTA: React.FC = () => {
   const handleStartNewScan = () => {
     click();
     success();
-
+    
     logger.info('SCAN_CTA', 'User initiated new scan from CTA', {
       userId: profile?.userId,
       daysSinceLastScan,
       scanStatus: scanStatus.status,
       timestamp: new Date().toISOString()
     });
-
+    
     navigate('/body-scan');
   };
 
   const handleViewInsights = () => {
     click();
-
+    
     logger.info('SCAN_CTA', 'User navigated to insights from CTA', {
       userId: profile?.userId,
       daysSinceLastScan,
       scanStatus: scanStatus.status,
       timestamp: new Date().toISOString()
     });
-
+    
     navigate('/avatar#avatar');
   };
 
   if (isLoading) {
     return (
       <div className="space-y-6 w-full">
-        <GlassCard
+        <GlassCard 
           className="text-center p-8"
           style={{
             background: `
@@ -172,7 +172,7 @@ const ScanCTA: React.FC = () => {
   if (error) {
     return (
       <div className="space-y-6 w-full">
-        <GlassCard
+        <GlassCard 
           className="text-center p-8"
           style={{
             background: `
@@ -221,7 +221,7 @@ const ScanCTA: React.FC = () => {
             `
           }}
         >
-          {/* 4 Carrés décoratifs aux coins */}
+          {/* 4 Carrés décoratifs aux coins - inspire du HeroTrainingCTA */}
           <div className="training-hero-corners" aria-hidden="true">
             {[0, 1, 2, 3].map((i) => (
               <motion.div
@@ -256,7 +256,6 @@ const ScanCTA: React.FC = () => {
               />
             ))}
           </div>
-
           {/* Status Icon */}
           <motion.div
             className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center relative"
@@ -272,15 +271,15 @@ const ScanCTA: React.FC = () => {
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 0.2 }}
           >
-            <SpatialIcon
-              Icon={scanStatus.status === 'never_scanned' ? ICONS.Scan :
-                    scanStatus.status === 'up_to_date' ? ICONS.Check :
-                    ICONS.Timer}
-              size={48}
+            <SpatialIcon 
+              Icon={scanStatus.status === 'never_scanned' ? ICONS.Scan : 
+                    scanStatus.status === 'up_to_date' ? ICONS.Check : 
+                    ICONS.Timer} 
+              size={48} 
               style={{ color: scanStatus.color }}
               variant="pure"
             />
-
+            
             {/* Pulse ring for urgent states */}
             {scanStatus.urgency === 'high' && (
               <motion.div
@@ -306,7 +305,7 @@ const ScanCTA: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="mb-8"
           >
-            <h3
+            <h3 
               className="text-3xl font-bold mb-3"
               style={{ color: scanStatus.color }}
             >
@@ -334,7 +333,7 @@ const ScanCTA: React.FC = () => {
               <span className="text-white font-medium text-sm">Recommandation TwinForge</span>
             </div>
             <p className="text-white/80 text-sm leading-relaxed">
-              Pour un suivi optimal de votre évolution corporelle, nous recommandons un scan tous les 7 jours.
+              Pour un suivi optimal de votre évolution corporelle, nous recommandons un scan tous les 7 jours. 
               Cela permet de détecter les changements subtils et d'ajuster vos objectifs en conséquence.
             </p>
           </motion.div>
@@ -346,61 +345,72 @@ const ScanCTA: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            {/* Primary CTA - New Scan */}
-            <motion.button
-              onClick={handleStartNewScan}
-              className="px-8 py-4 rounded-full font-bold text-lg text-white relative overflow-hidden min-h-[64px]"
+            {/* Primary CTA - New Scan - GlassCard avec thème cyan/bleu */}
+            <GlassCard
+              className="p-0 overflow-hidden"
+              interactive
               style={{
                 background: `
-                  linear-gradient(135deg,
-                    color-mix(in srgb, ${scanStatus.color} 85%, transparent),
-                    color-mix(in srgb, ${scanStatus.color} 70%, transparent)
-                  )
+                  radial-gradient(circle at 30% 30%, rgba(6, 182, 212, 0.15) 0%, transparent 60%),
+                  radial-gradient(circle at 70% 70%, rgba(6, 182, 212, 0.10) 0%, transparent 50%),
+                  var(--glass-opacity-base)
                 `,
-                border: `2px solid ${scanStatus.color}`,
+                borderColor: 'rgba(6, 182, 212, 0.4)',
                 boxShadow: `
-                  0 12px 40px color-mix(in srgb, ${scanStatus.color} 40%, transparent),
-                  0 0 60px color-mix(in srgb, ${scanStatus.color} 30%, transparent),
-                  inset 0 3px 0 rgba(255, 255, 255, 0.4)
-                `,
-                backdropFilter: 'blur(20px) saturate(160%)'
-              }}
-              whileHover={{
-                scale: 1.02,
-                y: -2,
-                boxShadow: `
-                  0 16px 50px color-mix(in srgb, ${scanStatus.color} 50%, transparent),
-                  0 0 80px color-mix(in srgb, ${scanStatus.color} 40%, transparent),
-                  inset 0 3px 0 rgba(255, 255, 255, 0.5)
+                  0 12px 40px rgba(0, 0, 0, 0.25),
+                  0 0 40px rgba(6, 182, 212, 0.25),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.2)
                 `
               }}
-              whileTap={{ scale: 0.98 }}
             >
-              {/* Shimmer Effect */}
-              <div
-                className="absolute inset-0 pointer-events-none"
+              <motion.button
+                onClick={handleStartNewScan}
+                className="w-full px-8 py-4 rounded-2xl font-bold text-lg text-white relative overflow-hidden min-h-[64px]"
                 style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-                  animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
-                  borderRadius: 'inherit'
+                  background: `
+                    linear-gradient(135deg,
+                      rgba(6, 182, 212, 0.25),
+                      rgba(6, 182, 212, 0.15)
+                    )
+                  `,
+                  border: 'none',
+                  backdropFilter: 'blur(20px) saturate(160%)'
                 }}
-              />
-
-              <div className="relative z-10 flex items-center justify-center gap-3">
-                <SpatialIcon
-                  Icon={ICONS.Scan}
-                  size={24}
+                whileHover={{
+                  scale: 1.01,
+                  y: -1
+                }}
+                whileTap={{ scale: 0.99 }}
+              >
+                {/* Shimmer Effect */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
                   style={{
-                    color: 'white',
-                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+                    background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.4), transparent)',
+                    animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
+                    borderRadius: 'inherit'
                   }}
-                  variant="pure"
                 />
-                <span style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-                  {scanStatus.status === 'never_scanned' ? 'Créer mon Avatar 3D' : 'Nouveau Scan'}
-                </span>
-              </div>
-            </motion.button>
+
+                <div className="relative z-10 flex items-center justify-center gap-3">
+                  <SpatialIcon
+                    Icon={ICONS.Scan}
+                    size={24}
+                    style={{
+                      color: '#06B6D4',
+                      filter: 'drop-shadow(0 2px 6px rgba(6, 182, 212, 0.5))'
+                    }}
+                    variant="pure"
+                  />
+                  <span style={{
+                    textShadow: '0 2px 8px rgba(6, 182, 212, 0.6)',
+                    color: 'white'
+                  }}>
+                    {scanStatus.status === 'never_scanned' ? 'Créer mon Avatar 3D' : 'Nouveau Scan Corporel'}
+                  </span>
+                </div>
+              </motion.button>
+            </GlassCard>
 
             {/* Secondary CTA - View Insights (only if scans exist) */}
             {scanStatus.status !== 'never_scanned' && (
@@ -442,7 +452,7 @@ const ScanCTA: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <GlassCard
+          <GlassCard 
             className="p-6"
             style={{
               background: `
@@ -459,7 +469,7 @@ const ScanCTA: React.FC = () => {
           >
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-white font-semibold bodyscan-flex-center bodyscan-gap-sm text-xl">
-                <div
+                <div 
                   className="w-10 h-10 rounded-full flex items-center justify-center"
                   style={{
                     background: `
@@ -481,7 +491,7 @@ const ScanCTA: React.FC = () => {
                 <div className="bodyscan-status-badge bodyscan-status-badge--active">
                   <div className="bodyscan-status-icon" />
                   <span className="bodyscan-status-text">
-                    {scanStatus.urgency === 'low' ? 'À jour' :
+                    {scanStatus.urgency === 'low' ? 'À jour' : 
                      scanStatus.urgency === 'medium' ? 'Bientôt' : 'Urgent'}
                   </span>
                 </div>
@@ -492,15 +502,15 @@ const ScanCTA: React.FC = () => {
             <div className="space-y-4">
               {/* Days Counter */}
               <div className="text-center">
-                <div
+                <div 
                   className="text-4xl font-bold mb-2"
                   style={{ color: scanStatus.color }}
                 >
                   {daysSinceLastScan === Infinity ? '∞' : daysSinceLastScan}
                 </div>
                 <div className="text-white/70 text-sm">
-                  {daysSinceLastScan === Infinity ? 'Aucun scan effectué' :
-                   daysSinceLastScan === 1 ? 'jour depuis le dernier scan' :
+                  {daysSinceLastScan === Infinity ? 'Aucun scan effectué' : 
+                   daysSinceLastScan === 1 ? 'jour depuis le dernier scan' : 
                    'jours depuis le dernier scan'}
                 </div>
               </div>
@@ -510,22 +520,22 @@ const ScanCTA: React.FC = () => {
                 <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
                   <motion.div
                     className="h-3 rounded-full relative overflow-hidden"
-                    style={{
+                    style={{ 
                       background: `linear-gradient(90deg, ${scanStatus.color}, color-mix(in srgb, ${scanStatus.color} 80%, white))`,
                       boxShadow: `0 0 12px ${scanStatus.color}60, inset 0 1px 0 rgba(255,255,255,0.3)`
                     }}
                     initial={{ width: 0 }}
-                    animate={{
-                      width: `${Math.min(100, Math.max(0, 100 - (daysSinceLastScan / 7 * 100)))}%`
+                    animate={{ 
+                      width: `${Math.min(100, Math.max(0, 100 - (daysSinceLastScan / 7 * 100)))}%` 
                     }}
                     transition={{ duration: 1.2, ease: "easeOut", delay: 0.5 }}
                   >
                     <div
                       className="absolute inset-0 rounded-full"
                       style={{
-                        background: `linear-gradient(90deg,
-                          transparent 0%,
-                          rgba(255,255,255,0.4) 50%,
+                        background: `linear-gradient(90deg, 
+                          transparent 0%, 
+                          rgba(255,255,255,0.4) 50%, 
                           transparent 100%
                         )`,
                         animation: 'progressShimmer 2s ease-in-out infinite'
@@ -533,7 +543,7 @@ const ScanCTA: React.FC = () => {
                     />
                   </motion.div>
                 </div>
-
+                
                 <div className="flex justify-between mt-2 text-xs text-white/50">
                   <span>Nouveau</span>
                   <span>7 jours</span>
@@ -541,7 +551,7 @@ const ScanCTA: React.FC = () => {
               </div>
 
               {/* Next Scan Recommendation */}
-              <div
+              <div 
                 className="text-center p-3 rounded-xl"
                 style={{
                   background: `color-mix(in srgb, ${scanStatus.color} 6%, transparent)`,
@@ -549,7 +559,7 @@ const ScanCTA: React.FC = () => {
                 }}
               >
                 <p className="text-white/80 text-sm">
-                  {scanStatus.status === 'up_to_date' ?
+                  {scanStatus.status === 'up_to_date' ? 
                     `Prochain scan recommandé dans ${7 - daysSinceLastScan} jour${7 - daysSinceLastScan > 1 ? 's' : ''}` :
                     'Un nouveau scan est recommandé pour suivre votre évolution'
                   }
@@ -566,7 +576,7 @@ const ScanCTA: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
       >
-        <GlassCard
+        <GlassCard 
           className="p-6"
           style={{
             background: `
@@ -599,7 +609,7 @@ const ScanCTA: React.FC = () => {
               <div className="text-white/60 text-xs font-normal mt-0.5">Optimisez votre suivi corporel avec des scans réguliers</div>
             </div>
           </div>
-
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <motion.div
               className="morphology-insight-item"
@@ -612,16 +622,16 @@ const ScanCTA: React.FC = () => {
               <div className="morphology-insight-icon-container">
                 <SpatialIcon Icon={ICONS.TrendingUp} size={20} style={{ color: '#22C55E' }} variant="pure" />
               </div>
-
+              
               <div className="morphology-insight-value">
                 Suivi Précis
               </div>
-
+              
               <div className="morphology-insight-title">
                 Détectez les changements subtils
               </div>
             </motion.div>
-
+            
             <motion.div
               className="morphology-insight-item"
               style={{ '--insight-color': '#3B82F6' } as React.CSSProperties}
@@ -633,16 +643,16 @@ const ScanCTA: React.FC = () => {
               <div className="morphology-insight-icon-container">
                 <SpatialIcon Icon={ICONS.Zap} size={20} style={{ color: '#3B82F6' }} variant="pure" />
               </div>
-
+              
               <div className="morphology-insight-value">
                 Insights IA
               </div>
-
+              
               <div className="morphology-insight-title">
                 Recommandations personnalisées
               </div>
             </motion.div>
-
+            
             <motion.div
               className="morphology-insight-item"
               style={{ '--insight-color': '#A855F7' } as React.CSSProperties}
@@ -654,11 +664,11 @@ const ScanCTA: React.FC = () => {
               <div className="morphology-insight-icon-container">
                 <SpatialIcon Icon={ICONS.Heart} size={20} style={{ color: '#A855F7' }} variant="pure" />
               </div>
-
+              
               <div className="morphology-insight-value">
                 Motivation
               </div>
-
+              
               <div className="morphology-insight-title">
                 Visualisez vos progrès
               </div>

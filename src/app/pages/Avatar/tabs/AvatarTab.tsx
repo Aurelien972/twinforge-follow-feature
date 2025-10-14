@@ -291,20 +291,75 @@ const AvatarTab: React.FC = () => {
         />
       )}
 
-      {/* Nouveau Scan Button */}
-      <div className="mt-8 text-center">
-        <button 
-          className="btn-glass--primary px-8 py-4 text-lg font-semibold"
+      {/* Nouveau Scan Button - GlassCard Cyan */}
+      <GlassCard
+        className="p-0 overflow-hidden"
+        interactive
+        style={{
+          background: `
+            radial-gradient(circle at 30% 30%, rgba(6, 182, 212, 0.15) 0%, transparent 60%),
+            radial-gradient(circle at 70% 70%, rgba(6, 182, 212, 0.10) 0%, transparent 50%),
+            var(--glass-opacity-base)
+          `,
+          borderColor: 'rgba(6, 182, 212, 0.4)',
+          boxShadow: `
+            0 12px 40px rgba(0, 0, 0, 0.25),
+            0 0 40px rgba(6, 182, 212, 0.25),
+            inset 0 2px 0 rgba(255, 255, 255, 0.2)
+          `
+        }}
+      >
+        <motion.button
           onClick={() => navigate('/body-scan')}
+          className="w-full px-8 py-4 rounded-2xl font-bold text-lg text-white relative overflow-hidden min-h-[64px]"
+          style={{
+            background: `
+              linear-gradient(135deg,
+                rgba(6, 182, 212, 0.25),
+                rgba(6, 182, 212, 0.15)
+              )
+            `,
+            border: 'none',
+            backdropFilter: 'blur(20px) saturate(160%)'
+          }}
+          whileHover={{
+            scale: 1.01,
+            y: -1
+          }}
+          whileTap={{ scale: 0.99 }}
         >
-          <div className="flex items-center justify-center gap-3">
-            <SpatialIcon Icon={ICONS.Scan} size={20} />
-            <span>Nouveau scan corporel</span>
+          {/* Shimmer Effect */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.4), transparent)',
+              animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
+              borderRadius: 'inherit'
+            }}
+          />
+
+          <div className="relative z-10 flex items-center justify-center gap-3">
+            <SpatialIcon
+              Icon={ICONS.Scan}
+              size={24}
+              style={{
+                color: '#06B6D4',
+                filter: 'drop-shadow(0 2px 6px rgba(6, 182, 212, 0.5))'
+              }}
+              variant="pure"
+            />
+            <span style={{
+              textShadow: '0 2px 8px rgba(6, 182, 212, 0.6)',
+              color: 'white'
+            }}>
+              Nouveau scan corporel
+            </span>
           </div>
-        </button>
-      </div>
+        </motion.button>
+      </GlassCard>
     </div>
   );
 };
+
 
 export default AvatarTab;
