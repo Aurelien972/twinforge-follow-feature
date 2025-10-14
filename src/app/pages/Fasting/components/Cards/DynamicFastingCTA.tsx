@@ -257,7 +257,8 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
           </>
         )}
 
-        {urgencyConfig.priority === 'high' && !reduceMotion && (
+        {/* Halo de Forge Temporelle - Animation Pulse Permanente */}
+        {!reduceMotion && (
           <div
             className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
             style={{

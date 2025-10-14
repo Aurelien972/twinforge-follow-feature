@@ -137,8 +137,8 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
           ))}
         </div>
 
-        {/* Halo de Forge Dynamique */}
-        {urgencyConfig.priority === 'high' && !reduceMotion && (
+        {/* Halo de Forge Dynamique - Animation Pulse Permanente */}
+        {!reduceMotion && (
           <div
             className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
             style={{

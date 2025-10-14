@@ -257,6 +257,17 @@ const ScanCTA: React.FC = () => {
             ))}
           </div>
 
+          {/* Halo de Forge Corporelle - Animation Pulse Permanente */}
+          <div
+            className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
+            style={{
+              background: `radial-gradient(circle at center, color-mix(in srgb, ${scanStatus.color} 8%, transparent) 0%, transparent 70%)`,
+              filter: 'blur(20px)',
+              transform: 'scale(1.2)',
+              zIndex: -1
+            }}
+          />
+
           {/* Status Icon */}
           <motion.div
             className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center relative"
