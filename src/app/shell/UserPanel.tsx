@@ -26,6 +26,12 @@ const UserPanel: React.FC<UserPanelProps> = ({ isOpen }) => {
     navigate('/profile');
   };
 
+  const handleHealthProfileClick = () => {
+    pillClick('#EF4444');
+    closeOverlay();
+    navigate('/health-profile');
+  };
+
   const handleSettingsClick = () => {
     pillClick('#7A5AF8');
     closeOverlay();
@@ -182,6 +188,29 @@ const UserPanel: React.FC<UserPanelProps> = ({ isOpen }) => {
                   <SpatialIcon Icon={ICONS.User} size={16} style={{ color: '#18E3FF' }} />
                 </div>
                 <span className="text-white text-sm font-medium">Mon Profil</span>
+              </motion.button>
+
+              <motion.button
+                onClick={handleHealthProfileClick}
+                className="glass-card rounded-xl px-4 py-3 flex items-center gap-3 w-full text-left"
+                style={{
+                  background: 'var(--glass-opacity-base)',
+                  border: '1px solid rgba(239, 68, 68, 0.24)',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 14px rgba(0,0,0,0.18)'
+                }}
+                whileHover={reduceMotion ? {} : { scale: 1.02, y: -1 }}
+                whileTap={reduceMotion ? {} : { scale: 0.98 }}
+              >
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.18))',
+                    border: '1px solid rgba(239, 68, 68, 0.4)'
+                  }}
+                >
+                  <SpatialIcon Icon={ICONS.Heart} size={16} style={{ color: '#EF4444' }} />
+                </div>
+                <span className="text-white text-sm font-medium">Mon Profil de Santé</span>
               </motion.button>
 
               <motion.button

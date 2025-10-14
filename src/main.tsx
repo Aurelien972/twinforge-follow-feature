@@ -37,6 +37,7 @@ const FastingInputPage = lazy(() => import('./app/pages/Fasting/FastingInputPage
 const FridgeScanPage = lazy(() => import('./app/pages/FridgeScanPage'));
 const DevCachePage = lazy(() => import('./app/pages/DevCachePage'));
 const LogoGalleryPage = lazy(() => import('./app/pages/LogoGalleryPage'));
+const HealthProfilePage = lazy(() => import('./app/pages/HealthProfile/HealthProfilePage'));
 
 function AuthWrapper({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -203,6 +204,10 @@ const router = createBrowserRouter([
       {
         path: "dev/logos",
         element: <Suspense fallback={<LoadingFallback />}><LogoGalleryPage /></Suspense>
+      },
+      {
+        path: "health-profile",
+        element: <Suspense fallback={<LoadingFallback />}><HealthProfilePage /></Suspense>
       }
     ]
   }

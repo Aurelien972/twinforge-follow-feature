@@ -1,0 +1,263 @@
+/**
+ * HealthOverviewTab Component
+ * Dashboard view with health score, risks, and quick actions
+ */
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import GlassCard from '../../../../ui/cards/GlassCard';
+import SpatialIcon from '../../../../ui/icons/SpatialIcon';
+import { ICONS } from '../../../../ui/icons/registry';
+import { HealthScoreWidget } from '../components/HealthScoreWidget';
+import { HealthRiskBadges } from '../components/HealthRiskBadges';
+import { useUserStore } from '../../../../system/store/userStore';
+import { useCountryHealthData } from '../../../../hooks/useCountryHealthData';
+import { calculateHealthScore } from '../utils/healthScoreCalculations';
+import { useHealthProfileNavigation } from '../hooks/useHealthProfileNavigation';
+import type { HealthProfileV2 } from '../../../../domain/health';
+
+export const HealthOverviewTab: React.FC = () => {
+  const { profile } = useUserStore();
+  const { countryData, loading: countryLoading } = useCountryHealthData();
+  const { navigateToTab, nextIncompleteTab, aiReadiness } = useHealthProfileNavigation();
+
+  const health = (profile as any)?.health as HealthProfileV2 | undefined;
+  const score = calculateHealthScore(health);
+
+  return (
+    <div className="space-y-6">
+      {/* Welcome Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <GlassCard className="p-6" style={{
+          background: `
+            radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 60%),
+            var(--glass-opacity)
+          `,
+          borderColor: 'rgba(6, 182, 212, 0.3)',
+        }}>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-white font-bold text-2xl mb-2">
+                Bienvenue dans votre Profil de Santé
+              </h2>
+              <p className="text-white/70 text-base leading-relaxed mb-4">
+                Complétez votre profil médical pour bénéficier d'analyses préventives personnalisées par intelligence artificielle.
+                Toutes vos données sont sécurisées et confidentielles.
+              </p>
+              <div className="flex items-center gap-2 text-cyan-300 text-sm">
+                <SpatialIcon Icon={ICONS.Lock} size={14} />
+                <span>Conforme RGPD • Données chiffrées • 100% confidentiel</span>
+              </div>
+            </div>
+            <div className="flex-shrink-0">
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center"
+                style={{
+                  background: `
+                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                    linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
+                  `,
+                  border: '2px solid rgba(6, 182, 212, 0.5)',
+                  boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
+                }}
+              >
+                <SpatialIcon Icon={ICONS.Sparkles} size={28} style={{ color: '#06B6D4' }} variant="pure" />
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+      </motion.div>
+
+      {/* Health Score Widget */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <HealthScoreWidget health={health} />
+      </motion.div>
+
+      {/* Country Health Risks */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <HealthRiskBadges countryData={countryData} loading={countryLoading} />
+      </motion.div>
+
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+      >
+        {/* Next Action Recommendation */}
+        {nextIncompleteTab && (
+          <GlassCard
+            className="p-6 cursor-pointer hover:scale-[1.02] transition-transform"
+            onClick={() => navigateToTab(nextIncompleteTab.id)}
+            style={{
+              background: `
+                radial-gradient(circle at 30% 20%, ${nextIncompleteTab.color}15 0%, transparent 60%),
+                var(--glass-opacity)
+              `,
+              borderColor: `${nextIncompleteTab.color}40`,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <SpatialIcon Icon={ICONS.Target} size={20} style={{ color: nextIncompleteTab.color }} />
+              <h3 className="text-white font-semibold text-lg">Action Recommandée</h3>
+            </div>
+            <p className="text-white/80 mb-4">
+              Complétez la section <strong>{nextIncompleteTab.label}</strong> pour améliorer votre score de santé.
+            </p>
+            <div className="flex items-center gap-2 text-sm" style={{ color: nextIncompleteTab.color }}>
+              <span className="font-medium">Continuer</span>
+              <SpatialIcon Icon={ICONS.ArrowRight} size={14} />
+            </div>
+          </GlassCard>
+        )}
+
+        {/* AI Readiness Status */}
+        <GlassCard
+          className="p-6"
+          style={{
+            background: aiReadiness
+              ? `radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.15) 0%, transparent 60%), var(--glass-opacity)`
+              : `radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.15) 0%, transparent 60%), var(--glass-opacity)`,
+            borderColor: aiReadiness ? 'rgba(16, 185, 129, 0.4)' : 'rgba(245, 158, 11, 0.4)',
+          }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <SpatialIcon
+              Icon={ICONS.Sparkles}
+              size={20}
+              className={aiReadiness ? 'text-green-400' : 'text-orange-400'}
+            />
+            <h3 className="text-white font-semibold text-lg">
+              {aiReadiness ? 'Analyse IA Disponible' : 'Analyse IA Limitée'}
+            </h3>
+          </div>
+          <p className="text-white/80 mb-4">
+            {aiReadiness
+              ? 'Votre profil est suffisamment complet pour bénéficier d\'analyses préventives complètes par IA.'
+              : 'Complétez les sections essentielles pour débloquer toutes les analyses IA préventives.'}
+          </p>
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${aiReadiness ? 'bg-green-400' : 'bg-orange-400'}`} />
+            <span className={`text-sm font-medium ${aiReadiness ? 'text-green-400' : 'text-orange-400'}`}>
+              Score IA: {score.aiReadiness}%
+            </span>
+          </div>
+        </GlassCard>
+
+        {/* Recent Updates */}
+        <GlassCard className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <SpatialIcon Icon={ICONS.Clock} size={20} className="text-purple-400" />
+            <h3 className="text-white font-semibold text-lg">Dernières Mises à Jour</h3>
+          </div>
+          <div className="space-y-3">
+            <UpdateItem
+              icon={ICONS.Check}
+              text="Profil santé créé"
+              date={new Date().toLocaleDateString('fr-FR')}
+              color="#10B981"
+            />
+            {profile?.country && (
+              <UpdateItem
+                icon={ICONS.MapPin}
+                text={`Contexte sanitaire: ${profile.country}`}
+                date={new Date().toLocaleDateString('fr-FR')}
+                color="#06B6D4"
+              />
+            )}
+          </div>
+        </GlassCard>
+
+        {/* Quick Links */}
+        <GlassCard className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <SpatialIcon Icon={ICONS.Zap} size={20} className="text-yellow-400" />
+            <h3 className="text-white font-semibold text-lg">Actions Rapides</h3>
+          </div>
+          <div className="space-y-2">
+            <QuickLinkButton
+              icon={ICONS.User}
+              label="Informations de Base"
+              onClick={() => navigateToTab('basic')}
+            />
+            <QuickLinkButton
+              icon={ICONS.Activity}
+              label="Constantes Vitales"
+              onClick={() => navigateToTab('vital-signs')}
+            />
+            <QuickLinkButton
+              icon={ICONS.Shield}
+              label="Vaccinations"
+              onClick={() => navigateToTab('vaccinations')}
+            />
+          </div>
+        </GlassCard>
+      </motion.div>
+
+      {/* Legal Disclaimer */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
+        <GlassCard className="p-4" style={{
+          background: 'rgba(255, 152, 0, 0.05)',
+          borderColor: 'rgba(255, 152, 0, 0.2)',
+        }}>
+          <div className="flex items-start gap-3">
+            <SpatialIcon Icon={ICONS.Info} size={16} className="text-orange-400 mt-0.5 flex-shrink-0" />
+            <p className="text-white/70 text-sm leading-relaxed">
+              <strong className="text-orange-300">Avertissement médical:</strong> Cet outil est destiné à des fins informatives et de suivi personnel uniquement.
+              Il ne remplace pas un avis médical professionnel. En cas de préoccupation médicale, consultez toujours un professionnel de santé qualifié.
+            </p>
+          </div>
+        </GlassCard>
+      </motion.div>
+    </div>
+  );
+};
+
+const UpdateItem: React.FC<{ icon: string; text: string; date: string; color: string }> = ({
+  icon,
+  text,
+  date,
+  color,
+}) => (
+  <div className="flex items-center justify-between">
+    <div className="flex items-center gap-2">
+      <SpatialIcon Icon={ICONS[icon as keyof typeof ICONS]} size={14} style={{ color }} />
+      <span className="text-white/80 text-sm">{text}</span>
+    </div>
+    <span className="text-white/50 text-xs">{date}</span>
+  </div>
+);
+
+const QuickLinkButton: React.FC<{ icon: string; label: string; onClick: () => void }> = ({
+  icon,
+  label,
+  onClick,
+}) => (
+  <button
+    onClick={onClick}
+    className="w-full flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+  >
+    <div className="flex items-center gap-3">
+      <SpatialIcon Icon={ICONS[icon as keyof typeof ICONS]} size={16} className="text-white/70" />
+      <span className="text-white/90 text-sm">{label}</span>
+    </div>
+    <SpatialIcon Icon={ICONS.ChevronRight} size={14} className="text-white/50" />
+  </button>
+);
