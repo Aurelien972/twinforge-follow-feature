@@ -27,6 +27,9 @@ const HealthProfilePage: React.FC = () => {
   const healthV2 = (profile as any)?.health as HealthProfileV2 | undefined;
   const completion = useHealthCompletion(healthV2);
 
+  // Mode dégradé : Permettre l'accès même si la migration n'est pas terminée après 10 secondes
+  const [degradedMode, setDegradedMode] = React.useState(false);
+
   // Update tab completion percentages when data changes
   React.useEffect(() => {
     if (completion) {
@@ -41,6 +44,17 @@ const HealthProfilePage: React.FC = () => {
       updateTabCompletion('emergency-contacts', completion.emergencyContacts);
     }
   }, [completion, updateTabCompletion]);
+
+  React.useEffect(() => {
+    if (!migrationComplete && !migrating && !migrationError) {
+      const timer = setTimeout(() => {
+        logger.warn('HEALTH_PROFILE', 'Entering degraded mode after timeout');
+        setDegradedMode(true);
+      }, 10000); // 10 secondes
+
+      return () => clearTimeout(timer);
+    }
+  }, [migrationComplete, migrating, migrationError]);
 
   if (migrating) {
     return (
@@ -202,20 +216,6 @@ const HealthProfilePage: React.FC = () => {
       </div>
     );
   }
-
-  // Mode dégradé : Permettre l'accès même si la migration n'est pas terminée après 10 secondes
-  const [degradedMode, setDegradedMode] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!migrationComplete && !migrating && !migrationError) {
-      const timer = setTimeout(() => {
-        logger.warn('HEALTH_PROFILE', 'Entering degraded mode after timeout');
-        setDegradedMode(true);
-      }, 10000); // 10 secondes
-
-      return () => clearTimeout(timer);
-    }
-  }, [migrationComplete, migrating, migrationError]);
 
   if (!migrationComplete && !degradedMode) {
     return null;

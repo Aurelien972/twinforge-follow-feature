@@ -101,13 +101,16 @@ export function useHealthDataMigration() {
           attempt: attemptCountRef.current,
         });
 
-        // Si erreur PGRST204 (colonne manquante), suggérer skip immédiat
+        // Si erreur PGRST204 (colonne manquante), entrer immédiatement en mode dégradé
         if (updateError.code === 'PGRST204') {
-          logger.warn('HEALTH_MIGRATION', 'Schema cache error detected (PGRST204)', {
-            hint: 'Database schema might be out of sync. User can skip migration.',
+          logger.warn('HEALTH_MIGRATION', 'Schema cache error detected (PGRST204) - entering degraded mode', {
+            hint: 'Database schema cache is out of sync. Allowing immediate access to UI.',
           });
           setCanSkip(true);
-          throw new Error(`Erreur de synchronisation du schéma (${updateError.code}). Vous pouvez continuer sans migrer.`);
+          setMigrationComplete(true); // Allow immediate UI access
+          localStorage.setItem(MIGRATION_FAILED_KEY, Date.now().toString());
+          attemptCountRef.current = MAX_MIGRATION_ATTEMPTS; // Prevent auto-retries
+          return; // Exit gracefully without throwing
         }
 
         throw new Error(`Migration update failed: ${updateError.message} (Code: ${updateError.code})`);
