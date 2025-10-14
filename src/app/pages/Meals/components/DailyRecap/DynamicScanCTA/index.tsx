@@ -151,34 +151,42 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
         )}
 
         <div className="relative z-10 space-y-4 md:space-y-6">
-          {/* Icône Principale Dynamique */}
+          {/* Icône Principale Dynamique avec Particules Jaillissantes */}
           <div
-            className={`w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full flex items-center justify-center relative ${
-              urgencyConfig.animation === 'pulse' && !reduceMotion ? 'icon-pulse-css' :
-              urgencyConfig.animation === 'breathing' && !reduceMotion ? 'icon-breathing-css' : ''
+            className={`w-20 h-20 md:w-24 md:h-24 mx-auto rounded-full flex items-center justify-center relative ${
+              !reduceMotion ? 'icon-breathing-css' : ''
             }`}
             style={iconStyles}
           >
-            <SpatialIcon 
-              Icon={ICONS[urgencyConfig.icon as keyof typeof ICONS]} 
-              size={urgencyConfig.priority === 'high' ? 36 : 32} 
-              style={{ color: urgencyConfig.color }} 
+            <SpatialIcon
+              Icon={ICONS[urgencyConfig.icon as keyof typeof ICONS]}
+              size={40}
+              style={{ color: urgencyConfig.color }}
             />
-            
-            {/* Particules de Forge autour de l'icône */}
-            {shouldShowParticles(urgencyConfig) && !reduceMotion && 
-              [...Array(getParticleCount(urgencyConfig))].map((_, i) => (
-                <div
-                  key={i}
-                  className={`absolute w-2 h-2 rounded-full dynamic-particle-css dynamic-particle-css--${i + 1}`}
-                  style={{
-                    left: `${15 + i * 15}%`,
-                    top: `${15 + (i % 3) * 25}%`,
-                    background: urgencyConfig.color,
-                    boxShadow: `0 0 8px color-mix(in srgb, ${urgencyConfig.color} 60%, transparent)`
-                  }}
-                />
-              ))
+
+            {/* Particules de Forge Jaillissantes - Style Forge Énergétique */}
+            {!reduceMotion &&
+              [...Array(6)].map((_, i) => {
+                const angle = (i * 360) / 6;
+                const radius = 60;
+                const x = Math.cos((angle * Math.PI) / 180) * radius;
+                const y = Math.sin((angle * Math.PI) / 180) * radius;
+
+                return (
+                  <div
+                    key={i}
+                    className={`absolute w-2 h-2 rounded-full dynamic-particle-css dynamic-particle-css--${i + 1}`}
+                    style={{
+                      background: urgencyConfig.color,
+                      boxShadow: `0 0 12px color-mix(in srgb, ${urgencyConfig.color} 70%, transparent)`,
+                      '--particle-x': `${x * 0.4}px`,
+                      '--particle-y': `${y * 0.4}px`,
+                      '--particle-x-end': `${x}px`,
+                      '--particle-y-end': `${y}px`
+                    } as React.CSSProperties}
+                  />
+                );
+              })
             }
           </div>
 
