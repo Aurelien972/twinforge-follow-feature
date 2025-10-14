@@ -60,24 +60,45 @@ const CalorieHighlightCard: React.FC<CalorieHighlightCardProps> = ({
 
   return (
     <div className="meal-results-enter">
-      <GlassCard 
-        className="p-6 md:p-8 text-center relative w-full perf-critical"
-        style={{
-          background: `
-            radial-gradient(circle at 50% 50%, color-mix(in srgb, #FF4500 4%, transparent) 0%, transparent 70%),
-            var(--glass-opacity)
-          `,
-          borderColor: 'color-mix(in srgb, #FF4500 30%, transparent)',
-          boxShadow: `
-            0 12px 40px rgba(0, 0, 0, 0.25),
-            0 0 30px color-mix(in srgb, #FF4500 15%, transparent),
-            inset 0 2px 0 rgba(255, 255, 255, 0.15)
-          `,
-          backdropFilter: 'blur(20px) saturate(150%)',
-          borderRadius: '24px',
-          border: '2px solid color-mix(in srgb, #FF4500 40%, transparent)'
+      <motion.div
+        animate={celebrationActive ? {
+          boxShadow: [
+            '0 12px 40px rgba(0, 0, 0, 0.25), 0 0 40px color-mix(in srgb, #FF4500 20%, transparent)',
+            '0 12px 40px rgba(0, 0, 0, 0.25), 0 0 60px color-mix(in srgb, #FF4500 35%, transparent)',
+            '0 12px 40px rgba(0, 0, 0, 0.25), 0 0 40px color-mix(in srgb, #FF4500 20%, transparent)'
+          ]
+        } : !reduceMotion ? {
+          boxShadow: [
+            '0 12px 40px rgba(0, 0, 0, 0.25), 0 0 30px color-mix(in srgb, #FF4500 15%, transparent)',
+            '0 12px 40px rgba(0, 0, 0, 0.25), 0 0 45px color-mix(in srgb, #FF4500 25%, transparent)',
+            '0 12px 40px rgba(0, 0, 0, 0.25), 0 0 30px color-mix(in srgb, #FF4500 15%, transparent)'
+          ]
+        } : {}}
+        transition={{
+          duration: celebrationActive ? 1.5 : 3,
+          repeat: Infinity,
+          ease: "easeInOut"
         }}
       >
+        <GlassCard
+          className="p-6 md:p-8 text-center relative w-full perf-critical"
+          style={{
+            background: `
+              radial-gradient(circle at 50% 50%, color-mix(in srgb, #FF4500 6%, transparent) 0%, transparent 70%),
+              radial-gradient(circle at 80% 20%, color-mix(in srgb, #FF8C00 4%, transparent) 0%, transparent 60%),
+              var(--glass-opacity)
+            `,
+            borderColor: 'color-mix(in srgb, #FF4500 30%, transparent)',
+            boxShadow: `
+              0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, #FF4500 15%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15)
+            `,
+            backdropFilter: 'blur(20px) saturate(150%)',
+            borderRadius: '24px',
+            border: '2px solid color-mix(in srgb, #FF4500 40%, transparent)'
+          }}
+        >
         {/* Halo de Forge Énergétique - Réduit */}
         <div
           className="absolute inset-0 rounded-inherit pointer-events-none"
@@ -92,42 +113,59 @@ const CalorieHighlightCard: React.FC<CalorieHighlightCardProps> = ({
         />
 
         <div className="relative z-10 space-y-6">
-          {/* Icône de Flamme Énergétique */}
+          {/* Icône de Flamme Énergétique - Améliorée */}
           <div className="flex justify-center mb-4">
             <motion.div
-              className="w-20 h-20 rounded-full flex items-center justify-center relative"
+              className="w-24 h-24 rounded-full flex items-center justify-center relative"
               style={{
                 background: `
-                  radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                  linear-gradient(135deg, color-mix(in srgb, #FF4500 40%, transparent), color-mix(in srgb, #FF8C00 30%, transparent))
+                  radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
+                  linear-gradient(135deg, color-mix(in srgb, #FF4500 50%, transparent), color-mix(in srgb, #FF8C00 40%, transparent))
                 `,
-                border: `2px solid color-mix(in srgb, #FF4500 60%, transparent)`,
+                border: `2px solid color-mix(in srgb, #FF4500 70%, transparent)`,
                 boxShadow: `
-                  0 0 40px color-mix(in srgb, #FF4500 50%, transparent),
-                  inset 0 2px 0 rgba(255, 255, 255, 0.3)
+                  0 0 50px color-mix(in srgb, #FF4500 60%, transparent),
+                  0 0 80px color-mix(in srgb, #FF4500 40%, transparent),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.35)
                 `
               }}
               animate={celebrationActive ? {
-                scale: [1, 1.08, 1],
+                scale: [1, 1.12, 1],
                 boxShadow: [
-                  `0 0 40px color-mix(in srgb, #FF4500 50%, transparent), inset 0 2px 0 rgba(255, 255, 255, 0.3)`,
-                  `0 0 60px color-mix(in srgb, #FF4500 70%, transparent), inset 0 3px 0 rgba(255, 255, 255, 0.4)`,
-                  `0 0 40px color-mix(in srgb, #FF4500 50%, transparent), inset 0 2px 0 rgba(255, 255, 255, 0.3)`
+                  `0 0 50px color-mix(in srgb, #FF4500 60%, transparent), 0 0 80px color-mix(in srgb, #FF4500 40%, transparent), inset 0 2px 0 rgba(255, 255, 255, 0.35)`,
+                  `0 0 70px color-mix(in srgb, #FF4500 80%, transparent), 0 0 120px color-mix(in srgb, #FF4500 60%, transparent), inset 0 3px 0 rgba(255, 255, 255, 0.45)`,
+                  `0 0 50px color-mix(in srgb, #FF4500 60%, transparent), 0 0 80px color-mix(in srgb, #FF4500 40%, transparent), inset 0 2px 0 rgba(255, 255, 255, 0.35)`
                 ]
+              } : !reduceMotion ? {
+                scale: [1, 1.03, 1],
+                rotate: [0, 2, -2, 0]
               } : {}}
               transition={{
-                duration: 1.5,
-                repeat: celebrationActive ? Infinity : 0,
+                duration: celebrationActive ? 1.5 : 2.5,
+                repeat: Infinity,
                 ease: "easeInOut"
               }}
             >
-              <SpatialIcon 
-                Icon={ICONS.Flame} 
-                size={32} 
-                className="text-white"
-                variant="pure"
-                aria-hidden="true"
-              />
+              <motion.div
+                animate={!reduceMotion ? {
+                  scale: [1, 1.1, 0.95, 1],
+                  opacity: [1, 0.9, 1, 1]
+                } : {}}
+                transition={{
+                  duration: 1.8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  times: [0, 0.3, 0.6, 1]
+                }}
+              >
+                <SpatialIcon
+                  Icon={ICONS.Flame}
+                  size={48}
+                  className="text-white"
+                  variant="pure"
+                  aria-hidden="true"
+                />
+              </motion.div>
             </motion.div>
           </div>
 
@@ -175,7 +213,8 @@ const CalorieHighlightCard: React.FC<CalorieHighlightCardProps> = ({
             </div>
           </div>
         </div>
-      </GlassCard>
+        </GlassCard>
+      </motion.div>
     </div>
   );
 };

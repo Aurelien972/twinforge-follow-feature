@@ -19,7 +19,7 @@ import { initialScanFlowState, type ScanFlowState } from './components/MealScanF
 import { useScanFlowHandlers } from './components/MealScanFlow/ScanFlowHandlers';
 import ScanExitConfirmationModal from './components/MealScanFlow/ScanExitConfirmationModal';
 import AIStatusBadge from './components/MealScanFlow/AIStatusBadge';
-import { uploadMealPhoto } from '../../../lib/storage/imageUpload';
+import { uploadMealPhoto, type UploadResult } from '../../../lib/storage/imageUpload';
 import Portal from '../../../ui/components/Portal';
 
 /**

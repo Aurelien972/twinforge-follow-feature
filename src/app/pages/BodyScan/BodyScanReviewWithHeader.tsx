@@ -12,7 +12,7 @@ const BodyScanReviewWithHeader: React.FC = () => {
   const { isActive, steps, currentStep, progress, message, subMessage } = useProgressStore();
 
   return (
-    <div className="max-w-7xl mx-auto mt-4 space-y-6">
+    <div className="max-w-7xl mx-auto mt-4 space-y-6 pb-4">
       {/* Progress Header - Always visible, at 100% */}
       {isActive && steps.length > 0 && (
         <BodyScanProgressHeader

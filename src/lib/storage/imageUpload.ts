@@ -1,13 +1,20 @@
 import { supabase } from '../../system/supabase/client';
 import logger from '../utils/logger';
 
+export interface UploadResult {
+  success: boolean;
+  publicUrl?: string;
+  uploadPath?: string;
+  error?: string;
+}
+
 /**
  * Upload a meal photo to Supabase Storage
  * @param file - The image file to upload
  * @param userId - The user ID for organizing files
- * @returns The public URL of the uploaded image
+ * @returns Upload result with success status and public URL
  */
-export async function uploadMealPhoto(file: File, userId: string): Promise<string> {
+export async function uploadMealPhoto(file: File, userId: string): Promise<UploadResult> {
   try {
     // Generate unique filename
     const timestamp = Date.now();
@@ -34,7 +41,10 @@ export async function uploadMealPhoto(file: File, userId: string): Promise<strin
         error: error.message,
         fileName
       });
-      throw error;
+      return {
+        success: false,
+        error: error.message
+      };
     }
 
     // Get public URL
@@ -47,12 +57,19 @@ export async function uploadMealPhoto(file: File, userId: string): Promise<strin
       publicUrl
     });
 
-    return publicUrl;
+    return {
+      success: true,
+      publicUrl,
+      uploadPath: fileName
+    };
   } catch (error) {
     logger.error('MEAL_PHOTO_UPLOAD', 'Error uploading meal photo', {
       error: error instanceof Error ? error.message : 'Unknown error'
     });
-    throw error;
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
   }
 }
 

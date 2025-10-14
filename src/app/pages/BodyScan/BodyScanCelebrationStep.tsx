@@ -134,7 +134,7 @@ const BodyScanCelebrationStep: React.FC = () => {
   };
 
   return (
-    <div className="relative overflow-visible pt-4 pb-12 md:pb-16">
+    <div className="relative overflow-visible pt-4 pb-6 md:pb-8">
       {/* Celebration Background Effects */}
       <div className="celebration-background-effects absolute inset-0 pointer-events-none overflow-visible">
         {/* Ambient Glow Background */}

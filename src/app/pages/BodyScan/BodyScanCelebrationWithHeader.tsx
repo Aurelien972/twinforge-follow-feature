@@ -12,7 +12,7 @@ const BodyScanCelebrationWithHeader: React.FC = () => {
   const { isActive, steps, currentStep, progress, message, subMessage } = useProgressStore();
 
   return (
-    <div className="max-w-4xl mx-auto mt-4 space-y-6">
+    <div className="max-w-4xl mx-auto mt-4 space-y-6 pb-4">
       {/* Progress Header - Always visible, non-animated at 100% */}
       {isActive && steps.length > 0 && (
         <BodyScanProgressHeader

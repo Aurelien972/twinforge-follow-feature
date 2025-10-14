@@ -325,6 +325,7 @@
   transform: translateZ(0);
   will-change: transform, box-shadow;
   cursor: pointer;
+  contain: layout style paint;
 }
 
 .btn-save-meal-cta:hover:not(:disabled) {
@@ -356,10 +357,13 @@
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
   animation: ctaShimmer 3s ease-in-out infinite;
-  border-radius: 999px;
+  border-radius: inherit;
   pointer-events: none;
   z-index: 1;
   overflow: hidden;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 @keyframes ctaShimmer {
