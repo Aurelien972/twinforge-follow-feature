@@ -314,12 +314,12 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col gap-4 items-center"
           >
             {/* Primary CTA - Enregistrer une activité */}
             <motion.button
               onClick={handleActivityInput}
-              className="px-8 py-4 rounded-full font-bold text-lg text-white relative overflow-hidden min-h-[64px]"
+              className="px-8 py-4 rounded-full font-bold text-lg text-white relative overflow-hidden min-h-[64px] w-full sm:w-auto"
               style={{
                 background: `
                   linear-gradient(135deg,
@@ -372,7 +372,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
               </div>
             </motion.button>
 
-            {/* Secondary CTA - View Insights (only if activities exist) */}
+            {/* Secondary CTA - View Insights (transparent button) */}
             {hasActivities && (
               <motion.button
                 onClick={handleViewInsights}
