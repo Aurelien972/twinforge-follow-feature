@@ -17,6 +17,8 @@ export const ICONS = {
   Users: L.Users,
   ChefHat: L.ChefHat,
   Archive: L.Archive,
+  LayoutDashboard: L.LayoutDashboard,
+  Phone: L.Phone,
 
   Menu: L.Menu,
   X: L.X,

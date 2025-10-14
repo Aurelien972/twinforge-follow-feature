@@ -111,7 +111,19 @@ export const HealthOverviewTab: React.FC = () => {
             }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <SpatialIcon Icon={ICONS.Target} size={20} style={{ color: nextIncompleteTab.color }} />
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{
+                  background: `
+                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                    linear-gradient(135deg, ${nextIncompleteTab.color}66, ${nextIncompleteTab.color}33)
+                  `,
+                  border: `2px solid ${nextIncompleteTab.color}80`,
+                  boxShadow: `0 0 30px ${nextIncompleteTab.color}66`,
+                }}
+              >
+                <SpatialIcon Icon={ICONS.Target} size={20} style={{ color: nextIncompleteTab.color }} variant="pure" />
+              </div>
               <h3 className="text-white font-semibold text-lg">Action Recommandée</h3>
             </div>
             <p className="text-white/80 mb-4">
@@ -135,11 +147,29 @@ export const HealthOverviewTab: React.FC = () => {
           }}
         >
           <div className="flex items-center gap-3 mb-4">
-            <SpatialIcon
-              Icon={ICONS.Sparkles}
-              size={20}
-              className={aiReadiness ? 'text-green-400' : 'text-orange-400'}
-            />
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{
+                background: aiReadiness
+                  ? `
+                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                    linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(16, 185, 129, 0.2))
+                  `
+                  : `
+                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                    linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.2))
+                  `,
+                border: aiReadiness ? '2px solid rgba(16, 185, 129, 0.5)' : '2px solid rgba(245, 158, 11, 0.5)',
+                boxShadow: aiReadiness ? '0 0 30px rgba(16, 185, 129, 0.4)' : '0 0 30px rgba(245, 158, 11, 0.4)',
+              }}
+            >
+              <SpatialIcon
+                Icon={ICONS.Sparkles}
+                size={20}
+                style={{ color: aiReadiness ? '#10B981' : '#F59E0B' }}
+                variant="pure"
+              />
+            </div>
             <h3 className="text-white font-semibold text-lg">
               {aiReadiness ? 'Analyse IA Disponible' : 'Analyse IA Limitée'}
             </h3>
@@ -160,7 +190,19 @@ export const HealthOverviewTab: React.FC = () => {
         {/* Recent Updates */}
         <GlassCard className="p-6">
           <div className="flex items-center gap-3 mb-4">
-            <SpatialIcon Icon={ICONS.Clock} size={20} className="text-purple-400" />
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{
+                background: `
+                  radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                  linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.2))
+                `,
+                border: '2px solid rgba(168, 85, 247, 0.5)',
+                boxShadow: '0 0 30px rgba(168, 85, 247, 0.4)',
+              }}
+            >
+              <SpatialIcon Icon={ICONS.Clock} size={20} style={{ color: '#A855F7' }} variant="pure" />
+            </div>
             <h3 className="text-white font-semibold text-lg">Dernières Mises à Jour</h3>
           </div>
           <div className="space-y-3">
@@ -184,15 +226,22 @@ export const HealthOverviewTab: React.FC = () => {
         {/* Quick Links */}
         <GlassCard className="p-6">
           <div className="flex items-center gap-3 mb-4">
-            <SpatialIcon Icon={ICONS.Zap} size={20} className="text-yellow-400" />
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{
+                background: `
+                  radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                  linear-gradient(135deg, rgba(234, 179, 8, 0.4), rgba(234, 179, 8, 0.2))
+                `,
+                border: '2px solid rgba(234, 179, 8, 0.5)',
+                boxShadow: '0 0 30px rgba(234, 179, 8, 0.4)',
+              }}
+            >
+              <SpatialIcon Icon={ICONS.Zap} size={20} style={{ color: '#EAB308' }} variant="pure" />
+            </div>
             <h3 className="text-white font-semibold text-lg">Actions Rapides</h3>
           </div>
           <div className="space-y-2">
-            <QuickLinkButton
-              icon={ICONS.User}
-              label="Informations de Base"
-              onClick={() => navigateToTab('basic')}
-            />
             <QuickLinkButton
               icon={ICONS.Activity}
               label="Constantes Vitales"
@@ -202,6 +251,11 @@ export const HealthOverviewTab: React.FC = () => {
               icon={ICONS.Shield}
               label="Vaccinations"
               onClick={() => navigateToTab('vaccinations')}
+            />
+            <QuickLinkButton
+              icon={ICONS.FileText}
+              label="Historique Médical"
+              onClick={() => navigateToTab('medical-history')}
             />
           </div>
         </GlassCard>

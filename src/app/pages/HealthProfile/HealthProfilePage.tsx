@@ -4,22 +4,24 @@
  */
 
 import React from 'react';
-import { HealthProfileLayout } from './HealthProfileLayout';
-import { HealthOverviewTab } from './tabs/HealthOverviewTab';
-import { BasicHealthTab } from './tabs/BasicHealthTab';
+import { motion } from 'framer-motion';
 import { useHealthProfileNavigation } from './hooks/useHealthProfileNavigation';
 import { useHealthDataMigration } from './hooks/useHealthDataMigration';
 import { useHealthCompletion } from './hooks/useHealthCompletion';
 import { useUserStore } from '../../../system/store/userStore';
+import { useTabsKeyboard } from '../../../ui/tabs/useTabsKeyboard';
+import { useScrollMemory } from '../../../hooks/scroll/useScrollMemory';
 import type { HealthProfileV2 } from '../../../domain/health';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
-import { motion } from 'framer-motion';
+import PageHeader from '../../../ui/page/PageHeader';
+import Tabs from '../../../ui/tabs/TabsComponent';
+import { HealthOverviewTab } from './tabs/HealthOverviewTab';
 import logger from '../../../lib/utils/logger';
 
 const HealthProfilePage: React.FC = () => {
-  const { activeTab, globalCompletion, updateTabCompletion } = useHealthProfileNavigation();
+  const { activeTab, globalCompletion, updateTabCompletion, allTabs } = useHealthProfileNavigation();
   const { migrating, migrationComplete, migrationError, retryMigration, skipMigration, forceSkip, canSkip, attemptsRemaining } = useHealthDataMigration();
   const { profile } = useUserStore();
 
@@ -30,10 +32,15 @@ const HealthProfilePage: React.FC = () => {
   // Mode dégradé : Permettre l'accès même si la migration n'est pas terminée après 10 secondes
   const [degradedMode, setDegradedMode] = React.useState(false);
 
+  // Enable keyboard navigation for tabs
+  useTabsKeyboard();
+
+  // Mémoriser la position de scroll pour chaque onglet
+  useScrollMemory(`health-profile:${activeTab}`);
+
   // Update tab completion percentages when data changes
   React.useEffect(() => {
     if (completion) {
-      updateTabCompletion('basic', completion.basic);
       updateTabCompletion('medical-history', completion.medicalHistory);
       updateTabCompletion('family-history', completion.familyHistory);
       updateTabCompletion('vital-signs', completion.vitalSigns);
@@ -50,7 +57,7 @@ const HealthProfilePage: React.FC = () => {
       const timer = setTimeout(() => {
         logger.warn('HEALTH_PROFILE', 'Entering degraded mode after timeout');
         setDegradedMode(true);
-      }, 10000); // 10 secondes
+      }, 10000);
 
       return () => clearTimeout(timer);
     }
@@ -222,7 +229,50 @@ const HealthProfilePage: React.FC = () => {
   }
 
   return (
-    <HealthProfileLayout globalCompletion={globalCompletion}>
+    <div className="space-y-6 w-full overflow-visible">
+      <PageHeader
+        icon="Heart"
+        title="Mon Profil de Santé"
+        subtitle="Médecine préventive par intelligence artificielle"
+        circuit="health"
+        iconColor="#EF4444"
+        actions={
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-cyan-400" style={{ boxShadow: '0 0 8px rgba(6, 182, 212, 0.6)' }} />
+                <span className="text-white font-bold text-lg">{globalCompletion}%</span>
+              </div>
+              <span className="text-white/60 text-xs">Complété</span>
+            </div>
+            <div className="w-16 h-16 relative">
+              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  className="text-white/10"
+                  strokeWidth="3"
+                  stroke="currentColor"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <motion.path
+                  className="text-cyan-400"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeDasharray="100"
+                  strokeDashoffset={100 - globalCompletion}
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  initial={{ strokeDashoffset: 100 }}
+                  animate={{ strokeDashoffset: 100 - globalCompletion }}
+                  transition={{ duration: 1, ease: 'easeOut' }}
+                />
+              </svg>
+            </div>
+          </div>
+        }
+      />
+
       {/* Bandeau d'avertissement si mode dégradé ou erreur */}
       {(degradedMode || (migrationError && !canSkip)) && (
         <motion.div
@@ -261,20 +311,68 @@ const HealthProfilePage: React.FC = () => {
         </motion.div>
       )}
 
-      {activeTab === 'overview' && <HealthOverviewTab />}
-      {activeTab === 'basic' && <BasicHealthTab />}
-      {activeTab === 'medical-history' && <PlaceholderTab title="Historique Médical" icon="FileText" />}
-      {activeTab === 'family-history' && <PlaceholderTab title="Antécédents Familiaux" icon="Users" />}
-      {activeTab === 'vital-signs' && <PlaceholderTab title="Constantes Vitales" icon="Activity" />}
-      {activeTab === 'lifestyle' && <PlaceholderTab title="Style de Vie" icon="Coffee" />}
-      {activeTab === 'vaccinations' && <PlaceholderTab title="Vaccinations" icon="Shield" />}
-      {activeTab === 'mental-health' && <PlaceholderTab title="Santé Mentale" icon="Brain" />}
-      {activeTab === 'reproductive-health' && <PlaceholderTab title="Santé Reproductive" icon="Heart" />}
-      {activeTab === 'emergency-contacts' && <PlaceholderTab title="Contacts d'Urgence" icon="Phone" />}
-      {activeTab === 'history' && <PlaceholderTab title="Historique" icon="Clock" />}
-      {activeTab === 'insights' && <PlaceholderTab title="Analyses IA" icon="Sparkles" />}
-      {activeTab === 'import-export' && <PlaceholderTab title="Import/Export" icon="Download" />}
-    </HealthProfileLayout>
+      <Tabs
+        defaultValue="overview"
+        className="w-full min-w-0 health-profile-tabs"
+        forgeContext="health"
+      >
+        <Tabs.List role="tablist" aria-label="Sections du profil de santé" className="mb-6 w-full">
+          {allTabs.map((tab) => (
+            <Tabs.Trigger key={tab.id} value={tab.id} icon={tab.icon as any}>
+              <span className="tab-text">{tab.label}</span>
+            </Tabs.Trigger>
+          ))}
+        </Tabs.List>
+
+        <Tabs.Panel value="overview">
+          <HealthOverviewTab />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="medical-history">
+          <PlaceholderTab title="Historique Médical" icon="FileText" />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="family-history">
+          <PlaceholderTab title="Antécédents Familiaux" icon="Users" />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="vital-signs">
+          <PlaceholderTab title="Constantes Vitales" icon="Activity" />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="lifestyle">
+          <PlaceholderTab title="Style de Vie" icon="Coffee" />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="vaccinations">
+          <PlaceholderTab title="Vaccinations" icon="Shield" />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="mental-health">
+          <PlaceholderTab title="Santé Mentale" icon="Brain" />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="reproductive-health">
+          <PlaceholderTab title="Santé Reproductive" icon="Heart" />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="emergency-contacts">
+          <PlaceholderTab title="Contacts d'Urgence" icon="Phone" />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="history">
+          <PlaceholderTab title="Historique" icon="Clock" />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="insights">
+          <PlaceholderTab title="Analyses IA" icon="Sparkles" />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="import-export">
+          <PlaceholderTab title="Import/Export" icon="Download" />
+        </Tabs.Panel>
+      </Tabs>
+    </div>
   );
 };
 
