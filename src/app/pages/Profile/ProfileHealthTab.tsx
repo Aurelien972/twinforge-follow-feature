@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
@@ -6,17 +7,23 @@ import { useUserStore } from '../../../system/store/userStore';
 import { useProfileHealthForm } from './hooks/useProfileHealthForm';
 import { ProgressBar, SectionSaveButton, ArrayItemManager } from './components/ProfileHealthComponents';
 import { calculateHealthCompletion } from './utils/profileCompletion';
+import { CountryHealthDataDisplay } from './components/health/CountryHealthDataDisplay';
+import { useCountryHealthData } from '../../../hooks/useCountryHealthData';
 
 /**
  * Profile Health Tab - Santé & Médical TwinForge
  * Gestion complète des données de santé avec design VisionOS 26
  */
 const ProfileHealthTab: React.FC = () => {
+  const navigate = useNavigate();
   const { profile } = useUserStore();
   const { form, actions, state } = useProfileHealthForm();
   const { register, handleSubmit, errors, isDirty, watchedValues, setValue } = form;
   const { saveBasicHealthSection, saveMedicalSection, saveConstraintsSection, onSubmit } = actions;
   const { saving, sectionSaving, hasBasicChanges, hasMedicalChanges, hasConstraintsChanges } = state;
+
+  // Country health data
+  const { countryData, loading: countryLoading, error: countryError, refresh: refreshCountryData } = useCountryHealthData();
   
   const [newCondition, setNewCondition] = React.useState('');
   const [newMedication, setNewMedication] = React.useState('');
@@ -383,7 +390,7 @@ const ProfileHealthTab: React.FC = () => {
               <span className="text-red-300 text-sm font-medium">Spécifique</span>
             </div>
           </div>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-white/90 text-sm font-medium mb-3">
@@ -409,6 +416,113 @@ const ProfileHealthTab: React.FC = () => {
             sectionName="Contraintes"
           />
         </GlassCard>
+
+        {/* Country Health Context Section */}
+        {!profile?.country ? (
+          <GlassCard className="p-6" style={{
+            background: `
+              radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 60%),
+              var(--glass-opacity)
+            `,
+            borderColor: 'rgba(6, 182, 212, 0.2)'
+          }}>
+            <div className="flex items-start gap-4">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{
+                  background: `
+                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                    linear-gradient(135deg, color-mix(in srgb, #06B6D4 35%, transparent), color-mix(in srgb, #06B6D4 25%, transparent))
+                  `,
+                  border: '2px solid color-mix(in srgb, #06B6D4 50%, transparent)',
+                  boxShadow: '0 0 20px color-mix(in srgb, #06B6D4 30%, transparent)'
+                }}
+              >
+                <SpatialIcon Icon={ICONS.MapPin} size={20} style={{ color: '#06B6D4' }} variant="pure" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-white font-semibold text-lg mb-2">Contexte sanitaire non disponible</h3>
+                <p className="text-white/70 text-sm leading-relaxed mb-4">
+                  Sélectionnez votre pays dans l'onglet Identité pour voir les risques sanitaires locaux,
+                  les maladies endémiques et les vaccinations recommandées.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const params = new URLSearchParams(window.location.search);
+                    params.set('tab', 'identity');
+                    navigate(`/profile?${params.toString()}`);
+                  }}
+                  className="btn-glass--primary px-4 py-2 text-sm"
+                >
+                  <div className="flex items-center gap-2">
+                    <SpatialIcon Icon={ICONS.User} size={16} />
+                    <span>Aller à l'onglet Identité</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </GlassCard>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{
+                    background: `
+                      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                      linear-gradient(135deg, color-mix(in srgb, #06B6D4 35%, transparent), color-mix(in srgb, #06B6D4 25%, transparent))
+                    `,
+                    border: '2px solid color-mix(in srgb, #06B6D4 50%, transparent)',
+                    boxShadow: '0 0 20px color-mix(in srgb, #06B6D4 30%, transparent)'
+                  }}
+                >
+                  <SpatialIcon Icon={ICONS.Globe} size={20} style={{ color: '#06B6D4' }} variant="pure" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold text-lg">Contexte Sanitaire Local</h3>
+                  <p className="text-white/60 text-sm">Risques et recommandations pour {profile.country}</p>
+                </div>
+              </div>
+              {countryData && (
+                <button
+                  type="button"
+                  onClick={() => refreshCountryData()}
+                  disabled={countryLoading}
+                  className="btn-glass px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Rafraîchir les données sanitaires"
+                >
+                  <SpatialIcon
+                    Icon={ICONS.RefreshCw}
+                    size={16}
+                    className={countryLoading ? 'animate-spin' : ''}
+                  />
+                </button>
+              )}
+            </div>
+
+            {countryError && (
+              <GlassCard className="p-4" style={{
+                background: 'rgba(239, 68, 68, 0.1)',
+                borderColor: 'rgba(239, 68, 68, 0.3)'
+              }}>
+                <div className="flex items-start gap-3">
+                  <SpatialIcon Icon={ICONS.AlertCircle} size={18} className="text-red-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-red-300 text-sm font-medium mb-1">Erreur de chargement</p>
+                    <p className="text-red-200 text-xs">{countryError.message}</p>
+                  </div>
+                </div>
+              </GlassCard>
+            )}
+
+            <CountryHealthDataDisplay
+              countryData={countryData}
+              loading={countryLoading}
+            />
+          </div>
+        )}
 
         {/* Global Save Action */}
         <div className="flex justify-center pt-4">
