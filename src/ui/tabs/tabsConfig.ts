@@ -34,7 +34,7 @@ export const TAB_COLORS: Record<string, string> = {
 
   // Fasting (Forge du Temps) - Utilise le contexte "fasting"
   'fasting:daily': '#F59E0B',     // Orange pour aujourd'hui
-  'fasting:insights': '#8B5CF6',  // Violet pour insights
+  'fasting:insights': '#10B981',  // Vert pour insights
   'fasting:progression': '#06B6D4', // Cyan pour progression
   'fasting:history': '#8B5CF6',   // Violet pour historique
   'timer': '#F59E0B',             // Orange pour timer (legacy)
@@ -218,4 +218,16 @@ export function getOptimizedVariants(variants: Variants): Variants {
     }, {} as Variants);
   }
   return variants;
+}
+
+/**
+ * Récupère la couleur d'un onglet avec support du contexte de forge
+ */
+export function getTabColorWithContext(tabValue: string, forgeContext?: string): string | undefined {
+  if (forgeContext) {
+    const contextualKey = `${forgeContext}:${tabValue}`;
+    const contextualColor = getTabColor(contextualKey);
+    if (contextualColor) return contextualColor;
+  }
+  return getTabColor(tabValue);
 }

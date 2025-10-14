@@ -22,7 +22,7 @@ const FastingTipsCard: React.FC = () => {
     {
       icon: 'Heart',
       text: 'Écoutez votre corps et arrêtez si nécessaire',
-      color: '#EF4444'
+      color: '#F59E0B'
     },
     {
       icon: 'Activity',
@@ -85,13 +85,13 @@ const FastingTipsCard: React.FC = () => {
                   border: `1px solid color-mix(in srgb, ${tip.color} 25%, transparent)`
                 }}
               >
-                <SpatialIcon 
-                  Icon={ICONS[tip.icon as keyof typeof ICONS] || ICONS.Info} 
-                  size={12} 
-                  style={{ color: tip.color }} 
+                <SpatialIcon
+                  Icon={ICONS[tip.icon as keyof typeof ICONS] || ICONS.Info}
+                  size={12}
+                  style={{ color: tip.color }}
                 />
               </div>
-              <p className="text-white/80 text-sm leading-relaxed flex-1">
+              <p className="text-white text-sm leading-relaxed flex-1">
                 {tip.text}
               </p>
             </div>

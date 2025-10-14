@@ -4,6 +4,7 @@ import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import type { FastingProgressionMetrics, FastingProgressionAnalysis } from '../../hooks/useFastingProgressionData';
+import { useFastingTabColor } from '../../hooks/useFastingTabColor';
 
 interface FastingProgressionSummaryCardProps {
   metrics: FastingProgressionMetrics;
@@ -63,7 +64,10 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
   cached,
   className = ''
 }) => {
+  const { tabColor, isProgressionTab } = useFastingTabColor();
   const theme = getPerformanceTheme(metrics.consistencyScore);
+
+  const iconColor = isProgressionTab ? tabColor : theme.color;
 
   return (
     <motion.div

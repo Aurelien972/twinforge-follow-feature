@@ -30,7 +30,7 @@ function getTabHeaderContent(activeTab: string) {
         title: 'Insights de Jeûne',
         subtitle: 'Analyses et patterns de votre discipline temporelle',
         circuit: 'fasting' as const,
-        color: '#8B5CF6',
+        color: '#10B981',
       };
     case 'progression':
       return {

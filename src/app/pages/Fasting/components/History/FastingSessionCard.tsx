@@ -8,6 +8,7 @@ import { useFeedback } from '@/hooks/useFeedback';
 import { useDeleteFastingSession, type FastingHistorySession } from '../../hooks/useFastingHistory';
 import { determineSessionOutcome, getOutcomeTheme } from '../../utils/fastingUtils';
 import { FASTING_PROTOCOLS } from '@/lib/nutrition/fastingProtocols';
+import { useFastingTabColor } from '../../hooks/useFastingTabColor';
 
 interface FastingSessionCardProps {
   session: FastingHistorySession;
@@ -48,6 +49,7 @@ const FastingSessionCard: React.FC<FastingSessionCardProps> = ({
   className = ''
 }) => {
   const { click, error: errorSound } = useFeedback();
+  const { tabColor, isHistoryTab } = useFastingTabColor();
   const deleteSessionMutation = useDeleteFastingSession();
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
 

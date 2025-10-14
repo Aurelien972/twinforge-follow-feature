@@ -4,6 +4,7 @@ import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import type { FastingInsight } from '../../hooks/useFastingInsightsGenerator';
+import { useFastingTabColor } from '../../hooks/useFastingTabColor';
 
 interface FastingInsightCardProps {
   insight: FastingInsight;
@@ -61,8 +62,11 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
   index,
   className = ''
 }) => {
+  const { tabColor, isInsightsTab } = useFastingTabColor();
   const theme = getPriorityTheme(insight.priority);
   const iconName = getInsightTypeIcon(insight.type, insight.icon);
+
+  const displayColor = isInsightsTab ? tabColor : insight.color;
 
   return (
     <motion.div
@@ -79,14 +83,14 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
         className="p-5 hover:scale-[1.01] transition-transform duration-200"
         style={{
           background: `
-            radial-gradient(circle at 30% 20%, color-mix(in srgb, ${insight.color} ${theme.backgroundIntensity}, transparent) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, color-mix(in srgb, ${displayColor} ${theme.backgroundIntensity}, transparent) 0%, transparent 60%),
             var(--glass-opacity)
           `,
-          borderColor: `color-mix(in srgb, ${insight.color} 25%, transparent)`,
+          borderColor: `color-mix(in srgb, ${displayColor} 25%, transparent)`,
           borderWidth: theme.borderWidth,
           boxShadow: `
             0 8px 32px rgba(0, 0, 0, 0.2),
-            0 0 20px color-mix(in srgb, ${insight.color} ${theme.glowIntensity}, transparent),
+            0 0 20px color-mix(in srgb, ${displayColor} ${theme.glowIntensity}, transparent),
             inset 0 1px 0 rgba(255, 255, 255, 0.12)
           `,
           backdropFilter: 'blur(16px) saturate(150%)'
@@ -99,16 +103,16 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
             style={{
               background: `
                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                linear-gradient(135deg, color-mix(in srgb, ${insight.color} 35%, transparent), color-mix(in srgb, ${insight.color} 25%, transparent))
+                linear-gradient(135deg, color-mix(in srgb, ${displayColor} 35%, transparent), color-mix(in srgb, ${displayColor} 25%, transparent))
               `,
-              border: `${theme.borderWidth} solid color-mix(in srgb, ${insight.color} 50%, transparent)`,
-              boxShadow: `0 0 20px color-mix(in srgb, ${insight.color} 30%, transparent)`
+              border: `${theme.borderWidth} solid color-mix(in srgb, ${displayColor} 50%, transparent)`,
+              boxShadow: `0 0 20px color-mix(in srgb, ${displayColor} 30%, transparent)`
             }}
           >
-            <SpatialIcon 
-              Icon={ICONS[iconName]} 
-              size={20} 
-              style={{ color: insight.color }} 
+            <SpatialIcon
+              Icon={ICONS[iconName]}
+              size={20}
+              style={{ color: displayColor }}
               variant="pure"
             />
           </div>
@@ -121,14 +125,14 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
               </h4>
               
               {/* Badge de Priorité */}
-              <div 
+              <div
                 className="px-2 py-1 rounded-full flex-shrink-0"
                 style={{
-                  background: `color-mix(in srgb, ${insight.color} 15%, transparent)`,
-                  border: `1px solid color-mix(in srgb, ${insight.color} 25%, transparent)`
+                  background: `color-mix(in srgb, ${displayColor} 15%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${displayColor} 25%, transparent)`
                 }}
               >
-                <span className="text-xs font-medium" style={{ color: insight.color }}>
+                <span className="text-xs font-medium" style={{ color: displayColor }}>
                   {insight.priority === 'high' ? 'Priorité' : 
                    insight.priority === 'medium' ? 'Important' : 'Info'}
                 </span>
@@ -142,25 +146,25 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
             
             {/* Action Recommandée */}
             {insight.actionable && (
-              <motion.div 
+              <motion.div
                 className="p-3 rounded-lg"
                 style={{
-                  background: `color-mix(in srgb, ${insight.color} 8%, transparent)`,
-                  border: `1px solid color-mix(in srgb, ${insight.color} 20%, transparent)`
+                  background: `color-mix(in srgb, ${displayColor} 8%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${displayColor} 20%, transparent)`
                 }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
               >
                 <div className="flex items-start gap-2">
-                  <SpatialIcon 
-                    Icon={ICONS.Target} 
-                    size={12} 
-                    style={{ color: insight.color }} 
-                    className="mt-0.5" 
+                  <SpatialIcon
+                    Icon={ICONS.Target}
+                    size={12}
+                    style={{ color: displayColor }}
+                    className="mt-0.5"
                   />
                   <div>
-                    <h6 className="font-medium text-sm mb-1" style={{ color: insight.color }}>
+                    <h6 className="font-medium text-sm mb-1" style={{ color: displayColor }}>
                       Action Recommandée
                     </h6>
                     <p className="text-white/80 text-xs leading-relaxed">
@@ -176,9 +180,9 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
         {/* Type Badge en bas */}
         <div className="flex justify-between items-center mt-4 pt-3 border-t border-white/10">
           <div className="flex items-center gap-2">
-            <div 
-              className="w-1.5 h-1.5 rounded-full" 
-              style={{ background: insight.color }} 
+            <div
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: displayColor }}
             />
             <span className="text-white/60 text-xs font-medium">
               {insight.type === 'pattern' ? 'Pattern détecté' :

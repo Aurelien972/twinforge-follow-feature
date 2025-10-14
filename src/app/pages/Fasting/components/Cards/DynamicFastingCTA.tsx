@@ -223,6 +223,60 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
         interactive
         style={cardStyles}
       >
+        {/* 4 Carrés Décoratifs aux coins - Style unifié avec autres forges */}
+        {!reduceMotion && (
+          <>
+            <div
+              className="absolute w-3 h-3 rounded-sm"
+              style={{
+                top: '-6px',
+                left: '-6px',
+                background: urgencyConfig.color,
+                boxShadow: `0 0 12px ${urgencyConfig.color}`,
+                opacity: 0.6,
+                animation: 'cornerSquarePulse 3s ease-in-out infinite',
+                animationDelay: '0s'
+              }}
+            />
+            <div
+              className="absolute w-3 h-3 rounded-sm"
+              style={{
+                top: '-6px',
+                right: '-6px',
+                background: urgencyConfig.color,
+                boxShadow: `0 0 12px ${urgencyConfig.color}`,
+                opacity: 0.6,
+                animation: 'cornerSquarePulse 3s ease-in-out infinite',
+                animationDelay: '0.75s'
+              }}
+            />
+            <div
+              className="absolute w-3 h-3 rounded-sm"
+              style={{
+                bottom: '-6px',
+                left: '-6px',
+                background: urgencyConfig.color,
+                boxShadow: `0 0 12px ${urgencyConfig.color}`,
+                opacity: 0.6,
+                animation: 'cornerSquarePulse 3s ease-in-out infinite',
+                animationDelay: '1.5s'
+              }}
+            />
+            <div
+              className="absolute w-3 h-3 rounded-sm"
+              style={{
+                bottom: '-6px',
+                right: '-6px',
+                background: urgencyConfig.color,
+                boxShadow: `0 0 12px ${urgencyConfig.color}`,
+                opacity: 0.6,
+                animation: 'cornerSquarePulse 3s ease-in-out infinite',
+                animationDelay: '2.25s'
+              }}
+            />
+          </>
+        )}
+
         {urgencyConfig.priority === 'high' && !reduceMotion && (
           <div
             className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
