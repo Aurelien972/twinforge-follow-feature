@@ -38,32 +38,12 @@ function getUrgencyConfig(
   hasPreferredProtocol: boolean,
   elapsedHours: number
 ): UrgencyConfig {
-  // Session active : priorité moyenne avec couleur rouge/orange
-  if (isActive) {
-    return {
-      priority: 'medium',
-      color: '#EF4444',
-      icon: 'Timer',
-      animation: 'breathing'
-    };
-  }
-  
-  // Pas de session mais protocole configuré : priorité moyenne
-  if (hasPreferredProtocol) {
-    return {
-      priority: 'medium',
-      color: '#F59E0B',
-      icon: 'Timer',
-      animation: 'breathing'
-    };
-  }
-  
-  // Aucune configuration : haute priorité pour encourager
+  // TOUJOURS ORANGE pour l'onglet Aujourd'hui
   return {
-    priority: 'high',
-    color: '#22C55E',
+    priority: isActive ? 'medium' : hasPreferredProtocol ? 'medium' : 'high',
+    color: '#F59E0B',
     icon: 'Timer',
-    animation: 'pulse'
+    animation: isActive ? 'breathing' : hasPreferredProtocol ? 'breathing' : 'pulse'
   };
 }
 
