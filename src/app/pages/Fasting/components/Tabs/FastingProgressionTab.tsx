@@ -83,6 +83,7 @@ const FastingProgressionTab: React.FC<FastingProgressionTabProps> = ({ onLoading
         onPeriodChange={setSelectedPeriod}
         availableSessionsCount={availableSessionsCount}
         getMinSessionsForPeriod={getProgressionMinSessions}
+        accentColor="#06B6D4"
       />
       
       {/* Data Completeness Alert */}

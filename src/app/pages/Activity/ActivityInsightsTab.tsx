@@ -307,6 +307,7 @@ const ActivityInsightsTab: React.FC = () => {
         onPeriodChange={handlePeriodChange}
         currentActivities={currentActivitiesCount}
         periodThresholds={periodThresholds}
+        accentColor="#F59E0B"
       />
 
       {/* Indicateur de cache si les données proviennent du cache */}

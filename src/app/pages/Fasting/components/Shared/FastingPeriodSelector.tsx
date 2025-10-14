@@ -1,8 +1,7 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { useFeedback } from '@/hooks/useFeedback';
 
 interface FastingPeriodSelectorProps {
   selectedPeriod: number;
@@ -10,29 +9,26 @@ interface FastingPeriodSelectorProps {
   availableSessionsCount?: number;
   getMinSessionsForPeriod?: (period: number) => number;
   className?: string;
+  accentColor?: string;
 }
 
 interface PeriodOption {
   value: number;
   label: string;
-  description: string;
 }
 
 const PERIOD_OPTIONS: PeriodOption[] = [
   {
     value: 7,
-    label: '7 derniers jours',
-    description: 'Analyse hebdomadaire',
+    label: '7 jours',
   },
   {
     value: 30,
-    label: '30 derniers jours',
-    description: 'Tendances mensuelles',
+    label: '30 jours',
   },
   {
     value: 90,
-    label: '90 derniers jours',
-    description: 'Analyse trimestrielle',
+    label: '90 jours',
   }
 ];
 
@@ -50,120 +46,94 @@ const defaultGetMinSessions = (period: number): number => {
 
 /**
  * Fasting Period Selector - Sélecteur de Période d'Analyse
- * Permet de choisir la période d'analyse pour les insights de jeûne
+ * Design compact horizontal harmonisé avec la Forge Énergétique
  */
 const FastingPeriodSelector: React.FC<FastingPeriodSelectorProps> = ({
   selectedPeriod,
   onPeriodChange,
   availableSessionsCount = 0,
   getMinSessionsForPeriod = defaultGetMinSessions,
-  className = ''
+  className = '',
+  accentColor = '#10B981'
 }) => {
+  const { click } = useFeedback();
+  const [showTooltip, setShowTooltip] = React.useState(false);
+
   return (
-    <div className={`fasting-period-selector ${className}`}>
-      <div className="flex flex-col sm:flex-row gap-3">
+    <div className={`flex flex-col items-center gap-3 ${className}`}>
+      <div className="inline-flex gap-2 p-1 rounded-lg" style={{
+        background: 'rgba(255, 255, 255, 0.05)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        backdropFilter: 'blur(10px)'
+      }}>
         {PERIOD_OPTIONS.map((option) => {
           const isSelected = selectedPeriod === option.value;
           const minSessions = getMinSessionsForPeriod(option.value);
           const hasEnoughData = availableSessionsCount >= minSessions;
           const isDisabled = !hasEnoughData;
-          
+
           return (
-            <motion.button
+            <button
               key={option.value}
-              onClick={() => !isDisabled && onPeriodChange(option.value)}
-              disabled={isDisabled}
-              className={`
-                flex-1 p-4 rounded-xl transition-all duration-200 relative overflow-hidden
-                ${isSelected ? 'ring-2' : ''}
-                ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-              `}
-              style={{
-                background: isSelected 
-                  ? `
-                    radial-gradient(circle at 30% 20%, color-mix(in srgb, #8B5CF6 15%, transparent) 0%, transparent 60%),
-                    color-mix(in srgb, #8B5CF6 8%, transparent)
-                  `
-                  : 'rgba(255, 255, 255, 0.05)',
-                border: isSelected 
-                  ? '2px solid color-mix(in srgb, #8B5CF6 40%, transparent)'
-                  : '1px solid rgba(255, 255, 255, 0.1)',
-                ringColor: isSelected ? '#8B5CF6' : 'transparent',
-                backdropFilter: 'blur(12px) saturate(130%)'
+              onClick={() => {
+                if (!isDisabled) {
+                  click();
+                  onPeriodChange(option.value);
+                }
               }}
-              whileHover={!isDisabled ? { 
-                scale: 1.02,
-                backgroundColor: isSelected 
-                  ? 'color-mix(in srgb, #8B5CF6 12%, transparent)'
-                  : 'rgba(255, 255, 255, 0.08)'
-              } : {}}
-              whileTap={!isDisabled ? { scale: 0.98 } : {}}
+              disabled={isDisabled}
+              className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 flex flex-col items-center gap-0.5"
+              style={{
+                background: isSelected ? `${accentColor}33` : 'transparent',
+                color: isSelected ? accentColor : hasEnoughData ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)',
+                border: isSelected ? `1px solid ${accentColor}66` : '1px solid transparent',
+                boxShadow: isSelected ? `0 0 20px ${accentColor}4D` : 'none',
+                opacity: hasEnoughData ? 1 : 0.5,
+                cursor: hasEnoughData ? 'pointer' : 'not-allowed'
+              }}
             >
-              <div className="text-left">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className={`font-semibold ${
-                    isSelected ? 'text-purple-300' : 'text-white/90'
-                  }`}>
-                    {option.label}
-                  </h4>
-                  {isSelected && (
-                    <div 
-                      className="w-6 h-6 rounded-full flex items-center justify-center"
-                      style={{
-                        background: 'color-mix(in srgb, #8B5CF6 20%, transparent)',
-                        border: '1px solid color-mix(in srgb, #8B5CF6 30%, transparent)'
-                      }}
-                    >
-                      <SpatialIcon Icon={ICONS.Check} size={12} style={{ color: '#8B5CF6' }} />
-                    </div>
-                  )}
-                </div>
-                
-                <p className={`text-sm mb-3 ${
-                  isSelected ? 'text-purple-200' : 'text-white/70'
-                }`}>
-                  {option.description}
-                </p>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <SpatialIcon 
-                      Icon={hasEnoughData ? ICONS.Check : ICONS.AlertCircle} 
-                      size={12} 
-                      className={hasEnoughData ? 'text-green-400' : 'text-orange-400'} 
-                    />
-                    <span className={`text-xs ${
-                      hasEnoughData ? 'text-green-300' : 'text-orange-300'
-                    }`}>
-                      {availableSessionsCount}/{minSessions} sessions
-                    </span>
-                  </div>
-                  
-                  {!hasEnoughData && (
-                    <span className="text-xs text-orange-300">
-                      {minSessions - availableSessionsCount} manquantes
-                    </span>
-                  )}
-                </div>
-              </div>
-            </motion.button>
+              <span>{option.label}</span>
+              <span className="text-xs" style={{
+                color: hasEnoughData ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.4)'
+              }}>
+                {availableSessionsCount}/{minSessions} sessions
+              </span>
+            </button>
           );
         })}
       </div>
-      
-      {/* Information sur les données requises */}
-      <div className="mt-4 p-3 rounded-xl bg-purple-500/10 border border-purple-400/20">
-        <div className="flex items-start gap-2">
-          <SpatialIcon Icon={ICONS.Info} size={14} className="text-purple-400 mt-0.5" />
-          <div>
-            <p className="text-purple-200 text-sm leading-relaxed">
-              Plus vous avez de sessions de jeûne, plus les insights de la Forge sont précis et personnalisés.
-            </p>
-            <div className="text-purple-300 text-xs mt-2">
-              <strong>Recommandé :</strong> Au moins 3 sessions pour 7 jours, 8 pour 30 jours, 20 pour 90 jours
+
+      {/* Info-bulle compacte */}
+      <div className="relative">
+        <button
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+          className="flex items-center gap-1.5 text-xs transition-colors duration-200"
+          style={{
+            color: 'rgba(255, 255, 255, 0.5)'
+          }}
+        >
+          <SpatialIcon Icon={ICONS.Info} size={12} />
+          <span>Sessions requises pour l'analyse</span>
+        </button>
+
+        {showTooltip && (
+          <div
+            className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 rounded-lg whitespace-nowrap text-xs z-50"
+            style={{
+              background: 'rgba(0, 0, 0, 0.9)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+            }}
+          >
+            <div className="text-white/90">
+              <div>7 jours: 3 sessions minimum</div>
+              <div>30 jours: 8 sessions minimum</div>
+              <div>90 jours: 20 sessions minimum</div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

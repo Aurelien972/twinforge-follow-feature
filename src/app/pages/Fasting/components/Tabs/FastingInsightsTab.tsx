@@ -126,6 +126,7 @@ const FastingInsightsTab: React.FC<FastingInsightsTabProps> = ({ onLoadingChange
         onPeriodChange={setSelectedPeriod}
         availableSessionsCount={availableSessionsCount}
         getMinSessionsForPeriod={getInsightsMinSessions}
+        accentColor="#10B981"
       />
       
       {/* Data Completeness Alert */}

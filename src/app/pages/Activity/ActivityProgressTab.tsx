@@ -472,6 +472,7 @@ const ActivityProgressTab: React.FC = () => {
         onPeriodChange={handlePeriodChange}
         currentActivities={currentActivitiesCount}
         periodThresholds={periodThresholds}
+        accentColor="#10B981"
       />
 
       {/* Indicateur de cache si les données proviennent du cache */}
