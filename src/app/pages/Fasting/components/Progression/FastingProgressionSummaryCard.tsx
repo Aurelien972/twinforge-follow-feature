@@ -102,16 +102,16 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
-                    linear-gradient(135deg, color-mix(in srgb, ${theme.color} 40%, transparent), color-mix(in srgb, ${theme.color} 30%, transparent))
+                    linear-gradient(135deg, color-mix(in srgb, #06B6D4 40%, transparent), color-mix(in srgb, #06B6D4 30%, transparent))
                   `,
-                  border: `2px solid color-mix(in srgb, ${theme.color} 60%, transparent)`,
-                  boxShadow: `0 0 25px color-mix(in srgb, ${theme.color} 50%, transparent)`
+                  border: `2px solid color-mix(in srgb, #06B6D4 60%, transparent)`,
+                  boxShadow: `0 0 25px color-mix(in srgb, #06B6D4 50%, transparent)`
                 }}
               >
                 <SpatialIcon
-                  Icon={ICONS[theme.icon]}
+                  Icon={ICONS.TrendingUp}
                   size={20}
-                  style={{ color: theme.color }}
+                  style={{ color: '#06B6D4' }}
                   variant="pure"
                 />
               </div>
@@ -339,8 +339,8 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
             transition={{ duration: 0.6, delay: 0.8 }}
           >
             <div className="flex items-center justify-center gap-3 mb-3">
-              <SpatialIcon Icon={ICONS.Lightbulb} size={18} style={{ color: theme.color }} />
-              <h4 className="font-bold text-lg" style={{ color: theme.color }}>
+              <SpatialIcon Icon={ICONS.Lightbulb} size={18} style={{ color: '#06B6D4' }} />
+              <h4 className="font-bold text-lg" style={{ color: '#06B6D4' }}>
                 {aiAnalysis ? 'Analyse IA de Performance' : 'Analyse de Performance'}
               </h4>
             </div>
@@ -366,8 +366,8 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
                 border: `1px solid color-mix(in srgb, ${theme.color} 20%, transparent)`
               }}
             >
-              <SpatialIcon Icon={ICONS.Target} size={14} style={{ color: theme.color }} />
-              <span className="text-sm font-medium" style={{ color: theme.color }}>
+              <SpatialIcon Icon={ICONS.Target} size={14} style={{ color: '#06B6D4' }} />
+              <span className="text-sm font-medium" style={{ color: '#06B6D4' }}>
                 {aiAnalysis ? 
                   aiAnalysis.nextMilestone :
                   metrics.currentStreak === 0 ? 'Objectif : Commencer une série' :
@@ -389,7 +389,7 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
               {/* Narrative Summary */}
               <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                 <h5 className="text-white font-semibold mb-2 flex items-center gap-2">
-                  <SpatialIcon Icon={ICONS.FileText} size={14} className="text-cyan-400" />
+                  <SpatialIcon Icon={ICONS.FileText} size={14} style={{ color: '#06B6D4' }} />
                   Résumé Narratif IA
                 </h5>
                 <p className="text-white/85 text-sm leading-relaxed">
@@ -400,7 +400,7 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
               {/* Trend Analysis */}
               <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                 <h5 className="text-white font-semibold mb-2 flex items-center gap-2">
-                  <SpatialIcon Icon={ICONS.TrendingUp} size={14} className="text-green-400" />
+                  <SpatialIcon Icon={ICONS.TrendingUp} size={14} style={{ color: '#06B6D4' }} />
                   Analyse de Tendances
                 </h5>
                 <p className="text-white/85 text-sm leading-relaxed">
@@ -412,13 +412,13 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
               {aiAnalysis.strategicRecommendations.length > 0 && (
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                   <h5 className="text-white font-semibold mb-3 flex items-center gap-2">
-                    <SpatialIcon Icon={ICONS.Target} size={14} className="text-purple-400" />
+                    <SpatialIcon Icon={ICONS.Target} size={14} style={{ color: '#06B6D4' }} />
                     Recommandations Stratégiques IA
                   </h5>
                   <div className="space-y-2">
                     {aiAnalysis.strategicRecommendations.map((recommendation, index) => (
                       <div key={index} className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-2 flex-shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ background: '#06B6D4' }} />
                         <span className="text-white/85 text-sm leading-relaxed">{recommendation}</span>
                       </div>
                     ))}
@@ -432,7 +432,7 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-3">
               <h5 className="text-white/80 font-medium text-sm flex items-center gap-2">
-                <SpatialIcon Icon={ICONS.Clock} size={14} className="text-cyan-400" />
+                <SpatialIcon Icon={ICONS.Clock} size={14} style={{ color: '#06B6D4' }} />
                 Métriques Temporelles
               </h5>
               <div className="space-y-2">
@@ -453,7 +453,7 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
 
             <div className="space-y-3">
               <h5 className="text-white/80 font-medium text-sm flex items-center gap-2">
-                <SpatialIcon Icon={ICONS.TrendingUp} size={14} className="text-green-400" />
+                <SpatialIcon Icon={ICONS.TrendingUp} size={14} style={{ color: '#06B6D4' }} />
                 Performance
               </h5>
               <div className="space-y-2">

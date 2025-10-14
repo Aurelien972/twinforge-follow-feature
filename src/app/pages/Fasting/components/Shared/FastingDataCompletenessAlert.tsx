@@ -100,10 +100,16 @@ const FastingDataCompletenessAlert: React.FC<FastingDataCompletenessAlertProps> 
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={handleCompleteProfile}
-                className="btn-glass--primary px-4 py-2 text-sm"
+                className="px-4 py-2 text-sm rounded-lg font-medium transition-all duration-200"
+                style={{
+                  background: `color-mix(in srgb, ${color} 20%, transparent)`,
+                  border: `2px solid color-mix(in srgb, ${color} 40%, transparent)`,
+                  color: color,
+                  backdropFilter: 'blur(10px)'
+                }}
               >
                 <div className="flex items-center gap-2">
-                  <SpatialIcon Icon={ICONS.User} size={14} />
+                  <SpatialIcon Icon={ICONS.User} size={14} style={{ color }} />
                   <span>Compléter le Profil</span>
                 </div>
               </button>

@@ -263,10 +263,16 @@ const FastingInsightsTab: React.FC<FastingInsightsTabProps> = ({ onLoadingChange
             
             <button
               onClick={() => navigate('/fasting/input')}
-              className="btn-glass--primary px-6 py-3"
+              className="px-6 py-3 rounded-lg font-medium transition-all duration-200"
+              style={{
+                background: 'color-mix(in srgb, #10B981 20%, transparent)',
+                border: '2px solid color-mix(in srgb, #10B981 40%, transparent)',
+                color: '#10B981',
+                backdropFilter: 'blur(10px)'
+              }}
             >
               <div className="flex items-center gap-2">
-                <SpatialIcon Icon={ICONS.Timer} size={16} />
+                <SpatialIcon Icon={ICONS.Timer} size={16} style={{ color: '#10B981' }} />
                 <span>Ajouter des Sessions</span>
               </div>
             </button>
