@@ -816,6 +816,88 @@ export function useAvatarViewerOrchestrator(
   const updateAttemptCountRef = useRef<number>(0);
   const successfulUpdateCountRef = useRef<number>(0);
 
+  // CRITICAL: Watch for faceMorphData changes and update morphs in real-time (for face adjustments)
+  const lastFaceMorphHashRef = useRef<string>('');
+  const faceMorphUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useLayoutEffect(() => {
+    // Skip if not fully initialized
+    if (!isFullyInitializedRef.current) {
+      return;
+    }
+
+    // Skip if already applying update
+    if (isApplyingMorphUpdateRef.current) {
+      return;
+    }
+
+    // Skip if model is not loaded yet
+    if (!modelLifecycle.model || !modelLifecycle.modelRef.current || !viewerState.isViewerReady) {
+      return;
+    }
+
+    // Skip if no face morph data provided
+    if (!props.faceMorphData || Object.keys(props.faceMorphData).length === 0) {
+      return;
+    }
+
+    // Skip if morphology mapping not available
+    if (!morphologyMapping) {
+      return;
+    }
+
+    // Create hash for face morph data
+    const faceMorphHash = JSON.stringify(props.faceMorphData);
+
+    // Check if face morphs changed
+    if (faceMorphHash === lastFaceMorphHashRef.current) {
+      return; // No change
+    }
+
+    logger.info('ORCHESTRATOR', '👤 Face morph data changed, updating viewer', {
+      faceMorphKeyCount: Object.keys(props.faceMorphData).length,
+      faceOnly: props.faceOnly,
+      philosophy: 'face_morph_change_detected'
+    });
+
+    // Clear existing timeout
+    if (faceMorphUpdateTimeoutRef.current) {
+      clearTimeout(faceMorphUpdateTimeoutRef.current);
+    }
+
+    // Debounce the update (100ms for responsive UI)
+    faceMorphUpdateTimeoutRef.current = setTimeout(async () => {
+      isApplyingMorphUpdateRef.current = true;
+
+      try {
+        lastFaceMorphHashRef.current = faceMorphHash;
+
+        // Get current body morphs if available
+        const bodyMorphData = props.morphData || {};
+
+        // Apply morphs with both body and face data
+        await morphLifecycle.applyMorphs(
+          modelLifecycle.model!,
+          bodyMorphData,
+          props.faceMorphData,
+          morphologyMapping
+        );
+
+        logger.info('ORCHESTRATOR', '✅ Face morphs updated successfully', {
+          philosophy: 'face_morph_update_complete'
+        });
+      } catch (error) {
+        logger.error('ORCHESTRATOR', 'Error updating face morphs', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          philosophy: 'face_morph_update_error'
+        });
+      } finally {
+        isApplyingMorphUpdateRef.current = false;
+      }
+    }, 100);
+
+  }, [props.faceMorphData, modelLifecycle.model, viewerState.isViewerReady, morphologyMapping, props.faceOnly, props.morphData, morphLifecycle]);
+
   // CRITICAL: Watch for override morph data changes and update morphs in real-time with throttling
   // This effect is COMPLETELY ISOLATED from initialization - it only updates morphs, never reinitializes
   useLayoutEffect(() => {

@@ -37,6 +37,7 @@ const FaceShapeControls: React.FC<FaceShapeControlsProps> = ({
   // Update local values when currentValues change from external source
   React.useEffect(() => {
     setLocalValues(currentValues);
+    setHasChanges(false); // Reset hasChanges when receiving new external values (e.g., after save)
   }, [currentValues]);
 
   // Gérer le changement d'une valeur avec debouncing pour les performances
@@ -88,9 +89,10 @@ const FaceShapeControls: React.FC<FaceShapeControlsProps> = ({
   }, [onValuesChange]);
 
   // Sauvegarder
-  const handleSave = useCallback(() => {
-    onSave();
-    setHasChanges(false);
+  const handleSave = useCallback(async () => {
+    await onSave();
+    // Ne réinitialiser hasChanges que si la sauvegarde est réussie
+    // (géré par l'appelant via le reset du callback après succès)
   }, [onSave]);
 
   // Basculer l'expansion d'une catégorie

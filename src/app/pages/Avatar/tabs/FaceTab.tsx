@@ -47,9 +47,10 @@ const FaceTab: React.FC = () => {
 
   // Utiliser les paramètres faciaux actuels (incluant les ajustements en temps réel)
   // Memoized to prevent unnecessary recalculations
+  // TOUJOURS utiliser currentFaceParams pour les ajustements en temps réel
   const activeFaceMorphData = React.useMemo(
-    () => showControls ? currentFaceParams : faceMorphData,
-    [showControls, currentFaceParams, faceMorphData]
+    () => currentFaceParams,
+    [currentFaceParams]
   );
 
   // Fusionner les données faciales avec les clés corporelles pertinentes

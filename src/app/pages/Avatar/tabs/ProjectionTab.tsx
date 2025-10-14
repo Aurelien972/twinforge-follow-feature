@@ -328,6 +328,10 @@ const ProjectionTab: React.FC = () => {
     );
   }
 
+  // Récupérer les morphs faciaux depuis le profil utilisateur
+  const faceMorphData = profile?.preferences?.face?.final_face_params || {};
+  const faceSkinTone = profile?.preferences?.face?.skin_tone || null;
+
   return (
     <div className="space-y-6 w-full">
       {/* Projection Parameters Section */}
@@ -351,6 +355,8 @@ const ProjectionTab: React.FC = () => {
           projectedLimbMasses={stableProjectedLimbMasses}
           projectedSkinTone={stableSkinTone}
           projectedGender={currentGender}
+          faceMorphData={faceMorphData}
+          faceSkinTone={faceSkinTone}
           isLoading={profileLoading || isCalculating}
           onViewerReady={handleViewerReady}
         />
