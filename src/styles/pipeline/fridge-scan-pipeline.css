@@ -1,0 +1,1201 @@
+/* =========================================
+   FRIDGE SCAN PIPELINE - Optimisé Mobile iPhone 11+
+   CSS dédié pour la pipeline complète de scan du frigo
+   Performance: 60fps garanti, zéro flickering, optimisé batterie
+   ========================================= */
+
+/* =========================================
+   1. VARIABLES CSS SPÉCIFIQUES PIPELINE
+   ========================================= */
+
+:root {
+  /* Couleurs Fridge Pipeline */
+  --fridge-primary: #EC4899;
+  --fridge-secondary: #F472B6;
+  --fridge-cyan-accent: #18E3FF;
+  --fridge-indigo: #3D13B3;
+
+  /* Glass optimisé par device */
+  --fridge-glass-blur-mobile: 8px;
+  --fridge-glass-blur-tablet: 12px;
+  --fridge-glass-blur-desktop: 16px;
+  --fridge-glass-saturate: 140%;
+
+  /* Catégories couleurs simplifiées */
+  --category-legumes: #22C55E;
+  --category-fruits: #F59E0B;
+  --category-viandes: #EF4444;
+  --category-poissons: #06B6D4;
+  --category-laitiers: #8B5CF6;
+  --category-cereales: #D97706;
+  --category-epices: #EC4899;
+  --category-autre: #6B7280;
+
+  /* Animations simplifiées */
+  --fridge-anim-fast: 200ms;
+  --fridge-anim-medium: 300ms;
+  --fridge-anim-slow: 400ms;
+
+  /* Shadows optimisées (1 layer seulement) */
+  --fridge-shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.2);
+  --fridge-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --fridge-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.3);
+
+  /* Grid spacing */
+  --fridge-grid-gap: 1rem;
+  --fridge-grid-gap-mobile: 0.75rem;
+}
+
+/* =========================================
+   2. CLASSES GLASS BASE OPTIMISÉES
+   ========================================= */
+
+/* Glass Principal - CTA de capture */
+.glass-fridge-main-cta {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(236, 72, 153, 0.12) 0%, transparent 60%),
+    rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  border: 1px solid rgba(236, 72, 153, 0.25);
+  border-radius: 24px;
+  box-shadow: var(--fridge-shadow-md);
+  padding: 2rem;
+  contain: layout style paint;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Glass Photo Grid Container */
+.glass-fridge-photo-grid {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(236, 72, 153, 0.08) 0%, transparent 60%),
+    rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  border: 1px solid rgba(236, 72, 153, 0.18);
+  border-radius: 20px;
+  box-shadow: var(--fridge-shadow-sm);
+  padding: 1.5rem;
+  contain: layout style paint;
+  transform: translateZ(0);
+}
+
+/* Glass Analysis Card - Optimisé pour animations */
+.glass-fridge-analysis-card {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 60%),
+    rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  border-radius: 24px;
+  box-shadow: var(--fridge-shadow-lg);
+  padding: 2rem;
+  min-height: 400px;
+  position: relative;
+  overflow: hidden;
+  contain: layout style paint;
+  content-visibility: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Glass Progress Header */
+.glass-fridge-progress-header {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 60%),
+    rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 1.5rem;
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+/* Glass Inventory Item */
+.glass-fridge-inventory-item {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 1rem;
+  contain: layout paint;
+  transform: translateZ(0);
+  transition: transform var(--fridge-anim-fast) ease, box-shadow var(--fridge-anim-fast) ease;
+}
+
+.glass-fridge-inventory-item:hover {
+  transform: translateY(-2px) scale(1.01) translateZ(0);
+  box-shadow: var(--fridge-shadow-md);
+}
+
+/* Glass Complement Card */
+.glass-fridge-complement-card {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(147, 51, 234, 0.12) 0%, transparent 60%),
+    rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--fridge-glass-blur-desktop)) saturate(var(--fridge-glass-saturate));
+  border: 1px solid rgba(147, 51, 234, 0.25);
+  border-radius: 20px;
+  padding: 1.5rem;
+  contain: layout style paint;
+  transform: translateZ(0);
+}
+
+/* Glass Action Button - Principal */
+.glass-fridge-action-button {
+  background:
+    linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(236, 72, 153, 0.2)),
+    rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 2px solid rgba(236, 72, 153, 0.4);
+  border-radius: 16px;
+  padding: 1rem 2rem;
+  min-height: 48px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: transform var(--fridge-anim-fast) ease, box-shadow var(--fridge-anim-fast) ease;
+  contain: layout style;
+}
+
+.glass-fridge-action-button:hover {
+  transform: translateY(-2px) scale(1.02) translateZ(0);
+  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.4);
+}
+
+.glass-fridge-action-button:active {
+  transform: scale(0.97) translateZ(0);
+}
+
+/* Glass Info Badge */
+.glass-fridge-info-badge {
+  background: rgba(236, 72, 153, 0.15);
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  contain: layout style;
+}
+
+/* =========================================
+   3. COMPOSANT CAPTURE MAIN CTA
+   ========================================= */
+
+.fridge-capture-cta-container {
+  text-align: center;
+}
+
+.fridge-capture-icon-wrapper {
+  width: 128px;
+  height: 128px;
+  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(236, 72, 153, 0.4), rgba(244, 114, 182, 0.3));
+  border: 4px solid rgba(236, 72, 153, 0.6);
+  box-shadow: 0 0 40px rgba(236, 72, 153, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transform: translateZ(0);
+  animation: fridge-breathing 3s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes fridge-breathing {
+  0%, 100% { transform: scale(1) translateZ(0); }
+  50% { transform: scale(1.03) translateZ(0); }
+}
+
+.fridge-capture-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.fridge-capture-description {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto 2rem;
+}
+
+/* =========================================
+   4. COMPOSANT CAPTURED PHOTOS DISPLAY
+   ========================================= */
+
+.fridge-photos-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.fridge-photos-icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(236, 72, 153, 0.2));
+  border: 2px solid rgba(236, 72, 153, 0.4);
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+}
+
+.fridge-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--fridge-grid-gap);
+}
+
+.fridge-photo-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  contain: layout paint;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.fridge-photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fridge-photo-delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  background: radial-gradient(circle at center, rgba(239, 68, 68, 0.9) 0%, rgba(239, 68, 68, 0.7) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: transform var(--fridge-anim-fast) ease, box-shadow var(--fridge-anim-fast) ease;
+  transform: translateZ(0);
+}
+
+.fridge-photo-delete-btn:hover {
+  transform: scale(1.1) translateZ(0);
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.9);
+}
+
+.fridge-photo-label {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 0.375rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* =========================================
+   5. COMPOSANT LOADING ANALYSIS CARD - SIMPLIFIÉ
+   ========================================= */
+
+.fridge-analysis-background-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(24, 227, 255, 0.2) 1px, transparent 2px),
+    linear-gradient(0deg, transparent 0%, rgba(24, 227, 255, 0.2) 1px, transparent 2px);
+  background-size: 40px 40px;
+  animation: fridge-grid-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes fridge-grid-pulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.25; }
+}
+
+.fridge-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(24, 227, 255, 0.8) 30%,
+    rgba(24, 227, 255, 1) 50%,
+    rgba(24, 227, 255, 0.8) 70%,
+    transparent 100%
+  );
+  box-shadow: 0 0 16px rgba(24, 227, 255, 0.6);
+  animation: fridge-scan-move 3s linear infinite;
+  will-change: transform;
+}
+
+@keyframes fridge-scan-move {
+  0% {
+    transform: translateX(-100%) translateZ(0);
+    opacity: 0;
+  }
+  10%, 90% { opacity: 0.8; }
+  100% {
+    transform: translateX(calc(100vw + 100%)) translateZ(0);
+    opacity: 0;
+  }
+}
+
+/* Particules simplifiées - seulement 3 au lieu de 8 */
+.fridge-data-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 8px currentColor;
+  animation: fridge-particle-float 4s ease-out infinite;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+@keyframes fridge-particle-float {
+  0% {
+    transform: translateY(0) translateZ(0);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% {
+    transform: translateY(-80px) translateZ(0);
+    opacity: 0;
+  }
+}
+
+.fridge-analysis-icon-container {
+  width: 128px;
+  height: 128px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(236, 72, 153, 0.45), rgba(24, 227, 255, 0.35));
+  border: 4px solid rgba(236, 72, 153, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transform: translateZ(0);
+}
+
+/* UN SEUL anneau de pulsation au lieu de 3 */
+.fridge-pulse-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(236, 72, 153, 0.5);
+  animation: fridge-ring-pulse 2s ease-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes fridge-ring-pulse {
+  0% {
+    transform: scale(1) translateZ(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.5) translateZ(0);
+    opacity: 0;
+  }
+}
+
+.fridge-progress-bar-container {
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  height: 12px;
+  overflow: hidden;
+}
+
+.fridge-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg,
+    var(--fridge-primary),
+    var(--fridge-cyan-accent),
+    var(--fridge-indigo)
+  );
+  box-shadow: 0 0 12px rgba(236, 72, 153, 0.6);
+  position: relative;
+  overflow: hidden;
+  transition: width var(--fridge-anim-medium) ease;
+  transform: translateZ(0);
+}
+
+.fridge-progress-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 100%
+  );
+  animation: fridge-shimmer 2s ease-in-out infinite;
+}
+
+@keyframes fridge-shimmer {
+  0% { transform: translateX(-100%) translateZ(0); opacity: 0; }
+  50% { transform: translateX(0%) translateZ(0); opacity: 1; }
+  100% { transform: translateX(100%) translateZ(0); opacity: 0; }
+}
+
+.fridge-loading-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 500px;
+  margin: 2rem auto 0;
+}
+
+.fridge-loading-step {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  transition: all var(--fridge-anim-fast) ease;
+  contain: layout style;
+}
+
+.fridge-loading-step.active {
+  background: rgba(236, 72, 153, 0.15);
+  border: 2px solid rgba(236, 72, 153, 0.35);
+  box-shadow: 0 0 16px rgba(236, 72, 153, 0.25);
+}
+
+.fridge-loading-step.completed {
+  background: rgba(24, 227, 255, 0.1);
+  border: 1px solid rgba(24, 227, 255, 0.25);
+}
+
+.fridge-loading-step.pending {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fridge-step-indicator {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.fridge-step-indicator.active {
+  background: rgba(236, 72, 153, 0.25);
+  border: 2px solid rgba(236, 72, 153, 0.5);
+}
+
+.fridge-step-indicator.completed {
+  background: rgba(24, 227, 255, 0.2);
+  border: 1px solid rgba(24, 227, 255, 0.4);
+}
+
+.fridge-step-indicator.pending {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================
+   6. COMPOSANT PROGRESS HEADER
+   ========================================= */
+
+.fridge-progress-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fridge-progress-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.fridge-progress-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(236, 72, 153, 0.3) 0%, transparent 70%),
+    linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(244, 114, 182, 0.15));
+  border: 3px solid rgba(236, 72, 153, 0.5);
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+  backdrop-filter: blur(12px);
+  animation: fridge-breathing 3s ease-in-out infinite;
+  transform: translateZ(0);
+}
+
+.fridge-progress-header-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+
+.fridge-progress-header-subtitle {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.fridge-progress-percentage {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.25) 0%, transparent 70%),
+    rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(147, 51, 234, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 20px rgba(147, 51, 234, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateZ(0);
+  min-width: 120px;
+}
+
+.fridge-progress-percentage-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 0 12px rgba(147, 51, 234, 0.6);
+  line-height: 1;
+}
+
+.fridge-progress-percentage-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 0.25rem;
+  white-space: nowrap;
+}
+
+.fridge-progress-bar-main {
+  width: 100%;
+  background: rgba(107, 114, 128, 0.5);
+  border-radius: 999px;
+  height: 8px;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+.fridge-progress-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #9333EA, #EC4899);
+  transition: width 500ms ease;
+  transform: translateZ(0);
+}
+
+.fridge-progress-dots {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fridge-progress-dots-left {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.fridge-progress-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4B5563;
+  transition: background var(--fridge-anim-fast) ease, transform var(--fridge-anim-fast) ease;
+  transform: translateZ(0);
+}
+
+.fridge-progress-dot.active {
+  background: linear-gradient(135deg, #9333EA, #EC4899);
+  transform: scale(1.2) translateZ(0);
+}
+
+.fridge-progress-dots-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* =========================================
+   7. COMPOSANT INVENTORY ITEM
+   ========================================= */
+
+.fridge-inventory-item-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.fridge-inventory-category-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid currentColor;
+  transform: translateZ(0);
+}
+
+.fridge-inventory-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.fridge-inventory-name {
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+
+.fridge-inventory-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fridge-inventory-quantity {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+}
+
+.fridge-inventory-category-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.fridge-inventory-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fridge-inventory-btn {
+  padding: 0.625rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all var(--fridge-anim-fast) ease;
+  transform: translateZ(0);
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fridge-inventory-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05) translateZ(0);
+}
+
+/* Inputs d'édition inline simplifiés */
+.fridge-inventory-input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: white;
+  font-size: 1rem;
+  width: 100%;
+  outline: none;
+  transition: border-color var(--fridge-anim-fast) ease;
+}
+
+.fridge-inventory-input:focus {
+  border-color: rgba(236, 72, 153, 0.5);
+}
+
+/* =========================================
+   8. STAGES REVIEW / COMPLEMENT
+   ========================================= */
+
+.fridge-stage-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.fridge-review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fridge-review-search {
+  flex: 1;
+  min-width: 200px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color var(--fridge-anim-fast) ease;
+}
+
+.fridge-review-search:focus {
+  border-color: rgba(236, 72, 153, 0.5);
+}
+
+.fridge-inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--fridge-grid-gap);
+}
+
+.fridge-suggestions-container {
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(147, 51, 234, 0.08);
+  border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+.fridge-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(24, 227, 255, 0.08);
+  border: 1px solid rgba(24, 227, 255, 0.2);
+}
+
+.fridge-stat-item {
+  text-align: center;
+}
+
+.fridge-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.fridge-stat-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* =========================================
+   9. ANIMATIONS OPTIMISÉES MOBILE
+   ========================================= */
+
+/* Animation d'entrée fade-scale simplifiée */
+@keyframes fridge-fade-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateZ(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+  }
+}
+
+.fridge-fade-in {
+  animation: fridge-fade-in var(--fridge-anim-medium) ease;
+  transform: translateZ(0);
+}
+
+/* Scroll performance mode - désactive backdrop-filter pendant scroll */
+.fridge-scroll-active .glass-fridge-main-cta,
+.fridge-scroll-active .glass-fridge-photo-grid,
+.fridge-scroll-active .glass-fridge-analysis-card,
+.fridge-scroll-active .glass-fridge-inventory-item {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition: none !important;
+}
+
+/* =========================================
+   10. MEDIA QUERIES RESPONSIVE
+   ========================================= */
+
+/* Mobile petit (320px-375px) - Simplifications maximales */
+@media (max-width: 375px) {
+  :root {
+    --fridge-grid-gap: 0.5rem;
+    --fridge-anim-fast: 150ms;
+    --fridge-anim-medium: 250ms;
+  }
+
+  .glass-fridge-main-cta,
+  .glass-fridge-photo-grid,
+  .glass-fridge-complement-card {
+    padding: 1rem;
+  }
+
+  .glass-fridge-analysis-card {
+    padding: 1.5rem;
+    min-height: 350px;
+  }
+
+  .fridge-capture-icon-wrapper {
+    width: 96px;
+    height: 96px;
+  }
+
+  .fridge-capture-title {
+    font-size: 1.5rem;
+  }
+
+  .fridge-photos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fridge-inventory-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile standard (376px-768px) - iPhone 11-14 - FOCUS PRINCIPAL */
+@media (max-width: 768px) {
+  :root {
+    --fridge-glass-blur-mobile: 8px;
+  }
+
+  /* Réduire backdrop-filter sur mobile */
+  .glass-fridge-main-cta,
+  .glass-fridge-photo-grid,
+  .glass-fridge-analysis-card,
+  .glass-fridge-progress-header,
+  .glass-fridge-inventory-item,
+  .glass-fridge-complement-card {
+    backdrop-filter: blur(var(--fridge-glass-blur-mobile)) saturate(var(--fridge-glass-saturate));
+    -webkit-backdrop-filter: blur(var(--fridge-glass-blur-mobile)) saturate(var(--fridge-glass-saturate));
+  }
+
+  /* Progress Header - Layout 2 lignes sur mobile */
+  .fridge-progress-header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .fridge-progress-header-left {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .fridge-progress-header-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .fridge-progress-header-title {
+    font-size: 1.125rem;
+  }
+
+  .fridge-progress-header-subtitle {
+    font-size: 0.8125rem;
+  }
+
+  .fridge-progress-percentage {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    min-width: auto;
+    padding: 1rem;
+  }
+
+  .fridge-progress-percentage-value {
+    font-size: 1.5rem;
+  }
+
+  .fridge-progress-percentage-label {
+    font-size: 0.6875rem;
+  }
+
+  /* Désactiver les animations lourdes */
+  .fridge-analysis-background-grid {
+    animation: none !important;
+    opacity: 0.2 !important;
+  }
+
+  /* Ralentir les animations essentielles */
+  .fridge-scan-line {
+    animation-duration: 6s !important;
+  }
+
+  .fridge-data-particle {
+    animation-duration: 8s !important;
+  }
+
+  .fridge-breathing {
+    animation-duration: 6s !important;
+  }
+
+  /* Réduire la taille des éléments */
+  .fridge-analysis-icon-container {
+    width: 96px;
+    height: 96px;
+  }
+
+  /* Grid mobile optimisé */
+  .fridge-photos-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--fridge-grid-gap-mobile);
+  }
+
+  .fridge-inventory-grid {
+    grid-template-columns: 1fr;
+    gap: var(--fridge-grid-gap-mobile);
+  }
+
+  /* Touch targets minimum 44px */
+  .fridge-photo-delete-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .glass-fridge-action-button {
+    min-height: 48px;
+    padding: 0.875rem 1.5rem;
+  }
+
+  .fridge-inventory-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Inputs mobile 16px pour éviter zoom iOS */
+  .fridge-review-search,
+  .fridge-inventory-input {
+    font-size: 16px !important;
+  }
+}
+
+/* Tablet (769px-1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .glass-fridge-main-cta,
+  .glass-fridge-photo-grid,
+  .glass-fridge-analysis-card,
+  .glass-fridge-progress-header,
+  .glass-fridge-inventory-item,
+  .glass-fridge-complement-card {
+    backdrop-filter: blur(var(--fridge-glass-blur-tablet)) saturate(var(--fridge-glass-saturate));
+    -webkit-backdrop-filter: blur(var(--fridge-glass-blur-tablet)) saturate(var(--fridge-glass-saturate));
+  }
+
+  .fridge-photos-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .fridge-inventory-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop (1025px+) */
+@media (min-width: 1025px) {
+  .fridge-photos-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .fridge-inventory-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Landscape mobile */
+@media (orientation: landscape) and (max-height: 600px) {
+  .glass-fridge-analysis-card {
+    min-height: 300px;
+  }
+
+  .fridge-analysis-icon-container {
+    width: 80px;
+    height: 80px;
+  }
+
+  .fridge-capture-icon-wrapper {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* =========================================
+   11. FALLBACKS ET OPTIMISATIONS
+   ========================================= */
+
+/* Fallback pour backdrop-filter non supporté */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-fridge-main-cta,
+  .glass-fridge-photo-grid,
+  .glass-fridge-analysis-card,
+  .glass-fridge-progress-header,
+  .glass-fridge-inventory-item,
+  .glass-fridge-complement-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+}
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .fridge-breathing,
+  .fridge-scan-line,
+  .fridge-data-particle,
+  .fridge-grid-pulse,
+  .fridge-ring-pulse,
+  .fridge-shimmer {
+    animation: none !important;
+  }
+
+  .fridge-analysis-background-grid {
+    opacity: 0.2 !important;
+  }
+
+  * {
+    transition-duration: 0.1s !important;
+  }
+}
+
+/* Prefers contrast high */
+@media (prefers-contrast: high) {
+  .glass-fridge-main-cta,
+  .glass-fridge-photo-grid,
+  .glass-fridge-analysis-card,
+  .glass-fridge-inventory-item {
+    border-width: 2px !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .glass-fridge-action-button {
+    border-width: 3px !important;
+    font-weight: 700 !important;
+  }
+}
+
+/* Hover device optimisations */
+@media (hover: hover) and (pointer: fine) {
+  .glass-fridge-inventory-item:hover {
+    transform: translateY(-2px) scale(1.01) translateZ(0);
+    box-shadow: var(--fridge-shadow-md);
+  }
+}
+
+/* Touch device optimisations */
+@media (hover: none) and (pointer: coarse) {
+  .glass-fridge-inventory-item:active {
+    transform: scale(0.98) translateZ(0);
+  }
+
+  .glass-fridge-action-button:active {
+    transform: scale(0.96) translateZ(0);
+  }
+}
+
+/* Performance critique - Containment */
+.fridge-scan-container {
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: 600px;
+}
+
+.fridge-loading-section {
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: 450px;
+}
+
+/* GPU acceleration pour tous les éléments animés */
+.glass-fridge-main-cta,
+.glass-fridge-photo-grid,
+.glass-fridge-analysis-card,
+.glass-fridge-inventory-item,
+.fridge-photo-item,
+.fridge-scan-line,
+.fridge-data-particle,
+.fridge-progress-bar-fill {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Will-change stratégique - seulement sur interactions */
+.glass-fridge-action-button:hover,
+.glass-fridge-inventory-item:hover,
+.fridge-photo-delete-btn:hover {
+  will-change: transform;
+}
+
+/* Cleanup will-change après transition */
+.glass-fridge-action-button,
+.glass-fridge-inventory-item,
+.fridge-photo-delete-btn {
+  will-change: auto;
+}

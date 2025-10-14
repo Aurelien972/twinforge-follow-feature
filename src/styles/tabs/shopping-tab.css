@@ -1,0 +1,722 @@
+/* =========================================
+   SHOPPING LIST TAB - CSS OPTIMIZED
+   TwinForge VisionOS 26 - iPhone 11+ Optimized
+   Thème: Orange (#F59E0B, #FB923C)
+   ========================================= */
+
+/* =========================================
+   VARIABLES - SHOPPING TAB THEME
+   ========================================= */
+:root {
+  --shopping-tab-primary: #F59E0B;
+  --shopping-tab-secondary: #FB923C;
+  --shopping-tab-tertiary: #FBBF24;
+  --shopping-tab-accent: #EA580C;
+
+  /* Category colors */
+  --shopping-cat-fruits: #10B981;
+  --shopping-cat-vegetables: #22C55E;
+  --shopping-cat-proteins: #EF4444;
+  --shopping-cat-dairy: #3B82F6;
+  --shopping-cat-grains: #F59E0B;
+  --shopping-cat-snacks: #EC4899;
+
+  /* Mobile optimizations */
+  --shopping-card-padding-mobile: 16px;
+  --shopping-card-padding-desktop: 24px;
+  --shopping-blur-mobile: 8px;
+  --shopping-blur-desktop: 16px;
+}
+
+/* =========================================
+   SHOPPING LIST HEADER
+   ========================================= */
+
+.glass-shopping-header {
+  padding: var(--shopping-card-padding-mobile);
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--shopping-tab-primary) 12%, transparent) 0%, transparent 60%),
+              radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--shopping-tab-secondary) 8%, transparent) 0%, transparent 50%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, var(--shopping-tab-primary) 25%, transparent);
+  border-radius: var(--glass-radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, var(--shopping-tab-primary) 15%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Shopping Header Icon */
+.shopping-header-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+              linear-gradient(135deg, color-mix(in srgb, var(--shopping-tab-primary) 35%, transparent), color-mix(in srgb, var(--shopping-tab-secondary) 25%, transparent));
+  border: 2px solid color-mix(in srgb, var(--shopping-tab-primary) 50%, transparent);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--shopping-tab-primary) 40%, transparent);
+  animation: breathingIconPulse 3s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* Progress Bar dans Header */
+.shopping-header-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--glass-radius-pill);
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.shopping-header-progress-fill {
+  height: 8px;
+  border-radius: var(--glass-radius-pill);
+  background: linear-gradient(90deg, var(--shopping-tab-primary), var(--shopping-tab-secondary));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--shopping-tab-primary) 70%, transparent),
+              inset 0 1px 0 rgba(255,255,255,0.4);
+  transition: width var(--animation-duration-medium) ease-out;
+  transform: translateZ(0);
+}
+
+/* =========================================
+   EMPTY SHOPPING STATE
+   ========================================= */
+
+.glass-shopping-empty-state {
+  padding: 32px;
+  text-align: center;
+  background: radial-gradient(circle at 20% 50%, color-mix(in srgb, var(--shopping-tab-secondary) 15%, transparent) 0%, color-mix(in srgb, var(--shopping-tab-primary) 10%, transparent) 50%, color-mix(in srgb, var(--shopping-tab-accent) 5%, transparent) 100%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, var(--shopping-tab-secondary) 20%, transparent);
+  border-radius: var(--glass-radius-lg);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--shopping-tab-secondary) 10%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Empty State Main Icon */
+.shopping-empty-icon-circle {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, color-mix(in srgb, var(--shopping-tab-secondary) 20%, transparent) 0%, color-mix(in srgb, var(--shopping-tab-primary) 15%, transparent) 100%);
+  border: 2px solid color-mix(in srgb, var(--shopping-tab-secondary) 30%, transparent);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--shopping-tab-secondary) 20%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: breathingIconPulse 3s ease-in-out infinite;
+}
+
+/* Empty State Features Grid */
+.shopping-empty-features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin: 32px 0;
+}
+
+@media (min-width: 768px) {
+  .shopping-empty-features-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.shopping-empty-feature-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, color-mix(in srgb, var(--shopping-tab-secondary) 15%, transparent) 0%, color-mix(in srgb, var(--shopping-tab-primary) 10%, transparent) 100%);
+  border: 1px solid color-mix(in srgb, var(--shopping-tab-secondary) 20%, transparent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--shopping-tab-secondary) 15%, transparent);
+  transform: translateZ(0);
+}
+
+/* Empty State CTA Button */
+.shopping-empty-cta-btn {
+  position: relative;
+  overflow: hidden;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 16px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--shopping-tab-secondary) 40%, transparent) 0%,
+    color-mix(in srgb, var(--shopping-tab-primary) 35%, transparent) 50%,
+    color-mix(in srgb, var(--shopping-tab-accent) 30%, transparent) 100%
+  );
+  border: 2px solid color-mix(in srgb, var(--shopping-tab-secondary) 40%, transparent);
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--shopping-tab-secondary) 30%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15),
+              inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transform: translateZ(0);
+  transition: all var(--animation-duration-medium) var(--animation-ease-glass);
+}
+
+.shopping-empty-cta-btn:hover {
+  transform: scale(1.05) translateZ(0);
+}
+
+/* =========================================
+   SHOPPING LIST GENERATOR CARD
+   ========================================= */
+
+.glass-shopping-generator {
+  padding: var(--shopping-card-padding-mobile);
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--shopping-tab-primary) 10%, transparent) 0%, transparent 60%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, var(--shopping-tab-primary) 20%, transparent);
+  border-radius: var(--glass-radius-lg);
+  backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Generator Step Indicator */
+.shopping-generator-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--glass-radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all var(--animation-duration-fast) var(--animation-ease-glass);
+  transform: translateZ(0);
+}
+
+.shopping-generator-step.active {
+  background: color-mix(in srgb, var(--shopping-tab-primary) 10%, transparent);
+  border-color: color-mix(in srgb, var(--shopping-tab-primary) 25%, transparent);
+}
+
+.shopping-generator-step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.shopping-generator-step.active .shopping-generator-step-number {
+  background: var(--shopping-tab-primary);
+  border-color: var(--shopping-tab-secondary);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--shopping-tab-primary) 50%, transparent);
+}
+
+/* =========================================
+   GENERATION LOADER
+   ========================================= */
+
+.glass-shopping-generation-loader {
+  padding: 32px;
+  text-align: center;
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--shopping-tab-primary) 15%, transparent) 0%, transparent 60%),
+              radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--shopping-tab-secondary) 12%, transparent) 0%, transparent 50%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, var(--shopping-tab-primary) 30%, transparent);
+  border-radius: var(--glass-radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, var(--shopping-tab-primary) 20%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Loader Icon */
+.shopping-loader-icon-circle {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+              linear-gradient(135deg, color-mix(in srgb, var(--shopping-tab-primary) 35%, transparent), color-mix(in srgb, var(--shopping-tab-primary) 25%, transparent));
+  border: 2px solid color-mix(in srgb, var(--shopping-tab-primary) 50%, transparent);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--shopping-tab-primary) 40%, transparent);
+  animation: planGenerationPulse 2s ease-in-out infinite;
+  transform: translateZ(0);
+}
+
+/* =========================================
+   SHOPPING LIST CATEGORY CARDS
+   ========================================= */
+
+.glass-shopping-category {
+  padding: 16px;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 60%),
+              var(--glass-opacity-base);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--glass-radius-lg);
+  backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+  transition: all var(--animation-duration-fast) var(--animation-ease-glass);
+}
+
+.glass-shopping-category:hover {
+  transform: scale(1.01) translateY(-2px) translateZ(0);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Category Header */
+.shopping-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.shopping-category-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.shopping-category-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.shopping-category-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* =========================================
+   SHOPPING LIST ITEMS
+   ========================================= */
+
+.shopping-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--glass-radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all var(--animation-duration-fast) var(--animation-ease-glass);
+  transform: translateZ(0);
+  min-height: 44px;
+}
+
+.shopping-list-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.shopping-list-item.checked {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+/* Item Checkbox */
+.shopping-item-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all var(--animation-duration-fast) var(--animation-ease-glass);
+  transform: translateZ(0);
+}
+
+.shopping-item-checkbox:hover {
+  border-color: var(--shopping-tab-primary);
+  background: color-mix(in srgb, var(--shopping-tab-primary) 10%, transparent);
+}
+
+.shopping-item-checkbox.checked {
+  background: var(--shopping-tab-primary);
+  border-color: var(--shopping-tab-primary);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--shopping-tab-primary) 50%, transparent);
+}
+
+/* Item Content */
+.shopping-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.shopping-item-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  margin-bottom: 2px;
+}
+
+.shopping-item-quantity {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.shopping-item-notes {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* =========================================
+   BUDGET ESTIMATION CARD
+   ========================================= */
+
+.glass-shopping-budget {
+  padding: var(--shopping-card-padding-mobile);
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, #10B981 10%, transparent) 0%, transparent 60%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, #10B981 20%, transparent);
+  border-radius: var(--glass-radius-lg);
+  backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+.shopping-budget-icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, #10B981 15%, transparent);
+  border: 2px solid color-mix(in srgb, #10B981 25%, transparent);
+  flex-shrink: 0;
+}
+
+.shopping-budget-amount {
+  font-size: 32px;
+  font-weight: 700;
+  color: #10B981;
+  text-shadow: 0 0 16px color-mix(in srgb, #10B981 40%, transparent);
+}
+
+/* Budget Breakdown Grid */
+.shopping-budget-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .shopping-budget-breakdown-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.shopping-budget-breakdown-item {
+  padding: 12px;
+  border-radius: var(--glass-radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  transform: translateZ(0);
+}
+
+/* =========================================
+   SUGGESTIONS & ADVICE CARDS
+   ========================================= */
+
+.glass-shopping-suggestions {
+  padding: var(--shopping-card-padding-mobile);
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, #3B82F6 8%, transparent) 0%, transparent 60%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, #3B82F6 20%, transparent);
+  border-radius: var(--glass-radius-lg);
+  backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+.glass-shopping-advice {
+  padding: var(--shopping-card-padding-mobile);
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, #8B5CF6 8%, transparent) 0%, transparent 60%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, #8B5CF6 20%, transparent);
+  border-radius: var(--glass-radius-lg);
+  backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Suggestion/Advice Item */
+.shopping-suggestion-item,
+.shopping-advice-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--glass-radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateZ(0);
+}
+
+.shopping-suggestion-icon,
+.shopping-advice-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+/* =========================================
+   EXPORT ACTIONS CARD
+   ========================================= */
+
+.glass-shopping-export {
+  padding: var(--shopping-card-padding-mobile);
+  background: var(--glass-opacity-base);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--glass-radius-lg);
+  backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--shopping-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Export Button */
+.shopping-export-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--glass-radius-md);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  transition: all var(--animation-duration-fast) var(--animation-ease-glass);
+  transform: translateZ(0);
+  min-height: 44px;
+}
+
+.shopping-export-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.02) translateZ(0);
+}
+
+.shopping-export-btn.primary {
+  background: linear-gradient(to right, var(--shopping-tab-primary), var(--shopping-tab-secondary));
+  border-color: var(--shopping-tab-primary);
+}
+
+.shopping-export-btn.primary:hover {
+  background: linear-gradient(to right, var(--shopping-tab-secondary), var(--shopping-tab-tertiary));
+}
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
+
+@keyframes breathingIconPulse {
+  0%, 100% {
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    transform: scale(1.05) translateZ(0);
+  }
+}
+
+@keyframes planGenerationPulse {
+  0%, 100% {
+    transform: scale(1) translateZ(0);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05) translateZ(0);
+    opacity: 1;
+  }
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) translateZ(0); }
+  100% { transform: translateX(100%) translateZ(0); }
+}
+
+/* =========================================
+   DESKTOP OPTIMIZATIONS
+   ========================================= */
+
+@media (min-width: 768px) {
+  .glass-shopping-header,
+  .glass-shopping-empty-state,
+  .glass-shopping-generator,
+  .glass-shopping-generation-loader,
+  .glass-shopping-budget,
+  .glass-shopping-suggestions,
+  .glass-shopping-advice,
+  .glass-shopping-export {
+    padding: var(--shopping-card-padding-desktop);
+    backdrop-filter: blur(var(--shopping-blur-desktop)) saturate(var(--glass-saturate-base));
+    -webkit-backdrop-filter: blur(var(--shopping-blur-desktop)) saturate(var(--glass-saturate-base));
+  }
+
+  .shopping-header-icon-circle {
+    width: 80px;
+    height: 80px;
+  }
+
+  .shopping-empty-icon-circle,
+  .shopping-loader-icon-circle {
+    width: 96px;
+    height: 96px;
+  }
+
+  .glass-shopping-category {
+    padding: 20px;
+  }
+}
+
+/* =========================================
+   MOBILE TOUCH OPTIMIZATIONS
+   ========================================= */
+
+@media (max-width: 767px) {
+  /* Ensure minimum touch targets */
+  .shopping-item-checkbox,
+  .shopping-export-btn,
+  .shopping-generator-step-number {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Category grid responsive */
+  .shopping-category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Reduce spacing on mobile */
+  .shopping-list-item {
+    padding: 10px;
+  }
+
+  .glass-shopping-category {
+    padding: 12px;
+  }
+}
+
+/* =========================================
+   CATEGORY COLOR VARIANTS
+   ========================================= */
+
+.shopping-category-dot.fruits { background: var(--shopping-cat-fruits); }
+.shopping-category-dot.vegetables { background: var(--shopping-cat-vegetables); }
+.shopping-category-dot.proteins { background: var(--shopping-cat-proteins); }
+.shopping-category-dot.dairy { background: var(--shopping-cat-dairy); }
+.shopping-category-dot.grains { background: var(--shopping-cat-grains); }
+.shopping-category-dot.snacks { background: var(--shopping-cat-snacks); }
+
+/* Category border accents */
+.glass-shopping-category.fruits {
+  border-left: 3px solid var(--shopping-cat-fruits);
+}
+
+.glass-shopping-category.vegetables {
+  border-left: 3px solid var(--shopping-cat-vegetables);
+}
+
+.glass-shopping-category.proteins {
+  border-left: 3px solid var(--shopping-cat-proteins);
+}
+
+.glass-shopping-category.dairy {
+  border-left: 3px solid var(--shopping-cat-dairy);
+}
+
+.glass-shopping-category.grains {
+  border-left: 3px solid var(--shopping-cat-grains);
+}
+
+.glass-shopping-category.snacks {
+  border-left: 3px solid var(--shopping-cat-snacks);
+}
+
+/* =========================================
+   PERFORMANCE OPTIMIZATIONS
+   ========================================= */
+
+/* GPU Acceleration for animated elements */
+.shopping-header-icon-circle,
+.shopping-empty-icon-circle,
+.shopping-loader-icon-circle,
+.shopping-empty-cta-btn,
+.shopping-export-btn,
+.shopping-item-checkbox,
+.glass-shopping-category {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .shopping-header-icon-circle,
+  .shopping-empty-icon-circle,
+  .shopping-loader-icon-circle {
+    animation: none;
+  }
+
+  .shopping-empty-cta-btn:hover,
+  .shopping-export-btn:hover,
+  .glass-shopping-category:hover {
+    transform: none;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

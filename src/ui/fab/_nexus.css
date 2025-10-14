@@ -1,0 +1,19 @@
+@@ .. @@
+ /* Mobile placement & perf tweaks */
+ @media (max-width:768px){
+-  .fab-nexus-forge{bottom:20px;right:20px;width:64px;height:64px;}
++  .fab-nexus-forge{
++    bottom:calc(var(--mobile-bottom-bar-bottom-offset) + var(--fab-vertical-offset-from-bar-top));
++    right:24px;
++    width:64px;
++    height:64px;
++  }
+   .quick-action-menu{
+-    width:calc(100vw - 32px) !important;max-width:340px !important;
+-    bottom:calc(max(20px, env(safe-area-inset-bottom, 0px)) + 64px + 8px) !important;
+-    right:max(20px, env(safe-area-inset-right, 0px)) !important;
++    width:calc(100vw - 32px) !important;
++    max-width:340px !important;
++    bottom:calc(var(--mobile-bottom-bar-bottom-offset) + var(--mobile-bottom-bar-height) + 8px) !important;
++    right:24px !important;
+   }

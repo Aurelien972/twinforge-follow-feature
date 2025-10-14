@@ -1,0 +1,220 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { persistQueryClient } from '@tanstack/react-query-persist-client';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { DataProvider } from './DataProvider';
+import { ToastProvider } from '../../ui/components/ToastProvider';
+import { DeviceProvider } from '../../system/device/DeviceProvider';
+import { ErrorBoundary } from './ErrorBoundary';
+import { IllustrationCacheProvider } from '../../system/context/IllustrationCacheContext';
+import { useDevicePerformance } from '../../hooks/useDevicePerformance';
+import { useAutoSync } from '../../hooks/useAutoSync';
+import { useUserStore } from '../../system/store/userStore';
+import logger from '../../lib/utils/logger';
+
+// Create QueryClient with enhanced cache configuration for persistence
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 10 * 60 * 1000, // 10 minutes - increased for better persistence
+      gcTime: 24 * 60 * 60 * 1000, // 24 hours - keep data longer in cache
+      retry: 1,
+      refetchOnWindowFocus: false, // Prevent unnecessary refetches
+      refetchOnMount: false, // Use cached data when available
+      refetchOnReconnect: false, // Prevent refetch on network reconnect
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
+
+// Create localStorage persister for React Query cache
+const localStoragePersister = createSyncStoragePersister({
+  storage: window.localStorage,
+  key: 'twinforge-react-query-cache',
+  serialize: JSON.stringify,
+  deserialize: (cachedString) => {
+    try {
+      // ISO 8601 date string pattern
+      const isoDateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/;
+      
+      // Reviver function to convert ISO date strings back to Date objects
+      const dateReviver = (key: string, value: any) => {
+        if (typeof value === 'string' && isoDateRegex.test(value)) {
+          const date = new Date(value);
+          // Only return the Date object if it's valid
+          return isNaN(date.getTime()) ? value : date;
+        }
+        return value;
+      };
+      
+      const parsed = JSON.parse(cachedString, dateReviver);
+      
+      // Fix invalid timestamps in queries to prevent RangeError: Invalid time value
+      if (parsed && parsed.queries) {
+        parsed.queries.forEach((query: any) => {
+          if (query.state) {
+            // Ensure dataUpdatedAt and fetchedAt are valid timestamps
+            if (query.state.dataUpdatedAt === null || query.state.dataUpdatedAt === undefined) {
+              query.state.dataUpdatedAt = 0;
+            }
+            if (query.state.fetchedAt === null || query.state.fetchedAt === undefined) {
+              query.state.fetchedAt = 0;
+            }
+            
+            // Validate timestamp values
+            if (typeof query.state.dataUpdatedAt === 'number' && isNaN(query.state.dataUpdatedAt)) {
+              query.state.dataUpdatedAt = 0;
+            }
+            if (typeof query.state.fetchedAt === 'number' && isNaN(query.state.fetchedAt)) {
+              query.state.fetchedAt = 0;
+            }
+          }
+        });
+      }
+      
+      return parsed;
+    } catch (error) {
+      logger.error('REACT_QUERY_PERSISTENCE', 'Failed to deserialize cache', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      });
+      return null;
+    }
+  },
+});
+
+// Initialize cache persistence
+let persistenceInitialized = false;
+
+const initializeCachePersistence = async () => {
+  if (persistenceInitialized) return;
+  
+  try {
+    logger.info('REACT_QUERY_PERSISTENCE', 'Initializing cache persistence', {
+      persisterKey: 'twinforge-react-query-cache',
+      storage: 'localStorage',
+      timestamp: new Date().toISOString()
+    });
+
+    await persistQueryClient({
+      queryClient,
+      persister: localStoragePersister,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      hydrateOptions: {
+        defaultOptions: {
+          queries: {
+            staleTime: 10 * 60 * 1000, // 10 minutes
+          },
+        },
+      },
+      dehydrateOptions: {
+        shouldDehydrateQuery: (query) => {
+          // Only persist specific query types to avoid bloating localStorage
+          const queryKey = query.queryKey;
+          
+          // DIAGNOSTIC: Log pour vérifier la déshydratation des insights d'activité
+          if (queryKey.includes('insights')) {
+            console.log('🔍 [REACT_QUERY_PERSISTENCE] Checking insights query for dehydration', {
+              queryKey,
+              shouldDehydrate: true,
+              queryData: query.state.data ? 'has_data' : 'no_data',
+              timestamp: new Date().toISOString()
+            });
+          }
+          
+          // Persist activity insights (expensive AI calls)
+          if (queryKey.includes('insights')) return true;
+          
+          // Persist activity progression data
+          if (queryKey.includes('progression')) return true;
+          
+          // Persist trend analyses
+          if (queryKey.includes('trend-analysis')) return true;
+          
+          // Persist daily summaries
+          if (queryKey.includes('daily-summary')) return true;
+          
+          // Don't persist real-time data like daily activities
+          if (queryKey.includes('daily') && !queryKey.includes('summary')) return false;
+          
+          // Don't persist user profile (changes frequently)
+          if (queryKey.includes('profile')) return false;
+          
+          // Default: persist other queries
+          return true;
+        },
+      },
+    });
+    
+    persistenceInitialized = true;
+    
+    // DIAGNOSTIC: Vérifier le contenu du localStorage après initialisation
+    setTimeout(() => {
+      try {
+        const cacheContent = localStorage.getItem('twinforge-react-query-cache');
+        const parsedCache = cacheContent ? JSON.parse(cacheContent) : null;
+        
+        console.log('🔍 [REACT_QUERY_PERSISTENCE] LocalStorage cache content after initialization', {
+          hasCacheContent: !!cacheContent,
+          cacheSize: cacheContent?.length || 0,
+          cacheKeys: parsedCache ? Object.keys(parsedCache) : [],
+          hasInsightsData: parsedCache && JSON.stringify(parsedCache).includes('insights'),
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        console.warn('Failed to inspect localStorage cache:', error);
+      }
+    }, 1000);
+    
+    logger.info('REACT_QUERY_PERSISTENCE', 'Cache persistence initialized successfully', {
+      cacheSize: Object.keys(localStorage).filter(key => key.startsWith('twinforge-react-query')).length,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    logger.error('REACT_QUERY_PERSISTENCE', 'Failed to initialize cache persistence', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  }
+};
+
+function PerformanceInitializer({ children }: { children: React.ReactNode }) {
+  useDevicePerformance();
+  return <>{children}</>;
+}
+
+function AutoSyncInitializer({ children }: { children: React.ReactNode }) {
+  const { profile } = useUserStore();
+  useAutoSync(profile?.id || null, { enabled: true, intervalMinutes: 60 });
+  return <>{children}</>;
+}
+
+export function AppProviders({ children }: { children: React.ReactNode }) {
+  // Initialize cache persistence on mount
+  React.useEffect(() => {
+    initializeCachePersistence();
+  }, []);
+
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <DataProvider>
+          <DeviceProvider>
+            <IllustrationCacheProvider>
+              <ToastProvider>
+                <PerformanceInitializer>
+                  <AutoSyncInitializer>
+                    {children}
+                  </AutoSyncInitializer>
+                </PerformanceInitializer>
+              </ToastProvider>
+            </IllustrationCacheProvider>
+          </DeviceProvider>
+        </DataProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  );
+}

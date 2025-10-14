@@ -1,0 +1,216 @@
+/* =========================================
+   TRAINING AI LOADER - GPU OPTIMIZED
+   VisionOS 26 Best Practices
+   ========================================= */
+
+.training-ai-loader {
+  contain: layout style paint;
+  will-change: auto;
+  position: relative;
+}
+
+/* Particle System - GPU Accelerated */
+.training-loader-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.training-loader-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.6;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Particle positions in circular pattern (8 particles) */
+.training-loader-particle:nth-child(1) { top: 50%; left: 100%; transform: translate(-50%, -50%) translateZ(0); }
+.training-loader-particle:nth-child(2) { top: 85%; left: 85%; transform: translate(-50%, -50%) translateZ(0); }
+.training-loader-particle:nth-child(3) { top: 100%; left: 50%; transform: translate(-50%, -50%) translateZ(0); }
+.training-loader-particle:nth-child(4) { top: 85%; left: 15%; transform: translate(-50%, -50%) translateZ(0); }
+.training-loader-particle:nth-child(5) { top: 50%; left: 0%; transform: translate(-50%, -50%) translateZ(0); }
+.training-loader-particle:nth-child(6) { top: 15%; left: 15%; transform: translate(-50%, -50%) translateZ(0); }
+.training-loader-particle:nth-child(7) { top: 0%; left: 50%; transform: translate(-50%, -50%) translateZ(0); }
+.training-loader-particle:nth-child(8) { top: 15%; left: 85%; transform: translate(-50%, -50%) translateZ(0); }
+
+/* Staggered pulse animation */
+.training-loader-particle:nth-child(1) { animation: training-pulse 1.6s ease-in-out infinite 0s; }
+.training-loader-particle:nth-child(2) { animation: training-pulse 1.6s ease-in-out infinite 0.08s; }
+.training-loader-particle:nth-child(3) { animation: training-pulse 1.6s ease-in-out infinite 0.16s; }
+.training-loader-particle:nth-child(4) { animation: training-pulse 1.6s ease-in-out infinite 0.24s; }
+.training-loader-particle:nth-child(5) { animation: training-pulse 1.6s ease-in-out infinite 0.32s; }
+.training-loader-particle:nth-child(6) { animation: training-pulse 1.6s ease-in-out infinite 0.4s; }
+.training-loader-particle:nth-child(7) { animation: training-pulse 1.6s ease-in-out infinite 0.48s; }
+.training-loader-particle:nth-child(8) { animation: training-pulse 1.6s ease-in-out infinite 0.56s; }
+
+@keyframes training-pulse {
+  0%, 100% {
+    transform: scale(0.8) translateZ(0);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2) translateZ(0);
+    opacity: 1;
+  }
+}
+
+/* Central icon container with halo */
+.training-loader-icon-container {
+  position: relative;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Halo pulsating animation */
+.training-loader-halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%) translateZ(0);
+  border-radius: 50%;
+  animation: training-halo-pulse 2.4s ease-in-out infinite;
+  pointer-events: none;
+  backface-visibility: hidden;
+}
+
+@keyframes training-halo-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 30px rgba(16, 185, 129, 0.4),
+      0 0 50px rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 50px rgba(16, 185, 129, 0.6),
+      0 0 80px rgba(16, 185, 129, 0.3);
+  }
+}
+
+/* Progress bar shimmer effect - GPU optimized */
+.training-progress-shimmer {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.training-progress-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: training-shimmer 2s linear infinite;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+@keyframes training-shimmer {
+  0% { transform: translateX(-100%) translateZ(0); }
+  100% { transform: translateX(200%) translateZ(0); }
+}
+
+/* Mobile optimizations - Reduce complexity */
+@media (max-width: 768px) {
+  /* Reduce particles from 8 to 4 */
+  .training-loader-particle:nth-child(n+5) {
+    display: none;
+  }
+
+  /* Reduce blur for better performance */
+  .training-ai-loader {
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+  }
+
+  /* Slower animations to reduce GPU load */
+  .training-loader-particle {
+    animation-duration: 1.92s !important; /* 20% slower */
+  }
+
+  .training-loader-halo {
+    animation-duration: 2.88s !important; /* 20% slower */
+  }
+
+  .training-progress-shimmer::after {
+    animation-duration: 2.4s !important; /* 20% slower */
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Reduce particles from 8 to 6 */
+  .training-loader-particle:nth-child(n+7) {
+    display: none;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .training-loader-particle {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+
+  .training-loader-halo {
+    animation: none !important;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.4) !important;
+  }
+
+  .training-progress-shimmer::after {
+    animation: none !important;
+    opacity: 0.3 !important;
+  }
+}
+
+/* Low power mode optimizations */
+.low-power-mode .training-loader-particle,
+.low-power-mode .training-loader-halo,
+.low-power-mode .training-progress-shimmer::after {
+  animation: none !important;
+}
+
+.low-power-mode .training-loader-particle {
+  opacity: 0.4 !important;
+}
+
+/* Performance mode - Disable non-essential animations */
+.perf-low .training-loader-particle {
+  display: none !important;
+}
+
+.perf-low .training-loader-halo {
+  animation: none !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Cleanup on unmount - Prevent memory leaks */
+.training-ai-loader.cleanup-on-unmount:not(.active) {
+  animation: none !important;
+  will-change: auto !important;
+}
+
+.training-ai-loader.cleanup-on-unmount:not(.active) * {
+  animation: none !important;
+  will-change: auto !important;
+}

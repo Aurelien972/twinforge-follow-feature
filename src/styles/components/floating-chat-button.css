@@ -1,0 +1,133 @@
+/**
+ * Floating Chat Button Styles
+ * VisionOS 26 inspired responsive styles
+ * IMPORTANT: Masqué sur mobile/tablette car intégré dans la bottom bar
+ * Visible uniquement sur desktop (>= 1025px)
+ */
+
+/* ============================================================
+   FLOATING CHAT BUTTON - BASE STYLES
+   ============================================================ */
+
+.floating-chat-button {
+  /* Caché par défaut sur mobile/tablette */
+  display: none !important;
+  width: 48px !important;
+  height: 48px !important;
+  position: relative;
+  overflow: visible !important;
+}
+
+/* ============================================================
+   DESKTOP OPTIMIZATIONS
+   ============================================================ */
+
+@media (min-width: 1025px) {
+  .floating-chat-button {
+    /* Visible uniquement sur desktop */
+    display: flex !important;
+    /* Taille plus grande sur desktop */
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  /* Amélioration du hover sur desktop */
+  .floating-chat-button:hover {
+    border-width: 1.5px;
+    border-color: rgba(255, 255, 255, 0.28);
+  }
+}
+
+/* ============================================================
+   TABLET OPTIMIZATIONS
+   ============================================================ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .floating-chat-button {
+    /* Masqué sur tablette - intégré dans la bottom bar */
+    display: none !important;
+  }
+}
+
+/* ============================================================
+   LARGE DESKTOP OPTIMIZATIONS
+   ============================================================ */
+
+@media (min-width: 1440px) {
+  .floating-chat-button {
+    /* Taille optimale pour grand écran */
+    width: 64px !important;
+    height: 64px !important;
+  }
+}
+
+/* ============================================================
+   ANIMATION OPTIMIZATIONS
+   ============================================================ */
+
+/* Amélioration de la fluidité des animations sur mobile */
+@media (max-width: 768px) {
+  .floating-chat-button {
+    /* Optimisation GPU pour mobile */
+    transform: translateZ(0) !important;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Réduction des animations sur batterie faible */
+@media (prefers-reduced-motion: reduce) {
+  .floating-chat-button {
+    transition: right 250ms linear !important;
+  }
+}
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
+/* Focus visible pour navigation clavier */
+.floating-chat-button:focus-visible {
+  outline: 3px solid rgba(24, 227, 255, 0.6);
+  outline-offset: 4px;
+  box-shadow:
+    var(--liquid-pill-shadow),
+    0 0 0 6px rgba(24, 227, 255, 0.2) !important;
+}
+
+/* ============================================================
+   HIGH CONTRAST MODE
+   ============================================================ */
+
+@media (prefers-contrast: high) {
+  .floating-chat-button {
+    border-width: 2px !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+  }
+}
+
+/* ============================================================
+   NOTIFICATION BADGE POSITIONING
+   ============================================================ */
+
+/* Badge positioning - Base (Mobile) */
+.floating-chat-badge {
+  top: -4px !important;
+  right: -4px !important;
+}
+
+/* Badge positioning - Tablet - Ajusté pour être bien visible */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .floating-chat-badge {
+    top: -6px !important;
+    right: -6px !important;
+  }
+}
+
+/* Badge positioning - Desktop */
+@media (min-width: 1025px) {
+  .floating-chat-badge {
+    top: -4px !important;
+    right: -4px !important;
+  }
+}

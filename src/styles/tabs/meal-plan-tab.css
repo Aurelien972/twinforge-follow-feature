@@ -1,0 +1,767 @@
+/* =========================================
+   MEAL PLAN TAB - CSS OPTIMIZED
+   TwinForge VisionOS 26 - iPhone 11+ Optimized
+   Thème: Purple/Violet (#8B5CF6, #A855F7)
+   ========================================= */
+
+/* =========================================
+   VARIABLES - PLAN TAB THEME
+   ========================================= */
+:root {
+  --plan-tab-primary: #8B5CF6;
+  --plan-tab-secondary: #A855F7;
+  --plan-tab-tertiary: #C084FC;
+  --plan-tab-accent: #7C3AED;
+
+  /* Green accent for nutritional info */
+  --plan-nutrition-green: #10B981;
+  --plan-nutrition-green-light: #22C55E;
+
+  /* Meal type colors */
+  --plan-meal-breakfast: #F59E0B;
+  --plan-meal-lunch: #10B981;
+  --plan-meal-dinner: #8B5CF6;
+  --plan-meal-snack: #EC4899;
+
+  /* Mobile optimizations */
+  --plan-card-padding-mobile: 16px;
+  --plan-card-padding-desktop: 24px;
+  --plan-blur-mobile: 8px;
+  --plan-blur-desktop: 16px;
+}
+
+/* =========================================
+   PLAN HEADER SECTION - Header avec Actions
+   ========================================= */
+
+/* Header Principal */
+.glass-plan-header {
+  position: relative;
+  padding: var(--plan-card-padding-mobile);
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--plan-tab-primary) 12%, transparent) 0%, transparent 60%),
+              radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--plan-tab-secondary) 8%, transparent) 0%, transparent 50%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, var(--plan-tab-primary) 25%, transparent);
+  border-radius: var(--glass-radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, var(--plan-tab-primary) 15%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Icône Animée Header */
+.plan-header-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+              linear-gradient(135deg, color-mix(in srgb, var(--plan-tab-primary) 35%, transparent), color-mix(in srgb, var(--plan-tab-primary) 25%, transparent));
+  border: 2px solid color-mix(in srgb, var(--plan-tab-primary) 50%, transparent);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--plan-tab-primary) 40%, transparent);
+  animation: breathingIconPulse 3s ease-in-out infinite;
+  transform: translateZ(0);
+}
+
+@keyframes breathingIconPulse {
+  0%, 100% { transform: scale(1) translateZ(0); }
+  50% { transform: scale(1.05) translateZ(0); }
+}
+
+/* Week Navigation Buttons */
+.plan-week-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--plan-tab-primary) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--plan-tab-primary) 25%, transparent);
+  transition: all var(--animation-duration-medium) var(--animation-ease-glass);
+  transform: translateZ(0);
+}
+
+.plan-week-nav-btn:hover:not(:disabled) {
+  transform: scale(1.05) translateZ(0);
+  background: color-mix(in srgb, var(--plan-tab-primary) 20%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--plan-tab-primary) 30%, transparent);
+}
+
+.plan-week-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   NUTRITIONAL SUMMARY - Résumé Nutritionnel
+   ========================================= */
+
+.glass-plan-nutrition-summary {
+  padding: var(--plan-card-padding-mobile);
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--plan-nutrition-green) 8%, transparent) 0%, transparent 60%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, var(--plan-nutrition-green) 20%, transparent);
+  border-radius: var(--glass-radius-lg);
+  backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+.plan-nutrition-icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--plan-nutrition-green) 15%, transparent);
+  border: 2px solid color-mix(in srgb, var(--plan-nutrition-green) 25%, transparent);
+  flex-shrink: 0;
+}
+
+/* Grid Stats Nutritionnels */
+.plan-nutrition-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .plan-nutrition-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.plan-nutrition-stat-card {
+  text-align: center;
+  padding: 16px;
+  border-radius: var(--glass-radius-md);
+  border: 1px solid;
+  backdrop-filter: blur(8px) saturate(120%);
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+.plan-nutrition-stat-card.calories {
+  background: color-mix(in srgb, #F59E0B 10%, transparent);
+  border-color: color-mix(in srgb, #F59E0B 20%, transparent);
+}
+
+.plan-nutrition-stat-card.protein {
+  background: color-mix(in srgb, #EF4444 10%, transparent);
+  border-color: color-mix(in srgb, #EF4444 20%, transparent);
+}
+
+.plan-nutrition-stat-card.carbs {
+  background: color-mix(in srgb, #3B82F6 10%, transparent);
+  border-color: color-mix(in srgb, #3B82F6 20%, transparent);
+}
+
+.plan-nutrition-stat-card.fat {
+  background: color-mix(in srgb, #8B5CF6 10%, transparent);
+  border-color: color-mix(in srgb, #8B5CF6 20%, transparent);
+}
+
+/* =========================================
+   PLAN GENERATION PROGRESS - Progression
+   ========================================= */
+
+.glass-plan-generation-progress {
+  padding: 32px;
+  text-align: center;
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--plan-tab-primary) 15%, transparent) 0%, transparent 60%),
+              radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--plan-tab-secondary) 12%, transparent) 0%, transparent 50%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, var(--plan-tab-primary) 30%, transparent);
+  border-radius: var(--glass-radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, var(--plan-tab-primary) 20%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Icône de Génération avec Animation */
+.plan-generation-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+              linear-gradient(135deg, color-mix(in srgb, var(--plan-tab-primary) 35%, transparent), color-mix(in srgb, var(--plan-tab-primary) 25%, transparent));
+  border: 2px solid color-mix(in srgb, var(--plan-tab-primary) 50%, transparent);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--plan-tab-primary) 40%, transparent);
+  animation: planGenerationPulse 2s ease-in-out infinite;
+  transform: translateZ(0);
+}
+
+@keyframes planGenerationPulse {
+  0%, 100% {
+    transform: scale(1) translateZ(0);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05) translateZ(0);
+    opacity: 1;
+  }
+}
+
+/* Progress Bar */
+.plan-progress-bar-container {
+  width: 100%;
+  max-width: 448px;
+  margin: 0 auto;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--glass-radius-pill);
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.plan-progress-bar-fill {
+  height: 12px;
+  border-radius: var(--glass-radius-pill);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, var(--plan-tab-primary), var(--plan-tab-secondary), var(--plan-tab-tertiary));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--plan-tab-primary) 70%, transparent),
+              inset 0 1px 0 rgba(255,255,255,0.4);
+  transform: translateZ(0);
+  transition: width var(--animation-duration-medium) ease-out;
+}
+
+/* Shimmer Effect sur Progress Bar */
+.plan-progress-shimmer {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--glass-radius-pill);
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.6) 50%,
+    transparent 100%
+  );
+  animation: progressShimmer 2s ease-in-out infinite;
+}
+
+@keyframes progressShimmer {
+  0% { transform: translateX(-100%) translateZ(0); }
+  100% { transform: translateX(100%) translateZ(0); }
+}
+
+/* =========================================
+   DAY PLAN CARD - Carte Journée
+   ========================================= */
+
+.glass-plan-day-card {
+  position: relative;
+  padding: 20px;
+  border-radius: var(--glass-radius-lg);
+  backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+  transition: all var(--animation-duration-medium) var(--animation-ease-glass);
+}
+
+.glass-plan-day-card:hover {
+  transform: scale(1.01) translateZ(0);
+}
+
+/* Variants pour différents états */
+.glass-plan-day-card.is-today {
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--plan-nutrition-green-light) 12%, transparent) 0%, transparent 60%),
+              radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--plan-nutrition-green) 8%, transparent) 0%, transparent 50%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, var(--plan-nutrition-green-light) 30%, transparent);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, var(--plan-nutrition-green-light) 20%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-plan-day-card.is-batch {
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--plan-tab-primary) 8%, transparent) 0%, transparent 60%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, var(--plan-tab-primary) 25%, transparent);
+}
+
+.glass-plan-day-card.is-regular {
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, #06B6D4 8%, transparent) 0%, transparent 60%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, #06B6D4 20%, transparent);
+}
+
+/* Badges sur Day Card */
+.plan-day-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  padding: 4px 8px;
+  border-radius: var(--glass-radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.plan-day-badge.today {
+  background: linear-gradient(to right, rgba(249, 115, 22, 0.8), rgba(239, 68, 68, 0.8));
+  border: 1px solid rgba(249, 115, 22, 0.6);
+}
+
+.plan-day-badge.batch {
+  background: linear-gradient(to right, rgba(34, 197, 94, 0.8), rgba(16, 185, 129, 0.8));
+  border: 1px solid rgba(34, 197, 94, 0.6);
+}
+
+/* Day Icon Circle */
+.plan-day-icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--animation-duration-medium) var(--animation-ease-glass);
+}
+
+/* Daily Summary Card */
+.plan-daily-summary {
+  padding: 16px;
+  border-radius: var(--glass-radius-md);
+  backdrop-filter: blur(12px) saturate(140%);
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* =========================================
+   MEAL SLOTS - Créneaux de Repas
+   ========================================= */
+
+.plan-meal-slot {
+  padding: 16px;
+  border-radius: var(--glass-radius-md);
+  border: 1px solid;
+  transition: all var(--animation-duration-fast) var(--animation-ease-glass);
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Meal Image Container */
+.plan-meal-image {
+  position: relative;
+  height: 128px;
+  overflow: hidden;
+  border-radius: var(--glass-radius-sm);
+  margin-bottom: 12px;
+}
+
+.plan-meal-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translateZ(0);
+}
+
+/* Meal Action Button - Positioned over image */
+.plan-meal-action-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: var(--glass-radius-pill);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(12px) saturate(140%);
+  transition: all var(--animation-duration-fast) var(--animation-ease-glass);
+  transform: translateZ(0);
+}
+
+.plan-meal-action-btn:hover:not(:disabled) {
+  transform: scale(1.05) translateZ(0);
+}
+
+/* Meal Skeleton Loading */
+.plan-meal-skeleton {
+  padding: 16px;
+  border-radius: var(--glass-radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.plan-meal-skeleton-line {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--glass-radius-xs);
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* =========================================
+   AI EXPLANATION CARD - Explication IA
+   ========================================= */
+
+.glass-plan-ai-explanation {
+  padding: var(--plan-card-padding-mobile);
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--plan-nutrition-green) 12%, transparent) 0%, transparent 60%),
+              radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--plan-nutrition-green-light) 8%, transparent) 0%, transparent 50%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, var(--plan-nutrition-green) 30%, transparent);
+  border-radius: var(--glass-radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, var(--plan-nutrition-green) 20%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* AI Icon avec Breathing Effect */
+.plan-ai-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
+              linear-gradient(135deg, color-mix(in srgb, var(--plan-nutrition-green) 40%, transparent), color-mix(in srgb, var(--plan-nutrition-green-light) 30%, transparent));
+  border: 3px solid color-mix(in srgb, var(--plan-nutrition-green) 60%, transparent);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--plan-nutrition-green) 50%, transparent),
+              0 0 80px color-mix(in srgb, var(--plan-nutrition-green-light) 30%, transparent),
+              inset 0 3px 0 rgba(255,255,255,0.4);
+  animation: breathingIconPulse 3s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* AI Content Sections */
+.plan-ai-section {
+  padding: 16px;
+  border-radius: var(--glass-radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid color-mix(in srgb, var(--plan-nutrition-green) 20%, transparent);
+  transform: translateZ(0);
+}
+
+/* AI Highlight Items */
+.plan-ai-highlight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--glass-radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid color-mix(in srgb, var(--plan-nutrition-green) 20%, transparent);
+  transform: translateZ(0);
+}
+
+/* =========================================
+   EMPTY PLAN STATE - État Vide
+   ========================================= */
+
+.glass-plan-empty-state {
+  padding: 32px;
+  text-align: center;
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--plan-tab-primary) 8%, transparent) 0%, transparent 60%),
+              var(--glass-opacity-base);
+  border: 1px solid color-mix(in srgb, var(--plan-tab-primary) 20%, transparent);
+  border-radius: var(--glass-radius-lg);
+  backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Empty State Icon */
+.plan-empty-icon-circle {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+              linear-gradient(135deg, color-mix(in srgb, var(--plan-tab-primary) 35%, transparent), color-mix(in srgb, var(--plan-tab-secondary) 25%, transparent));
+  border: 2px solid color-mix(in srgb, var(--plan-tab-primary) 50%, transparent);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--plan-tab-primary) 40%, transparent),
+              0 0 60px color-mix(in srgb, var(--plan-tab-primary) 30%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(16px) saturate(150%);
+  animation: breathingIconPulse 3s ease-in-out infinite;
+}
+
+/* Empty State Feature Grid */
+.plan-empty-features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin: 32px 0;
+}
+
+@media (min-width: 768px) {
+  .plan-empty-features-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.plan-empty-feature-item {
+  text-align: center;
+}
+
+.plan-empty-feature-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
+              linear-gradient(135deg, color-mix(in srgb, var(--plan-tab-primary) 25%, transparent), color-mix(in srgb, var(--plan-tab-secondary) 15%, transparent));
+  border: 1px solid color-mix(in srgb, var(--plan-tab-primary) 40%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--plan-tab-primary) 30%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px) saturate(140%);
+}
+
+/* Empty State 3D CTA Button */
+.plan-empty-cta-btn {
+  position: relative;
+  overflow: hidden;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 16px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--plan-tab-primary) 90%, transparent) 0%,
+    color-mix(in srgb, var(--plan-tab-secondary) 80%, transparent) 50%,
+    color-mix(in srgb, var(--plan-tab-accent) 85%, transparent) 100%
+  );
+  border: 2px solid color-mix(in srgb, var(--plan-tab-primary) 70%, transparent);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--plan-tab-primary) 50%, transparent),
+              0 0 40px color-mix(in srgb, var(--plan-tab-primary) 40%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.4),
+              inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+              inset 2px 0 0 rgba(255, 255, 255, 0.2),
+              inset -2px 0 0 rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
+  transition: all var(--animation-duration-medium) var(--animation-ease-glass);
+}
+
+.plan-empty-cta-btn:hover:not(:disabled) {
+  transform: scale(1.05) translateZ(0);
+}
+
+.plan-empty-cta-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Shine Effect Animation */
+@keyframes shine {
+  0% { transform: translateX(-100%) translateZ(0); }
+  100% { transform: translateX(100%) translateZ(0); }
+}
+
+/* =========================================
+   MEAL PLAN REVIEW CTA - CTA de Validation
+   ========================================= */
+
+.glass-plan-review-cta {
+  padding: var(--plan-card-padding-mobile);
+  border: 2px solid color-mix(in srgb, var(--plan-tab-primary) 30%, transparent);
+  border-radius: var(--glass-radius-lg);
+  backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  -webkit-backdrop-filter: blur(var(--plan-blur-mobile)) saturate(var(--glass-saturate-base));
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Progress Bar in Review CTA */
+.plan-review-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--glass-radius-pill);
+  overflow: hidden;
+}
+
+.plan-review-progress-fill {
+  height: 8px;
+  border-radius: var(--glass-radius-pill);
+  background: linear-gradient(to right, var(--plan-tab-primary), var(--plan-tab-secondary));
+  transition: width var(--animation-duration-medium) ease-out;
+}
+
+/* Stats Grid */
+.plan-review-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .plan-review-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Action Buttons */
+.plan-review-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-weight: 600;
+  border-radius: var(--glass-radius-md);
+  transition: all var(--animation-duration-fast) var(--animation-ease-glass);
+  transform: translateZ(0);
+}
+
+.plan-review-action-btn.primary {
+  background: linear-gradient(to right, var(--plan-tab-primary), var(--plan-tab-secondary));
+  color: white;
+}
+
+.plan-review-action-btn.primary:hover:not(:disabled) {
+  background: linear-gradient(to right, var(--plan-tab-secondary), var(--plan-tab-tertiary));
+  transform: scale(1.02) translateZ(0);
+}
+
+.plan-review-action-btn.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.plan-review-action-btn.secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.plan-review-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   DESKTOP OPTIMIZATIONS
+   ========================================= */
+
+@media (min-width: 768px) {
+  .glass-plan-header,
+  .glass-plan-nutrition-summary,
+  .glass-plan-generation-progress,
+  .glass-plan-day-card,
+  .glass-plan-ai-explanation,
+  .glass-plan-empty-state,
+  .glass-plan-review-cta {
+    padding: var(--plan-card-padding-desktop);
+    backdrop-filter: blur(var(--plan-blur-desktop)) saturate(var(--glass-saturate-base));
+    -webkit-backdrop-filter: blur(var(--plan-blur-desktop)) saturate(var(--glass-saturate-base));
+  }
+
+  .plan-header-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .plan-generation-icon {
+    width: 96px;
+    height: 96px;
+  }
+
+  .plan-empty-icon-circle {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* =========================================
+   MOBILE TOUCH OPTIMIZATIONS
+   ========================================= */
+
+@media (max-width: 767px) {
+  /* Ensure minimum touch targets */
+  .plan-week-nav-btn,
+  .plan-meal-action-btn,
+  .plan-review-action-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Reduce padding on mobile for better space usage */
+  .plan-meal-slot {
+    padding: 12px;
+  }
+
+  .plan-daily-summary {
+    padding: 12px;
+  }
+}
+
+/* =========================================
+   PERFORMANCE OPTIMIZATIONS
+   ========================================= */
+
+/* GPU Acceleration for animated elements */
+.plan-header-icon,
+.plan-generation-icon,
+.plan-ai-icon-circle,
+.plan-empty-icon-circle,
+.plan-progress-bar-fill,
+.plan-meal-action-btn,
+.plan-empty-cta-btn {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .plan-header-icon,
+  .plan-generation-icon,
+  .plan-ai-icon-circle,
+  .plan-empty-icon-circle {
+    animation: none;
+  }
+
+  .plan-empty-cta-btn:hover:not(:disabled),
+  .plan-meal-action-btn:hover:not(:disabled) {
+    transform: none;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

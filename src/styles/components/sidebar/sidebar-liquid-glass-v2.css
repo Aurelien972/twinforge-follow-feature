@@ -1,0 +1,377 @@
+/* =========================================
+   SIDEBAR LIQUID GLASS V2 - VisionOS 26 Premium
+   Alignement complet avec bottom bar et central menu
+   ========================================= */
+
+/* Main sidebar container - ultra-transparent liquid glass */
+.sidebar-glass-enhanced {
+  /* Ultra-transparent Liquid Glass matching bottom bar */
+  background:
+    var(--liquid-reflections-multi),
+    var(--liquid-highlight-ambient),
+    var(--liquid-glass-bg-base) !important;
+
+  backdrop-filter: blur(var(--liquid-blur-strong)) saturate(var(--liquid-saturate-strong)) !important;
+  -webkit-backdrop-filter: blur(var(--liquid-blur-strong)) saturate(var(--liquid-saturate-strong)) !important;
+
+  border-radius: 24px !important;
+  box-shadow: var(--liquid-shadow-elevated) !important;
+
+  transition: all var(--liquid-transition-medium);
+  position: relative;
+  overflow: visible !important;
+  isolation: isolate !important;
+  transform: translateZ(0);
+  will-change: transform, filter;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  /* Safari rounded fix */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
+}
+
+/* Multi-color gradient border with animation - ÉPAISSIE POUR ROBUSTESSE */
+.sidebar-glass-enhanced::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  padding: 3px;
+  background: var(--liquid-border-gradient-tricolor);
+  background-size: 200% 200%;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.95;
+  z-index: 2;
+  animation: borderFlow 6s ease-in-out infinite;
+}
+
+/* Ambient glow underneath */
+.sidebar-glass-enhanced::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: calc(24px + 4px);
+  background: radial-gradient(
+    ellipse at 50% 20%,
+    rgba(24, 227, 255, 0.15) 0%,
+    rgba(61, 19, 179, 0.1) 40%,
+    transparent 70%
+  );
+  opacity: 0.75;
+  z-index: -1;
+  pointer-events: none;
+  animation: sidebarGlow 4s ease-in-out infinite alternate;
+  filter: blur(10px);
+}
+
+@keyframes borderFlow {
+  0%, 100% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+}
+
+@keyframes sidebarGlow {
+  0% {
+    opacity: 0.65;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1.01);
+  }
+}
+
+.sidebar-glass-enhanced:hover {
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.5),
+    0 0 50px color-mix(in srgb, var(--brand-primary) 20%, transparent),
+    0 0 100px color-mix(in srgb, var(--color-plasma-cyan) 18%, transparent),
+    inset 0 2px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Content scrolling */
+.sidebar-content {
+  overflow: visible !important;
+  max-height: calc(100vh - 4rem);
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.sidebar-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-content > *,
+.sidebar-content .space-y-4,
+.sidebar-content .space-y-4 > * {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* Section titles */
+.sidebar-section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0.5rem 0;
+  padding-left: 0.75rem;
+  text-transform: uppercase;
+  position: relative;
+}
+
+/* Nav items - restructured with icon containers like bottom bar */
+.sidebar-item {
+  margin: 0.125rem 0;
+  transition: all var(--liquid-transition-fast);
+  border-radius: 16px;
+  padding: 0.625rem;
+  background: transparent;
+  border: 1px solid transparent;
+  position: relative;
+  transform: translateZ(0);
+  will-change: transform, background, border-color, box-shadow;
+  overflow: visible !important;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Hover effects now focus on the icon container */
+@media (hover: hover) and (pointer: fine) {
+  .sidebar-item:hover {
+    background: transparent;
+    transform: translateY(-1px) translateZ(0);
+  }
+
+  .sidebar-item:hover .sidebar-item-icon-container {
+    transform: scale(1.08) translateZ(0);
+    box-shadow:
+      var(--liquid-pill-shadow),
+      0 0 20px rgba(255,255,255,0.15),
+      0 4px 16px rgba(0,0,0,0.2);
+    border-color: rgba(255,255,255,0.3);
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
+      var(--liquid-pill-bg);
+  }
+}
+
+.sidebar-item-icon {
+  transition: color 200ms ease, filter 200ms ease;
+}
+
+.sidebar-item-label {
+  transition: color 200ms ease;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.sidebar-item-subtitle {
+  transition: color 200ms ease;
+}
+
+/* Active state - enhanced with icon container focus */
+.sidebar-item[aria-current="page"] {
+  background: transparent;
+  border-color: transparent;
+  transform: translateY(-1px) translateZ(0);
+  z-index: 20 !important;
+  overflow: visible !important;
+}
+
+.sidebar-item[aria-current="page"] .sidebar-item-icon-container {
+  /* Use the active class from liquid-glass-premium.css */
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28) 0%, transparent 60%),
+    radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 20%, transparent) 0%, transparent 70%),
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 30%, transparent),
+      color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 18%, transparent));
+
+  border: 1.5px solid color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 50%, transparent);
+
+  box-shadow:
+    var(--liquid-pill-shadow),
+    0 0 24px color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 30%, transparent),
+    0 0 48px color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 18%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+
+  transform: scale(1.05) translateZ(0);
+}
+
+.sidebar-item[aria-current="page"] .sidebar-item-icon {
+  color: var(--color-plasma-cyan) !important;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-plasma-cyan) 40%, transparent)) !important;
+}
+
+.sidebar-item[aria-current="page"] .sidebar-item-label {
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+.sidebar-item[aria-current="page"]:hover .sidebar-item-icon-container {
+  transform: scale(1.1) translateZ(0);
+  box-shadow:
+    var(--liquid-pill-shadow),
+    0 0 30px color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 35%, transparent),
+    0 0 60px color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 22%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.35);
+  border-color: color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 60%, transparent);
+}
+
+/* Primary pill - enhanced with icon container like bottom bar */
+.sidebar-item--primary {
+  margin-bottom: 0.75rem;
+  padding: 1rem;
+  min-height: 64px;
+  background: transparent;
+  border: none;
+}
+
+.sidebar-item--primary .sidebar-item-icon-container {
+  /* Larger icon container for primary items */
+  width: 44px;
+  height: 44px;
+
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent) 0%, transparent 60%),
+    var(--liquid-pill-bg);
+
+  border: 1.5px solid color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent);
+  box-shadow:
+    var(--liquid-pill-shadow),
+    0 0 20px color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent);
+}
+
+.sidebar-item--primary:hover .sidebar-item-icon-container {
+  transform: scale(1.08) translateZ(0);
+  border-color: color-mix(in srgb, var(--color-plasma-cyan) 40%, transparent);
+  box-shadow:
+    var(--liquid-pill-shadow),
+    0 0 30px color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent),
+    0 0 60px color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent),
+    0 4px 20px rgba(0,0,0,0.25);
+}
+
+.sidebar-item--primary .sidebar-item-icon {
+  color: var(--color-plasma-cyan) !important;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-plasma-cyan) 40%, transparent)) !important;
+}
+
+.sidebar-item--primary .sidebar-item-label {
+  color: #fff !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .sidebar-section-title {
+    font-size: 0.75rem;
+    margin-top: 0.375rem;
+    padding-left: 0.5rem;
+  }
+  .sidebar-item {
+    margin: 0.2rem 0;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-glass-enhanced::before,
+  .sidebar-glass-enhanced::after {
+    animation: none !important;
+  }
+
+  .sidebar-item:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .sidebar-item-icon,
+  .sidebar-item-label {
+    transition: color 0.2s ease;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .sidebar-glass-enhanced {
+    background: rgba(11, 14, 23, 0.95) !important;
+    border: 3px solid rgba(24, 227, 255, 0.8) !important;
+  }
+
+  .sidebar-item {
+    border-width: 2px !important;
+  }
+
+  .sidebar-item[aria-current="page"] {
+    background: rgba(24, 227, 255, 0.2) !important;
+    border-width: 3px !important;
+  }
+}
+
+/* ==========================================
+   HOME BUTTON - Logo Orange Gradient
+   ========================================== */
+
+/* Home button - Cœur de la Forge with orange gradient */
+.sidebar-item[href="/"] .sidebar-item-icon-container,
+.sidebar-item[href="/"][aria-current="page"] .sidebar-item-icon-container {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28) 0%, transparent 60%),
+    radial-gradient(circle at 70% 70%, rgba(247, 147, 30, 0.20) 0%, transparent 70%),
+    linear-gradient(135deg,
+      rgba(255, 107, 53, 0.30),
+      rgba(253, 200, 48, 0.18)) !important;
+
+  border: 1.5px solid rgba(247, 147, 30, 0.50) !important;
+
+  box-shadow:
+    var(--liquid-pill-shadow),
+    0 0 24px rgba(247, 147, 30, 0.30),
+    0 0 48px rgba(253, 200, 48, 0.18),
+    inset 0 1px 0 rgba(255,255,255,0.3) !important;
+}
+
+.sidebar-item[href="/"] .sidebar-item-icon {
+  color: #FDC830 !important;
+  filter: drop-shadow(0 0 8px rgba(253, 200, 48, 0.60)) !important;
+}
+
+.sidebar-item[href="/"]:hover .sidebar-item-icon-container {
+  transform: scale(1.1) translateZ(0) !important;
+  box-shadow:
+    var(--liquid-pill-shadow),
+    0 0 30px rgba(247, 147, 30, 0.40),
+    0 0 60px rgba(253, 200, 48, 0.25),
+    inset 0 1px 0 rgba(255,255,255,0.35) !important;
+  border-color: rgba(247, 147, 30, 0.65) !important;
+}

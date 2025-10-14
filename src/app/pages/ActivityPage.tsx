@@ -1,0 +1,124 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Tabs from '../../ui/tabs/TabsComponent';
+import { ICONS } from '../../ui/icons/registry';
+import { useScrollMemory } from '../../hooks/scroll/useScrollMemory';
+import ActivityDailyTab from './Activity/ActivityDailyTab';
+import ActivityInsightsTab from './Activity/ActivityInsightsTab';
+import ActivityProgressTab from './Activity/ActivityProgressTab';
+import ActivityHistoryTab from './Activity/ActivityHistoryTab';
+import { useFeedback } from '../../hooks/useFeedback';
+import logger from '../../lib/utils/logger';
+import PageHeader from '../../ui/page/PageHeader';
+import './Activity/styles/index.css';
+
+/**
+ * Get dynamic header content based on active tab
+ */
+function getTabHeaderContent(activeTab: string) {
+  switch (activeTab) {
+    case 'daily':
+      return {
+        icon: 'Activity' as const,
+        title: 'Forge Énergétique',
+        subtitle: 'Votre énergie forgée aujourd\'hui et vos séances actives',
+        circuit: 'activity' as const,
+        color: '#3B82F6',
+      };
+    case 'insights':
+      return {
+        icon: 'BarChart3' as const,
+        title: 'Insights Énergétiques',
+        subtitle: 'Analyses avancées et recommandations personnalisées',
+        circuit: 'activity' as const,
+        color: '#F59E0B',
+      };
+    case 'progression':
+      return {
+        icon: 'TrendingUp' as const,
+        title: 'Progression de la Forge',
+        subtitle: 'Évolution de vos performances et tendances énergétiques',
+        circuit: 'activity' as const,
+        color: '#10B981',
+      };
+    case 'history':
+      return {
+        icon: 'History' as const,
+        title: 'Historique Énergétique',
+        subtitle: 'Toutes vos séances et activités forgées',
+        circuit: 'activity' as const,
+        color: '#8B5CF6',
+      };
+    default:
+      return {
+        icon: 'Activity' as const,
+        title: 'Forge Énergétique',
+        subtitle: 'Votre centre de suivi d\'activité physique',
+        circuit: 'activity' as const,
+        color: '#3B82F6',
+      };
+  }
+}
+
+/**
+ * Activity Page - Forge Énergétique TwinForge
+ * Page principale avec 4 onglets pour le suivi d'activité
+ */
+const ActivityPage: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { showFeedback } = useFeedback();
+  
+  const [activeTab, setActiveTab] = React.useState('daily');
+  const headerContent = getTabHeaderContent(activeTab);
+  
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    logger.info('Activity tab changed', { tab: value });
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="space-y-6"
+    >
+      <PageHeader
+        icon={headerContent.icon}
+        title={headerContent.title}
+        subtitle={headerContent.subtitle}
+        circuit={headerContent.circuit}
+        iconColor={headerContent.color}
+      />
+
+      <Tabs defaultValue="daily" className="w-full" onValueChange={handleTabChange}>
+        <Tabs.List>
+          <Tabs.Trigger value="daily">Aujourd'hui</Tabs.Trigger>
+          <Tabs.Trigger value="insights">Insights</Tabs.Trigger>
+          <Tabs.Trigger value="progression">Progression</Tabs.Trigger>
+          <Tabs.Trigger value="history">Historique</Tabs.Trigger>
+        </Tabs.List>
+
+        <Tabs.Panel value="daily" className="mt-6">
+          <ActivityDailyTab />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="insights" className="mt-6">
+          <ActivityInsightsTab />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="progression" className="mt-6">
+          <ActivityProgressTab />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="history" className="mt-6">
+          <ActivityHistoryTab />
+        </Tabs.Panel>
+      </Tabs>
+    </motion.div>
+  )
+};
+
+export default ActivityPage;

@@ -1,0 +1,493 @@
+/**
+ * Projection Tab Styles - Visualisation de projection morphologique
+ * Optimisé pour ProjectionTab, ProjectionControlPanel, ProjectionMetricsDisplay
+ * VisionOS 26 Style - Mobile-first avec contrôles interactifs fluides
+ */
+
+/* =========================================
+   PROJECTION CONTROL PANEL - Main Container
+   ========================================= */
+
+.projection-control-panel {
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+.projection-control-header {
+  margin-bottom: 1.5rem;
+}
+
+.projection-control-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.projection-control-subtitle {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+/* =========================================
+   PARAMETER CONTROLS - Slider Groups
+   ========================================= */
+
+.projection-parameter-group {
+  margin-bottom: 1.5rem;
+}
+
+.projection-parameter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.projection-parameter-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+}
+
+.projection-parameter-status {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+/* =========================================
+   SLIDER CONTROLS - Interactive Range Input
+   ========================================= */
+
+.projection-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.projection-slider-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateZ(0);
+  contain: layout style;
+}
+
+.projection-slider-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.projection-slider-button:active:not(:disabled) {
+  transform: scale(0.95) translateZ(0);
+}
+
+.projection-slider-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   SLIDER VALUE DISPLAY
+   ========================================= */
+
+.projection-slider-value-container {
+  flex: 1;
+  text-align: center;
+}
+
+.projection-slider-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.projection-slider-value--green {
+  color: #4ADE80;
+}
+
+.projection-slider-value--blue {
+  color: #60A5FA;
+}
+
+.projection-slider-value--orange {
+  color: #FBBF24;
+}
+
+/* Progress bar visualization */
+.projection-slider-progress-bar {
+  width: 100%;
+  height: 0.375rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+  position: relative;
+}
+
+.projection-slider-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateZ(0);
+  position: relative;
+}
+
+.projection-slider-progress-fill--green {
+  background: linear-gradient(90deg, #22C55E, #4ADE80);
+}
+
+.projection-slider-progress-fill--blue {
+  background: linear-gradient(90deg, #3B82F6, #60A5FA);
+}
+
+.projection-slider-progress-fill--orange {
+  background: linear-gradient(90deg, #F59E0B, #FBBF24);
+}
+
+/* =========================================
+   SLIDER RANGE LABELS
+   ========================================= */
+
+.projection-slider-range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  padding: 0 0.25rem;
+}
+
+.projection-slider-range-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* =========================================
+   TIME PERIOD SELECTOR - Button Group
+   ========================================= */
+
+.projection-time-period-group {
+  margin-top: 1.5rem;
+}
+
+.projection-time-period-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.projection-time-period-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .projection-time-period-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.projection-time-period-button {
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateZ(0);
+  contain: layout style;
+}
+
+.projection-time-period-button--inactive {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.projection-time-period-button--inactive:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.projection-time-period-button--active {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, #8B5CF6 50%, transparent),
+    color-mix(in srgb, #8B5CF6 35%, transparent)
+  );
+  border: 2px solid #8B5CF6;
+  color: white;
+  box-shadow: 0 0 20px color-mix(in srgb, #8B5CF6 30%, transparent);
+}
+
+/* =========================================
+   PROJECTION METRICS DISPLAY
+   ========================================= */
+
+.projection-metrics-container {
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+.projection-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1rem;
+}
+
+/* =========================================
+   PROJECTION METRIC CARD
+   ========================================= */
+
+.projection-metric-card {
+  padding: 1.25rem;
+  border-radius: 1.25rem;
+  text-align: center;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  transform: translateZ(0);
+  contain: layout style;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.projection-metric-card:hover {
+  transform: translateY(-2px) translateZ(0);
+}
+
+.projection-metric-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.projection-metric-values {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.projection-metric-current {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  font-variant-numeric: tabular-nums;
+}
+
+.projection-metric-arrow {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.25rem;
+}
+
+.projection-metric-projected {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  font-variant-numeric: tabular-nums;
+}
+
+.projection-metric-change {
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  display: inline-block;
+}
+
+.projection-metric-change--positive {
+  background: color-mix(in srgb, #22C55E 15%, transparent);
+  color: #4ADE80;
+}
+
+.projection-metric-change--negative {
+  background: color-mix(in srgb, #EF4444 15%, transparent);
+  color: #F87171;
+}
+
+.projection-metric-change--neutral {
+  background: color-mix(in srgb, #6B7280 15%, transparent);
+  color: #9CA3AF;
+}
+
+/* =========================================
+   LOADING STATES
+   ========================================= */
+
+.projection-calculating-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  gap: 1rem;
+}
+
+.projection-calculating-spinner {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #8B5CF6;
+  animation: projection-spinner-rotate 0.8s linear infinite;
+}
+
+@keyframes projection-spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+
+.projection-calculating-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* =========================================
+   ERROR & EMPTY STATES
+   ========================================= */
+
+.projection-empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.projection-empty-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.projection-empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.projection-empty-description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+  max-width: 28rem;
+  margin: 0 auto 1.5rem;
+}
+
+.projection-empty-cta {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =========================================
+   MOBILE OPTIMIZATIONS
+   ========================================= */
+
+@media (max-width: 768px) {
+  .projection-control-panel,
+  .projection-metrics-container {
+    padding: 1.25rem;
+  }
+
+  .projection-slider-button {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .projection-slider-value {
+    font-size: 1.25rem;
+  }
+
+  .projection-metric-current {
+    font-size: 1.25rem;
+  }
+
+  .projection-metric-projected {
+    font-size: 1.5rem;
+  }
+
+  .projection-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .projection-calculating-overlay {
+    padding: 2rem 1rem;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION SUPPORT
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .projection-slider-progress-fill,
+  .projection-metric-card,
+  .projection-slider-button,
+  .projection-empty-cta {
+    transition: none;
+  }
+
+  .projection-calculating-spinner {
+    animation: none;
+    border-top-color: rgba(139, 92, 246, 0.5);
+  }
+
+  .projection-metric-card:hover {
+    transform: translateZ(0);
+  }
+}
+
+/* =========================================
+   PERFORMANCE OPTIMIZATIONS
+   ========================================= */
+
+.projection-control-panel,
+.projection-metrics-container,
+.projection-metric-card,
+.projection-slider-button {
+  isolation: isolate;
+}
+
+/* Low performance mode */
+.perf-low .projection-control-panel,
+.perf-low .projection-metrics-container,
+.perf-low .projection-metric-card {
+  backdrop-filter: blur(8px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+  box-shadow: none !important;
+}
+
+/* Ensure touch targets are at least 44x44px */
+@media (pointer: coarse) {
+  .projection-slider-button,
+  .projection-time-period-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
