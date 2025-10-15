@@ -372,16 +372,35 @@ export class CountryHealthEnrichmentService {
         );
 
       if (error) {
+        // Handle specific error cases gracefully
         if (error.code === 'PGRST205' || error.message?.includes('does not exist')) {
-          logger.warn('COUNTRY_HEALTH_SAVE', 'Table does not exist, skipping save', { country: data.country_name });
+          logger.warn('COUNTRY_HEALTH_SAVE', 'Table does not exist, skipping global save', { country: data.country_name });
           return;
         }
-        logger.error('COUNTRY_HEALTH_SAVE', 'Save failed', { error: error.message });
+
+        // 403 Forbidden - RLS issue, non-critical, data is cached in user profile
+        if (error.code === '42501' || error.message?.includes('policy')) {
+          logger.info('COUNTRY_HEALTH_SAVE', 'RLS prevented global save, data cached in user profile', {
+            country: data.country_name,
+            code: error.code
+          });
+          return;
+        }
+
+        // For other errors, log but don't throw - the data is still cached in user profile
+        logger.warn('COUNTRY_HEALTH_SAVE', 'Global save failed, continuing with user cache', {
+          error: error.message,
+          country: data.country_name
+        });
+      } else {
+        logger.info('COUNTRY_HEALTH_SAVE', 'Successfully saved to global cache', { country: data.country_name });
       }
     } catch (error) {
-      logger.error('COUNTRY_HEALTH_SAVE', 'Save exception', {
+      // Catch any unexpected errors but continue gracefully
+      logger.warn('COUNTRY_HEALTH_SAVE', 'Save exception, continuing with user cache', {
         error: error instanceof Error ? error.message : 'Unknown',
       });
+      // Don't re-throw - we want the enrichment to continue even if global save fails
     }
   }
 

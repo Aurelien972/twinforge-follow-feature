@@ -20,14 +20,77 @@ import type {
 const CACHE_DURATION_HOURS = 1;
 
 // Country coordinates for weather data (capital cities)
+// Comprehensive list including francophone countries and DOM-TOM
 const COUNTRY_COORDINATES: Record<string, { lat: number; lon: number; city: string }> = {
+  // France et DOM-TOM
   FR: { lat: 48.8566, lon: 2.3522, city: 'Paris' },
+  GP: { lat: 16.2650, lon: -61.5510, city: 'Basse-Terre' }, // Guadeloupe
+  MQ: { lat: 14.6415, lon: -61.0242, city: 'Fort-de-France' }, // Martinique
+  GF: { lat: 4.9227, lon: -52.3269, city: 'Cayenne' }, // Guyane
+  RE: { lat: -20.8823, lon: 55.4504, city: 'Saint-Denis' }, // Réunion
+  YT: { lat: -12.8275, lon: 45.1662, city: 'Mamoudzou' }, // Mayotte
+  PM: { lat: 46.7738, lon: -56.1815, city: 'Saint-Pierre' }, // Saint-Pierre-et-Miquelon
+  BL: { lat: 17.9000, lon: -62.8333, city: 'Gustavia' }, // Saint-Barthélemy
+  MF: { lat: 18.0731, lon: -63.0822, city: 'Marigot' }, // Saint-Martin
+  WF: { lat: -13.2829, lon: -176.1745, city: 'Mata-Utu' }, // Wallis-et-Futuna
+  PF: { lat: -17.5516, lon: -149.5585, city: 'Papeete' }, // Polynésie française
+  NC: { lat: -22.2758, lon: 166.4572, city: 'Nouméa' }, // Nouvelle-Calédonie
+
+  // Pays francophones d'Europe
+  BE: { lat: 50.8503, lon: 4.3517, city: 'Bruxelles' }, // Belgique
+  CH: { lat: 46.9480, lon: 7.4474, city: 'Berne' }, // Suisse
+  LU: { lat: 49.6116, lon: 6.1319, city: 'Luxembourg' }, // Luxembourg
+  MC: { lat: 43.7384, lon: 7.4246, city: 'Monaco' }, // Monaco
+
+  // Pays francophones d'Afrique
+  DZ: { lat: 36.7538, lon: 3.0588, city: 'Alger' }, // Algérie
+  MA: { lat: 34.0209, lon: -6.8416, city: 'Rabat' }, // Maroc
+  TN: { lat: 36.8065, lon: 10.1815, city: 'Tunis' }, // Tunisie
+  SN: { lat: 14.6928, lon: -17.4467, city: 'Dakar' }, // Sénégal
+  CI: { lat: 6.8270, lon: -5.2893, city: 'Yamoussoukro' }, // Côte d'Ivoire
+  CM: { lat: 3.8480, lon: 11.5021, city: 'Yaoundé' }, // Cameroun
+  CD: { lat: -4.3217, lon: 15.3125, city: 'Kinshasa' }, // RD Congo
+  CG: { lat: -4.2634, lon: 15.2429, city: 'Brazzaville' }, // Congo
+  GA: { lat: 0.4162, lon: 9.4673, city: 'Libreville' }, // Gabon
+  ML: { lat: 12.6392, lon: -8.0029, city: 'Bamako' }, // Mali
+  BJ: { lat: 6.4969, lon: 2.6289, city: 'Porto-Novo' }, // Bénin
+  NE: { lat: 13.5127, lon: 2.1128, city: 'Niamey' }, // Niger
+  BF: { lat: 12.3714, lon: -1.5197, city: 'Ouagadougou' }, // Burkina Faso
+  TG: { lat: 6.1256, lon: 1.2116, city: 'Lomé' }, // Togo
+  TD: { lat: 12.1348, lon: 15.0557, city: 'N\'Djamena' }, // Tchad
+  CF: { lat: 4.3947, lon: 18.5582, city: 'Bangui' }, // Centrafrique
+  GN: { lat: 9.6412, lon: -13.5784, city: 'Conakry' }, // Guinée
+  RW: { lat: -1.9536, lon: 30.0606, city: 'Kigali' }, // Rwanda
+  BI: { lat: -3.3614, lon: 29.3599, city: 'Bujumbura' }, // Burundi
+  DJ: { lat: 11.5721, lon: 43.1456, city: 'Djibouti' }, // Djibouti
+  MG: { lat: -18.8792, lon: 47.5079, city: 'Antananarivo' }, // Madagascar
+  MU: { lat: -20.1609, lon: 57.5012, city: 'Port-Louis' }, // Maurice
+  SC: { lat: -4.6796, lon: 55.4920, city: 'Victoria' }, // Seychelles
+  KM: { lat: -11.7172, lon: 43.2473, city: 'Moroni' }, // Comores
+
+  // Pays francophones d'Amérique et Caraïbes
+  CA: { lat: 45.4215, lon: -75.6972, city: 'Ottawa' }, // Canada
+  HT: { lat: 18.5944, lon: -72.3074, city: 'Port-au-Prince' }, // Haïti
+
+  // Pays francophones d'Asie/Moyen-Orient
+  LB: { lat: 33.8886, lon: 35.4955, city: 'Beyrouth' }, // Liban
+  VN: { lat: 21.0285, lon: 105.8542, city: 'Hanoï' }, // Vietnam
+  KH: { lat: 11.5564, lon: 104.9282, city: 'Phnom Penh' }, // Cambodge
+  LA: { lat: 17.9757, lon: 102.6331, city: 'Vientiane' }, // Laos
+
+  // Pays francophones d'Océanie (Vanuatu déjà couvert via PF, NC, WF)
+  VU: { lat: -17.7333, lon: 168.3273, city: 'Port-Vila' }, // Vanuatu
+
+  // Autres pays majeurs
   US: { lat: 38.9072, lon: -77.0369, city: 'Washington D.C.' },
   GB: { lat: 51.5074, lon: -0.1278, city: 'London' },
   DE: { lat: 52.5200, lon: 13.4050, city: 'Berlin' },
   ES: { lat: 40.4168, lon: -3.7038, city: 'Madrid' },
   IT: { lat: 41.9028, lon: 12.4964, city: 'Rome' },
-  CA: { lat: 45.4215, lon: -75.6972, city: 'Ottawa' },
+  PT: { lat: 38.7223, lon: -9.1393, city: 'Lisbonne' },
+  NL: { lat: 52.3676, lon: 4.9041, city: 'Amsterdam' },
+  AT: { lat: 48.2082, lon: 16.3738, city: 'Vienne' },
+  GR: { lat: 37.9838, lon: 23.7275, city: 'Athènes' },
   AU: { lat: -35.2809, lon: 149.1300, city: 'Canberra' },
   JP: { lat: 35.6762, lon: 139.6503, city: 'Tokyo' },
   CN: { lat: 39.9042, lon: 116.4074, city: 'Beijing' },
@@ -36,6 +99,36 @@ const COUNTRY_COORDINATES: Record<string, { lat: number; lon: number; city: stri
   MX: { lat: 19.4326, lon: -99.1332, city: 'Mexico City' },
   RU: { lat: 55.7558, lon: 37.6173, city: 'Moscow' },
   ZA: { lat: -25.7479, lon: 28.2293, city: 'Pretoria' },
+  AR: { lat: -34.6037, lon: -58.3816, city: 'Buenos Aires' },
+  CL: { lat: -33.4489, lon: -70.6693, city: 'Santiago' },
+  CO: { lat: 4.7110, lon: -74.0721, city: 'Bogotá' },
+  PE: { lat: -12.0464, lon: -77.0428, city: 'Lima' },
+  EG: { lat: 30.0444, lon: 31.2357, city: 'Le Caire' },
+  KE: { lat: -1.2921, lon: 36.8219, city: 'Nairobi' },
+  NG: { lat: 9.0765, lon: 7.3986, city: 'Abuja' },
+  ET: { lat: 9.0320, lon: 38.7469, city: 'Addis-Abeba' },
+  GH: { lat: 5.6037, lon: -0.1870, city: 'Accra' },
+  TH: { lat: 13.7563, lon: 100.5018, city: 'Bangkok' },
+  MY: { lat: 3.1390, lon: 101.6869, city: 'Kuala Lumpur' },
+  SG: { lat: 1.3521, lon: 103.8198, city: 'Singapour' },
+  ID: { lat: -6.2088, lon: 106.8456, city: 'Jakarta' },
+  PH: { lat: 14.5995, lon: 120.9842, city: 'Manille' },
+  KR: { lat: 37.5665, lon: 126.9780, city: 'Séoul' },
+  TR: { lat: 39.9334, lon: 32.8597, city: 'Ankara' },
+  SA: { lat: 24.7136, lon: 46.6753, city: 'Riyad' },
+  AE: { lat: 24.4539, lon: 54.3773, city: 'Abu Dhabi' },
+  IL: { lat: 31.7683, lon: 35.2137, city: 'Jérusalem' },
+  PL: { lat: 52.2297, lon: 21.0122, city: 'Varsovie' },
+  CZ: { lat: 50.0755, lon: 14.4378, city: 'Prague' },
+  HU: { lat: 47.4979, lon: 19.0402, city: 'Budapest' },
+  RO: { lat: 44.4268, lon: 26.1025, city: 'Bucarest' },
+  BG: { lat: 42.6977, lon: 23.3219, city: 'Sofia' },
+  SE: { lat: 59.3293, lon: 18.0686, city: 'Stockholm' },
+  NO: { lat: 59.9139, lon: 10.7522, city: 'Oslo' },
+  DK: { lat: 55.6761, lon: 12.5683, city: 'Copenhague' },
+  FI: { lat: 60.1699, lon: 24.9384, city: 'Helsinki' },
+  IE: { lat: 53.3498, lon: -6.2603, city: 'Dublin' },
+  NZ: { lat: -41.2865, lon: 174.7762, city: 'Wellington' },
 };
 
 /**
@@ -316,6 +409,20 @@ function calculateEnvironmentalExposure(airQuality: AirQualityData): Environment
 /**
  * Get cached geographic data or fetch new data
  */
+/**
+ * Get list of supported country codes
+ */
+export function getSupportedCountries(): string[] {
+  return Object.keys(COUNTRY_COORDINATES);
+}
+
+/**
+ * Check if a country is supported
+ */
+export function isCountrySupported(countryCode: string): boolean {
+  return countryCode in COUNTRY_COORDINATES;
+}
+
 export async function getGeographicData(
   userId: string,
   countryCode: string,
@@ -325,7 +432,12 @@ export async function getGeographicData(
   try {
     const coords = COUNTRY_COORDINATES[countryCode];
     if (!coords) {
-      throw new Error(`No coordinates found for country: ${countryCode}`);
+      logger.warn('GEOGRAPHIC_SERVICE', 'Country not supported for geographic data', {
+        countryCode,
+        userId,
+        supportedCountries: getSupportedCountries().length,
+      });
+      throw new Error(`Le pays "${countryCode}" n'est pas encore supporté pour les données géographiques. ${getSupportedCountries().length} pays disponibles.`);
     }
 
     const locationKey = `${countryCode}_${coords.city.replace(/\s/g, '')}`;
@@ -417,11 +529,22 @@ export async function getGeographicData(
       next_update_due: expiresAt.toISOString(),
     };
   } catch (error) {
-    logger.error('GEOGRAPHIC_SERVICE', 'Failed to get geographic data', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      userId,
-      countryCode,
-    });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+    // Check if it's an unsupported country error
+    if (errorMessage.includes('pas encore supporté')) {
+      logger.warn('GEOGRAPHIC_SERVICE', 'Unsupported country requested', {
+        error: errorMessage,
+        userId,
+        countryCode,
+      });
+    } else {
+      logger.error('GEOGRAPHIC_SERVICE', 'Failed to get geographic data', {
+        error: errorMessage,
+        userId,
+        countryCode,
+      });
+    }
     throw error;
   }
 }

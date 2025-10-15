@@ -27,6 +27,9 @@ export const GeographicTab: React.FC = () => {
 
   const hasCountry = !!profile?.country;
 
+  // Check if error is due to unsupported country
+  const isUnsupportedCountry = geoError?.message?.includes('pas encore supporté');
+
   if (!hasCountry) {
     return (
       <div className="space-y-6">
@@ -130,8 +133,45 @@ export const GeographicTab: React.FC = () => {
         </GlassCard>
       </motion.div>
 
-      {/* Error State */}
-      {geoError && (
+      {/* Error State - Unsupported Country */}
+      {geoError && isUnsupportedCountry && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <GlassCard className="p-6" style={{
+            background: 'rgba(245, 158, 11, 0.1)',
+            borderColor: 'rgba(245, 158, 11, 0.3)',
+          }}>
+            <div className="flex items-start gap-3">
+              <SpatialIcon Icon={ICONS.AlertTriangle} size={20} className="text-orange-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="text-orange-300 font-semibold mb-2">Pays non encore supporté</h3>
+                <p className="text-orange-200 text-sm mb-3">
+                  Les données géographiques ne sont pas encore disponibles pour <strong>{profile?.country}</strong>.
+                  Nous couvrons actuellement plus de 100 pays, incluant tous les pays francophones, DOM-TOM et pays majeurs.
+                </p>
+                <p className="text-orange-200 text-sm mb-4">
+                  Le contexte sanitaire local reste disponible ci-dessous. Les données météo et qualité de l'air seront ajoutées prochainement pour votre pays.
+                </p>
+                <button
+                  onClick={() => window.location.href = '/profile?tab=identity'}
+                  className="btn-glass text-sm px-4 py-2"
+                >
+                  <div className="flex items-center gap-2">
+                    <SpatialIcon Icon={ICONS.MapPin} size={14} />
+                    <span>Changer de pays</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </GlassCard>
+        </motion.div>
+      )}
+
+      {/* Error State - Other Errors */}
+      {geoError && !isUnsupportedCountry && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
