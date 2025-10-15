@@ -13,9 +13,6 @@ interface HealthCompletionBreakdown {
   familyHistory: number;
   vitalSigns: number;
   lifestyle: number;
-  vaccinations: number;
-  mentalHealth: number;
-  reproductiveHealth: number;
   emergencyContacts: number;
   overall: number;
 }
@@ -30,22 +27,28 @@ export function useHealthCompletion(health?: HealthProfileV2): HealthCompletionB
         familyHistory: 0,
         vitalSigns: 0,
         lifestyle: 0,
-        vaccinations: 0,
-        mentalHealth: 0,
-        reproductiveHealth: 0,
         emergencyContacts: 0,
         overall: 0,
       };
     }
 
-    // Calculate basic completion (bloodType, height_cm, weight_kg)
+    // Calculate basic completion (bloodType, height_cm, weight_kg, vaccinations, mental_health basics)
     const basicFields = [
       health.basic?.bloodType,
       health.basic?.height_cm,
       health.basic?.weight_kg,
     ];
+    let basicFieldsCount = basicFields.filter(Boolean).length;
+    let totalBasicFields = basicFields.length;
+
+    // Add vaccination status
+    if (health.vaccinations?.up_to_date !== undefined) {
+      basicFieldsCount++;
+      totalBasicFields++;
+    }
+
     const basicCompletion = Math.round(
-      (basicFields.filter(Boolean).length / basicFields.length) * 100
+      (basicFieldsCount / totalBasicFields) * 100
     );
 
     // Calculate medical history completion
@@ -90,15 +93,6 @@ export function useHealthCompletion(health?: HealthProfileV2): HealthCompletionB
       (lifestyleFields.filter(Boolean).length / lifestyleFields.length) * 100
     );
 
-    // Calculate vaccinations completion
-    const vaccinationsCompletion = health.vaccinations?.up_to_date !== undefined ? 100 : 0;
-
-    // Calculate mental health completion
-    const mentalHealthCompletion = health.mental_health?.conditions ? 50 : 0;
-
-    // Calculate reproductive health completion
-    const reproductiveHealthCompletion = health.reproductive_health?.menopause_status ? 50 : 0;
-
     // Calculate emergency contacts completion
     const emergencyContactsFields = [
       health.emergency_contact?.name,
@@ -128,9 +122,6 @@ export function useHealthCompletion(health?: HealthProfileV2): HealthCompletionB
       familyHistory: familyHistoryCompletion,
       vitalSigns: vitalSignsCompletion,
       lifestyle: lifestyleCompletion,
-      vaccinations: vaccinationsCompletion,
-      mentalHealth: mentalHealthCompletion,
-      reproductiveHealth: reproductiveHealthCompletion,
       emergencyContacts: emergencyContactsCompletion,
       overall: overallCompletion,
     };

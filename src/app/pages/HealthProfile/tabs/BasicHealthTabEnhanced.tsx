@@ -49,8 +49,8 @@ export const BasicHealthTabEnhanced: React.FC = () => {
                 <SpatialIcon Icon={ICONS.Scale} size={24} style={{ color: '#06B6D4' }} variant="pure" />
               </div>
               <div>
-                <h2 className="text-white font-bold text-xl">Informations de Base</h2>
-                <p className="text-white/70 text-sm">Groupe sanguin, taille, poids, IMC et conditions médicales</p>
+                <h2 className="text-white font-bold text-xl">Base</h2>
+                <p className="text-white/70 text-sm">Groupe sanguin, mensurations, vaccinations et conditions</p>
               </div>
             </div>
             <div className="text-right">
@@ -161,9 +161,9 @@ export const BasicHealthTabEnhanced: React.FC = () => {
             borderColor: 'rgba(6, 182, 212, 0.2)',
           }}>
             <div className="mb-6">
-              <h3 className="text-white font-semibold text-lg mb-2">Vos Mesures</h3>
+              <h3 className="text-white font-semibold text-lg mb-2">Données Essentielles</h3>
               <p className="text-white/60 text-sm">
-                Ces informations de base permettent de calculer votre IMC et d'adapter les recommandations de santé.
+                Ces informations permettent de calculer votre IMC et d'adapter les recommandations de médecine préventive.
               </p>
             </div>
 

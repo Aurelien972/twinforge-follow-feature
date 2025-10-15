@@ -53,7 +53,7 @@ export const VitalSignsTab: React.FC = () => {
                 <SpatialIcon Icon={ICONS.Activity} size={24} style={{ color: '#EF4444' }} variant="pure" />
               </div>
               <div>
-                <h2 className="text-white font-bold text-xl">Constantes Vitales</h2>
+                <h2 className="text-white font-bold text-xl">Vitales</h2>
                 <p className="text-white/70 text-sm">Tension, rythme cardiaque, glycémie</p>
               </div>
             </div>

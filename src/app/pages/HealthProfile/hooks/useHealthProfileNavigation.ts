@@ -9,13 +9,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 export type HealthProfileTab =
   | 'overview'
   | 'basic-info'
+  | 'lifestyle'
   | 'medical-history'
   | 'family-history'
-  | 'vital-signs'
-  | 'lifestyle'
-  | 'vaccinations'
-  | 'mental-health'
-  | 'reproductive-health';
+  | 'vital-signs';
 
 export interface TabConfig {
   id: HealthProfileTab;
@@ -29,7 +26,7 @@ export interface TabConfig {
 export const HEALTH_PROFILE_TABS: TabConfig[] = [
   {
     id: 'overview',
-    label: 'Vue d\'ensemble',
+    label: 'Vue',
     icon: 'LayoutDashboard',
     description: 'Tableau de bord et métriques clés',
     color: '#06B6D4',
@@ -37,15 +34,23 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
   },
   {
     id: 'basic-info',
-    label: 'Infos de Base',
+    label: 'Base',
     icon: 'Scale',
-    description: 'Groupe sanguin, taille, poids, IMC',
+    description: 'Groupe sanguin, mensurations, vaccinations',
     color: '#06B6D4',
     requiredForAI: true,
   },
   {
+    id: 'lifestyle',
+    label: 'Vie',
+    icon: 'Coffee',
+    description: 'Habitudes quotidiennes',
+    color: '#FF9800',
+    requiredForAI: true,
+  },
+  {
     id: 'medical-history',
-    label: 'Historique Médical',
+    label: 'Historique',
     icon: 'FileText',
     description: 'Conditions, traitements, interventions',
     color: '#EF4444',
@@ -53,51 +58,19 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
   },
   {
     id: 'family-history',
-    label: 'Antécédents Familiaux',
+    label: 'Famille',
     icon: 'Users',
-    description: 'Prédispositions génétiques',
-    color: '#8B5CF6',
+    description: 'Antécédents familiaux',
+    color: '#A855F7',
     requiredForAI: true,
   },
   {
     id: 'vital-signs',
-    label: 'Constantes Vitales',
+    label: 'Vitales',
     icon: 'Activity',
     description: 'Tension, fréquence cardiaque, glycémie',
-    color: '#F59E0B',
+    color: '#EF4444',
     requiredForAI: true,
-  },
-  {
-    id: 'lifestyle',
-    label: 'Style de Vie',
-    icon: 'Coffee',
-    description: 'Habitudes quotidiennes',
-    color: '#3B82F6',
-    requiredForAI: true,
-  },
-  {
-    id: 'vaccinations',
-    label: 'Vaccinations',
-    icon: 'Shield',
-    description: 'Carnet vaccinal et rappels',
-    color: '#14B8A6',
-    requiredForAI: false,
-  },
-  {
-    id: 'mental-health',
-    label: 'Santé Mentale',
-    icon: 'Brain',
-    description: 'Bien-être psychologique',
-    color: '#A855F7',
-    requiredForAI: false,
-  },
-  {
-    id: 'reproductive-health',
-    label: 'Santé Reproductive',
-    icon: 'Heart',
-    description: 'Données spécifiques cycle de vie',
-    color: '#EC4899',
-    requiredForAI: false,
   },
 ];
 
@@ -113,13 +86,10 @@ export function useHealthProfileNavigation() {
   const [completionByTab, setCompletionByTab] = useState<Record<HealthProfileTab, number>>({
     'overview': 100,
     'basic-info': 0,
+    'lifestyle': 0,
     'medical-history': 0,
     'family-history': 0,
     'vital-signs': 0,
-    'lifestyle': 0,
-    'vaccinations': 0,
-    'mental-health': 0,
-    'reproductive-health': 0,
   });
 
   const navigateToTab = useCallback((tabId: HealthProfileTab) => {

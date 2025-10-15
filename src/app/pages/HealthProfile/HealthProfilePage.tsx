@@ -46,13 +46,10 @@ const HealthProfilePage: React.FC = () => {
   React.useEffect(() => {
     if (completion) {
       updateTabCompletion('basic-info', completion.basicInfo || 0);
+      updateTabCompletion('lifestyle', completion.lifestyle);
       updateTabCompletion('medical-history', completion.medicalHistory);
       updateTabCompletion('family-history', completion.familyHistory);
       updateTabCompletion('vital-signs', completion.vitalSigns);
-      updateTabCompletion('lifestyle', completion.lifestyle);
-      updateTabCompletion('vaccinations', completion.vaccinations);
-      updateTabCompletion('mental-health', completion.mentalHealth);
-      updateTabCompletion('reproductive-health', completion.reproductiveHealth);
     }
   }, [completion, updateTabCompletion]);
 
@@ -301,8 +298,12 @@ const HealthProfilePage: React.FC = () => {
           <BasicHealthTabEnhanced />
         </Tabs.Panel>
 
+        <Tabs.Panel value="lifestyle">
+          <LifestyleTab />
+        </Tabs.Panel>
+
         <Tabs.Panel value="medical-history">
-          <PlaceholderTab title="Historique Médical" icon="FileText" />
+          <PlaceholderTab title="Historique" icon="FileText" />
         </Tabs.Panel>
 
         <Tabs.Panel value="family-history">
@@ -311,22 +312,6 @@ const HealthProfilePage: React.FC = () => {
 
         <Tabs.Panel value="vital-signs">
           <VitalSignsTab />
-        </Tabs.Panel>
-
-        <Tabs.Panel value="lifestyle">
-          <LifestyleTab />
-        </Tabs.Panel>
-
-        <Tabs.Panel value="vaccinations">
-          <PlaceholderTab title="Vaccinations" icon="Shield" />
-        </Tabs.Panel>
-
-        <Tabs.Panel value="mental-health">
-          <PlaceholderTab title="Santé Mentale" icon="Brain" />
-        </Tabs.Panel>
-
-        <Tabs.Panel value="reproductive-health">
-          <PlaceholderTab title="Santé Reproductive" icon="Heart" />
         </Tabs.Panel>
       </Tabs>
     </div>

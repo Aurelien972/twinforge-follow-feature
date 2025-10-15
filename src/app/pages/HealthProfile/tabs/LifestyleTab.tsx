@@ -54,7 +54,7 @@ export const LifestyleTab: React.FC = () => {
                 <SpatialIcon Icon={ICONS.Coffee} size={24} style={{ color: '#FF9800' }} variant="pure" />
               </div>
               <div>
-                <h2 className="text-white font-bold text-xl">Style de Vie</h2>
+                <h2 className="text-white font-bold text-xl">Vie</h2>
                 <p className="text-white/70 text-sm">Habitudes quotidiennes et facteurs de santé</p>
               </div>
             </div>

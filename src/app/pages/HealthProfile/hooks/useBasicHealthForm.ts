@@ -10,7 +10,15 @@ import { useUserStore } from '../../../../system/store/userStore';
 import { useToast } from '../../../../ui/components/ToastProvider';
 import { useFeedback } from '../../../../hooks/useFeedback';
 import logger from '../../../../lib/utils/logger';
-import { basicHealthSectionSchema, type BasicHealthSectionForm } from '../../Profile/validation/profileHealthValidationV2';
+import { z } from 'zod';
+import { basicHealthSectionSchema, vaccinationsSectionSchema, type BasicHealthSectionForm } from '../../Profile/validation/profileHealthValidationV2';
+
+// Extended schema to include vaccinations in Basic tab
+const extendedBasicHealthSchema = basicHealthSectionSchema.extend({
+  vaccinations: vaccinationsSectionSchema.optional(),
+});
+
+type ExtendedBasicHealthForm = z.infer<typeof extendedBasicHealthSchema>;
 import type { HealthProfileV2 } from '../../../../domain/health';
 
 export function useBasicHealthForm() {
@@ -22,13 +30,17 @@ export function useBasicHealthForm() {
   const healthV2 = (profile as any)?.health as HealthProfileV2 | undefined;
   const basicInfo = healthV2?.basic;
 
-  // Initialize form
-  const form = useForm<BasicHealthSectionForm>({
-    resolver: zodResolver(basicHealthSectionSchema),
+  // Initialize form with extended schema
+  const form = useForm<ExtendedBasicHealthForm>({
+    resolver: zodResolver(extendedBasicHealthSchema),
     defaultValues: {
       bloodType: basicInfo?.bloodType,
       height_cm: basicInfo?.height_cm,
       weight_kg: basicInfo?.weight_kg,
+      vaccinations: healthV2?.vaccinations ? {
+        up_to_date: healthV2.vaccinations.up_to_date,
+        records: healthV2.vaccinations.records || [],
+      } : undefined,
     },
     mode: 'onChange',
   });
@@ -52,11 +64,17 @@ export function useBasicHealthForm() {
   // Calculate completion percentage
   const completion = React.useMemo(() => {
     let filled = 0;
-    const total = 3; // bloodType, height_cm, weight_kg
+    let total = 3; // bloodType, height_cm, weight_kg
 
     if (watchedValues.bloodType) filled++;
     if (watchedValues.height_cm && watchedValues.height_cm > 0) filled++;
     if (watchedValues.weight_kg && watchedValues.weight_kg > 0) filled++;
+
+    // Add vaccination to completion if it exists
+    if (watchedValues.vaccinations?.up_to_date !== undefined) {
+      total++;
+      if (watchedValues.vaccinations.up_to_date) filled++;
+    }
 
     return Math.round((filled / total) * 100);
   }, [watchedValues]);
@@ -84,6 +102,7 @@ export function useBasicHealthForm() {
           ...currentHealth,
           version: '2.0' as const,
           basic: updatedBasic,
+          vaccinations: data.vaccinations || currentHealth?.vaccinations,
         },
         updated_at: new Date().toISOString(),
       });

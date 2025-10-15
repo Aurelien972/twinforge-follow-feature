@@ -54,8 +54,8 @@ export const FamilyHistoryTab: React.FC = () => {
                 <SpatialIcon Icon={ICONS.Users} size={24} style={{ color: '#A855F7' }} variant="pure" />
               </div>
               <div>
-                <h2 className="text-white font-bold text-xl">Antécédents Familiaux</h2>
-                <p className="text-white/70 text-sm">Historique génétique et prédispositions</p>
+                <h2 className="text-white font-bold text-xl">Famille</h2>
+                <p className="text-white/70 text-sm">Antécédents familiaux et prédispositions génétiques</p>
               </div>
             </div>
             <div className="text-right">

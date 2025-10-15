@@ -96,11 +96,11 @@ export const HealthScoreWidget: React.FC<HealthScoreWidgetProps> = ({ health, on
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-        <ScoreItem label="Base" value={score.basic} max={15} />
-        <ScoreItem label="Médical" value={score.medicalHistory} max={20} />
+        <ScoreItem label="Base" value={score.basic} max={20} />
+        <ScoreItem label="Vie" value={score.lifestyle} max={15} />
+        <ScoreItem label="Historique" value={score.medicalHistory} max={20} />
         <ScoreItem label="Famille" value={score.familyHistory} max={15} />
-        <ScoreItem label="Constantes" value={score.vitalSigns} max={20} />
-        <ScoreItem label="Style de vie" value={score.lifestyle} max={15} />
+        <ScoreItem label="Vitales" value={score.vitalSigns} max={20} />
         <ScoreItem label="Vaccins" value={score.vaccinations} max={5} />
       </div>
 

@@ -13,21 +13,17 @@ export interface HealthScoreBreakdown {
   vitalSigns: number;
   lifestyle: number;
   vaccinations: number;
-  mentalHealth: number;
-  reproductiveHealth: number;
   emergencyContacts: number;
   aiReadiness: number;
   maxScore: number;
 }
 
-const WEIGHT_BASIC = 15;
+const WEIGHT_BASIC = 20;
 const WEIGHT_MEDICAL_HISTORY = 20;
 const WEIGHT_FAMILY_HISTORY = 15;
 const WEIGHT_VITAL_SIGNS = 20;
 const WEIGHT_LIFESTYLE = 15;
 const WEIGHT_VACCINATIONS = 5;
-const WEIGHT_MENTAL_HEALTH = 5;
-const WEIGHT_REPRODUCTIVE_HEALTH = 5;
 const WEIGHT_EMERGENCY_CONTACTS = 5;
 
 const MAX_SCORE = 100;
@@ -50,9 +46,15 @@ function calculateBasicScore(health: HealthProfileV2): number {
     health.basic?.weight_kg,
   ];
 
+  // Basic fields (75% of basic score)
   fields.forEach(field => {
-    if (hasValue(field)) score += WEIGHT_BASIC / 3;
+    if (hasValue(field)) score += (WEIGHT_BASIC * 0.75) / 3;
   });
+
+  // Vaccinations (25% of basic score)
+  if (health.vaccinations?.up_to_date !== undefined) {
+    score += WEIGHT_BASIC * 0.25;
+  }
 
   return Math.min(score, WEIGHT_BASIC);
 }
@@ -162,45 +164,6 @@ function calculateVaccinationsScore(health: HealthProfileV2): number {
   return Math.min(score, WEIGHT_VACCINATIONS);
 }
 
-function calculateMentalHealthScore(health: HealthProfileV2): number {
-  if (!health.mental_health) return 0;
-
-  let score = 0;
-
-  if (hasValue(health.mental_health.conditions)) {
-    score += WEIGHT_MENTAL_HEALTH * 0.4;
-  }
-
-  if (typeof health.mental_health.therapy === 'boolean') {
-    score += WEIGHT_MENTAL_HEALTH * 0.3;
-  }
-
-  if (hasValue(health.mental_health.medications)) {
-    score += WEIGHT_MENTAL_HEALTH * 0.3;
-  }
-
-  return Math.min(score, WEIGHT_MENTAL_HEALTH);
-}
-
-function calculateReproductiveHealthScore(health: HealthProfileV2): number {
-  if (!health.reproductive_health) return 0;
-
-  let score = 0;
-
-  if (typeof health.reproductive_health.menstrual_cycle_regular === 'boolean') {
-    score += WEIGHT_REPRODUCTIVE_HEALTH * 0.3;
-  }
-
-  if (hasValue(health.reproductive_health.menopause_status)) {
-    score += WEIGHT_REPRODUCTIVE_HEALTH * 0.3;
-  }
-
-  if (hasValue(health.reproductive_health.pregnancy_history)) {
-    score += WEIGHT_REPRODUCTIVE_HEALTH * 0.4;
-  }
-
-  return Math.min(score, WEIGHT_REPRODUCTIVE_HEALTH);
-}
 
 function calculateEmergencyContactsScore(health: HealthProfileV2): number {
   let score = 0;
@@ -226,8 +189,6 @@ export function calculateHealthScore(health: HealthProfileV2 | null | undefined)
       vitalSigns: 0,
       lifestyle: 0,
       vaccinations: 0,
-      mentalHealth: 0,
-      reproductiveHealth: 0,
       emergencyContacts: 0,
       aiReadiness: 0,
       maxScore: MAX_SCORE,
@@ -240,8 +201,6 @@ export function calculateHealthScore(health: HealthProfileV2 | null | undefined)
   const vitalSigns = calculateVitalSignsScore(health);
   const lifestyle = calculateLifestyleScore(health);
   const vaccinations = calculateVaccinationsScore(health);
-  const mentalHealth = calculateMentalHealthScore(health);
-  const reproductiveHealth = calculateReproductiveHealthScore(health);
   const emergencyContacts = calculateEmergencyContactsScore(health);
 
   const total = Math.round(
@@ -251,8 +210,6 @@ export function calculateHealthScore(health: HealthProfileV2 | null | undefined)
     vitalSigns +
     lifestyle +
     vaccinations +
-    mentalHealth +
-    reproductiveHealth +
     emergencyContacts
   );
 
@@ -267,8 +224,6 @@ export function calculateHealthScore(health: HealthProfileV2 | null | undefined)
     vitalSigns: Math.round(vitalSigns),
     lifestyle: Math.round(lifestyle),
     vaccinations: Math.round(vaccinations),
-    mentalHealth: Math.round(mentalHealth),
-    reproductiveHealth: Math.round(reproductiveHealth),
     emergencyContacts: Math.round(emergencyContacts),
     aiReadiness,
     maxScore: MAX_SCORE,
