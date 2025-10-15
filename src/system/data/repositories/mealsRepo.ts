@@ -115,10 +115,19 @@ export interface MealData {
   created_at?: string;
 }
 
+export interface ScannedProductData {
+  barcode: string;
+  name: string;
+  brand?: string;
+  mealItem: MealItem;
+  portionMultiplier: number;
+}
+
 export interface MealAnalysisRequest {
   user_id: string;
   image_url?: string;
   image_data?: string;
+  scanned_products?: ScannedProductData[];
   meal_type?: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   timestamp?: string;
   user_profile_context?: UserProfileContext;
@@ -258,14 +267,27 @@ export const mealsRepo = {
         hasData: !!data,
         hasError: !!error,
         errorMessage: error?.message,
+        errorContext: error?.context,
+        errorName: error?.name,
+        errorStack: error?.stack,
+        fullError: error ? JSON.stringify(error, null, 2) : 'null',
         dataSuccess: data?.success,
+        dataKeys: data ? Object.keys(data) : [],
+        dataPreview: data ? JSON.stringify(data).substring(0, 500) + '...' : 'null',
         timestamp: new Date().toISOString()
       });
 
       if (error) {
-        logger.error('MEALS_REPO', 'Meal analysis edge function error', {
-          error: error.message,
+        logger.error('MEALS_REPO', 'Meal analysis edge function error - CRITICAL DEBUG', {
+          errorType: typeof error,
+          errorConstructor: error?.constructor?.name,
+          errorMessage: error.message,
           errorContext: error.context,
+          errorName: error.name,
+          errorStack: error.stack,
+          fullErrorObject: JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
+          allErrorKeys: Object.keys(error),
+          allErrorValues: Object.values(error),
           userId: request.user_id,
           hasUserContext: !!request.user_profile_context,
           hasScannedProducts: !!(request.scanned_products && request.scanned_products.length > 0),
