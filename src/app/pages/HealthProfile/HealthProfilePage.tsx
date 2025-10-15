@@ -17,8 +17,8 @@ import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import PageHeader from '../../../ui/page/PageHeader';
 import Tabs from '../../../ui/tabs/TabsComponent';
-import { HealthOverviewTab } from './tabs/HealthOverviewTab';
 import { BasicHealthTabEnhancedV2 } from './tabs/BasicHealthTabEnhancedV2';
+import { FamilyHistoryTab } from './tabs/FamilyHistoryTab';
 import { VitalSignsTab } from './tabs/VitalSignsTab';
 import { LifestyleTab } from './tabs/LifestyleTab';
 import { IntimacyTab } from './tabs/IntimacyTab';
@@ -46,9 +46,8 @@ const HealthProfilePage: React.FC = () => {
   // Update tab completion percentages when data changes
   React.useEffect(() => {
     if (completion) {
-      // Include family history in basic-info now
-      const basicInfoCompletion = ((completion.basicInfo || 0) + completion.familyHistory) / 2;
-      updateTabCompletion('basic-info', basicInfoCompletion);
+      updateTabCompletion('basic-info', completion.basicInfo);
+      updateTabCompletion('family-history', completion.familyHistory);
       updateTabCompletion('lifestyle', completion.lifestyle);
       updateTabCompletion('intimacy', completion.intimacy || 0);
       updateTabCompletion('vital-signs', completion.vitalSigns);
@@ -286,7 +285,7 @@ const HealthProfilePage: React.FC = () => {
       )}
 
       <Tabs
-        defaultValue="overview"
+        defaultValue="basic-info"
         className="w-full min-w-0 health-profile-tabs"
         forgeContext="health"
       >
@@ -298,12 +297,12 @@ const HealthProfilePage: React.FC = () => {
           ))}
         </Tabs.List>
 
-        <Tabs.Panel value="overview">
-          <HealthOverviewTab />
-        </Tabs.Panel>
-
         <Tabs.Panel value="basic-info">
           <BasicHealthTabEnhancedV2 />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="family-history">
+          <FamilyHistoryTab />
         </Tabs.Panel>
 
         <Tabs.Panel value="lifestyle">
@@ -314,12 +313,12 @@ const HealthProfilePage: React.FC = () => {
           <IntimacyTab />
         </Tabs.Panel>
 
-        <Tabs.Panel value="geographic">
-          <GeographicTab />
-        </Tabs.Panel>
-
         <Tabs.Panel value="vital-signs">
           <VitalSignsTab />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="geographic">
+          <GeographicTab />
         </Tabs.Panel>
       </Tabs>
     </div>

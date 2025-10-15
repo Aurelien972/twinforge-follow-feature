@@ -17,7 +17,6 @@ import { VaccinationsSection } from '../components/VaccinationsSection';
 import { MedicalConditionsCard } from '../components/MedicalConditionsCard';
 import { CurrentMedicationsCard } from '../components/CurrentMedicationsCard';
 import { AllergiesSection } from '../components/AllergiesSection';
-import { FamilyHistorySection } from '../../Profile/components/health/FamilyHistorySection';
 import { useUserStore } from '../../../../system/store/userStore';
 import { useCountryHealthData } from '../hooks/useCountryHealthData';
 import { useVaccinationsForm } from '../hooks/useVaccinationsForm';
@@ -31,16 +30,6 @@ import type { HealthProfileV2 } from '../../../../domain/health';
 // Schema for the comprehensive health form
 const comprehensiveHealthSchema = z.object({
   bloodType: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
-  medical_history: z.object({
-    family_history: z.object({
-      cardiovascular: z.boolean().optional(),
-      diabetes: z.boolean().optional(),
-      cancer: z.array(z.string()).optional(),
-      hypertension: z.boolean().optional(),
-      alzheimers: z.boolean().optional(),
-      genetic_conditions: z.array(z.string()).optional(),
-    }).optional(),
-  }).optional(),
 });
 
 type ComprehensiveHealthForm = z.infer<typeof comprehensiveHealthSchema>;
@@ -65,33 +54,23 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
   // Allergies hook
   const allergies = useAllergiesForm();
 
-  // Main form for blood type and family history
+  // Main form for blood type
   const form = useForm<ComprehensiveHealthForm>({
     resolver: zodResolver(comprehensiveHealthSchema),
     defaultValues: {
       bloodType: healthV2?.basic?.bloodType,
-      medical_history: {
-        family_history: {
-          cardiovascular: healthV2?.medical_history?.family_history?.cardiovascular,
-          diabetes: healthV2?.medical_history?.family_history?.diabetes,
-          cancer: healthV2?.medical_history?.family_history?.cancer || [],
-          hypertension: healthV2?.medical_history?.family_history?.hypertension,
-          alzheimers: healthV2?.medical_history?.family_history?.alzheimers,
-          genetic_conditions: healthV2?.medical_history?.family_history?.genetic_conditions || [],
-        },
-      },
     },
     mode: 'onChange',
   });
 
-  const { register, handleSubmit, formState, watch, setValue } = form;
+  const { register, handleSubmit, formState, watch } = form;
   const { errors, isDirty } = formState;
   const watchedValues = watch();
 
   // Calculate overall completion
   const completion = React.useMemo(() => {
     let filled = 0;
-    let total = 5; // blood type, vaccinations, conditions/meds, allergies, family history
+    let total = 4; // blood type, vaccinations, conditions/meds, allergies
 
     // Blood type
     if (watchedValues.bloodType) filled++;
@@ -105,28 +84,14 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
     // Allergies
     if (allergies.allergies.length > 0) filled++;
 
-    // Family history - check if at least one field is filled
-    const familyHistory = watchedValues.medical_history?.family_history;
-    if (
-      familyHistory?.cardiovascular ||
-      familyHistory?.diabetes ||
-      familyHistory?.hypertension ||
-      familyHistory?.alzheimers ||
-      (familyHistory?.cancer && familyHistory.cancer.length > 0) ||
-      (familyHistory?.genetic_conditions && familyHistory.genetic_conditions.length > 0)
-    ) {
-      filled++;
-    }
-
     return Math.round((filled / total) * 100);
   }, [watchedValues, vaccinations, medicalConditions, allergies]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      logger.info('HEALTH_PROFILE', 'Saving comprehensive health info', {
+      logger.info('HEALTH_PROFILE', 'Saving basic health info', {
         userId: profile?.userId,
         hasBloodType: !!data.bloodType,
-        hasFamilyHistory: !!data.medical_history?.family_history,
       });
 
       const currentHealth = (profile as any)?.health as HealthProfileV2 | undefined;
@@ -138,12 +103,6 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
           basic: {
             ...currentHealth?.basic,
             bloodType: data.bloodType,
-          },
-          medical_history: {
-            ...currentHealth?.medical_history,
-            conditions: currentHealth?.medical_history?.conditions || [],
-            medications: currentHealth?.medical_history?.medications || [],
-            family_history: data.medical_history?.family_history,
           },
         },
         updated_at: new Date().toISOString(),
@@ -181,10 +140,10 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
       >
         <GlassCard className="p-6" style={{
           background: `
-            radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.12) 0%, transparent 60%),
             var(--glass-opacity)
           `,
-          borderColor: 'rgba(6, 182, 212, 0.3)',
+          borderColor: 'rgba(239, 68, 68, 0.3)',
         }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -193,17 +152,17 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
+                    linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2))
                   `,
-                  border: '2px solid rgba(6, 182, 212, 0.5)',
-                  boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
+                  border: '2px solid rgba(239, 68, 68, 0.5)',
+                  boxShadow: '0 0 30px rgba(239, 68, 68, 0.4)',
                 }}
               >
-                <SpatialIcon Icon={ICONS.Heart} size={24} style={{ color: '#06B6D4' }} variant="pure" />
+                <SpatialIcon Icon={ICONS.Scale} size={24} style={{ color: '#EF4444' }} variant="pure" />
               </div>
               <div>
                 <h2 className="text-white font-bold text-xl">Base</h2>
-                <p className="text-white/70 text-sm">Informations médicales essentielles et antécédents familiaux</p>
+                <p className="text-white/70 text-sm">Informations médicales essentielles</p>
               </div>
             </div>
             <div className="text-right">
@@ -211,8 +170,8 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
                 <div
                   className="w-3 h-3 rounded-full"
                   style={{
-                    background: '#06B6D4',
-                    boxShadow: '0 0 8px rgba(6, 182, 212, 0.6)',
+                    background: '#EF4444',
+                    boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)',
                   }}
                 />
                 <span className="text-white font-bold text-lg">{completion}%</span>
@@ -227,8 +186,8 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
               <motion.div
                 className="h-3 rounded-full relative overflow-hidden"
                 style={{
-                  background: 'linear-gradient(90deg, #06B6D4, rgba(6, 182, 212, 0.8))',
-                  boxShadow: '0 0 12px rgba(6, 182, 212, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)',
+                  background: 'linear-gradient(90deg, #EF4444, rgba(239, 68, 68, 0.8))',
+                  boxShadow: '0 0 12px rgba(239, 68, 68, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)',
                 }}
                 initial={{ width: 0 }}
                 animate={{ width: `${completion}%` }}
@@ -302,42 +261,6 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
         onAddMedication={medicalConditions.addMedication}
         onRemoveMedication={medicalConditions.removeMedication}
       />
-
-      {/* Family History Section */}
-      <GlassCard className="p-6" style={{
-        background: `
-          radial-gradient(circle at 30% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 60%),
-          var(--glass-opacity)
-        `,
-        borderColor: 'rgba(168, 85, 247, 0.2)',
-      }}>
-        <div className="flex items-center gap-3 mb-6">
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{
-              background: `
-                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.2))
-              `,
-              border: '2px solid rgba(168, 85, 247, 0.5)',
-              boxShadow: '0 0 30px rgba(168, 85, 247, 0.4)',
-            }}
-          >
-            <SpatialIcon Icon={ICONS.Users} size={24} style={{ color: '#A855F7' }} variant="pure" />
-          </div>
-          <div>
-            <h3 className="text-white font-semibold text-xl">Antécédents Familiaux</h3>
-            <p className="text-white/70 text-sm">Historique médical de la famille</p>
-          </div>
-        </div>
-
-        <FamilyHistorySection
-          register={register}
-          errors={errors}
-          watch={watch}
-          setValue={setValue}
-        />
-      </GlassCard>
 
       {/* Save button for conditions and medications */}
       {medicalConditions.isDirty && (

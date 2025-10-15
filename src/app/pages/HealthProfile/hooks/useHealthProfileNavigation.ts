@@ -7,8 +7,8 @@ import { useState, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export type HealthProfileTab =
-  | 'overview'
   | 'basic-info'
+  | 'family-history'
   | 'lifestyle'
   | 'intimacy'
   | 'geographic'
@@ -25,19 +25,19 @@ export interface TabConfig {
 
 export const HEALTH_PROFILE_TABS: TabConfig[] = [
   {
-    id: 'overview',
-    label: 'Vue',
-    icon: 'LayoutDashboard',
-    description: 'Tableau de bord et métriques clés',
-    color: '#EF4444',
-    requiredForAI: false,
-  },
-  {
     id: 'basic-info',
     label: 'Base',
     icon: 'Scale',
-    description: 'Groupe sanguin, mensurations, vaccinations, famille',
-    color: '#06B6D4',
+    description: 'Groupe sanguin, mensurations, vaccinations',
+    color: '#EF4444',
+    requiredForAI: true,
+  },
+  {
+    id: 'family-history',
+    label: 'Famille',
+    icon: 'Users',
+    description: 'Antécédents familiaux et prédispositions génétiques',
+    color: '#A855F7',
     requiredForAI: true,
   },
   {
@@ -80,12 +80,12 @@ export function useHealthProfileNavigation() {
 
   const activeTab = useMemo<HealthProfileTab>(() => {
     const hash = location.hash.replace('#', '') as HealthProfileTab;
-    return HEALTH_PROFILE_TABS.find(tab => tab.id === hash)?.id || 'overview';
+    return HEALTH_PROFILE_TABS.find(tab => tab.id === hash)?.id || 'basic-info';
   }, [location.hash]);
 
   const [completionByTab, setCompletionByTab] = useState<Record<HealthProfileTab, number>>({
-    'overview': 100,
     'basic-info': 0,
+    'family-history': 0,
     'lifestyle': 0,
     'intimacy': 0,
     'geographic': 0,

@@ -93,27 +93,18 @@ export const IntimacyTab: React.FC = () => {
                 <p className="text-white/70 text-sm">Santé sexuelle et reproductive</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{
-                background: 'rgba(236, 72, 153, 0.15)',
-                border: '1px solid rgba(236, 72, 153, 0.3)',
-              }}>
-                <div className="w-2 h-2 rounded-full bg-pink-400" />
-                <span className="text-pink-300 text-sm font-medium">Confidentiel</span>
+            <div className="text-right">
+              <div className="flex items-center gap-2 mb-1">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{
+                    background: '#EC4899',
+                    boxShadow: '0 0 8px rgba(236, 72, 153, 0.6)',
+                  }}
+                />
+                <span className="text-white font-bold text-lg">{state.completion}%</span>
               </div>
-              <div className="text-right">
-                <div className="flex items-center gap-2 mb-1">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{
-                      background: '#EC4899',
-                      boxShadow: '0 0 8px rgba(236, 72, 153, 0.6)',
-                    }}
-                  />
-                  <span className="text-white font-bold text-lg">{state.completion}%</span>
-                </div>
-                <span className="text-white/60 text-xs">Complété</span>
-              </div>
+              <span className="text-white/60 text-xs">Complété</span>
             </div>
           </div>
 
@@ -129,18 +120,6 @@ export const IntimacyTab: React.FC = () => {
                 animate={{ width: `${state.completion}%` }}
                 transition={{ duration: 1.2, ease: 'easeOut' }}
               />
-            </div>
-          </div>
-
-          <div className="p-4 rounded-xl bg-pink-500/10 border border-pink-400/20">
-            <div className="flex items-start gap-3">
-              <SpatialIcon Icon={ICONS.Lock} size={18} className="text-pink-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-pink-200 text-sm leading-relaxed">
-                  Toutes les informations de cette section sont strictement confidentielles et protégées.
-                  Elles permettent de personnaliser les recommandations médicales préventives.
-                </p>
-              </div>
             </div>
           </div>
         </GlassCard>
