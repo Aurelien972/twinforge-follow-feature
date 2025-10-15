@@ -899,13 +899,63 @@ Deno.serve(async (req: Request) => {
     let fallbackUsed = false;
     let fallbackReason: string | undefined;
 
-    if (imageDataForAnalysis) {
+    // Check if we ONLY have scanned products (no photo)
+    const hasScannedProducts = requestBody.scanned_products && requestBody.scanned_products.length > 0;
+    const hasPhoto = !!imageDataForAnalysis;
+
+    if (hasPhoto) {
+      // We have a photo, analyze it with AI
       const apiResult = await callOpenAIVisionWithRetry(imageDataForAnalysis, requestBody.user_profile_context);
       analysisResult = apiResult.result;
       tokenUsage = apiResult.tokenUsage;
       aiModel = apiResult.aiModel;
       fallbackUsed = apiResult.fallbackUsed;
       fallbackReason = apiResult.fallbackReason;
+    } else if (hasScannedProducts) {
+      // ONLY scanned products, no photo - skip AI analysis entirely
+      console.log('MEAL_ANALYZER', 'Only scanned products provided, skipping AI analysis', {
+        analysisId,
+        scannedProductsCount: requestBody.scanned_products.length,
+        products: requestBody.scanned_products.map(p => ({ barcode: p.barcode, name: p.name })),
+        timestamp: new Date().toISOString()
+      });
+
+      // Build meal name from products
+      const productNames = requestBody.scanned_products.map(p => p.name).slice(0, 3).join(', ');
+      const mealName = requestBody.scanned_products.length <= 3
+        ? productNames
+        : `${productNames}...`;
+
+      analysisResult = {
+        meal_name: mealName,
+        detected_foods: [],
+        confidence: 1.0, // High confidence for scanned barcodes
+        analysis_metadata: {
+          processing_time_ms: 0,
+          model_version: 'barcode-only',
+          quality_score: 1.0,
+          image_quality: 0,
+          ai_model_used: 'barcode-scan',
+          fallback_used: false,
+        },
+        personalized_insights: [{
+          type: 'insight',
+          category: 'nutrition',
+          message: 'Produits scannés directement depuis les codes-barres',
+          reasoning: 'Données nutritionnelles précises issues de la base OpenFoodFacts',
+          priority: 'low',
+        }],
+        objective_alignment: {
+          calories_vs_target: 1.0,
+          macros_balance: {
+            proteins_status: 'optimal' as const,
+            carbs_status: 'optimal' as const,
+            fats_status: 'optimal' as const,
+          },
+        },
+        ai_powered: false,
+      };
+      aiModel = 'barcode-scan';
     }
 
     const processingTime = Date.now() - startTime;
@@ -913,15 +963,16 @@ Deno.serve(async (req: Request) => {
     // Combine scanned products with AI-detected foods
     let allDetectedFoods: DetectedFood[] = [...(analysisResult.detected_foods || [])];
 
-    if (requestBody.scanned_products && requestBody.scanned_products.length > 0) {
-      console.log('MEAL_ANALYZER', 'Adding scanned products to analysis', {
+    if (hasScannedProducts) {
+      console.log('MEAL_ANALYZER', 'Adding scanned products to detected foods', {
         analysisId,
-        scannedProductsCount: requestBody.scanned_products.length,
-        products: requestBody.scanned_products.map(p => ({ barcode: p.barcode, name: p.name })),
+        scannedProductsCount: requestBody.scanned_products!.length,
+        products: requestBody.scanned_products!.map(p => ({ barcode: p.barcode, name: p.name })),
+        aiDetectedFoodsCount: analysisResult.detected_foods?.length || 0,
         timestamp: new Date().toISOString()
       });
 
-      const scannedFoods: DetectedFood[] = requestBody.scanned_products.map(p => p.mealItem);
+      const scannedFoods: DetectedFood[] = requestBody.scanned_products!.map(p => p.mealItem);
       allDetectedFoods = [...allDetectedFoods, ...scannedFoods];
     }
 

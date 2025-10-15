@@ -155,7 +155,7 @@ const MealScanFlowPage: React.FC = () => {
     success,
     errorSound,
     queryClient,
-    onAIError: (error: string) => {
+    onAnalysisError: (error: string) => {
       setScanFlowState(prev => ({ ...prev, analysisError: error }));
       showToast(`Erreur d'analyse: ${error}`, 'error');
       errorSound();
