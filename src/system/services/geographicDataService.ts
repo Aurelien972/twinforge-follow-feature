@@ -6,6 +6,7 @@
 
 import { supabase } from '../supabase/client';
 import logger from '../../lib/utils/logger';
+import { weatherProviderManager } from './weatherProviders/weatherProviderManager';
 import type {
   GeographicData,
   GeographicDataCache,
@@ -186,54 +187,36 @@ function getAQIRecommendations(level: AirQualityLevel): string[] {
 }
 
 /**
- * Fetch weather data from Open-Meteo API
+ * Fetch weather data using multi-provider system with automatic fallback
+ * Prioritizes Météo-France for French territories, falls back to Open-Meteo
  */
-async function fetchWeatherData(lat: number, lon: number): Promise<WeatherData> {
+async function fetchWeatherData(
+  countryCode: string,
+  lat: number,
+  lon: number
+): Promise<WeatherData & { provider?: string }> {
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m&timezone=auto`;
+    const { data, provider } = await weatherProviderManager.fetchWeather(
+      countryCode,
+      lat,
+      lon
+    );
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Open-Meteo API error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const current = data.current;
-
-    // Map weather codes to descriptions
-    const weatherDescriptions: Record<number, string> = {
-      0: 'Dégagé',
-      1: 'Principalement dégagé',
-      2: 'Partiellement nuageux',
-      3: 'Couvert',
-      45: 'Brouillard',
-      48: 'Brouillard givrant',
-      51: 'Bruine légère',
-      53: 'Bruine modérée',
-      55: 'Bruine dense',
-      61: 'Pluie légère',
-      63: 'Pluie modérée',
-      65: 'Pluie forte',
-      71: 'Chute de neige légère',
-      73: 'Chute de neige modérée',
-      75: 'Chute de neige forte',
-      95: 'Orage',
-    };
+    logger.info('GEOGRAPHIC_SERVICE', 'Weather data fetched successfully', {
+      provider,
+      countryCode,
+      lat,
+      lon,
+    });
 
     return {
-      temperature_celsius: current.temperature_2m,
-      feels_like_celsius: current.apparent_temperature,
-      humidity_percent: current.relative_humidity_2m,
-      wind_speed_ms: current.wind_speed_10m,
-      wind_direction: current.wind_direction_10m,
-      precipitation_mm: current.precipitation,
-      cloud_cover_percent: current.cloud_cover,
-      weather_condition: weatherDescriptions[current.weather_code] || 'Inconnu',
-      last_updated: new Date().toISOString(),
+      ...data,
+      provider,
     };
   } catch (error) {
-    logger.error('GEOGRAPHIC_SERVICE', 'Failed to fetch weather data', {
+    logger.error('GEOGRAPHIC_SERVICE', 'Failed to fetch weather data from all providers', {
       error: error instanceof Error ? error.message : 'Unknown error',
+      countryCode,
       lat,
       lon,
     });
@@ -242,52 +225,60 @@ async function fetchWeatherData(lat: number, lon: number): Promise<WeatherData> 
 }
 
 /**
- * Fetch air quality data from Open-Meteo Air Quality API
+ * Fetch air quality data using multi-provider system with automatic fallback
  */
-async function fetchAirQualityData(lat: number, lon: number): Promise<AirQualityData> {
+async function fetchAirQualityData(
+  countryCode: string,
+  lat: number,
+  lon: number
+): Promise<AirQualityData> {
   try {
-    const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=european_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone&timezone=auto`;
+    const { data, provider } = await weatherProviderManager.fetchAirQuality(
+      countryCode,
+      lat,
+      lon
+    );
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Open-Meteo Air Quality API error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const current = data.current;
-
-    const aqi = current.european_aqi || 50;
+    const aqi = data.aqi;
     const level = getAQILevel(aqi);
 
     // Determine dominant pollutant
     const pollutants = {
-      'PM2.5': current.pm2_5,
-      'PM10': current.pm10,
-      'CO': current.carbon_monoxide,
-      'NO2': current.nitrogen_dioxide,
-      'O3': current.ozone,
-      'SO2': current.sulphur_dioxide,
+      'PM2.5': data.pm2_5,
+      'PM10': data.pm10,
+      'CO': data.co,
+      'NO2': data.no2,
+      'O3': data.o3,
+      'SO2': data.so2,
     };
     const dominant = Object.entries(pollutants)
       .filter(([, value]) => value !== undefined && value > 0)
       .sort(([, a], [, b]) => (b || 0) - (a || 0))[0]?.[0] || 'PM2.5';
 
+    logger.info('GEOGRAPHIC_SERVICE', 'Air quality data fetched successfully', {
+      provider,
+      countryCode,
+      aqi,
+      level,
+    });
+
     return {
       aqi,
       level,
-      pm2_5: current.pm2_5,
-      pm10: current.pm10,
-      co: current.carbon_monoxide,
-      no2: current.nitrogen_dioxide,
-      o3: current.ozone,
-      so2: current.sulphur_dioxide,
+      pm2_5: data.pm2_5,
+      pm10: data.pm10,
+      co: data.co,
+      no2: data.no2,
+      o3: data.o3,
+      so2: data.so2,
       dominant_pollutant: dominant,
       health_recommendations: getAQIRecommendations(level),
       last_updated: new Date().toISOString(),
     };
   } catch (error) {
-    logger.error('GEOGRAPHIC_SERVICE', 'Failed to fetch air quality data', {
+    logger.error('GEOGRAPHIC_SERVICE', 'Failed to fetch air quality data from all providers', {
       error: error instanceof Error ? error.message : 'Unknown error',
+      countryCode,
       lat,
       lon,
     });
@@ -478,11 +469,12 @@ export async function getGeographicData(
       userId,
       countryCode,
       city: coords.city,
+      availableProviders: weatherProviderManager.getAvailableProviders(countryCode),
     });
 
     const [weather, airQuality] = await Promise.all([
-      fetchWeatherData(coords.lat, coords.lon),
-      fetchAirQualityData(coords.lat, coords.lon),
+      fetchWeatherData(countryCode, coords.lat, coords.lon),
+      fetchAirQualityData(countryCode, coords.lat, coords.lon),
     ]);
 
     const environmentalExposure = calculateEnvironmentalExposure(airQuality);

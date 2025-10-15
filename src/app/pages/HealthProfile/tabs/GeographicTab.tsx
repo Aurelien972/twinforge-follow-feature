@@ -150,7 +150,7 @@ export const GeographicTab: React.FC = () => {
                 <h3 className="text-orange-300 font-semibold mb-2">Pays non encore supporté</h3>
                 <p className="text-orange-200 text-sm mb-3">
                   Les données géographiques ne sont pas encore disponibles pour <strong>{profile?.country}</strong>.
-                  Nous couvrons actuellement plus de 100 pays, incluant tous les pays francophones, DOM-TOM et pays majeurs.
+                  Nous couvrons actuellement plus de 130 pays, incluant la France métropolitaine, tous les DOM-TOM (Martinique, Guadeloupe, Guyane, Réunion, Mayotte, etc.), et les pays majeurs.
                 </p>
                 <p className="text-orange-200 text-sm mb-4">
                   Le contexte sanitaire local reste disponible ci-dessous. Les données météo et qualité de l'air seront ajoutées prochainement pour votre pays.

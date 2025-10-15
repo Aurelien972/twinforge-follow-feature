@@ -129,14 +129,22 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ weather, city }) =
 
         {/* Last Updated */}
         <div className="mt-4 pt-4 border-t border-white/10">
-          <div className="flex items-center gap-2 text-white/50 text-xs">
-            <SpatialIcon Icon={ICONS.Clock} size={12} />
-            <span>
-              Mis à jour: {new Date(weather.last_updated).toLocaleTimeString('fr-FR', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </span>
+          <div className="flex items-center justify-between text-white/50 text-xs">
+            <div className="flex items-center gap-2">
+              <SpatialIcon Icon={ICONS.Clock} size={12} />
+              <span>
+                Mis à jour: {new Date(weather.last_updated).toLocaleTimeString('fr-FR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </span>
+            </div>
+            {(weather as any).provider && (
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+                <span className="text-white/60">{(weather as any).provider}</span>
+              </div>
+            )}
           </div>
         </div>
       </GlassCard>

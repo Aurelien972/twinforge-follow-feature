@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUserStore } from '../system/store/userStore';
 import { getGeographicData } from '../system/services/geographicDataService';
+import { getCountryISOCode } from '../system/services/countryCodeMapping';
 import type { GeographicData, PhysicalActivityLevel } from '../domain/health';
 import logger from '../lib/utils/logger';
 
@@ -35,6 +36,18 @@ export function useGeographicData(): UseGeographicDataReturn {
       setLoading(true);
       setError(null);
 
+      // Convert country name to ISO code
+      const countryCode = getCountryISOCode(profile.country);
+      if (!countryCode) {
+        throw new Error(`Le pays "${profile.country}" n'est pas encore supporté pour les données météo.`);
+      }
+
+      logger.info('USE_GEOGRAPHIC_DATA', 'Fetching geographic data', {
+        userId: profile.userId,
+        countryName: profile.country,
+        countryCode,
+      });
+
       // Extract user data for hydration calculations
       const userWeightKg = (profile as any)?.weight_kg || (profile as any)?.health?.basic?.weight_kg;
 
@@ -45,7 +58,7 @@ export function useGeographicData(): UseGeographicDataReturn {
 
       const geoData = await getGeographicData(
         profile.userId,
-        profile.country,
+        countryCode,
         userWeightKg,
         activityLevel
       );
@@ -54,7 +67,8 @@ export function useGeographicData(): UseGeographicDataReturn {
       setLastUpdated(geoData.last_updated);
       logger.info('USE_GEOGRAPHIC_DATA', 'Geographic data loaded successfully', {
         userId: profile.userId,
-        country: profile.country,
+        countryName: profile.country,
+        countryCode,
       });
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch geographic data');
@@ -62,7 +76,7 @@ export function useGeographicData(): UseGeographicDataReturn {
       logger.error('USE_GEOGRAPHIC_DATA', 'Failed to fetch geographic data', {
         error: error.message,
         userId: profile?.userId,
-        country: profile?.country,
+        countryName: profile?.country,
       });
     } finally {
       setLoading(false);
