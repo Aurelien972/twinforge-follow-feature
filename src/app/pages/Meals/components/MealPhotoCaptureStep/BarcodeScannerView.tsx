@@ -23,15 +23,17 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
   uploadedImage,
 }) => {
   const [isScanning, setIsScanning] = useState(mode === 'camera');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [lastScannedBarcode, setLastScannedBarcode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [scanStep, setScanStep] = useState<'loading' | 'ready' | 'analyzing' | 'complete'>('loading');
 
   useEffect(() => {
     if (mode === 'upload' && uploadedImage) {
-      handleImageUpload(uploadedImage);
+      loadImagePreview(uploadedImage);
     }
   }, [mode, uploadedImage]);
 
@@ -43,21 +45,37 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
     };
   }, [imagePreview]);
 
-  const handleImageUpload = async (file: File) => {
-    setIsLoading(true);
+  const loadImagePreview = (file: File) => {
     setError(null);
+    setScanStep('loading');
 
     const preview = URL.createObjectURL(file);
     setImagePreview(preview);
+    setUploadedFile(file);
 
-    logger.info('BARCODE_SCANNER', 'Processing uploaded image', {
+    logger.info('BARCODE_SCANNER', 'Image loaded for preview (not analyzed yet)', {
       fileName: file.name,
       fileSize: file.size,
       timestamp: new Date().toISOString(),
     });
 
+    setScanStep('ready');
+  };
+
+  const handleAnalyzeImage = async () => {
+    if (!uploadedFile) return;
+
+    setIsAnalyzing(true);
+    setError(null);
+    setScanStep('analyzing');
+
+    logger.info('BARCODE_SCANNER', 'Starting barcode analysis', {
+      fileName: uploadedFile.name,
+      timestamp: new Date().toISOString(),
+    });
+
     try {
-      const scanResult = await scanBarcodeFromImage(file);
+      const scanResult = await scanBarcodeFromImage(uploadedFile);
 
       if (!scanResult.success || !scanResult.barcode) {
         logger.warn('BARCODE_SCANNER', 'No barcode found in image', {
@@ -66,34 +84,29 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
         });
 
         setError(scanResult.error || 'Aucun code-barre détecté');
-        setTimeout(() => {
-          URL.revokeObjectURL(preview);
-          onClose();
-        }, 3000);
+        setScanStep('ready');
         return;
       }
 
       await processBarcode(scanResult.barcode);
     } catch (err) {
-      logger.error('BARCODE_SCANNER', 'Error processing image', {
+      logger.error('BARCODE_SCANNER', 'Error analyzing image', {
         error: err instanceof Error ? err.message : String(err),
         timestamp: new Date().toISOString(),
       });
 
-      setError('Erreur lors du traitement de l\'image');
-      setTimeout(() => {
-        if (imagePreview) URL.revokeObjectURL(imagePreview);
-        onClose();
-      }, 3000);
+      setError('Erreur lors de l\'analyse de l\'image');
+      setScanStep('ready');
     } finally {
-      setIsLoading(false);
+      setIsAnalyzing(false);
     }
   };
 
   const processBarcode = async (barcode: string) => {
-    setIsLoading(true);
+    setIsAnalyzing(true);
     setError(null);
     setSuccessMessage(null);
+    setScanStep('analyzing');
 
     logger.info('BARCODE_SCANNER', 'Processing barcode', {
       barcode,
@@ -115,7 +128,8 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
           setError(null);
           setIsScanning(true);
           setLastScannedBarcode(null);
-          setIsLoading(false);
+          setIsAnalyzing(false);
+          setScanStep('ready');
         }, 3000);
         return;
       }
@@ -128,7 +142,8 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
           setError(null);
           setIsScanning(true);
           setLastScannedBarcode(null);
-          setIsLoading(false);
+          setIsAnalyzing(false);
+          setScanStep('ready');
         }, 3000);
         return;
       }
@@ -154,13 +169,15 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
       onProductScanned(scannedProduct);
 
       setSuccessMessage(`${scannedProduct.name} ajouté !`);
+      setScanStep('complete');
 
       // Réinitialiser pour permettre un nouveau scan après un court délai
       setTimeout(() => {
         setSuccessMessage(null);
         setIsScanning(true);
         setLastScannedBarcode(null);
-        setIsLoading(false);
+        setIsAnalyzing(false);
+        setScanStep('loading');
       }, 1500);
 
     } catch (err) {
@@ -175,13 +192,14 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
         setError(null);
         setIsScanning(true);
         setLastScannedBarcode(null);
-        setIsLoading(false);
+        setIsAnalyzing(false);
+        setScanStep('ready');
       }, 3000);
     }
   };
 
   const handleScan = async (detectedCodes: any[]) => {
-    if (!isScanning || isLoading || detectedCodes.length === 0) return;
+    if (!isScanning || isAnalyzing || detectedCodes.length === 0) return;
 
     const barcode = detectedCodes[0]?.rawValue;
     if (!barcode || barcode === lastScannedBarcode) return;
@@ -343,7 +361,7 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
               </div>
 
               <AnimatePresence>
-                {isLoading && (
+                {isAnalyzing && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -352,7 +370,9 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
                   >
                     <div className="text-center">
                       <div className="animate-spin w-12 h-12 border-4 border-indigo-400 border-t-transparent rounded-full mx-auto mb-3"></div>
-                      <p className="text-white font-medium">Recherche du produit...</p>
+                      <p className="text-white font-medium">
+                        {scanStep === 'analyzing' ? 'Analyse du code-barre...' : 'Recherche du produit...'}
+                      </p>
                     </div>
                   </motion.div>
                 )}
@@ -393,13 +413,46 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
             </div>
           </div>
 
+          {/* Action buttons and status messages */}
           <div className="text-center">
-            <p className="text-gray-400 text-sm mb-2">
-              Positionnez le code-barre dans le cadre
-            </p>
-            <p className="text-gray-500 text-xs">
-              Formats supportés : EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39
-            </p>
+            {mode === 'upload' && scanStep === 'ready' && !isAnalyzing && !error && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-center gap-2 text-green-400 mb-3">
+                  <SpatialIcon Icon={ICONS.Check} size={20} />
+                  <p className="text-sm font-medium">Image chargée avec succès</p>
+                </div>
+
+                <button
+                  onClick={handleAnalyzeImage}
+                  className="w-full py-3 px-4 rounded-lg font-semibold transition-all"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(79, 70, 229, 0.25))',
+                    border: '2px solid rgba(99, 102, 241, 0.6)',
+                    boxShadow: '0 0 20px rgba(99, 102, 241, 0.4)',
+                  }}
+                >
+                  <div className="flex items-center justify-center gap-2 text-white">
+                    <SpatialIcon Icon={ICONS.Scan} size={20} />
+                    <span>Analyser le code-barre</span>
+                  </div>
+                </button>
+
+                <p className="text-gray-500 text-xs mt-2">
+                  Formats supportés : EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39
+                </p>
+              </div>
+            )}
+
+            {mode === 'camera' && (
+              <div>
+                <p className="text-gray-400 text-sm mb-2">
+                  Positionnez le code-barre dans le cadre
+                </p>
+                <p className="text-gray-500 text-xs">
+                  Formats supportés : EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39
+                </p>
+              </div>
+            )}
           </div>
         </GlassCard>
       </div>
