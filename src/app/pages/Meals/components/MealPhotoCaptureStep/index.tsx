@@ -96,7 +96,12 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
   };
 
   const handleGalleryClick = () => {
-    galleryInputRef.current?.click();
+    console.log('Gallery button clicked', galleryInputRef.current);
+    if (galleryInputRef.current) {
+      // Force reset the input value to allow selecting the same file again
+      galleryInputRef.current.value = '';
+      galleryInputRef.current.click();
+    }
   };
 
   const handleBarcodeClick = () => {
@@ -119,6 +124,8 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    console.log('File selected:', file?.name, 'from:', event.target === fileInputRef.current ? 'camera' : 'gallery');
+
     if (!file) return;
 
     setIsValidating(true);
@@ -150,9 +157,12 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
       console.error('Photo validation failed:', error);
     } finally {
       setIsValidating(false);
-      // Reset file input
+      // Reset both file inputs
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
+      }
+      if (galleryInputRef.current) {
+        galleryInputRef.current.value = '';
       }
     }
   };
