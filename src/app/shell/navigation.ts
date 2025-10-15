@@ -51,8 +51,13 @@ export function navFor(): NavSection[] {
     {
       title: 'Ateliers du Forgeron',
       items: [
-        { to: '/fridge', icon: 'Refrigerator', label: 'Atelier de Recettes', subtitle: 'Recettes, Courses & Plans', circuitColor: '#EC4899' },
         { to: '/training', icon: 'Target', label: 'Atelier de Training', subtitle: 'Générateur de Training', circuitColor: '#18E3FF' },
+      ],
+    },
+    {
+      title: 'Forge Culinaire',
+      items: [
+        { to: '/fridge', icon: 'ChefHat', label: 'Forge Culinaire', subtitle: 'Recettes & Plans', circuitColor: '#EC4899' },
       ],
     },
   ];

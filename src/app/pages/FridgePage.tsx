@@ -1,24 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import PageHeader from '../../ui/page/PageHeader';
-import GlassCard from '../../ui/cards/GlassCard';
-import UnderConstructionCard from '../components/UnderConstructionCard';
-import { PLACEHOLDER_PAGES_CONFIG } from '../../config/placeholderPagesConfig';
+import Tabs from '../../ui/tabs/TabsComponent';
+import FridgesTab from './Fridge/tabs/FridgesTab';
+import RecipesTab from './Fridge/tabs/RecipesTab';
+import PlanTab from './Fridge/tabs/PlanTab';
+import ShoppingListTab from './Fridge/tabs/ShoppingListTab';
 
 /**
- * FridgePage - Atelier de Recettes
- * Placeholder pour la fonctionnalité de gestion d'inventaire
+ * FridgePage - Forge Culinaire
+ * Page principale avec système d'onglets pour la gestion d'inventaire, recettes, plans et courses
  */
 const FridgePage: React.FC = () => {
-  const config = PLACEHOLDER_PAGES_CONFIG.fridge || {
-    icon: 'Refrigerator',
-    title: 'Atelier de Recettes',
-    subtitle: 'Fonctionnalité en cours de développement',
-    circuit: 'fridge',
-    color: '#06B6D4',
-    tabs: []
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -27,27 +20,45 @@ const FridgePage: React.FC = () => {
       className="space-y-6"
     >
       <PageHeader
-        icon={config.icon as any}
-        title={config.title}
-        subtitle={config.subtitle}
-        circuit={config.circuit as any}
-        iconColor={config.color}
+        icon="ChefHat"
+        title="Forge Culinaire"
+        subtitle="Recettes & Plans"
+        circuit="fridge"
+        iconColor="#EC4899"
       />
 
-      <GlassCard className="p-6">
-        <UnderConstructionCard
-          title="Atelier de Recettes"
-          description="Gérez votre inventaire, générez des recettes et planifiez vos repas"
-          icon="Refrigerator"
-          color={config.color}
-          features={[
-            'Scanner de frigo intelligent',
-            'Génération de recettes personnalisées',
-            'Planification de repas hebdomadaire',
-            'Liste de courses automatique'
-          ]}
-        />
-      </GlassCard>
+      <Tabs defaultValue="inventaire" forgeContext="fridge">
+        <Tabs.List role="tablist" aria-label="Forge Culinaire Navigation">
+          <Tabs.Trigger value="inventaire" icon="Refrigerator">
+            Inventaire
+          </Tabs.Trigger>
+          <Tabs.Trigger value="recipes" icon="ChefHat">
+            Recettes
+          </Tabs.Trigger>
+          <Tabs.Trigger value="plan" icon="Calendar">
+            Plan
+          </Tabs.Trigger>
+          <Tabs.Trigger value="courses" icon="ShoppingCart">
+            Courses
+          </Tabs.Trigger>
+        </Tabs.List>
+
+        <Tabs.Panel value="inventaire">
+          <FridgesTab />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="recipes">
+          <RecipesTab />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="plan">
+          <PlanTab />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="courses">
+          <ShoppingListTab />
+        </Tabs.Panel>
+      </Tabs>
     </motion.div>
   );
 };
