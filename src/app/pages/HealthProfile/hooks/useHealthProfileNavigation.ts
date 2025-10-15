@@ -21,6 +21,8 @@ export interface TabConfig {
   description: string;
   color: string;
   requiredForAI: boolean;
+  title: string;
+  subtitle: string;
 }
 
 export const HEALTH_PROFILE_TABS: TabConfig[] = [
@@ -31,14 +33,8 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     description: 'Groupe sanguin, mensurations, vaccinations',
     color: '#EF4444',
     requiredForAI: true,
-  },
-  {
-    id: 'family-history',
-    label: 'Famille',
-    icon: 'Users',
-    description: 'Antécédents familiaux et prédispositions génétiques',
-    color: '#A855F7',
-    requiredForAI: true,
+    title: 'Informations Médicales de Base',
+    subtitle: 'Groupe sanguin, vaccinations, allergies et médicaments actuels',
   },
   {
     id: 'lifestyle',
@@ -47,6 +43,8 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     description: 'Habitudes quotidiennes',
     color: '#F59E0B',
     requiredForAI: true,
+    title: 'Habitudes de Vie',
+    subtitle: 'Sommeil, stress, hydratation et temps d\'écran quotidien',
   },
   {
     id: 'intimacy',
@@ -55,6 +53,18 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     description: 'Santé sexuelle et reproductive',
     color: '#EC4899',
     requiredForAI: true,
+    title: 'Santé Intime',
+    subtitle: 'Santé sexuelle, reproductive et suivi gynécologique ou andrologique',
+  },
+  {
+    id: 'family-history',
+    label: 'Famille',
+    icon: 'Users',
+    description: 'Antécédents familiaux et prédispositions génétiques',
+    color: '#06B6D4',
+    requiredForAI: true,
+    title: 'Antécédents Familiaux',
+    subtitle: 'Historique médical familial et prédispositions héréditaires',
   },
   {
     id: 'vital-signs',
@@ -63,6 +73,8 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     description: 'Tension, fréquence cardiaque, glycémie',
     color: '#8B5CF6',
     requiredForAI: true,
+    title: 'Signes Vitaux',
+    subtitle: 'Tension artérielle, fréquence cardiaque et glycémie',
   },
   {
     id: 'geographic',
@@ -71,6 +83,8 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     description: 'Environnement, météo, qualité de l\'air',
     color: '#3B82F6',
     requiredForAI: false,
+    title: 'Environnement Géographique',
+    subtitle: 'Météo, qualité de l\'air et contexte sanitaire local',
   },
 ];
 

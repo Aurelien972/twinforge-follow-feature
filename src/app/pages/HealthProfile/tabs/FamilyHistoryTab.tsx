@@ -14,15 +14,6 @@ import { useFamilyHistoryFormTab } from '../hooks/useFamilyHistoryFormTab';
 export const FamilyHistoryTab: React.FC = () => {
   const { form, state } = useFamilyHistoryFormTab();
 
-  const getRiskColor = () => {
-    if (state.geneticRisk.category === 'low') return { color: '#10B981', label: 'Faible', icon: ICONS.Shield };
-    if (state.geneticRisk.category === 'moderate') return { color: '#06B6D4', label: 'Modéré', icon: ICONS.Info };
-    if (state.geneticRisk.category === 'elevated') return { color: '#F59E0B', label: 'Élevé', icon: ICONS.AlertCircle };
-    return { color: '#EF4444', label: 'Très élevé', icon: ICONS.AlertTriangle };
-  };
-
-  const riskColor = getRiskColor();
-
   return (
     <div className="space-y-6">
       {/* Progress Header */}
@@ -33,10 +24,10 @@ export const FamilyHistoryTab: React.FC = () => {
       >
         <GlassCard className="p-6" style={{
           background: `
-            radial-gradient(circle at 30% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 60%),
             var(--glass-opacity)
           `,
-          borderColor: 'rgba(168, 85, 247, 0.3)',
+          borderColor: 'rgba(6, 182, 212, 0.3)',
         }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -45,13 +36,13 @@ export const FamilyHistoryTab: React.FC = () => {
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.2))
+                    linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
                   `,
-                  border: '2px solid rgba(168, 85, 247, 0.5)',
-                  boxShadow: '0 0 30px rgba(168, 85, 247, 0.4)',
+                  border: '2px solid rgba(6, 182, 212, 0.5)',
+                  boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
                 }}
               >
-                <SpatialIcon Icon={ICONS.Users} size={24} style={{ color: '#A855F7' }} variant="pure" />
+                <SpatialIcon Icon={ICONS.Users} size={24} style={{ color: '#06B6D4' }} variant="pure" />
               </div>
               <div>
                 <h2 className="text-white font-bold text-xl">Famille</h2>
@@ -63,8 +54,8 @@ export const FamilyHistoryTab: React.FC = () => {
                 <div
                   className="w-3 h-3 rounded-full"
                   style={{
-                    background: '#A855F7',
-                    boxShadow: '0 0 8px rgba(168, 85, 247, 0.6)',
+                    background: '#06B6D4',
+                    boxShadow: '0 0 8px rgba(6, 182, 212, 0.6)',
                   }}
                 />
                 <span className="text-white font-bold text-lg">{state.completion}%</span>
@@ -78,8 +69,8 @@ export const FamilyHistoryTab: React.FC = () => {
               <motion.div
                 className="h-3 rounded-full relative overflow-hidden"
                 style={{
-                  background: 'linear-gradient(90deg, #A855F7, rgba(168, 85, 247, 0.8))',
-                  boxShadow: '0 0 12px rgba(168, 85, 247, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)',
+                  background: 'linear-gradient(90deg, #06B6D4, rgba(6, 182, 212, 0.8))',
+                  boxShadow: '0 0 12px rgba(6, 182, 212, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)',
                 }}
                 initial={{ width: 0 }}
                 animate={{ width: `${state.completion}%` }}
@@ -90,77 +81,6 @@ export const FamilyHistoryTab: React.FC = () => {
         </GlassCard>
       </motion.div>
 
-      {/* Genetic Risk Assessment Card */}
-      {state.completion > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <GlassCard className="p-6" style={{
-            background: `
-              radial-gradient(circle at 30% 20%, ${riskColor.color}15 0%, transparent 60%),
-              var(--glass-opacity)
-            `,
-            borderColor: `${riskColor.color}40`,
-          }}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{
-                    background: `
-                      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                      linear-gradient(135deg, ${riskColor.color}66, ${riskColor.color}33)
-                    `,
-                    border: `2px solid ${riskColor.color}80`,
-                    boxShadow: `0 0 20px ${riskColor.color}66`,
-                  }}
-                >
-                  <SpatialIcon
-                    Icon={riskColor.icon}
-                    size={20}
-                    style={{ color: riskColor.color }}
-                    variant="pure"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold">Risque Génétique: {riskColor.label}</h3>
-                  <p className="text-white/60 text-sm">
-                    Score: {state.geneticRisk.score.toFixed(1)}/10
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {state.geneticRisk.hasRisks ? (
-              <div>
-                <h4 className="text-white/80 text-sm font-medium mb-2">Facteurs héréditaires identifiés:</h4>
-                <div className="space-y-2">
-                  {state.geneticRisk.riskFactors.map((factor, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm" style={{ color: riskColor.color }}>
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: riskColor.color }} />
-                      <span>{factor}</span>
-                    </div>
-                  ))}
-                </div>
-                {state.geneticRisk.category === 'elevated' || state.geneticRisk.category === 'high' ? (
-                  <div className="mt-4 p-3 rounded-lg bg-white/5">
-                    <p className="text-white/70 text-sm leading-relaxed">
-                      Ces antécédents familiaux nécessitent une attention particulière. Un dépistage préventif régulier
-                      et un suivi médical adapté sont recommandés.
-                    </p>
-                  </div>
-                ) : null}
-              </div>
-            ) : (
-              <p className="text-white/70 text-sm">
-                Aucun antécédent familial significatif identifié. Continuez à surveiller votre santé avec des bilans réguliers.
-              </p>
-            )}
-          </GlassCard>
-        </motion.div>
-      )}
 
       {/* Main Form */}
       <motion.div
@@ -171,10 +91,10 @@ export const FamilyHistoryTab: React.FC = () => {
         <form onSubmit={form.handleSubmit}>
           <GlassCard className="p-6" style={{
             background: `
-              radial-gradient(circle at 30% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 60%),
+              radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 60%),
               var(--glass-opacity)
             `,
-            borderColor: 'rgba(168, 85, 247, 0.2)',
+            borderColor: 'rgba(6, 182, 212, 0.2)',
           }}>
             <FamilyHistorySection
               register={form.register}

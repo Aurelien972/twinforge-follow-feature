@@ -18,10 +18,10 @@ export const PregnancyMenopauseCard: React.FC<PregnancyMenopauseCardProps> = ({ 
   return (
     <GlassCard className="p-6" style={{
       background: `
-        radial-gradient(circle at 30% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 30% 20%, rgba(236, 72, 153, 0.08) 0%, transparent 60%),
         var(--glass-opacity)
       `,
-      borderColor: 'rgba(168, 85, 247, 0.2)'
+      borderColor: 'rgba(236, 72, 153, 0.2)'
     }}>
       <div className="flex items-center gap-3 mb-6">
         <div
@@ -29,13 +29,13 @@ export const PregnancyMenopauseCard: React.FC<PregnancyMenopauseCardProps> = ({ 
           style={{
             background: `
               radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-              linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.2))
+              linear-gradient(135deg, rgba(236, 72, 153, 0.4), rgba(236, 72, 153, 0.2))
             `,
-            border: '2px solid rgba(168, 85, 247, 0.5)',
-            boxShadow: '0 0 30px rgba(168, 85, 247, 0.4)',
+            border: '2px solid rgba(236, 72, 153, 0.5)',
+            boxShadow: '0 0 30px rgba(236, 72, 153, 0.4)',
           }}
         >
-          <SpatialIcon Icon={ICONS.Baby} size={24} style={{ color: '#A855F7' }} variant="pure" />
+          <SpatialIcon Icon={ICONS.Baby} size={24} style={{ color: '#EC4899' }} variant="pure" />
         </div>
         <div>
           <h3 className="text-white font-semibold text-xl">Grossesse & Ménopause</h3>

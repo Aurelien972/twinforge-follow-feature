@@ -60,10 +60,10 @@ export const CurrentMedicationsCard: React.FC<CurrentMedicationsCardProps> = ({
         className="p-6"
         style={{
           background: `
-            radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.08) 0%, transparent 60%),
             var(--glass-opacity)
           `,
-          borderColor: 'rgba(59, 130, 246, 0.2)',
+          borderColor: 'rgba(239, 68, 68, 0.2)',
         }}
       >
         <div className="flex items-center gap-3 mb-6">
@@ -72,13 +72,13 @@ export const CurrentMedicationsCard: React.FC<CurrentMedicationsCardProps> = ({
             style={{
               background: `
                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, 0.2))
+                linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2))
               `,
-              border: '2px solid rgba(59, 130, 246, 0.5)',
-              boxShadow: '0 0 20px rgba(59, 130, 246, 0.4)',
+              border: '2px solid rgba(239, 68, 68, 0.5)',
+              boxShadow: '0 0 20px rgba(239, 68, 68, 0.4)',
             }}
           >
-            <SpatialIcon Icon={ICONS.Pill} size={24} style={{ color: '#3B82F6' }} variant="pure" />
+            <SpatialIcon Icon={ICONS.Pill} size={24} style={{ color: '#EF4444' }} variant="pure" />
           </div>
           <div className="flex-1">
             <h3 className="text-white font-semibold text-xl">Médicaments Actuels</h3>

@@ -67,14 +67,14 @@ export const FamilyHistorySection: React.FC<FamilyHistorySectionProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-400/20">
+      <div className="p-4 rounded-xl bg-cyan-500/10 border border-cyan-400/20">
         <div className="flex items-start gap-3">
-          <SpatialIcon Icon={ICONS.Info} size={18} className="text-purple-400 mt-0.5 flex-shrink-0" />
+          <SpatialIcon Icon={ICONS.Info} size={18} className="text-cyan-400 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="text-purple-200 text-sm leading-relaxed mb-2">
+            <p className="text-cyan-200 text-sm leading-relaxed mb-2">
               <strong>Antécédents familiaux:</strong> Ces informations aident à identifier les prédispositions génétiques et facteurs de risque héréditaires.
             </p>
-            <p className="text-purple-300 text-xs">
+            <p className="text-cyan-300 text-xs">
               Cochez si un membre de votre famille proche (parents, frères, sœurs) a été diagnostiqué avec ces conditions.
             </p>
           </div>
@@ -127,12 +127,12 @@ export const FamilyHistorySection: React.FC<FamilyHistorySectionProps> = ({
               {...register('medical_history.family_history.alzheimers')}
               type="checkbox"
               id="family_history.alzheimers"
-              className="w-5 h-5 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-purple-500"
+              className="w-5 h-5 rounded border-white/20 bg-white/10 text-cyan-500 focus:ring-cyan-500"
             />
             <label htmlFor="family_history.alzheimers" className="text-white/90 text-sm font-medium flex-1">
               Alzheimer / Démence
             </label>
-            <SpatialIcon Icon={ICONS.Brain} size={16} className="text-purple-400" />
+            <SpatialIcon Icon={ICONS.Brain} size={16} className="text-cyan-400" />
           </div>
         </div>
 
@@ -229,15 +229,15 @@ export const FamilyHistorySection: React.FC<FamilyHistorySectionProps> = ({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     style={{
-                      background: 'rgba(168, 85, 247, 0.15)',
-                      borderColor: 'rgba(168, 85, 247, 0.3)',
+                      background: 'rgba(6, 182, 212, 0.15)',
+                      borderColor: 'rgba(6, 182, 212, 0.3)',
                     }}
                   >
-                    <span className="text-purple-300">{condition}</span>
+                    <span className="text-cyan-300">{condition}</span>
                     <button
                       type="button"
                       onClick={() => removeGeneticCondition(index)}
-                      className="hover:opacity-80 transition-opacity text-purple-300"
+                      className="hover:opacity-80 transition-opacity text-cyan-300"
                     >
                       <SpatialIcon Icon={ICONS.X} size={12} />
                     </button>

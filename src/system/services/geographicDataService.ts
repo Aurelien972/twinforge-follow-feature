@@ -507,6 +507,9 @@ export async function getGeographicData(
       });
     }
 
+    // Save to history (once per day per user)
+    await saveGeographicDataHistory(userId, countryCode, coords, weather, airQuality, environmentalExposure, hydrationRecommendation);
+
     return {
       user_id: userId,
       country_code: countryCode,
@@ -538,6 +541,116 @@ export async function getGeographicData(
       });
     }
     throw error;
+  }
+}
+
+/**
+ * Save geographic data to history (once per day per user)
+ */
+async function saveGeographicDataHistory(
+  userId: string,
+  countryCode: string,
+  coords: { lat: number; lon: number; city: string },
+  weather: WeatherData,
+  airQuality: AirQualityData,
+  environmentalExposure: EnvironmentalExposure,
+  hydrationRecommendation: HydrationRecommendation
+): Promise<void> {
+  try {
+    // Check if we already have a record for today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const { data: existing } = await supabase
+      .from('geographic_data_history')
+      .select('id')
+      .eq('user_id', userId)
+      .gte('recorded_at', today.toISOString())
+      .lt('recorded_at', tomorrow.toISOString())
+      .maybeSingle();
+
+    // If we already have data for today, skip
+    if (existing) {
+      logger.debug('GEOGRAPHIC_SERVICE', 'Geographic data already saved for today', { userId });
+      return;
+    }
+
+    // Save new history entry
+    const { error } = await supabase
+      .from('geographic_data_history')
+      .insert({
+        user_id: userId,
+        country_code: countryCode,
+        city: coords.city,
+        latitude: coords.lat,
+        longitude: coords.lon,
+        weather: weather,
+        air_quality: airQuality,
+        hydration_recommendation: hydrationRecommendation,
+        environmental_exposure: environmentalExposure,
+        recorded_at: new Date().toISOString(),
+      });
+
+    if (error) {
+      logger.error('GEOGRAPHIC_SERVICE', 'Failed to save geographic data history', {
+        error: error.message,
+        userId,
+      });
+    } else {
+      logger.info('GEOGRAPHIC_SERVICE', 'Saved geographic data history', { userId, date: today.toISOString() });
+    }
+  } catch (error) {
+    logger.error('GEOGRAPHIC_SERVICE', 'Failed to save geographic data history', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      userId,
+    });
+  }
+}
+
+/**
+ * Get geographic data history for a user
+ */
+export async function getGeographicDataHistory(
+  userId: string,
+  limit: number = 30
+): Promise<GeographicData[]> {
+  try {
+    const { data, error } = await supabase
+      .from('geographic_data_history')
+      .select('*')
+      .eq('user_id', userId)
+      .order('recorded_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      logger.error('GEOGRAPHIC_SERVICE', 'Failed to fetch geographic data history', {
+        error: error.message,
+        userId,
+      });
+      return [];
+    }
+
+    return (data || []).map(record => ({
+      user_id: record.user_id,
+      country_code: record.country_code,
+      city: record.city || undefined,
+      latitude: record.latitude ? Number(record.latitude) : undefined,
+      longitude: record.longitude ? Number(record.longitude) : undefined,
+      weather: record.weather as WeatherData,
+      air_quality: record.air_quality as AirQualityData,
+      hydration_recommendation: record.hydration_recommendation as HydrationRecommendation,
+      environmental_exposure: record.environmental_exposure as EnvironmentalExposure,
+      last_updated: record.recorded_at,
+      next_update_due: undefined,
+    }));
+  } catch (error) {
+    logger.error('GEOGRAPHIC_SERVICE', 'Failed to fetch geographic data history', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      userId,
+    });
+    return [];
   }
 }
 

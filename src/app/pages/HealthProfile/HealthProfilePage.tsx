@@ -232,16 +232,19 @@ const HealthProfilePage: React.FC = () => {
     return null;
   }
 
-  // Get current tab configuration for dynamic header color
+  // Get current tab configuration for dynamic header color and content
   const currentTabConfig = getTabConfig(activeTab);
   const headerColor = currentTabConfig?.color || '#EF4444';
+  const headerIcon = currentTabConfig?.icon || 'Heart';
+  const headerTitle = currentTabConfig?.title || 'Mon Profil de Santé';
+  const headerSubtitle = currentTabConfig?.subtitle || 'Médecine préventive par intelligence artificielle';
 
   return (
     <div className="space-y-6 w-full overflow-visible">
       <PageHeader
-        icon="Heart"
-        title="Mon Profil de Santé"
-        subtitle="Médecine préventive par intelligence artificielle"
+        icon={headerIcon as any}
+        title={headerTitle}
+        subtitle={headerSubtitle}
         circuit="health"
         iconColor={headerColor}
       />
@@ -301,16 +304,16 @@ const HealthProfilePage: React.FC = () => {
           <BasicHealthTabEnhancedV2 />
         </Tabs.Panel>
 
-        <Tabs.Panel value="family-history">
-          <FamilyHistoryTab />
-        </Tabs.Panel>
-
         <Tabs.Panel value="lifestyle">
           <LifestyleTab />
         </Tabs.Panel>
 
         <Tabs.Panel value="intimacy">
           <IntimacyTab />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="family-history">
+          <FamilyHistoryTab />
         </Tabs.Panel>
 
         <Tabs.Panel value="vital-signs">

@@ -138,10 +138,10 @@ export const AllergiesSection: React.FC<AllergiesSectionProps> = ({
         className="p-6"
         style={{
           background: `
-            radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.08) 0%, transparent 60%),
             var(--glass-opacity)
           `,
-          borderColor: 'rgba(245, 158, 11, 0.2)',
+          borderColor: 'rgba(239, 68, 68, 0.2)',
         }}
       >
         <div className="flex items-center gap-3 mb-6">
@@ -150,13 +150,13 @@ export const AllergiesSection: React.FC<AllergiesSectionProps> = ({
             style={{
               background: `
                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.2))
+                linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2))
               `,
-              border: '2px solid rgba(245, 158, 11, 0.5)',
-              boxShadow: '0 0 20px rgba(245, 158, 11, 0.4)',
+              border: '2px solid rgba(239, 68, 68, 0.5)',
+              boxShadow: '0 0 20px rgba(239, 68, 68, 0.4)',
             }}
           >
-            <SpatialIcon Icon={ICONS.AlertTriangle} size={24} style={{ color: '#F59E0B' }} variant="pure" />
+            <SpatialIcon Icon={ICONS.AlertTriangle} size={24} style={{ color: '#EF4444' }} variant="pure" />
           </div>
           <div className="flex-1">
             <h3 className="text-white font-semibold text-xl">Allergies</h3>
