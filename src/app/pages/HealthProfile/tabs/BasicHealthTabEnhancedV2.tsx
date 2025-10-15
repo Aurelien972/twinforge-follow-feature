@@ -21,15 +21,10 @@ import { useVaccinationsForm } from '../hooks/useVaccinationsForm';
 import { useMedicalConditionsForm } from '../hooks/useMedicalConditionsForm';
 import { useAllergiesForm } from '../hooks/useAllergiesForm';
 import { useBloodTypeForm } from '../hooks/useBloodTypeForm';
-import { useBasicHealthTabCoordinator } from '../hooks/useBasicHealthTabCoordinator';
-import { useFeedback } from '../../../../hooks/useFeedback';
 import logger from '../../../../lib/utils/logger';
-import UnsavedChangesIndicator from '../../../../ui/components/UnsavedChangesIndicator';
-import { useUnsavedChangesWarning } from '../../../../hooks/useUnsavedChangesWarning';
 
 export const BasicHealthTabEnhancedV2: React.FC = () => {
-  const { profile, saving } = useUserStore();
-  const { success } = useFeedback();
+  const { profile } = useUserStore();
 
   // Get country health data
   const countryData = useCountryHealthData(profile?.country);
@@ -45,29 +40,6 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
 
   // Blood type hook
   const bloodTypeForm = useBloodTypeForm();
-
-  // Central coordinator for dirty state management
-  const coordinator = useBasicHealthTabCoordinator({
-    bloodTypeState: {
-      isDirty: bloodTypeForm.isDirty,
-      changedFieldsCount: bloodTypeForm.changedFieldsCount || 0,
-    },
-    vaccinationsState: {
-      isDirty: vaccinations.isDirty,
-      changedFieldsCount: vaccinations.changedFieldsCount || 0,
-    },
-    medicalConditionsState: {
-      isDirty: medicalConditions.isDirty,
-      changedFieldsCount: medicalConditions.changedFieldsCount || 0,
-    },
-    allergiesState: {
-      isDirty: allergies.isDirty,
-      changedFieldsCount: allergies.changedFieldsCount || 0,
-    },
-  });
-
-  // Warn user about unsaved changes
-  useUnsavedChangesWarning({ isDirty: coordinator.hasAnyChanges });
 
   // Calculate overall completion
   const completion = React.useMemo(() => {
@@ -89,63 +61,8 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
     return Math.round((filled / total) * 100);
   }, [bloodTypeForm.bloodType, vaccinations, medicalConditions, allergies]);
 
-  // Save all sections that have changes
-  const saveAllChanges = async () => {
-    try {
-      logger.info('BASIC_HEALTH_TAB', 'Starting coordinated save of all sections', {
-        userId: profile?.userId,
-        breakdown: coordinator.breakdown,
-        totalChangedFields: coordinator.totalChangedFields,
-      });
-
-      // Save each section that has changes
-      const savePromises: Promise<void>[] = [];
-
-      if (coordinator.breakdown.bloodType) {
-        savePromises.push(bloodTypeForm.saveChanges());
-      }
-
-      if (coordinator.breakdown.vaccinations) {
-        savePromises.push(vaccinations.onSave());
-      }
-
-      if (coordinator.breakdown.medicalConditions) {
-        savePromises.push(medicalConditions.saveChanges());
-      }
-
-      if (coordinator.breakdown.allergies) {
-        savePromises.push(allergies.onSave());
-      }
-
-      // Wait for all saves to complete
-      await Promise.all(savePromises);
-
-      // Reset coordinator dirty state
-      coordinator.resetAllDirtyStates();
-
-      success();
-      logger.info('BASIC_HEALTH_TAB', 'All sections saved successfully', {
-        userId: profile?.userId,
-      });
-    } catch (error) {
-      logger.error('BASIC_HEALTH_TAB', 'Failed to save all sections', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        userId: profile?.userId,
-      });
-    }
-  };
-
   return (
     <div className="space-y-6">
-      {/* Unsaved Changes Indicator */}
-      <UnsavedChangesIndicator
-        isDirty={coordinator.hasAnyChanges}
-        onSave={saveAllChanges}
-        isSaving={saving}
-        isValid={true}
-        modifiedFieldsCount={coordinator.totalChangedFields}
-      />
-
       {/* Progress Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
