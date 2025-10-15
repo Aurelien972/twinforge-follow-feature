@@ -7,16 +7,15 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useUserStore } from '../../../../system/store/userStore';
-import { useToast } from '../../../../ui/components/ToastProvider';
-import { useFeedback } from '../../../../hooks/useFeedback';
 import logger from '../../../../lib/utils/logger';
 import { vitalSignsSectionSchema, type VitalSignsSectionForm } from '../../Profile/validation/profileHealthValidationV2';
 import type { HealthProfileV2 } from '../../../../domain/health';
+import { useHealthProfileSave } from './useHealthProfileSave';
+import { useHealthFormDirtyState } from './useHealthFormDirtyState';
 
 export function useVitalSignsFormTab() {
-  const { profile, updateProfile, saving } = useUserStore();
-  const { showToast } = useToast();
-  const { success } = useFeedback();
+  const { profile } = useUserStore();
+  const { saveSection, isSectionSaving } = useHealthProfileSave();
 
   // Extract V2 health data
   const healthV2 = (profile as any)?.health as HealthProfileV2 | undefined;
@@ -36,8 +35,24 @@ export function useVitalSignsFormTab() {
   });
 
   const { register, handleSubmit, formState, watch, reset } = form;
-  const { errors, isDirty, isValid } = formState;
+  const { errors, isValid } = formState;
   const watchedValues = watch();
+
+  // Track initial values for intelligent dirty detection
+  const [initialValues, setInitialValues] = React.useState<VitalSignsSectionForm>({
+    blood_pressure_systolic: vitalSigns?.blood_pressure_systolic,
+    blood_pressure_diastolic: vitalSigns?.blood_pressure_diastolic,
+    resting_heart_rate: vitalSigns?.resting_heart_rate,
+    blood_glucose_mg_dl: vitalSigns?.blood_glucose_mg_dl,
+    last_measured: vitalSigns?.last_measured,
+  });
+
+  // Use intelligent dirty state detection
+  const { isDirty, changedFieldsCount, resetDirtyState } = useHealthFormDirtyState({
+    currentValues: watchedValues,
+    initialValues,
+    formName: 'VITAL_SIGNS',
+  });
 
   // Calculate completion percentage
   const completion = React.useMemo(() => {
@@ -91,46 +106,26 @@ export function useVitalSignsFormTab() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      logger.info('HEALTH_PROFILE', 'Saving vital signs', {
+      logger.info('VITAL_SIGNS_FORM', 'Saving vital signs', {
         userId: profile?.userId,
         hasBloodPressure: !!(data.blood_pressure_systolic && data.blood_pressure_diastolic),
         hasHeartRate: !!data.resting_heart_rate,
         hasGlucose: !!data.blood_glucose_mg_dl,
       });
 
-      const currentHealth = (profile as any)?.health as HealthProfileV2 | undefined;
-
-      await updateProfile({
-        health: {
-          ...currentHealth,
-          version: '2.0' as const,
-          vital_signs: data,
+      await saveSection({
+        section: 'vital_signs',
+        data,
+        onSuccess: () => {
+          setInitialValues(data);
+          resetDirtyState(data);
+          reset(data);
+          logger.info('VITAL_SIGNS_FORM', 'Successfully saved and reset dirty state');
         },
-        updated_at: new Date().toISOString(),
       });
-
-      success();
-      showToast({
-        type: 'success',
-        title: 'Constantes vitales sauvegardées',
-        message: 'Vos mesures ont été mises à jour avec succès',
-        duration: 3000,
-      });
-
-      // Reset form with new values
-      reset(data);
-
     } catch (error) {
-      logger.error('HEALTH_PROFILE', 'Failed to save vital signs', {
+      logger.error('VITAL_SIGNS_FORM', 'Save failed (already handled by saveSection)', {
         error: error instanceof Error ? error.message : 'Unknown error',
-        userId: profile?.userId,
-      });
-
-      showToast({
-        type: 'error',
-        title: 'Erreur de sauvegarde',
-        message: 'Impossible de sauvegarder les constantes vitales',
-        duration: 4000,
       });
     }
   });
@@ -145,9 +140,10 @@ export function useVitalSignsFormTab() {
       watchedValues,
     },
     state: {
-      saving,
+      saving: isSectionSaving('vital_signs'),
       completion,
       vitalStatus,
     },
+    changedFieldsCount,
   };
 }

@@ -40,6 +40,23 @@ export function analyzeHealthSaveError(
     timestamp: new Date().toISOString(),
   });
 
+  // QuotaExceededError (localStorage full)
+  if (
+    error instanceof Error &&
+    (error.name === 'QuotaExceededError' ||
+      error.message.includes('QuotaExceededError') ||
+      error.message.includes('quota') ||
+      error.message.includes('exceeded the quota'))
+  ) {
+    return {
+      type: HealthSaveErrorType.DATABASE,
+      message: 'Espace de stockage insuffisant',
+      originalError: error,
+      retryable: true,
+      userMessage: 'Mémoire locale saturée. Un nettoyage automatique a été effectué. Veuillez réessayer.',
+    };
+  }
+
   // Network errors (fetch failures, timeouts)
   if (error instanceof Error && (
     error.message.includes('fetch') ||

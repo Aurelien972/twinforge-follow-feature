@@ -7,16 +7,15 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useUserStore } from '../../../../system/store/userStore';
-import { useToast } from '../../../../ui/components/ToastProvider';
-import { useFeedback } from '../../../../hooks/useFeedback';
 import logger from '../../../../lib/utils/logger';
 import { familyHistorySectionSchema, type FamilyHistorySectionForm } from '../../Profile/validation/profileHealthValidationV2';
 import type { HealthProfileV2 } from '../../../../domain/health';
+import { useHealthProfileSave } from './useHealthProfileSave';
+import { useHealthFormDirtyState } from './useHealthFormDirtyState';
 
 export function useFamilyHistoryFormTab() {
-  const { profile, updateProfile, saving } = useUserStore();
-  const { showToast } = useToast();
-  const { success } = useFeedback();
+  const { profile } = useUserStore();
+  const { saveSection, isSectionSaving } = useHealthProfileSave();
 
   // Extract V2 health data
   const healthV2 = (profile as any)?.health as HealthProfileV2 | undefined;
@@ -38,8 +37,25 @@ export function useFamilyHistoryFormTab() {
   });
 
   const { register, handleSubmit, formState, watch, reset, setValue } = form;
-  const { errors, isDirty, isValid } = formState;
+  const { errors, isValid } = formState;
   const watchedValues = watch();
+
+  // Track initial values for intelligent dirty detection
+  const [initialValues, setInitialValues] = React.useState<FamilyHistorySectionForm>({
+    cardiovascular: familyHistory?.cardiovascular || false,
+    diabetes: familyHistory?.diabetes || false,
+    cancer: familyHistory?.cancer || [],
+    hypertension: familyHistory?.hypertension || false,
+    alzheimers: familyHistory?.alzheimers || false,
+    genetic_conditions: familyHistory?.genetic_conditions || [],
+  });
+
+  // Use intelligent dirty state detection
+  const { isDirty, changedFieldsCount, resetDirtyState } = useHealthFormDirtyState({
+    currentValues: watchedValues,
+    initialValues,
+    formName: 'FAMILY_HISTORY',
+  });
 
   // Calculate completion percentage
   const completion = React.useMemo(() => {
@@ -106,7 +122,7 @@ export function useFamilyHistoryFormTab() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      logger.info('HEALTH_PROFILE', 'Saving family history', {
+      logger.info('FAMILY_HISTORY_FORM', 'Saving family history', {
         userId: profile?.userId,
         hasCardiovascular: data.cardiovascular,
         hasDiabetes: data.diabetes,
@@ -114,43 +130,19 @@ export function useFamilyHistoryFormTab() {
         geneticConditions: data.genetic_conditions?.length || 0,
       });
 
-      const currentHealth = (profile as any)?.health as HealthProfileV2 | undefined;
-      const currentMedicalHistory = currentHealth?.medical_history || {};
-
-      await updateProfile({
-        health: {
-          ...currentHealth,
-          version: '2.0' as const,
-          medical_history: {
-            ...currentMedicalHistory,
-            family_history: data,
-          },
+      await saveSection({
+        section: 'family_history',
+        data,
+        onSuccess: () => {
+          setInitialValues(data);
+          resetDirtyState(data);
+          reset(data);
+          logger.info('FAMILY_HISTORY_FORM', 'Successfully saved and reset dirty state');
         },
-        updated_at: new Date().toISOString(),
       });
-
-      success();
-      showToast({
-        type: 'success',
-        title: 'Antécédents familiaux sauvegardés',
-        message: 'Votre historique familial a été mis à jour',
-        duration: 3000,
-      });
-
-      // Reset form with new values
-      reset(data);
-
     } catch (error) {
-      logger.error('HEALTH_PROFILE', 'Failed to save family history', {
+      logger.error('FAMILY_HISTORY_FORM', 'Save failed (already handled by saveSection)', {
         error: error instanceof Error ? error.message : 'Unknown error',
-        userId: profile?.userId,
-      });
-
-      showToast({
-        type: 'error',
-        title: 'Erreur de sauvegarde',
-        message: 'Impossible de sauvegarder les antécédents familiaux',
-        duration: 4000,
       });
     }
   });
@@ -167,9 +159,10 @@ export function useFamilyHistoryFormTab() {
       watch,
     },
     state: {
-      saving,
+      saving: isSectionSaving('family_history'),
       completion,
       geneticRisk,
     },
+    changedFieldsCount,
   };
 }

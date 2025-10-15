@@ -13,6 +13,7 @@ import type {
 } from '../../domain/recipe';
 import type { HealthProfile, CountryHealthData } from '../../domain/health';
 import logger from '../../lib/utils/logger';
+import { safeStorageOperation, monitorStorageUsage, logStorageUsage } from '../../lib/utils/storageManager';
 
 type Role = 'user' | 'coach' | 'admin';
 
@@ -126,6 +127,50 @@ type UserState = {
   setProfile: (updates: Partial<Profile>) => void;
   saveProfile: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
+};
+
+// Create a storage wrapper with quota handling
+const createSafeStorage = () => {
+  return {
+    getItem: (name: string) => {
+      try {
+        const value = localStorage.getItem(name);
+        if (value) {
+          // Monitor storage on read
+          monitorStorageUsage();
+        }
+        return value;
+      } catch (error) {
+        logger.error('STORAGE', 'Failed to read from localStorage', {
+          key: name,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return null;
+      }
+    },
+    setItem: (name: string, value: string) => {
+      return safeStorageOperation(
+        () => {
+          localStorage.setItem(name, value);
+          logger.debug('STORAGE', 'Successfully wrote to localStorage', {
+            key: name,
+            sizeMB: (new Blob([value]).size / (1024 * 1024)).toFixed(2),
+          });
+        },
+        'USERSTORE_PERSIST'
+      );
+    },
+    removeItem: (name: string) => {
+      try {
+        localStorage.removeItem(name);
+      } catch (error) {
+        logger.error('STORAGE', 'Failed to remove from localStorage', {
+          key: name,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    },
+  };
 };
 
 export const useUserStore = create<UserState>()(
@@ -585,9 +630,25 @@ export const useUserStore = create<UserState>()(
     }),
     {
       name: STORAGE_KEY,
+      storage: createJSONStorage(createSafeStorage),
       partialize: (state) => ({
         session: state.session,
-        profile: state.profile,
+        profile: state.profile ? {
+          // Only persist essential profile data to reduce storage usage
+          userId: state.profile.userId,
+          id: state.profile.id,
+          displayName: state.profile.displayName,
+          sex: state.profile.sex,
+          height_cm: state.profile.height_cm,
+          weight_kg: state.profile.weight_kg,
+          birthdate: state.profile.birthdate,
+          country: state.profile.country,
+          avatarStatus: state.profile.avatarStatus,
+          avatarUrl: state.profile.avatarUrl,
+          health: state.profile.health,
+          // Exclude large objects that can be re-fetched
+          // preferences, nutrition, etc will be loaded from DB
+        } : null,
       }),
       merge: (persistedState, currentState) => ({
         ...currentState,
@@ -597,6 +658,21 @@ export const useUserStore = create<UserState>()(
         loading: currentState.loading,
         saving: currentState.saving,
       }),
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            logger.error('USERSTORE_REHYDRATE', 'Failed to rehydrate store', {
+              error: error.message,
+            });
+            // Log storage usage on rehydration error
+            logStorageUsage('USERSTORE_REHYDRATE_ERROR');
+          } else {
+            logger.info('USERSTORE_REHYDRATE', 'Store rehydrated successfully');
+            // Log storage usage on successful rehydration
+            logStorageUsage('USERSTORE_REHYDRATE_SUCCESS');
+          }
+        };
+      },
     }
   )
 );
