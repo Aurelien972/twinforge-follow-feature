@@ -23,7 +23,7 @@ interface MealInsightsTabProps {
 
 const MealInsightsTab: React.FC<MealInsightsTabProps> = ({ onLoadingChange }) => {
   const navigate = useNavigate();
-  const { session } = useUserStore();
+  const { session, profile } = useUserStore();
   const userId = session?.user?.id;
 
   // Récupérer les repas des 7 derniers jours pour l'analyse de tendances
