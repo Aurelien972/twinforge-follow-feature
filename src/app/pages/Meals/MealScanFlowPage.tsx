@@ -15,8 +15,11 @@ import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import PageHeader from '../../../ui/page/PageHeader';
 import logger from '../../../lib/utils/logger';
-import { initialScanFlowState, type ScanFlowState } from './components/MealScanFlow/ScanFlowState';
+import { initialScanFlowState, type ScanFlowState, type ScanType } from './components/MealScanFlow/ScanFlowState';
 import { useScanFlowHandlers } from './components/MealScanFlow/ScanFlowHandlers';
+import { useBarcodePipelineHandlers } from './components/MealScanFlow/BarcodePipelineHandlers';
+import BarcodeAnalysisProcessingStep from './components/BarcodeAnalysisStep/BarcodeAnalysisProcessingStep';
+import BarcodeResultsDisplayStep from './components/BarcodeAnalysisStep/BarcodeResultsDisplayStep';
 import ScanExitConfirmationModal from './components/MealScanFlow/ScanExitConfirmationModal';
 import AIStatusBadge from './components/MealScanFlow/AIStatusBadge';
 import { uploadMealPhoto, type UploadResult } from '../../../lib/storage/imageUpload';
@@ -142,7 +145,7 @@ const MealScanFlowPage: React.FC = () => {
     });
   }, [session, user, profile, authReady, userId]);
 
-  // Get scan flow handlers
+  // Get scan flow handlers (for photo-analysis pipeline)
   const scanFlowHandlers = useScanFlowHandlers({
     scanFlowState,
     setScanFlowState,
@@ -165,12 +168,51 @@ const MealScanFlowPage: React.FC = () => {
     }
   });
 
+  // Get barcode pipeline handlers (for barcode-scan pipeline)
+  const barcodePipelineHandlers = useBarcodePipelineHandlers({
+    scanFlowState,
+    setScanFlowState,
+    clientScanIdRef,
+    processingGuardRef,
+    onAnalysisError: (error: string) => {
+      setScanFlowState(prev => ({ ...prev, analysisError: error }));
+      showToast(`Erreur d'analyse: ${error}`, 'error');
+      errorSound();
+    },
+    onSuccess: () => {
+      success();
+    },
+  });
+
+  // Handle scan type selection
+  const handleSelectScanType = React.useCallback((selectedScanType: ScanType) => {
+    setScanFlowState(prev => ({
+      ...prev,
+      scanType: selectedScanType,
+      progressMessage: selectedScanType === 'photo-analysis' ? 'Forge du Repas' : 'Scanner un Code-Barre',
+      progressSubMessage: selectedScanType === 'photo-analysis' ? 'Capturez votre carburant nutritionnel' : 'Scannez le code-barre d\'un produit',
+    }));
+
+    logger.info('MEAL_SCAN_FLOW', 'Scan type selected', {
+      scanType: selectedScanType,
+      timestamp: new Date().toISOString(),
+    });
+  }, [setScanFlowState]);
+
   // State pour la sauvegarde
   const [isSaving, setIsSaving] = useState(false);
 
   // Handle save meal and reset - Fonction complète de sauvegarde et réinitialisation
   const handleSaveMealAndReset = async () => {
-    if (!userId || !scanFlowState.analysisResults || isSaving) {
+    if (!userId || isSaving) {
+      return;
+    }
+
+    // Check if we have results from either pipeline
+    const hasPhotoAnalysisResults = !!scanFlowState.analysisResults;
+    const hasBarcodeResults = !!scanFlowState.barcodeAnalysisResults;
+
+    if (!hasPhotoAnalysisResults && !hasBarcodeResults) {
       return;
     }
 
@@ -179,8 +221,12 @@ const MealScanFlowPage: React.FC = () => {
     try {
       logger.info('MEAL_SCAN_SAVE', 'Starting meal save and reset process', {
         userId,
-        hasAnalysisResults: !!scanFlowState.analysisResults,
-        totalCalories: scanFlowState.analysisResults.total_calories,
+        scanType: scanFlowState.scanType,
+        hasAnalysisResults: hasPhotoAnalysisResults,
+        hasBarcodeResults: hasBarcodeResults,
+        totalCalories: hasPhotoAnalysisResults
+          ? scanFlowState.analysisResults.total_calories
+          : scanFlowState.barcodeAnalysisResults?.totalCalories,
         hasCapturedPhoto: !!scanFlowState.capturedPhoto,
         timestamp: new Date().toISOString()
       });
@@ -234,25 +280,42 @@ const MealScanFlowPage: React.FC = () => {
         }
       }
 
-      // Combiner les items détectés par IA et les produits scannés
-      const allItems = [
-        ...(scanFlowState.analysisResults.detected_foods || []),
-        ...(scanFlowState.scannedProducts.map(p => p.mealItem) || []),
-      ];
+      // Préparer les données du repas selon le type de scan
+      let mealData;
 
-      // Recalculer les totaux si on a des produits scannés en plus
-      const totalCalories = allItems.reduce((sum, item) => sum + item.calories, 0);
+      if (scanFlowState.scanType === 'barcode-scan' && hasBarcodeResults) {
+        // Barcode scan: utiliser les données du produit scanné
+        const product = scanFlowState.barcodeAnalysisResults!.scannedProduct;
+        mealData = {
+          user_id: userId,
+          timestamp: new Date().toISOString(),
+          items: [product.mealItem],
+          total_kcal: scanFlowState.barcodeAnalysisResults!.totalCalories,
+          meal_type: 'snack' as const,
+          meal_name: product.name,
+          photo_url: photoUrl,
+        };
+      } else if (hasPhotoAnalysisResults) {
+        // Photo analysis: utiliser les résultats de l'IA
+        const allItems = [
+          ...(scanFlowState.analysisResults.detected_foods || []),
+          ...(scanFlowState.scannedProducts.map(p => p.mealItem) || []),
+        ];
 
-      // Préparer les données du repas
-      const mealData = {
-        user_id: userId,
-        timestamp: new Date().toISOString(),
-        items: allItems,
-        total_kcal: totalCalories || scanFlowState.analysisResults.total_calories || 0,
-        meal_type: (scanFlowState.analysisResults.meal_type || 'dinner') as 'breakfast' | 'lunch' | 'dinner' | 'snack',
-        meal_name: scanFlowState.analysisResults.meal_name,
-        photo_url: photoUrl, // Use uploaded photo URL instead of blob URL
-      };
+        const totalCalories = allItems.reduce((sum, item) => sum + item.calories, 0);
+
+        mealData = {
+          user_id: userId,
+          timestamp: new Date().toISOString(),
+          items: allItems,
+          total_kcal: totalCalories || scanFlowState.analysisResults.total_calories || 0,
+          meal_type: (scanFlowState.analysisResults.meal_type || 'dinner') as 'breakfast' | 'lunch' | 'dinner' | 'snack',
+          meal_name: scanFlowState.analysisResults.meal_name,
+          photo_url: photoUrl,
+        };
+      } else {
+        throw new Error('Aucune donnée de repas à sauvegarder');
+      }
 
       // Sauvegarder le repas
       const savedMeal = await mealsRepo.saveMeal(mealData);
@@ -307,10 +370,14 @@ const MealScanFlowPage: React.FC = () => {
       success();
       
       // Toast de succès
+      const totalCalories = hasPhotoAnalysisResults
+        ? scanFlowState.analysisResults.total_calories
+        : scanFlowState.barcodeAnalysisResults!.totalCalories;
+
       showToast({
         type: 'success',
         title: 'Repas sauvegardé !',
-        message: `${scanFlowState.analysisResults.total_calories} kcal ajoutées à votre forge nutritionnelle${photoUrl ? ' avec photo' : ''}`,
+        message: `${totalCalories} kcal ajoutées à votre forge nutritionnelle${photoUrl ? ' avec photo' : ''}`,
         duration: 3000,
       });
 
@@ -601,19 +668,21 @@ const MealScanFlowPage: React.FC = () => {
       case 'capture':
         return (
           <MealPhotoCaptureStep
+            scanType={scanFlowState.scanType}
+            onSelectScanType={handleSelectScanType}
             capturedPhoto={scanFlowState.capturedPhoto}
             scannedBarcodes={scanFlowState.scannedBarcodes}
             scannedProducts={scanFlowState.scannedProducts}
             onPhotoCapture={scanFlowHandlers.handlePhotoCapture}
-            onBarcodeDetected={scanFlowHandlers.handleBarcodeDetected}
+            onBarcodeDetected={scanFlowState.scanType === 'barcode-scan' ? barcodePipelineHandlers.handleBarcodeDetected : scanFlowHandlers.handleBarcodeDetected}
             onProductScanned={scanFlowHandlers.handleProductScanned}
             onProductPortionChange={scanFlowHandlers.handleProductPortionChange}
             onProductRemove={scanFlowHandlers.handleProductRemove}
             onBarcodePortionChange={scanFlowHandlers.handleBarcodePortionChange}
             onBarcodeRemove={scanFlowHandlers.handleBarcodeRemove}
-            onRetake={scanFlowHandlers.handleRetake}
+            onRetake={scanFlowState.scanType === 'barcode-scan' ? barcodePipelineHandlers.handleBarcodeRetake : scanFlowHandlers.handleRetake}
             onBack={() => navigate('/meals')}
-            onProceedToProcessing={scanFlowHandlers.handleProceedToProcessing}
+            onProceedToProcessing={scanFlowState.scanType === 'barcode-scan' ? barcodePipelineHandlers.handleBarcodeScan : scanFlowHandlers.handleProceedToProcessing}
             isProcessingInProgress={scanFlowState.isProcessing}
             readyForProcessingRef={readyForProcessingRef}
             progress={scanFlowState.progress}
@@ -621,8 +690,19 @@ const MealScanFlowPage: React.FC = () => {
             progressSubMessage={scanFlowState.progressSubMessage}
           />
         );
-      
+
       case 'processing':
+        if (scanFlowState.scanType === 'barcode-scan') {
+          return (
+            <BarcodeAnalysisProcessingStep
+              barcode={scanFlowState.scannedBarcodes[0]?.barcode || ''}
+              productImage={scanFlowState.scannedBarcodes[0]?.image_url}
+              progress={scanFlowState.progress}
+              progressMessage={scanFlowState.progressMessage}
+              progressSubMessage={scanFlowState.progressSubMessage}
+            />
+          );
+        }
         return (
           <MealAnalysisProcessingStep
             capturedPhoto={scanFlowState.capturedPhoto}
@@ -631,8 +711,22 @@ const MealScanFlowPage: React.FC = () => {
             progressSubMessage={scanFlowState.progressSubMessage}
           />
         );
-      
+
       case 'results':
+        if (scanFlowState.scanType === 'barcode-scan' && scanFlowState.barcodeAnalysisResults) {
+          return (
+            <BarcodeResultsDisplayStep
+              barcodeResults={scanFlowState.barcodeAnalysisResults}
+              onSaveMeal={handleSaveMealAndReset}
+              isSaving={isSaving}
+              onRetake={barcodePipelineHandlers.handleBarcodeRetake}
+              onNewScan={() => {
+                setScanFlowState(initialScanFlowState);
+                clientScanIdRef.current = nanoid();
+              }}
+            />
+          );
+        }
         return (
           <MealResultsDisplayStep
             analysisResults={scanFlowState.analysisResults}
@@ -644,11 +738,7 @@ const MealScanFlowPage: React.FC = () => {
             isSaving={isSaving}
             onRetake={scanFlowHandlers.handleRetake}
             onNewScan={() => {
-              setScanFlowState({
-                ...initialScanFlowState,
-                progressMessage: 'Forge du Repas',
-                progressSubMessage: 'Capturez votre carburant nutritionnel'
-              });
+              setScanFlowState(initialScanFlowState);
               clientScanIdRef.current = nanoid();
             }}
           />

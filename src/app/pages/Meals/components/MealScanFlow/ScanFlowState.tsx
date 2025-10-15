@@ -2,6 +2,7 @@ import React from 'react';
 import type { MealItem } from '../../../../system/data/repositories/mealsRepo';
 
 export type MealScanStep = 'capture' | 'processing' | 'results';
+export type ScanType = 'photo-analysis' | 'barcode-scan' | null;
 export type CaptureMode = 'photo' | 'barcode';
 
 export interface CapturedMealPhoto {
@@ -32,13 +33,30 @@ export interface ScannedProduct {
   scannedAt: string;
 }
 
+export interface BarcodeAnalysisResults {
+  scannedProduct: ScannedProduct;
+  totalCalories: number;
+  totalProteins: number;
+  totalCarbs: number;
+  totalFats: number;
+  productDetails: {
+    name: string;
+    brand?: string;
+    image_url?: string;
+    barcode: string;
+    portionSize: string;
+  };
+}
+
 export interface ScanFlowState {
+  scanType: ScanType;
   currentStep: MealScanStep;
   captureMode: CaptureMode;
   capturedPhoto: CapturedMealPhoto | null;
   scannedBarcodes: ScannedBarcode[];
   scannedProducts: ScannedProduct[];
   analysisResults: any;
+  barcodeAnalysisResults: BarcodeAnalysisResults | null;
   isProcessing: boolean;
   progress: number;
   progressMessage: string;
@@ -49,16 +67,18 @@ export interface ScanFlowState {
 }
 
 export const initialScanFlowState: ScanFlowState = {
+  scanType: null,
   currentStep: 'capture',
   captureMode: 'photo',
   capturedPhoto: null,
   scannedBarcodes: [],
   scannedProducts: [],
   analysisResults: null,
+  barcodeAnalysisResults: null,
   isProcessing: false,
   progress: 0,
-  progressMessage: 'Forge du Repas',
-  progressSubMessage: 'Capturez votre carburant nutritionnel',
+  progressMessage: 'Choisissez votre mode de scan',
+  progressSubMessage: 'Scanner un repas avec IA ou un code-barre produit',
   analysisError: null,
   analysisMetadata: null,
   isScanningBarcode: false,

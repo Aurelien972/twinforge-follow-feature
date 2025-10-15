@@ -11,7 +11,8 @@ import ScannedProductCard from './ScannedProductCard';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
-import type { ScannedProduct, ScannedBarcode } from '../MealScanFlow/ScanFlowState';
+import type { ScannedProduct, ScannedBarcode, ScanType } from '../MealScanFlow/ScanFlowState';
+import ScanTypeSelector from './ScanTypeSelector';
 
 interface CapturedMealPhoto {
   file: File;
@@ -26,6 +27,8 @@ interface CapturedMealPhoto {
 
 
 interface MealPhotoCaptureStepProps {
+  scanType: ScanType;
+  onSelectScanType: (scanType: ScanType) => void;
   capturedPhoto: CapturedMealPhoto | null;
   scannedBarcodes: ScannedBarcode[];
   scannedProducts: ScannedProduct[];
@@ -51,6 +54,8 @@ interface MealPhotoCaptureStepProps {
  * Handles photo capture flow for meal scanning
  */
 const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
+  scanType,
+  onSelectScanType,
   capturedPhoto,
   scannedBarcodes,
   scannedProducts,
@@ -214,45 +219,89 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
       style={{ minHeight: '100vh' }}
     >
       {/* MealProgressHeader au-dessus de tout */}
-      <MealProgressHeader
-        currentStep="capture"
-        progress={progress}
-        message={progressMessage}
-        subMessage={progressSubMessage}
-      />
-      
+      {scanType && (
+        <MealProgressHeader
+          currentStep="capture"
+          progress={progress}
+          message={progressMessage}
+          subMessage={progressSubMessage}
+        />
+      )}
+
+      {/* Scan Type Selector - Show only when no scan type selected */}
+      {!scanType && (
+        <div className="mt-6">
+          <ScanTypeSelector onSelectScanType={onSelectScanType} />
+        </div>
+      )}
+
       {/* Main Content */}
-      <div 
-        className="space-y-6 mt-6" 
-      >
-        {!capturedPhoto ? (
-          <div className="mt-6">
-            <CaptureGuide
-              isValidating={isValidating}
-              onCameraClick={handleCameraClick}
-              onGalleryClick={handleGalleryClick}
-              onBarcodeClick={handleBarcodeClick}
-              onBarcodeImageUpload={handleBarcodeImageUpload}
-            />
-          </div>
-        ) : (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key="captured"
-              className="mt-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <CapturedPhotoDisplay
-                capturedPhoto={capturedPhoto}
-                showSuccessAnimation={showSuccessAnimation}
-                onRetake={onRetake}
+      {scanType && (
+        <div
+          className="space-y-6 mt-6"
+        >
+          {scanType === 'photo-analysis' && !capturedPhoto && (
+            <div className="mt-6">
+              <CaptureGuide
+                isValidating={isValidating}
+                onCameraClick={handleCameraClick}
+                onGalleryClick={handleGalleryClick}
+                onBarcodeClick={handleBarcodeClick}
+                onBarcodeImageUpload={handleBarcodeImageUpload}
               />
-            </motion.div>
-          </AnimatePresence>
-        )}
+            </div>
+          )}
+
+          {scanType === 'photo-analysis' && capturedPhoto && (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="captured"
+                className="mt-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <CapturedPhotoDisplay
+                  capturedPhoto={capturedPhoto}
+                  showSuccessAnimation={showSuccessAnimation}
+                  onRetake={onRetake}
+                />
+              </motion.div>
+            </AnimatePresence>
+          )}
+
+          {scanType === 'barcode-scan' && scannedBarcodes.length === 0 && (
+            <div className="mt-6">
+              <GlassCard className="p-6 text-center">
+                <button
+                  onClick={handleBarcodeClick}
+                  className="w-full btn-glass touch-feedback-css"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.1))',
+                    borderColor: 'rgba(99, 102, 241, 0.35)',
+                    padding: '1.5rem',
+                  }}
+                >
+                  <div className="flex flex-col items-center gap-4">
+                    <div
+                      className="w-20 h-20 rounded-2xl flex items-center justify-center"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(79, 70, 229, 0.15))',
+                        border: '2px solid rgba(99, 102, 241, 0.4)',
+                      }}
+                    >
+                      <SpatialIcon Icon={ICONS.ScanBarcode} size={40} className="text-indigo-300" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold text-lg mb-1">Scanner un Code-Barre</h3>
+                      <p className="text-gray-300 text-sm">Appuyez pour démarrer le scan</p>
+                    </div>
+                  </div>
+                </button>
+              </GlassCard>
+            </div>
+          )}
 
         {/* Scanned Barcodes List */}
         {scannedBarcodes.length > 0 && (
@@ -398,15 +447,16 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
           </div>
         )}
 
-        {/* Benefits Info Card - Show only when no photo or products */}
-        {!capturedPhoto && scannedBarcodes.length === 0 && scannedProducts.length === 0 && (
+        {/* Benefits Info Card - Show only when no photo or products AND photo-analysis selected */}
+        {scanType === 'photo-analysis' && !capturedPhoto && scannedBarcodes.length === 0 && scannedProducts.length === 0 && (
           <BenefitsInfoCard
             benefits={mealScanBenefits}
             themeColor="#10B981"
             title="Pourquoi scanner mes repas ?"
           />
         )}
-      </div>
+        </div>
+      )}
 
       {/* Hidden File Input */}
       <input
