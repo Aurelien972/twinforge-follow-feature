@@ -197,9 +197,13 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
         </div>
         
         <button
-          onClick={onCameraClick}
+          onClick={(e) => {
+            console.log('CaptureGuide: Camera button onClick fired', e);
+            onCameraClick();
+          }}
           className="w-full btn-glass--primary btn-breathing-css touch-feedback-css"
           disabled={isValidating}
+          type="button"
           style={{
             '--scan-primary': '#10B981',
             background: `
@@ -236,9 +240,13 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
         </button>
 
         <button
-          onClick={onGalleryClick}
+          onClick={(e) => {
+            console.log('CaptureGuide: Gallery button onClick fired', e);
+            onGalleryClick();
+          }}
           className="w-full btn-glass btn-glass--secondary-nav touch-feedback-css"
           disabled={isValidating}
+          type="button"
           style={{
             background: 'rgba(16, 185, 129, 0.08)',
             borderColor: 'rgba(16, 185, 129, 0.25)',
@@ -269,6 +277,7 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
           onClick={() => setShowBarcodeOptions(!showBarcodeOptions)}
           className="w-full btn-glass touch-feedback-css group relative overflow-hidden"
           disabled={isValidating}
+          type="button"
           style={{
             background: `
               linear-gradient(145deg,

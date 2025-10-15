@@ -92,15 +92,40 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
   ];
 
   const handleCameraClick = () => {
-    fileInputRef.current?.click();
+    console.log('Camera button clicked');
+    console.log('fileInputRef.current:', fileInputRef.current);
+
+    if (!fileInputRef.current) {
+      console.error('fileInputRef.current is null or undefined');
+      return;
+    }
+
+    try {
+      console.log('Attempting to trigger file input click');
+      fileInputRef.current.click();
+      console.log('File input click triggered successfully');
+    } catch (error) {
+      console.error('Error clicking file input:', error);
+    }
   };
 
   const handleGalleryClick = () => {
-    console.log('Gallery button clicked', galleryInputRef.current);
-    if (galleryInputRef.current) {
+    console.log('Gallery button clicked');
+    console.log('galleryInputRef.current:', galleryInputRef.current);
+
+    if (!galleryInputRef.current) {
+      console.error('galleryInputRef.current is null or undefined');
+      return;
+    }
+
+    try {
+      console.log('Attempting to reset and trigger gallery input');
       // Force reset the input value to allow selecting the same file again
       galleryInputRef.current.value = '';
       galleryInputRef.current.click();
+      console.log('Gallery input click triggered successfully');
+    } catch (error) {
+      console.error('Error clicking gallery input:', error);
     }
   };
 
@@ -168,8 +193,9 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
   };
 
   return (
-    <div 
-      className="space-y-6 pb-24" 
+    <div
+      className="space-y-6 pb-32"
+      style={{ minHeight: '100vh' }}
     >
       {/* MealProgressHeader au-dessus de tout */}
       <MealProgressHeader
@@ -261,8 +287,21 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
         type="file"
         accept="image/*"
         onChange={handleFileSelect}
-        className="hidden"
+        style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: '0',
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          whiteSpace: 'nowrap',
+          border: '0',
+          opacity: 0,
+          pointerEvents: 'none'
+        }}
         capture="environment"
+        data-testid="camera-file-input"
       />
       
       {/* Hidden Gallery Input */}
@@ -271,7 +310,20 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
         type="file"
         accept="image/*"
         onChange={handleFileSelect}
-        className="hidden"
+        style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: '0',
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          whiteSpace: 'nowrap',
+          border: '0',
+          opacity: 0,
+          pointerEvents: 'none'
+        }}
+        data-testid="gallery-file-input"
       />
 
       {/* Hidden Barcode Image Input */}
@@ -292,11 +344,16 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
       {/* Navigation Controls - Fixed at bottom */}
       <div
         className="fixed bottom-0 left-0 right-0 p-4 z-50"
+        style={{
+          pointerEvents: 'none'
+        }}
       >
-        <NavigationControls
-          capturedPhoto={capturedPhoto}
-          onBack={onBack}
-        />
+        <div style={{ pointerEvents: 'auto' }}>
+          <NavigationControls
+            capturedPhoto={capturedPhoto}
+            onBack={onBack}
+          />
+        </div>
       </div>
 
       {/* Barcode Scanner Inline Component */}
