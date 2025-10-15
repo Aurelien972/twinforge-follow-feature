@@ -274,8 +274,8 @@ const MealScanFlowPage: React.FC = () => {
         timestamp: new Date().toISOString()
       });
 
-      // OPTIMISATION CRITIQUE: Forcer le refetch synchrone des queries actives
-      // refetchType: 'active' garantit que seules les queries montées sont rafraîchies
+      // OPTIMISATION CRITIQUE: Forcer le refetch synchrone de toutes les queries de repas
+      // Utilisation de refetchQueries avec type: 'active' pour forcer les refetch immediats
       await Promise.all([
         queryClient.refetchQueries({
           queryKey: ['meals-today', userId],
@@ -289,13 +289,17 @@ const MealScanFlowPage: React.FC = () => {
           queryKey: ['meals-recent', userId],
           type: 'active'
         }),
+        queryClient.refetchQueries({
+          queryKey: ['meals-history', userId],
+          type: 'active'
+        }),
         queryClient.invalidateQueries({ queryKey: ['meals-month', userId] }),
-        queryClient.invalidateQueries({ queryKey: ['meals-history', userId] }),
         queryClient.invalidateQueries({ queryKey: ['daily-ai-summary', userId] })
       ]);
 
-      logger.info('MEAL_SCAN_SAVE', 'Query refetch completed', {
+      logger.info('MEAL_SCAN_SAVE', 'All meal queries refetched', {
         mealId: savedMeal.id,
+        queries: ['meals-today', 'meals-week', 'meals-recent', 'meals-history', 'meals-month', 'daily-ai-summary'],
         timestamp: new Date().toISOString()
       });
 

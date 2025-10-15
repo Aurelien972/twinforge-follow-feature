@@ -194,16 +194,25 @@ const DailyRecapTab: React.FC<DailyRecapTabProps> = ({ onLoadingChange }) => {
     
     try {
       await mealsRepo.deleteMeal(mealId, userId);
-      
-      // Invalider toutes les requêtes de repas pour mise à jour UI
+
+      // Forcer le refetch immédiat des queries actives pour mise à jour UI
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['meals-today', userId] }),
-        queryClient.invalidateQueries({ queryKey: ['meals-week', userId] }),
+        queryClient.refetchQueries({
+          queryKey: ['meals-today', userId],
+          type: 'active'
+        }),
+        queryClient.refetchQueries({
+          queryKey: ['meals-week', userId],
+          type: 'active'
+        }),
+        queryClient.refetchQueries({
+          queryKey: ['meals-history', userId],
+          type: 'active'
+        }),
         queryClient.invalidateQueries({ queryKey: ['meals-month', userId] }),
-        queryClient.invalidateQueries({ queryKey: ['meals-history', userId] }),
         queryClient.invalidateQueries({ queryKey: ['daily-ai-summary', userId] })
       ]);
-      
+
       success();
       showToast({
         type: 'success',
@@ -211,10 +220,11 @@ const DailyRecapTab: React.FC<DailyRecapTabProps> = ({ onLoadingChange }) => {
         message: 'Le repas a été retiré de votre forge nutritionnelle',
         duration: 3000,
       });
-      
-      logger.info('MEAL_DELETE', 'Meal deleted successfully', {
+
+      logger.info('MEAL_DELETE', 'Meal deleted and all queries refetched', {
         mealId,
         userId,
+        queriesRefetched: ['meals-today', 'meals-week', 'meals-history'],
         timestamp: new Date().toISOString()
       });
       

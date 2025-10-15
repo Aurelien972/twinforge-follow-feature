@@ -26,6 +26,14 @@ const MealHistoryTab: React.FC = () => {
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
   const [deletingMealId, setDeletingMealId] = useState<string | null>(null);
 
+  // Log when component mounts to track tab activation
+  React.useEffect(() => {
+    logger.info('MEAL_HISTORY_TAB', 'Tab activated (component mounted)', {
+      userId,
+      timestamp: new Date().toISOString()
+    });
+  }, [userId]);
+
   const handleDeleteMeal = async (mealId: string) => {
     if (!userId) return;
     
@@ -33,13 +41,22 @@ const MealHistoryTab: React.FC = () => {
     
     try {
       await mealsRepo.deleteMeal(mealId, userId);
-      
-      // Invalider toutes les requêtes de repas pour mise à jour UI
+
+      // Forcer le refetch immédiat des queries actives pour mise à jour UI
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['meals-today', userId] }),
-        queryClient.invalidateQueries({ queryKey: ['meals-week', userId] }),
+        queryClient.refetchQueries({
+          queryKey: ['meals-today', userId],
+          type: 'active'
+        }),
+        queryClient.refetchQueries({
+          queryKey: ['meals-week', userId],
+          type: 'active'
+        }),
+        queryClient.refetchQueries({
+          queryKey: ['meals-history', userId],
+          type: 'active'
+        }),
         queryClient.invalidateQueries({ queryKey: ['meals-month', userId] }),
-        queryClient.invalidateQueries({ queryKey: ['meals-history', userId] }),
         queryClient.invalidateQueries({ queryKey: ['daily-ai-summary', userId] })
       ]);
       
@@ -50,10 +67,11 @@ const MealHistoryTab: React.FC = () => {
         message: 'Le repas a été retiré de votre historique',
         duration: 3000,
       });
-      
-      logger.info('MEAL_DELETE', 'Meal deleted successfully from history', {
+
+      logger.info('MEAL_DELETE', 'Meal deleted and all queries refetched', {
         mealId,
         userId,
+        queriesRefetched: ['meals-today', 'meals-week', 'meals-history'],
         timestamp: new Date().toISOString()
       });
       
@@ -82,13 +100,28 @@ const MealHistoryTab: React.FC = () => {
     queryKey: ['meals-history', userId],
     queryFn: async () => {
       if (!userId) return [];
-      
+
+      logger.info('MEAL_HISTORY_TAB', 'Fetching meal history', {
+        userId,
+        timestamp: new Date().toISOString()
+      });
+
       const thirtyDaysAgo = subDays(new Date(), 30);
       const today = new Date();
-      return mealsRepo.getUserMeals(userId, thirtyDaysAgo, today, 50);
+      const result = await mealsRepo.getUserMeals(userId, thirtyDaysAgo, today, 50);
+
+      logger.info('MEAL_HISTORY_TAB', 'Meal history fetched', {
+        userId,
+        mealsCount: result.length,
+        timestamp: new Date().toISOString()
+      });
+
+      return result;
     },
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // CRITIQUE: Aucun cache pour garantir des données fraîches
+    refetchOnWindowFocus: true, // Refetch quand la fenêtre reprend le focus
+    refetchOnMount: true, // CRITIQUE: Toujours refetch au montage du composant
   });
 
   // Grouper les repas par jour
