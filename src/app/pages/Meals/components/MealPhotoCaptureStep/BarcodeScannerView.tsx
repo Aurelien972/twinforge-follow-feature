@@ -150,10 +150,13 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
         timestamp: new Date().toISOString(),
       });
 
+      // Ajouter le produit immédiatement
+      onProductScanned(scannedProduct);
+
       setSuccessMessage(`${scannedProduct.name} ajouté !`);
 
+      // Réinitialiser pour permettre un nouveau scan après un court délai
       setTimeout(() => {
-        onProductScanned(scannedProduct);
         setSuccessMessage(null);
         setIsScanning(true);
         setLastScannedBarcode(null);

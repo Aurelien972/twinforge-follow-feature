@@ -8,6 +8,9 @@ import { useFeedback } from '../../../../../hooks/useFeedback';
 interface ReadyForProcessingProps {
   onProceedToProcessing: () => void;
   isProcessingInProgress: boolean;
+  hasPhoto: boolean;
+  hasScannedProducts: boolean;
+  scannedProductsCount: number;
 }
 
 /**
@@ -17,8 +20,33 @@ interface ReadyForProcessingProps {
 const ReadyForProcessing: React.FC<ReadyForProcessingProps> = ({
   onProceedToProcessing,
   isProcessingInProgress,
+  hasPhoto,
+  hasScannedProducts,
+  scannedProductsCount,
 }) => {
   const { success } = useFeedback();
+
+  // Générer le message contextuel selon ce qui a été capturé
+  const getContextualMessage = () => {
+    if (hasPhoto && hasScannedProducts) {
+      return {
+        title: 'Photo et produits scannés !',
+        subtitle: `Votre photo et ${scannedProductsCount} produit${scannedProductsCount > 1 ? 's' : ''} scanné${scannedProductsCount > 1 ? 's' : ''} sont prêts pour l'analyse TwinForge.`,
+      };
+    } else if (hasScannedProducts) {
+      return {
+        title: `${scannedProductsCount} produit${scannedProductsCount > 1 ? 's' : ''} scanné${scannedProductsCount > 1 ? 's' : ''} !`,
+        subtitle: 'Vos produits sont prêts pour l\'analyse nutritionnelle TwinForge.',
+      };
+    } else {
+      return {
+        title: 'Photo capturée avec succès !',
+        subtitle: 'Votre carburant nutritionnel est prêt pour l\'analyse TwinForge.',
+      };
+    }
+  };
+
+  const message = getContextualMessage();
 
   return (
     <div className="meal-ready-processing meal-capture-enter">
@@ -80,11 +108,11 @@ const ReadyForProcessing: React.FC<ReadyForProcessingProps> = ({
             </div>
             
             <h3 className="text-white text-xl font-bold text-center">
-              Photo capturée avec succès !
+              {message.title}
             </h3>
-            
+
             <p className="text-green-100 text-base leading-relaxed max-w-md mx-auto text-center">
-              Votre carburant nutritionnel est prêt pour l'analyse TwinForge.
+              {message.subtitle}
             </p>
             </div>
           </div>

@@ -8,6 +8,9 @@ import MealProgressHeader from '../MealProgressHeader';
 import BenefitsInfoCard, { Benefit } from '../../../../../ui/cards/BenefitsInfoCard';
 import BarcodeScannerView from './BarcodeScannerView';
 import ScannedProductCard from './ScannedProductCard';
+import GlassCard from '../../../../../ui/cards/GlassCard';
+import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
+import { ICONS } from '../../../../../ui/icons/registry';
 import type { ScannedProduct } from '../MealScanFlow/ScanFlowState';
 
 interface CapturedMealPhoto {
@@ -245,21 +248,72 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
 
         {/* Scanned Products List */}
         {scannedProducts.length > 0 && (
-          <div className="mt-6 space-y-3">
-            <h3 className="text-white font-semibold text-sm mb-3 flex items-center gap-2">
-              <span>Produits scannés</span>
-              <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs">
-                {scannedProducts.length}
-              </span>
-            </h3>
-            {scannedProducts.map((product) => (
-              <ScannedProductCard
-                key={product.barcode}
-                product={product}
-                onPortionChange={onProductPortionChange}
-                onRemove={onProductRemove}
-              />
-            ))}
+          <div className="mt-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-white font-semibold text-base flex items-center gap-2">
+                <SpatialIcon Icon={ICONS.ScanBarcode} size={20} className="text-indigo-400" />
+                <span>Produits scannés</span>
+                <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold">
+                  {scannedProducts.length}
+                </span>
+              </h3>
+            </div>
+
+            <div className="space-y-3">
+              {scannedProducts.map((product) => (
+                <ScannedProductCard
+                  key={product.barcode}
+                  product={product}
+                  onPortionChange={onProductPortionChange}
+                  onRemove={onProductRemove}
+                />
+              ))}
+            </div>
+
+            {/* Option to add photo for scanned products */}
+            {!capturedPhoto && scannedProducts.length > 0 && (
+              <div className="mt-4">
+                <GlassCard
+                  className="p-4 text-center"
+                  style={{
+                    background: 'rgba(99, 102, 241, 0.05)',
+                    borderColor: 'rgba(99, 102, 241, 0.2)',
+                  }}
+                >
+                  <p className="text-gray-300 text-sm mb-3">
+                    Ajouter une photo pour enrichir votre analyse nutritionnelle
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleCameraClick}
+                      className="flex-1 btn-glass touch-feedback-css"
+                      style={{
+                        background: 'rgba(16, 185, 129, 0.08)',
+                        borderColor: 'rgba(16, 185, 129, 0.25)',
+                      }}
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <SpatialIcon Icon={ICONS.Camera} size={16} />
+                        <span className="text-sm font-medium">Appareil photo</span>
+                      </div>
+                    </button>
+                    <button
+                      onClick={handleGalleryClick}
+                      className="flex-1 btn-glass touch-feedback-css"
+                      style={{
+                        background: 'rgba(16, 185, 129, 0.08)',
+                        borderColor: 'rgba(16, 185, 129, 0.25)',
+                      }}
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <SpatialIcon Icon={ICONS.Image} size={16} />
+                        <span className="text-sm font-medium">Galerie</span>
+                      </div>
+                    </button>
+                  </div>
+                </GlassCard>
+              </div>
+            )}
           </div>
         )}
 
@@ -272,6 +326,9 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
             <ReadyForProcessing
               onProceedToProcessing={onProceedToProcessing}
               isProcessingInProgress={isProcessingInProgress}
+              hasPhoto={!!capturedPhoto}
+              hasScannedProducts={scannedProducts.length > 0}
+              scannedProductsCount={scannedProducts.length}
             />
           </div>
         )}

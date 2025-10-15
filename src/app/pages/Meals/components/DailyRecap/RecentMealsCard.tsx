@@ -89,9 +89,9 @@ const RecentMealsCard: React.FC<RecentMealsCardProps> = ({
                   }}
                   onClick={() => onMealClick(meal)}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-1">
                     <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{
                         background: `
                           radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12) 0%, transparent 60%),
@@ -103,16 +103,33 @@ const RecentMealsCard: React.FC<RecentMealsCardProps> = ({
                     >
                       <SpatialIcon Icon={ICONS.Utensils} size={16} className="text-green-400" />
                     </div>
-                    <div>
-                      <div className="text-white font-semibold">
-                        {meal.meal_name || (meal.meal_type ? 
-                          meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1) : 
-                          'Repas'
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-semibold truncate">
+                          {meal.meal_name || (meal.meal_type ?
+                            meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1) :
+                            'Repas'
+                          )}
+                        </span>
+                        {/* Badge code-barre si le repas n'a pas de photo */}
+                        {!meal.photo_url && (
+                          <span
+                            className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0"
+                            style={{
+                              background: 'rgba(99, 102, 241, 0.15)',
+                              border: '1px solid rgba(99, 102, 241, 0.3)',
+                              color: '#A5B4FC',
+                            }}
+                            title="Repas créé via scan de code-barre"
+                          >
+                            <SpatialIcon Icon={ICONS.ScanBarcode} size={12} />
+                            <span>Scan</span>
+                          </span>
                         )}
                       </div>
                       <div className="text-white/60 text-sm">
-                        {meal.meal_type ? 
-                          meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1) : 
+                        {meal.meal_type ?
+                          meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1) :
                           'Repas'
                         } • {format(new Date(meal.timestamp), 'HH:mm')}
                       </div>
