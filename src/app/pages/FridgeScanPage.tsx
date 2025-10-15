@@ -13,7 +13,7 @@ const FridgeScanPage: React.FC = () => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    navigate('/meals/fridge');
+    navigate('/fridge');
   }, [navigate]);
 
   return (
