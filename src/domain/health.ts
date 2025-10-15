@@ -295,3 +295,94 @@ export function getHealthVersion(health: HealthProfile | null | undefined): '1.0
   if (isHealthV2(health)) return '2.0';
   return '1.0';
 }
+
+/**
+ * Geographic and Environmental Data Types
+ */
+
+export type AirQualityLevel = 'good' | 'moderate' | 'unhealthy_sensitive' | 'unhealthy' | 'very_unhealthy' | 'hazardous';
+
+export interface AirQualityData {
+  aqi: number;
+  level: AirQualityLevel;
+  pm2_5?: number;
+  pm10?: number;
+  co?: number;
+  no2?: number;
+  o3?: number;
+  so2?: number;
+  dominant_pollutant?: string;
+  health_recommendations?: string[];
+  last_updated: string;
+}
+
+export interface WeatherData {
+  temperature_celsius: number;
+  feels_like_celsius?: number;
+  humidity_percent: number;
+  pressure_hpa?: number;
+  wind_speed_ms?: number;
+  wind_direction?: number;
+  precipitation_mm?: number;
+  uv_index?: number;
+  visibility_km?: number;
+  cloud_cover_percent?: number;
+  weather_condition: string;
+  weather_description?: string;
+  last_updated: string;
+}
+
+export interface HydrationRecommendation {
+  base_amount_liters: number;
+  weather_adjustment_liters: number;
+  activity_adjustment_liters: number;
+  total_recommended_liters: number;
+  factors: {
+    temperature: number;
+    humidity: number;
+    physical_activity_level: string;
+    user_weight_kg?: number;
+  };
+  recommendations: string[];
+  alerts?: string[];
+}
+
+export interface EnvironmentalExposure {
+  air_quality: AirQualityData;
+  pollution_sources?: string[];
+  environmental_hazards?: string[];
+  exposure_level: 'low' | 'moderate' | 'high' | 'severe';
+  protective_measures?: string[];
+  time_outdoors_recommended?: {
+    safe_hours: string[];
+    avoid_hours: string[];
+  };
+}
+
+export interface GeographicData {
+  user_id: string;
+  country_code: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+  weather: WeatherData;
+  air_quality: AirQualityData;
+  environmental_exposure: EnvironmentalExposure;
+  hydration_recommendation: HydrationRecommendation;
+  last_updated: string;
+  next_update_due: string;
+}
+
+export interface GeographicDataCache {
+  id: string;
+  user_id: string;
+  country_code: string;
+  city?: string;
+  location_key: string;
+  weather_data: WeatherData;
+  air_quality_data: AirQualityData;
+  environmental_data: EnvironmentalExposure;
+  hydration_data: HydrationRecommendation;
+  created_at: string;
+  expires_at: string;
+}

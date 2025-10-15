@@ -22,7 +22,7 @@ import { BasicHealthTabEnhancedV2 } from './tabs/BasicHealthTabEnhancedV2';
 import { VitalSignsTab } from './tabs/VitalSignsTab';
 import { LifestyleTab } from './tabs/LifestyleTab';
 import { IntimacyTab } from './tabs/IntimacyTab';
-import { FamilyHistoryTab } from './tabs/FamilyHistoryTab';
+import { GeographicTab } from './tabs/GeographicTab';
 import logger from '../../../lib/utils/logger';
 
 const HealthProfilePage: React.FC = () => {
@@ -46,13 +46,16 @@ const HealthProfilePage: React.FC = () => {
   // Update tab completion percentages when data changes
   React.useEffect(() => {
     if (completion) {
-      updateTabCompletion('basic-info', completion.basicInfo || 0);
+      // Include family history in basic-info now
+      const basicInfoCompletion = ((completion.basicInfo || 0) + completion.familyHistory) / 2;
+      updateTabCompletion('basic-info', basicInfoCompletion);
       updateTabCompletion('lifestyle', completion.lifestyle);
       updateTabCompletion('intimacy', completion.intimacy || 0);
-      updateTabCompletion('family-history', completion.familyHistory);
       updateTabCompletion('vital-signs', completion.vitalSigns);
+      // Geographic tab is optional, always show as complete if country is set
+      updateTabCompletion('geographic', profile?.country ? 100 : 0);
     }
-  }, [completion, updateTabCompletion]);
+  }, [completion, updateTabCompletion, profile?.country]);
 
   React.useEffect(() => {
     if (!migrationComplete && !migrating && !migrationError) {
@@ -307,8 +310,8 @@ const HealthProfilePage: React.FC = () => {
           <IntimacyTab />
         </Tabs.Panel>
 
-        <Tabs.Panel value="family-history">
-          <FamilyHistoryTab />
+        <Tabs.Panel value="geographic">
+          <GeographicTab />
         </Tabs.Panel>
 
         <Tabs.Panel value="vital-signs">

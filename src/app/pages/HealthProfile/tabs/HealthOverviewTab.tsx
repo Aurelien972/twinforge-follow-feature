@@ -12,14 +12,12 @@ import { HealthScoreWidget } from '../components/HealthScoreWidget';
 import { HealthRiskBadges } from '../components/HealthRiskBadges';
 import { BMIMetricsCard } from '../components/BMIMetricsCard';
 import { useUserStore } from '../../../../system/store/userStore';
-import { useCountryHealthData } from '../../../../hooks/useCountryHealthData';
 import { calculateHealthScore } from '../utils/healthScoreCalculations';
 import { useHealthProfileNavigation } from '../hooks/useHealthProfileNavigation';
 import type { HealthProfileV2 } from '../../../../domain/health';
 
 export const HealthOverviewTab: React.FC = () => {
   const { profile } = useUserStore();
-  const { countryData, loading: countryLoading } = useCountryHealthData();
   const { navigateToTab, nextIncompleteTab, aiReadiness } = useHealthProfileNavigation();
 
   const health = (profile as any)?.health as HealthProfileV2 | undefined;
@@ -45,14 +43,52 @@ export const HealthOverviewTab: React.FC = () => {
         <BMIMetricsCard />
       </motion.div>
 
-      {/* Country Health Risks */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <HealthRiskBadges countryData={countryData} loading={countryLoading} />
-      </motion.div>
+      {/* Geographic & Country Health CTA */}
+      {profile?.country && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <GlassCard
+            className="p-6 cursor-pointer hover:scale-[1.02] transition-transform"
+            onClick={() => navigateToTab('geographic')}
+            style={{
+              background: `
+                radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 60%),
+                var(--glass-opacity)
+              `,
+              borderColor: 'rgba(6, 182, 212, 0.4)',
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{
+                  background: `
+                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                    linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
+                  `,
+                  border: '2px solid rgba(6, 182, 212, 0.5)',
+                  boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
+                }}
+              >
+                <SpatialIcon Icon={ICONS.MapPin} size={24} style={{ color: '#06B6D4' }} variant="pure" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-white font-semibold text-lg mb-1">Environnement & Géographie</h3>
+                <p className="text-white/70 text-sm mb-2">
+                  Consultez la météo, la qualité de l'air et le contexte sanitaire local pour {profile.country}
+                </p>
+                <div className="flex items-center gap-2 text-cyan-400 text-sm font-medium">
+                  <span>Accéder à l'onglet Géo</span>
+                  <SpatialIcon Icon={ICONS.ArrowRight} size={14} />
+                </div>
+              </div>
+            </div>
+          </GlassCard>
+        </motion.div>
+      )}
 
       {/* Quick Actions */}
       <motion.div

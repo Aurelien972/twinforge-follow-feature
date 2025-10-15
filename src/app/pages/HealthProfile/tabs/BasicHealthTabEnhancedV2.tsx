@@ -17,6 +17,7 @@ import { VaccinationsSection } from '../components/VaccinationsSection';
 import { MedicalConditionsCard } from '../components/MedicalConditionsCard';
 import { CurrentMedicationsCard } from '../components/CurrentMedicationsCard';
 import { AllergiesSection } from '../components/AllergiesSection';
+import { FamilyHistorySection } from '../../Profile/components/health/FamilyHistorySection';
 import { useUserStore } from '../../../../system/store/userStore';
 import { useCountryHealthData } from '../hooks/useCountryHealthData';
 import { useVaccinationsForm } from '../hooks/useVaccinationsForm';
@@ -30,6 +31,16 @@ import type { HealthProfileV2 } from '../../../../domain/health';
 // Schema for the comprehensive health form
 const comprehensiveHealthSchema = z.object({
   bloodType: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
+  medical_history: z.object({
+    family_history: z.object({
+      cardiovascular: z.boolean().optional(),
+      diabetes: z.boolean().optional(),
+      cancer: z.array(z.string()).optional(),
+      hypertension: z.boolean().optional(),
+      alzheimers: z.boolean().optional(),
+      genetic_conditions: z.array(z.string()).optional(),
+    }).optional(),
+  }).optional(),
 });
 
 type ComprehensiveHealthForm = z.infer<typeof comprehensiveHealthSchema>;
@@ -54,23 +65,33 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
   // Allergies hook
   const allergies = useAllergiesForm();
 
-  // Main form for blood type
+  // Main form for blood type and family history
   const form = useForm<ComprehensiveHealthForm>({
     resolver: zodResolver(comprehensiveHealthSchema),
     defaultValues: {
       bloodType: healthV2?.basic?.bloodType,
+      medical_history: {
+        family_history: {
+          cardiovascular: healthV2?.medical_history?.family_history?.cardiovascular,
+          diabetes: healthV2?.medical_history?.family_history?.diabetes,
+          cancer: healthV2?.medical_history?.family_history?.cancer || [],
+          hypertension: healthV2?.medical_history?.family_history?.hypertension,
+          alzheimers: healthV2?.medical_history?.family_history?.alzheimers,
+          genetic_conditions: healthV2?.medical_history?.family_history?.genetic_conditions || [],
+        },
+      },
     },
     mode: 'onChange',
   });
 
-  const { register, handleSubmit, formState, watch } = form;
+  const { register, handleSubmit, formState, watch, setValue } = form;
   const { errors, isDirty } = formState;
   const watchedValues = watch();
 
   // Calculate overall completion
   const completion = React.useMemo(() => {
     let filled = 0;
-    let total = 4; // blood type, vaccinations, conditions/meds, allergies
+    let total = 5; // blood type, vaccinations, conditions/meds, allergies, family history
 
     // Blood type
     if (watchedValues.bloodType) filled++;
@@ -84,6 +105,19 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
     // Allergies
     if (allergies.allergies.length > 0) filled++;
 
+    // Family history - check if at least one field is filled
+    const familyHistory = watchedValues.medical_history?.family_history;
+    if (
+      familyHistory?.cardiovascular ||
+      familyHistory?.diabetes ||
+      familyHistory?.hypertension ||
+      familyHistory?.alzheimers ||
+      (familyHistory?.cancer && familyHistory.cancer.length > 0) ||
+      (familyHistory?.genetic_conditions && familyHistory.genetic_conditions.length > 0)
+    ) {
+      filled++;
+    }
+
     return Math.round((filled / total) * 100);
   }, [watchedValues, vaccinations, medicalConditions, allergies]);
 
@@ -92,6 +126,7 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
       logger.info('HEALTH_PROFILE', 'Saving comprehensive health info', {
         userId: profile?.userId,
         hasBloodType: !!data.bloodType,
+        hasFamilyHistory: !!data.medical_history?.family_history,
       });
 
       const currentHealth = (profile as any)?.health as HealthProfileV2 | undefined;
@@ -101,7 +136,14 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
           ...currentHealth,
           version: '2.0' as const,
           basic: {
+            ...currentHealth?.basic,
             bloodType: data.bloodType,
+          },
+          medical_history: {
+            ...currentHealth?.medical_history,
+            conditions: currentHealth?.medical_history?.conditions || [],
+            medications: currentHealth?.medical_history?.medications || [],
+            family_history: data.medical_history?.family_history,
           },
         },
         updated_at: new Date().toISOString(),
@@ -161,7 +203,7 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-white font-bold text-xl">Base</h2>
-                <p className="text-white/70 text-sm">Informations médicales essentielles et contacts d'urgence</p>
+                <p className="text-white/70 text-sm">Informations médicales essentielles et antécédents familiaux</p>
               </div>
             </div>
             <div className="text-right">
@@ -252,29 +294,50 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
         />
       </div>
 
-      {/* Vaccinations and Medications Side by Side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <VaccinationsSection
-          vaccinations={vaccinations.vaccinations}
-          countryData={countryData}
-          onAddVaccination={vaccinations.onAddVaccination}
-          onUpdateVaccination={vaccinations.onUpdateVaccination}
-          onRemoveVaccination={vaccinations.onRemoveVaccination}
-          onToggleUpToDate={vaccinations.onToggleUpToDate}
-          upToDate={vaccinations.upToDate}
-          onSave={vaccinations.onSave}
-          isSaving={vaccinations.isSaving}
-          isDirty={vaccinations.isDirty}
-        />
+      {/* Medications Card */}
+      <CurrentMedicationsCard
+        medications={medicalConditions.medications}
+        newMedication={medicalConditions.newMedication}
+        setNewMedication={medicalConditions.setNewMedication}
+        onAddMedication={medicalConditions.addMedication}
+        onRemoveMedication={medicalConditions.removeMedication}
+      />
 
-        <CurrentMedicationsCard
-          medications={medicalConditions.medications}
-          newMedication={medicalConditions.newMedication}
-          setNewMedication={medicalConditions.setNewMedication}
-          onAddMedication={medicalConditions.addMedication}
-          onRemoveMedication={medicalConditions.removeMedication}
+      {/* Family History Section */}
+      <GlassCard className="p-6" style={{
+        background: `
+          radial-gradient(circle at 30% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 60%),
+          var(--glass-opacity)
+        `,
+        borderColor: 'rgba(168, 85, 247, 0.2)',
+      }}>
+        <div className="flex items-center gap-3 mb-6">
+          <div
+            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{
+              background: `
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.2))
+              `,
+              border: '2px solid rgba(168, 85, 247, 0.5)',
+              boxShadow: '0 0 30px rgba(168, 85, 247, 0.4)',
+            }}
+          >
+            <SpatialIcon Icon={ICONS.Users} size={24} style={{ color: '#A855F7' }} variant="pure" />
+          </div>
+          <div>
+            <h3 className="text-white font-semibold text-xl">Antécédents Familiaux</h3>
+            <p className="text-white/70 text-sm">Historique médical de la famille</p>
+          </div>
+        </div>
+
+        <FamilyHistorySection
+          register={register}
+          errors={errors}
+          watch={watch}
+          setValue={setValue}
         />
-      </div>
+      </GlassCard>
 
       {/* Save button for conditions and medications */}
       {medicalConditions.isDirty && (

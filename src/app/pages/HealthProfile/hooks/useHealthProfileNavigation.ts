@@ -11,7 +11,7 @@ export type HealthProfileTab =
   | 'basic-info'
   | 'lifestyle'
   | 'intimacy'
-  | 'family-history'
+  | 'geographic'
   | 'vital-signs';
 
 export interface TabConfig {
@@ -36,7 +36,7 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     id: 'basic-info',
     label: 'Base',
     icon: 'Scale',
-    description: 'Groupe sanguin, mensurations, vaccinations',
+    description: 'Groupe sanguin, mensurations, vaccinations, famille',
     color: '#06B6D4',
     requiredForAI: true,
   },
@@ -57,12 +57,12 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     requiredForAI: true,
   },
   {
-    id: 'family-history',
-    label: 'Famille',
-    icon: 'Users',
-    description: 'Antécédents familiaux',
-    color: '#A855F7',
-    requiredForAI: true,
+    id: 'geographic',
+    label: 'Géo',
+    icon: 'MapPin',
+    description: 'Environnement, météo, qualité de l\'air',
+    color: '#06B6D4',
+    requiredForAI: false,
   },
   {
     id: 'vital-signs',
@@ -88,7 +88,7 @@ export function useHealthProfileNavigation() {
     'basic-info': 0,
     'lifestyle': 0,
     'intimacy': 0,
-    'family-history': 0,
+    'geographic': 0,
     'vital-signs': 0,
   });
 
