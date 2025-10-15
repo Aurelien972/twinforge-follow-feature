@@ -10,6 +10,7 @@ import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
 import { HealthScoreWidget } from '../components/HealthScoreWidget';
 import { HealthRiskBadges } from '../components/HealthRiskBadges';
+import { BMIMetricsCard } from '../components/BMIMetricsCard';
 import { useUserStore } from '../../../../system/store/userStore';
 import { useCountryHealthData } from '../../../../hooks/useCountryHealthData';
 import { calculateHealthScore } from '../utils/healthScoreCalculations';
@@ -26,52 +27,6 @@ export const HealthOverviewTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Banner */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <GlassCard className="p-6" style={{
-          background: `
-            radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 60%),
-            var(--glass-opacity)
-          `,
-          borderColor: 'rgba(6, 182, 212, 0.3)',
-        }}>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-white font-bold text-2xl mb-2">
-                Bienvenue dans votre Profil de Santé
-              </h2>
-              <p className="text-white/70 text-base leading-relaxed mb-4">
-                Complétez votre profil médical pour bénéficier d'analyses préventives personnalisées par intelligence artificielle.
-                Toutes vos données sont sécurisées et confidentielles.
-              </p>
-              <div className="flex items-center gap-2 text-cyan-300 text-sm">
-                <SpatialIcon Icon={ICONS.Lock} size={14} />
-                <span>Conforme RGPD • Données chiffrées • 100% confidentiel</span>
-              </div>
-            </div>
-            <div className="flex-shrink-0">
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center"
-                style={{
-                  background: `
-                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
-                  `,
-                  border: '2px solid rgba(6, 182, 212, 0.5)',
-                  boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
-                }}
-              >
-                <SpatialIcon Icon={ICONS.Sparkles} size={28} style={{ color: '#06B6D4' }} variant="pure" />
-              </div>
-            </div>
-          </div>
-        </GlassCard>
-      </motion.div>
-
       {/* Health Score Widget */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -79,6 +34,15 @@ export const HealthOverviewTab: React.FC = () => {
         transition={{ duration: 0.5, delay: 0.1 }}
       >
         <HealthScoreWidget health={health} />
+      </motion.div>
+
+      {/* BMI and Body Metrics */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+      >
+        <BMIMetricsCard />
       </motion.div>
 
       {/* Country Health Risks */}
@@ -261,11 +225,57 @@ export const HealthOverviewTab: React.FC = () => {
         </GlassCard>
       </motion.div>
 
+      {/* Welcome Banner - Moved to bottom */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
+        <GlassCard className="p-6" style={{
+          background: `
+            radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 60%),
+            var(--glass-opacity)
+          `,
+          borderColor: 'rgba(6, 182, 212, 0.3)',
+        }}>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-white font-bold text-2xl mb-2">
+                Bienvenue dans votre Profil de Santé
+              </h2>
+              <p className="text-white/70 text-base leading-relaxed mb-4">
+                Complétez votre profil médical pour bénéficier d'analyses préventives personnalisées par intelligence artificielle.
+                Toutes vos données sont sécurisées et confidentielles.
+              </p>
+              <div className="flex items-center gap-2 text-cyan-300 text-sm">
+                <SpatialIcon Icon={ICONS.Lock} size={14} />
+                <span>Conforme RGPD • Données chiffrées • 100% confidentiel</span>
+              </div>
+            </div>
+            <div className="flex-shrink-0">
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center"
+                style={{
+                  background: `
+                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                    linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
+                  `,
+                  border: '2px solid rgba(6, 182, 212, 0.5)',
+                  boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
+                }}
+              >
+                <SpatialIcon Icon={ICONS.Sparkles} size={28} style={{ color: '#06B6D4' }} variant="pure" />
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+      </motion.div>
+
       {/* Legal Disclaimer */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
+        transition={{ duration: 0.5, delay: 0.45 }}
       >
         <GlassCard className="p-4" style={{
           background: 'rgba(255, 152, 0, 0.05)',

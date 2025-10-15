@@ -18,7 +18,7 @@ import { ICONS } from '../../../ui/icons/registry';
 import PageHeader from '../../../ui/page/PageHeader';
 import Tabs from '../../../ui/tabs/TabsComponent';
 import { HealthOverviewTab } from './tabs/HealthOverviewTab';
-import { BasicHealthTab } from './tabs/BasicHealthTab';
+import { BasicHealthTabEnhanced } from './tabs/BasicHealthTabEnhanced';
 import { VitalSignsTab } from './tabs/VitalSignsTab';
 import { LifestyleTab } from './tabs/LifestyleTab';
 import { FamilyHistoryTab } from './tabs/FamilyHistoryTab';
@@ -298,7 +298,7 @@ const HealthProfilePage: React.FC = () => {
         </Tabs.Panel>
 
         <Tabs.Panel value="basic-info">
-          <BasicHealthTab />
+          <BasicHealthTabEnhanced />
         </Tabs.Panel>
 
         <Tabs.Panel value="medical-history">

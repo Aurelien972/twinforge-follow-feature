@@ -8,6 +8,8 @@ import { useProfileHealthForm } from './hooks/useProfileHealthForm';
 import { ProgressBar, SectionSaveButton, ArrayItemManager } from './components/ProfileHealthComponents';
 import { calculateHealthCompletion } from './utils/profileCompletion';
 import { CountryHealthDataDisplay } from './components/health/CountryHealthDataDisplay';
+import { HealthProfileCTA } from './components/health/HealthProfileCTA';
+import { InjuriesLimitationsSection } from './components/health/InjuriesLimitationsSection';
 import { useCountryHealthData } from '../../../hooks/useCountryHealthData';
 
 /**
@@ -96,80 +98,11 @@ const ProfileHealthTab: React.FC = () => {
         color="#EF4444"
       />
 
+      {/* Health Profile CTA */}
+      <HealthProfileCTA />
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Basic Health Info Card */}
-        <GlassCard className="p-6" style={{
-          background: `
-            radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.08) 0%, transparent 60%),
-            var(--glass-opacity)
-          `,
-          borderColor: 'rgba(239, 68, 68, 0.2)'
-        }}>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-white font-semibold flex items-center gap-3">
-              <div 
-                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{
-                  background: `
-                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, color-mix(in srgb, #EF4444 35%, transparent), color-mix(in srgb, #EF4444 25%, transparent))
-                  `,
-                  border: '2px solid color-mix(in srgb, #EF4444 50%, transparent)',
-                  boxShadow: '0 0 20px color-mix(in srgb, #EF4444 30%, transparent)'
-                }}
-              >
-                <SpatialIcon Icon={ICONS.Heart} size={20} style={{ color: '#EF4444' }} variant="pure" />
-              </div>
-              <div>
-                <div className="text-xl">Informations Médicales de Base</div>
-                <div className="text-white/60 text-sm font-normal mt-0.5">Données de base pour votre suivi médical</div>
-              </div>
-            </h3>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-red-400" />
-              <span className="text-red-300 text-sm font-medium">Médical</span>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Blood Type */}
-            <div>
-              <label htmlFor="bloodType" className="block text-white/90 text-sm font-medium mb-3">
-                Groupe sanguin
-              </label>
-              <select
-                {...register('bloodType')}
-                id="bloodType"
-                className="glass-input"
-              >
-                <option value="">Sélectionnez votre groupe sanguin</option>
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
-              </select>
-              {errors.bloodType && (
-                <p className="text-red-300 text-xs mt-2 flex items-center gap-1">
-                  <SpatialIcon Icon={ICONS.AlertCircle} size={12} />
-                  {errors.bloodType.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <SectionSaveButton
-            isDirty={hasBasicChanges}
-            isSaving={sectionSaving === 'basic'}
-            onSave={saveBasicHealthSection}
-            sectionName="Base"
-          />
-        </GlassCard>
-
-        {/* Medical Conditions & Medications Card */}
+        {/* Medical Conditions & Medications Card - Simplified */}
         <GlassCard className="p-6" style={{
           background: `
             radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.08) 0%, transparent 60%),
@@ -283,70 +216,6 @@ const ProfileHealthTab: React.FC = () => {
                 </div>
               </div>
             )}
-
-            {/* Medical Conditions */}
-            <div>
-              <label className="block text-white/90 text-sm font-medium mb-3">
-                Conditions médicales
-              </label>
-              <ArrayItemManager
-                items={watchedValues.conditions || []}
-                newItem={newCondition}
-                setNewItem={setNewCondition}
-                onAdd={addCondition}
-                onRemove={removeCondition}
-                placeholder="Ajouter une condition médicale..."
-                itemColor="rgba(239, 68, 68"
-                itemLabel="condition"
-              />
-            </div>
-
-            {/* Medications */}
-            <div>
-              <label className="block text-white/90 text-sm font-medium mb-3">
-                Médicaments actuels
-              </label>
-              <ArrayItemManager
-                items={watchedValues.medications || []}
-                newItem={newMedication}
-                setNewItem={setNewMedication}
-                onAdd={addMedication}
-                onRemove={removeMedication}
-                placeholder="Ajouter un médicament..."
-                itemColor="rgba(59, 130, 246"
-                itemLabel="médicament"
-              />
-            </div>
-
-            {/* Physical Limitations */}
-            <div>
-              <label className="block text-white/90 text-sm font-medium mb-3">
-                Limitations physiques et blessures
-              </label>
-              <div className="mb-3 p-3 rounded-xl bg-orange-500/10 border border-orange-400/20">
-                <div className="flex items-start gap-2">
-                  <SpatialIcon Icon={ICONS.Info} size={14} className="text-orange-400 mt-0.5" />
-                  <div>
-                    <p className="text-orange-200 text-sm leading-relaxed">
-                      Indiquez vos blessures passées, douleurs chroniques ou limitations physiques.
-                    </p>
-                    <div className="text-orange-300 text-xs mt-2">
-                      <strong>Exemples :</strong> "Douleur au genou gauche", "Problème de dos", "Épaule fragile", "Tendinite du coude"
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <ArrayItemManager
-                items={watchedValues.physicalLimitations || []}
-                newItem={newPhysicalLimitation}
-                setNewItem={setNewPhysicalLimitation}
-                onAdd={addPhysicalLimitation}
-                onRemove={removePhysicalLimitation}
-                placeholder="Ex: Douleur au genou, problème de dos..."
-                itemColor="rgba(245, 158, 11"
-                itemLabel="limitation"
-              />
-            </div>
           </div>
 
           <SectionSaveButton
@@ -356,6 +225,18 @@ const ProfileHealthTab: React.FC = () => {
             sectionName="Médical"
           />
         </GlassCard>
+
+        {/* Injuries and Limitations */}
+        <InjuriesLimitationsSection
+          physicalLimitations={watchedValues.physicalLimitations || []}
+          newPhysicalLimitation={newPhysicalLimitation}
+          setNewPhysicalLimitation={setNewPhysicalLimitation}
+          onAddPhysicalLimitation={addPhysicalLimitation}
+          onRemovePhysicalLimitation={removePhysicalLimitation}
+          onSave={saveMedicalSection}
+          isSaving={sectionSaving === 'medical'}
+          isDirty={hasConstraintsChanges}
+        />
 
         {/* Health Constraints Card */}
         <GlassCard className="p-6" style={{
