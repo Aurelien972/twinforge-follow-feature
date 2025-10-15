@@ -1,6 +1,6 @@
 import React from 'react';
 import { nanoid } from 'nanoid';
-import { type UserProfileContext } from '../../../../../system/data/repositories/mealsRepo';
+import { type UserProfileContext, type MealAnalysisRequest } from '../../../../../system/data/repositories/mealsRepo';
 import logger from '../../../../../lib/utils/logger';
 import type { CapturedMealPhoto, ScanFlowState, ScannedProduct, ScannedBarcode } from './ScanFlowState';
 import { openFoodFactsService } from '../../../../../system/services/openFoodFactsService';
@@ -355,7 +355,8 @@ export function useScanFlowHandlers({
       // Construction du contexte utilisateur complet pour l'IA GPT-5 mini
       const userContext = buildUserProfileContext(profile);
 
-      const analysisRequest: any = {
+      // CRITICAL: Build the analysis request with proper typing
+      const analysisRequest: MealAnalysisRequest = {
         user_id: userId,
         meal_type: 'dinner' as const,
         timestamp: new Date().toISOString(),
@@ -376,6 +377,13 @@ export function useScanFlowHandlers({
           mealItem: p.mealItem,
           portionMultiplier: p.portionMultiplier,
         }));
+
+        console.log('🔵 DEBUG - scannedProducts being sent:', {
+          count: scanFlowState.scannedProducts.length,
+          products: analysisRequest.scanned_products,
+          analysisRequestKeys: Object.keys(analysisRequest),
+          hasScannedProducts: !!analysisRequest.scanned_products,
+        });
       }
 
       // Log du contexte transmis pour audit
