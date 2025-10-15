@@ -67,7 +67,7 @@ export interface ScanFlowState {
 }
 
 export const initialScanFlowState: ScanFlowState = {
-  scanType: null,
+  scanType: 'photo-analysis',
   currentStep: 'capture',
   captureMode: 'photo',
   capturedPhoto: null,
@@ -77,8 +77,8 @@ export const initialScanFlowState: ScanFlowState = {
   barcodeAnalysisResults: null,
   isProcessing: false,
   progress: 0,
-  progressMessage: 'Choisissez votre mode de scan',
-  progressSubMessage: 'Scanner un repas avec IA ou un code-barre produit',
+  progressMessage: 'Prêt à scanner votre repas',
+  progressSubMessage: 'Prenez une photo ou sélectionnez depuis la galerie',
   analysisError: null,
   analysisMetadata: null,
   isScanningBarcode: false,
