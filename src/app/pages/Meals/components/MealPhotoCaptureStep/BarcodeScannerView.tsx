@@ -7,35 +7,95 @@ import { ICONS } from '../../../../../ui/icons/registry';
 import { openFoodFactsService, type BarcodeProductResult } from '../../../../../system/services/openFoodFactsService';
 import type { ScannedProduct } from '../MealScanFlow/ScanFlowState';
 import logger from '../../../../../lib/utils/logger';
+import { scanBarcodeFromImage } from '../../../../../lib/barcode/barcodeImageScanner';
 
 interface BarcodeScannerViewProps {
   onProductScanned: (product: ScannedProduct) => void;
   onClose: () => void;
+  mode: 'camera' | 'upload' | null;
+  uploadedImage?: File;
 }
 
 const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
   onProductScanned,
   onClose,
+  mode,
+  uploadedImage,
 }) => {
-  const [isScanning, setIsScanning] = useState(true);
+  const [isScanning, setIsScanning] = useState(mode === 'camera');
   const [isLoading, setIsLoading] = useState(false);
   const [lastScannedBarcode, setLastScannedBarcode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const handleScan = async (detectedCodes: any[]) => {
-    if (!isScanning || isLoading || detectedCodes.length === 0) return;
+  useEffect(() => {
+    if (mode === 'upload' && uploadedImage) {
+      handleImageUpload(uploadedImage);
+    }
+  }, [mode, uploadedImage]);
 
-    const barcode = detectedCodes[0]?.rawValue;
-    if (!barcode || barcode === lastScannedBarcode) return;
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
-    setLastScannedBarcode(barcode);
-    setIsScanning(false);
+  const handleImageUpload = async (file: File) => {
+    setIsLoading(true);
+    setError(null);
+
+    const preview = URL.createObjectURL(file);
+    setImagePreview(preview);
+
+    logger.info('BARCODE_SCANNER', 'Processing uploaded image', {
+      fileName: file.name,
+      fileSize: file.size,
+      timestamp: new Date().toISOString(),
+    });
+
+    try {
+      const scanResult = await scanBarcodeFromImage(file);
+
+      if (!scanResult.success || !scanResult.barcode) {
+        logger.warn('BARCODE_SCANNER', 'No barcode found in image', {
+          error: scanResult.error,
+          timestamp: new Date().toISOString(),
+        });
+
+        setError(scanResult.error || 'Aucun code-barre détecté');
+        setTimeout(() => {
+          URL.revokeObjectURL(preview);
+          onClose();
+        }, 3000);
+        return;
+      }
+
+      await processBarcode(scanResult.barcode);
+    } catch (err) {
+      logger.error('BARCODE_SCANNER', 'Error processing image', {
+        error: err instanceof Error ? err.message : String(err),
+        timestamp: new Date().toISOString(),
+      });
+
+      setError('Erreur lors du traitement de l\'image');
+      setTimeout(() => {
+        if (imagePreview) URL.revokeObjectURL(imagePreview);
+        onClose();
+      }, 3000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const processBarcode = async (barcode: string) => {
     setIsLoading(true);
     setError(null);
     setSuccessMessage(null);
 
-    logger.info('BARCODE_SCANNER', 'Barcode detected, fetching product info', {
+    logger.info('BARCODE_SCANNER', 'Processing barcode', {
       barcode,
       timestamp: new Date().toISOString(),
     });
@@ -117,6 +177,17 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
     }
   };
 
+  const handleScan = async (detectedCodes: any[]) => {
+    if (!isScanning || isLoading || detectedCodes.length === 0) return;
+
+    const barcode = detectedCodes[0]?.rawValue;
+    if (!barcode || barcode === lastScannedBarcode) return;
+
+    setLastScannedBarcode(barcode);
+    setIsScanning(false);
+    await processBarcode(barcode);
+  };
+
   const handleError = (error: any) => {
     logger.error('BARCODE_SCANNER', 'Camera error', {
       error: error?.message || String(error),
@@ -126,14 +197,14 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ duration: 0.3 }}
-        className="w-full max-w-lg"
-      >
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="relative z-40 mt-4"
+    >
+      <div className="w-full">
         <GlassCard
           className="p-6 relative overflow-hidden"
           style={{
@@ -198,7 +269,13 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
           </div>
 
           <div className="relative aspect-square rounded-xl overflow-hidden mb-4">
-            {isScanning && (
+            {mode === 'upload' && imagePreview ? (
+              <img
+                src={imagePreview}
+                alt="Uploaded barcode"
+                className="w-full h-full object-cover"
+              />
+            ) : isScanning && (
               <Scanner
                 onScan={handleScan}
                 onError={handleError}
@@ -322,8 +399,8 @@ const BarcodeScannerView: React.FC<BarcodeScannerViewProps> = ({
             </p>
           </div>
         </GlassCard>
-      </motion.div>
-    </div>
+      </div>
+    </motion.div>
   );
 };
 

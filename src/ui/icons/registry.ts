@@ -13,6 +13,8 @@ export const ICONS = {
   Smile: L.Smile,
   Scan: L.Scan,
   ScanFace: L.ScanFace,
+  ScanBarcode: L.ScanBarcode,
+  Barcode: L.Barcode,
   Refrigerator: L.Refrigerator,
   Users: L.Users,
   ChefHat: L.ChefHat,

@@ -62,8 +62,10 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
   const [isValidating, setIsValidating] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+  const [barcodeScanMode, setBarcodeScanMode] = useState<'camera' | 'upload' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const barcodeImageInputRef = useRef<HTMLInputElement>(null);
 
   const mealScanBenefits: Benefit[] = [
     {
@@ -99,6 +101,11 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
 
   const handleBarcodeClick = () => {
     setShowBarcodeScanner(true);
+    setBarcodeScanMode('camera');
+  };
+
+  const handleBarcodeImageUpload = () => {
+    barcodeImageInputRef.current?.click();
   };
 
   const handleBarcodeClose = () => {
@@ -173,6 +180,7 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
               onCameraClick={handleCameraClick}
               onGalleryClick={handleGalleryClick}
               onBarcodeClick={handleBarcodeClick}
+              onBarcodeImageUpload={handleBarcodeImageUpload}
             />
           </div>
         ) : (
@@ -256,6 +264,21 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
         className="hidden"
       />
 
+      {/* Hidden Barcode Image Input */}
+      <input
+        ref={barcodeImageInputRef}
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            setShowBarcodeScanner(true);
+            setBarcodeScanMode('upload');
+          }
+        }}
+        className="hidden"
+      />
+
       {/* Navigation Controls - Fixed at bottom */}
       <div
         className="fixed bottom-0 left-0 right-0 p-4 z-50"
@@ -266,11 +289,13 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
         />
       </div>
 
-      {/* Barcode Scanner Modal */}
+      {/* Barcode Scanner Inline Component */}
       {showBarcodeScanner && (
         <BarcodeScannerView
           onProductScanned={handleProductScanned}
           onClose={handleBarcodeClose}
+          mode={barcodeScanMode}
+          uploadedImage={barcodeScanMode === 'upload' ? barcodeImageInputRef.current?.files?.[0] : undefined}
         />
       )}
     </div>
