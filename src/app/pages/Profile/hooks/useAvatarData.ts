@@ -11,18 +11,21 @@ import logger from '../../../../lib/utils/logger';
 export interface BodyScanData {
   id: string;
   created_at: string;
-  front_photo_url: string | null;
-  side_photo_url: string | null;
-  back_photo_url: string | null;
-  final_shape_params: Record<string, number> | null;
-  final_limb_masses: Record<string, number> | null;
-  measurements: {
-    height?: number;
-    weight?: number;
-    chest?: number;
-    waist?: number;
-    hips?: number;
+  resolved_gender: string | null;
+  morph_values: Record<string, number> | null;
+  limb_masses: Record<string, number> | null;
+  weight: number | null;
+  body_fat_percentage: number | null;
+  bmi: number | null;
+  waist_circumference: number | null;
+  raw_measurements: {
+    height_cm?: number;
+    weight_kg?: number;
+    chest_cm?: number;
+    waist_cm?: number;
+    hips_cm?: number;
   } | null;
+  avatar_version: string | null;
 }
 
 export interface FaceScanData {
@@ -76,7 +79,7 @@ export function useAvatarData() {
         // Fetch latest body scan
         const { data: bodyScans, error: bodyScanError } = await supabase
           .from('body_scans')
-          .select('id, created_at, front_photo_url, side_photo_url, back_photo_url, final_shape_params, final_limb_masses, measurements')
+          .select('id, created_at, resolved_gender, morph_values, limb_masses, weight, body_fat_percentage, bmi, waist_circumference, raw_measurements, avatar_version')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(1);
