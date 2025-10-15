@@ -104,30 +104,46 @@ export function useAvatarData() {
           throw bodyScanError;
         }
 
-        // Fetch latest face scan
-        const { data: faceScans, error: faceScanError } = await supabase
+        // Fetch latest face scan (optional - table may not exist yet)
+        let faceScans = null;
+        let faceCount = 0;
+
+        const { data: faceScansData, error: faceScanError } = await supabase
           .from('face_scans')
           .select('id, created_at, photo_url, final_face_params, skin_tone_v2')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(1);
 
-        if (faceScanError) throw faceScanError;
+        if (faceScanError) {
+          // Table may not exist yet - log but don't throw
+          logger.warn('AVATAR_DATA', 'face_scans table not accessible (may not exist yet)', {
+            userId: user.id,
+            error: faceScanError.message,
+            errorCode: faceScanError.code,
+            philosophy: 'face_scans_optional'
+          });
+        } else {
+          faceScans = faceScansData;
 
-        // Count total scans
+          // Count face scans only if table exists
+          const { count: faceCountData, error: faceCountError } = await supabase
+            .from('face_scans')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id);
+
+          if (!faceCountError) {
+            faceCount = faceCountData || 0;
+          }
+        }
+
+        // Count total body scans
         const { count: bodyCount, error: bodyCountError } = await supabase
           .from('body_scans')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user.id);
 
         if (bodyCountError) throw bodyCountError;
-
-        const { count: faceCount, error: faceCountError } = await supabase
-          .from('face_scans')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id);
-
-        if (faceCountError) throw faceCountError;
 
         // Extract and enrich body scan data with fallback logic (similar to useBodyScanData.ts)
         let latestBodyScan: BodyScanData | null = null;
