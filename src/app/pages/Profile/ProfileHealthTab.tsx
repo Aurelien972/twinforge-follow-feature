@@ -13,7 +13,6 @@ import { VaccinationsSection } from '../HealthProfile/components/VaccinationsSec
 import { MedicalConditionsCard } from '../HealthProfile/components/MedicalConditionsCard';
 import { CurrentMedicationsCard } from '../HealthProfile/components/CurrentMedicationsCard';
 import { AllergiesSection } from '../HealthProfile/components/AllergiesSection';
-import { HealthProfileCTA } from './components/health/HealthProfileCTA';
 
 // Import hooks
 import { useVaccinationsForm } from '../HealthProfile/hooks/useVaccinationsForm';
@@ -85,9 +84,6 @@ const ProfileHealthTab: React.FC = () => {
         subtitle="Configurez vos informations médicales et contraintes"
         color="#EF4444"
       />
-
-      {/* CTA to Full Health Profile */}
-      <HealthProfileCTA />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Health Constraints Card - MOVED TO TOP */}
