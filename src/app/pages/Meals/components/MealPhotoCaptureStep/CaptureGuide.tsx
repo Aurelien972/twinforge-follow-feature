@@ -167,22 +167,6 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
       </div>
       
       <div className="space-y-6" style={{ position: 'relative', zIndex: 1 }}>
-        {/* DEBUG: Simple test buttons */}
-        <div style={{ marginBottom: '1rem', padding: '1rem', background: 'red', opacity: 0.3 }}>
-          <button
-            onClick={() => console.log('TEST BUTTON 1 CLICKED')}
-            style={{ padding: '1rem', background: 'yellow', color: 'black', width: '100%', marginBottom: '0.5rem' }}
-          >
-            TEST BUTTON 1 - SIMPLE HTML
-          </button>
-          <button
-            onClick={() => console.log('TEST BUTTON 2 CLICKED')}
-            style={{ padding: '1rem', background: 'green', color: 'white', width: '100%' }}
-          >
-            TEST BUTTON 2 - SIMPLE HTML
-          </button>
-        </div>
-
         {/* Guide Overlay */}
         <div 
           className="relative aspect-[4/3] rounded-xl overflow-visible meal-capture-guide"
