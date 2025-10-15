@@ -262,32 +262,37 @@ export const mealsRepo = {
         body: payload,
       });
 
+      // Log response details directly to console for debugging
+      console.log('📡 Edge function response:', {
+        hasData: !!data,
+        hasError: !!error,
+        error: error,
+        data: data,
+      });
+
       logger.info('MEALS_REPO', 'Received response from meal-analyzer', {
         userId: request.user_id,
         hasData: !!data,
         hasError: !!error,
-        errorMessage: error?.message,
-        errorContext: error?.context,
-        errorName: error?.name,
-        errorStack: error?.stack,
-        fullError: error ? JSON.stringify(error, null, 2) : 'null',
         dataSuccess: data?.success,
-        dataKeys: data ? Object.keys(data) : [],
-        dataPreview: data ? JSON.stringify(data).substring(0, 500) + '...' : 'null',
         timestamp: new Date().toISOString()
       });
 
       if (error) {
-        logger.error('MEALS_REPO', 'Meal analysis edge function error - CRITICAL DEBUG', {
+        // Log EVERYTHING about the error directly to console
+        console.error('🔴 CRITICAL ERROR DEBUG - Edge function error:', {
           errorType: typeof error,
           errorConstructor: error?.constructor?.name,
           errorMessage: error.message,
           errorContext: error.context,
           errorName: error.name,
           errorStack: error.stack,
-          fullErrorObject: JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
+          fullErrorStringified: JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
           allErrorKeys: Object.keys(error),
           allErrorValues: Object.values(error),
+        });
+
+        logger.error('MEALS_REPO', `Meal analysis edge function error - ${error.message}`, {
           userId: request.user_id,
           hasUserContext: !!request.user_profile_context,
           hasScannedProducts: !!(request.scanned_products && request.scanned_products.length > 0),
