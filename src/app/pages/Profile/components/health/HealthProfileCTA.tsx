@@ -28,10 +28,10 @@ export const HealthProfileCTA: React.FC = () => {
         onClick={handleNavigate}
         style={{
           background: `
-            radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.15) 0%, transparent 60%),
             var(--glass-opacity)
           `,
-          borderColor: 'rgba(6, 182, 212, 0.4)',
+          borderColor: 'rgba(239, 68, 68, 0.4)',
         }}
       >
         <div className="flex items-start justify-between gap-6">
@@ -42,19 +42,19 @@ export const HealthProfileCTA: React.FC = () => {
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, rgba(6, 182, 212, 0.5), rgba(6, 182, 212, 0.3))
+                    linear-gradient(135deg, rgba(239, 68, 68, 0.5), rgba(239, 68, 68, 0.3))
                   `,
-                  border: '2px solid rgba(6, 182, 212, 0.6)',
-                  boxShadow: '0 0 30px rgba(6, 182, 212, 0.5)',
+                  border: '2px solid rgba(239, 68, 68, 0.6)',
+                  boxShadow: '0 0 30px rgba(239, 68, 68, 0.5)',
                 }}
               >
-                <SpatialIcon Icon={ICONS.Sparkles} size={24} style={{ color: '#06B6D4' }} variant="pure" />
+                <SpatialIcon Icon={ICONS.Sparkles} size={24} style={{ color: '#EF4444' }} variant="pure" />
               </div>
               <div>
                 <h3 className="text-white font-bold text-xl">
                   Débloquez votre Profil de Santé Complet
                 </h3>
-                <p className="text-cyan-300 text-sm font-medium mt-1">
+                <p className="text-red-300 text-sm font-medium mt-1">
                   Médecine préventive par Intelligence Artificielle
                 </p>
               </div>
@@ -86,7 +86,7 @@ export const HealthProfileCTA: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-cyan-300 text-sm">
+            <div className="flex items-center gap-2 text-red-300 text-sm">
               <SpatialIcon Icon={ICONS.Lock} size={14} />
               <span>100% confidentiel • Conforme RGPD • Données chiffrées</span>
             </div>
@@ -95,20 +95,28 @@ export const HealthProfileCTA: React.FC = () => {
           <div className="flex flex-col items-center gap-3">
             <button
               onClick={handleNavigate}
-              className="btn-glass--primary px-6 py-3 text-base font-semibold"
+              className="btn-glass--primary px-6 py-3 text-base font-semibold relative overflow-hidden"
               style={{
-                background: 'rgba(6, 182, 212, 0.2)',
-                borderColor: 'rgba(6, 182, 212, 0.5)',
+                background: `
+                  radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0%, transparent 70%),
+                  linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2))
+                `,
+                borderColor: 'rgba(239, 68, 68, 0.7)',
+                boxShadow: `
+                  0 0 40px rgba(239, 68, 68, 0.6),
+                  0 4px 20px rgba(0, 0, 0, 0.3),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                `,
               }}
             >
-              <div className="flex items-center gap-2">
-                <span>Accéder au Profil</span>
-                <SpatialIcon Icon={ICONS.ArrowRight} size={18} />
+              <div className="flex items-center gap-2 relative z-10">
+                <span className="text-white font-bold">Accéder au Profil</span>
+                <SpatialIcon Icon={ICONS.ArrowRight} size={18} style={{ color: '#FFF' }} />
               </div>
             </button>
 
             <div className="text-center">
-              <div className="text-2xl font-bold text-cyan-400">5 min</div>
+              <div className="text-2xl font-bold text-red-400">5 min</div>
               <div className="text-xs text-white/60">Pour commencer</div>
             </div>
           </div>

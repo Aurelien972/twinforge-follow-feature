@@ -35,10 +35,10 @@ export const InjuriesLimitationsSection: React.FC<InjuriesLimitationsSectionProp
       className="p-6"
       style={{
         background: `
-          radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 60%),
+          radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.08) 0%, transparent 60%),
           var(--glass-opacity)
         `,
-        borderColor: 'rgba(245, 158, 11, 0.2)',
+        borderColor: 'rgba(239, 68, 68, 0.2)',
       }}
     >
       <div className="flex items-center justify-between mb-6">
@@ -48,13 +48,13 @@ export const InjuriesLimitationsSection: React.FC<InjuriesLimitationsSectionProp
             style={{
               background: `
                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                linear-gradient(135deg, color-mix(in srgb, #F59E0B 35%, transparent), color-mix(in srgb, #F59E0B 25%, transparent))
+                linear-gradient(135deg, color-mix(in srgb, #EF4444 35%, transparent), color-mix(in srgb, #EF4444 25%, transparent))
               `,
-              border: '2px solid color-mix(in srgb, #F59E0B 50%, transparent)',
-              boxShadow: '0 0 20px color-mix(in srgb, #F59E0B 30%, transparent)',
+              border: '2px solid color-mix(in srgb, #EF4444 50%, transparent)',
+              boxShadow: '0 0 20px color-mix(in srgb, #EF4444 30%, transparent)',
             }}
           >
-            <SpatialIcon Icon={ICONS.AlertTriangle} size={20} style={{ color: '#F59E0B' }} variant="pure" />
+            <SpatialIcon Icon={ICONS.AlertTriangle} size={20} style={{ color: '#EF4444' }} variant="pure" />
           </div>
           <div>
             <div className="text-xl">Blessures et Limitations</div>
@@ -64,21 +64,21 @@ export const InjuriesLimitationsSection: React.FC<InjuriesLimitationsSectionProp
           </div>
         </h3>
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-orange-400" />
-          <span className="text-orange-300 text-sm font-medium">Important</span>
+          <div className="w-2 h-2 rounded-full bg-red-400" />
+          <span className="text-red-300 text-sm font-medium">Important</span>
         </div>
       </div>
 
       <div className="space-y-4">
-        <div className="p-4 rounded-xl bg-orange-500/10 border border-orange-400/20">
+        <div className="p-4 rounded-xl bg-red-500/10 border border-red-400/20">
           <div className="flex items-start gap-3">
-            <SpatialIcon Icon={ICONS.Info} size={16} className="text-orange-400 mt-0.5 flex-shrink-0" />
+            <SpatialIcon Icon={ICONS.Info} size={16} className="text-red-400 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-orange-200 text-sm leading-relaxed mb-2">
+              <p className="text-red-200 text-sm leading-relaxed mb-2">
                 Indiquez vos blessures passées, douleurs chroniques ou limitations physiques pour adapter
                 vos programmes d'entraînement et éviter les mouvements à risque.
               </p>
-              <div className="text-orange-300 text-xs">
+              <div className="text-red-300 text-xs">
                 <strong>Exemples :</strong> "Douleur au genou gauche", "Problème de dos", "Épaule fragile",
                 "Tendinite du coude", "Entorse cheville droite"
               </div>
@@ -97,7 +97,7 @@ export const InjuriesLimitationsSection: React.FC<InjuriesLimitationsSectionProp
             onAdd={onAddPhysicalLimitation}
             onRemove={onRemovePhysicalLimitation}
             placeholder="Ex: Douleur au genou, problème de dos..."
-            itemColor="rgba(245, 158, 11"
+            itemColor="rgba(239, 68, 68"
             itemLabel="limitation"
           />
         </div>
