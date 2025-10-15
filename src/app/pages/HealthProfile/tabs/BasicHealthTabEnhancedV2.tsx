@@ -17,8 +17,6 @@ import { VaccinationsSection } from '../components/VaccinationsSection';
 import { MedicalConditionsCard } from '../components/MedicalConditionsCard';
 import { CurrentMedicationsCard } from '../components/CurrentMedicationsCard';
 import { AllergiesSection } from '../components/AllergiesSection';
-import { MedicalFollowUpSection } from '../components/MedicalFollowUpSection';
-import { EmergencyContactsSection } from '../components/EmergencyContactsSection';
 import { useUserStore } from '../../../../system/store/userStore';
 import { useCountryHealthData } from '../hooks/useCountryHealthData';
 import { useVaccinationsForm } from '../hooks/useVaccinationsForm';
@@ -32,19 +30,6 @@ import type { HealthProfileV2 } from '../../../../domain/health';
 // Schema for the comprehensive health form
 const comprehensiveHealthSchema = z.object({
   bloodType: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
-  last_checkup_date: z.string().optional(),
-  next_checkup_due: z.string().optional(),
-  emergency_contact: z.object({
-    name: z.string().min(1, 'Le nom est requis'),
-    phone: z.string().min(1, 'Le téléphone est requis'),
-    relationship: z.string().min(1, 'La relation est requise'),
-  }).optional(),
-  primary_care_physician: z.object({
-    name: z.string().min(1, 'Le nom est requis'),
-    phone: z.string().min(1, 'Le téléphone est requis'),
-    email: z.string().email('Email invalide').optional().or(z.literal('')),
-    address: z.string().optional(),
-  }).optional(),
 });
 
 type ComprehensiveHealthForm = z.infer<typeof comprehensiveHealthSchema>;
@@ -69,27 +54,11 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
   // Allergies hook
   const allergies = useAllergiesForm();
 
-  // Calculate BMI from Identity tab data
-  const calculatedBMI = React.useMemo(() => {
-    const height = profile?.height_cm;
-    const weight = profile?.weight_kg;
-
-    if (!height || !weight || height <= 0) return undefined;
-
-    const heightInMeters = height / 100;
-    const bmi = weight / (heightInMeters * heightInMeters);
-    return Math.round(bmi * 10) / 10;
-  }, [profile?.height_cm, profile?.weight_kg]);
-
-  // Main form for blood type and follow-up
+  // Main form for blood type
   const form = useForm<ComprehensiveHealthForm>({
     resolver: zodResolver(comprehensiveHealthSchema),
     defaultValues: {
       bloodType: healthV2?.basic?.bloodType,
-      last_checkup_date: healthV2?.last_checkup_date,
-      next_checkup_due: healthV2?.next_checkup_due,
-      emergency_contact: healthV2?.emergency_contact,
-      primary_care_physician: healthV2?.primary_care_physician,
     },
     mode: 'onChange',
   });
@@ -101,7 +70,7 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
   // Calculate overall completion
   const completion = React.useMemo(() => {
     let filled = 0;
-    let total = 7; // blood type, vaccinations, conditions/meds, allergies, checkups, contacts
+    let total = 4; // blood type, vaccinations, conditions/meds, allergies
 
     // Blood type
     if (watchedValues.bloodType) filled++;
@@ -115,15 +84,6 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
     // Allergies
     if (allergies.allergies.length > 0) filled++;
 
-    // Checkups
-    if (watchedValues.last_checkup_date || watchedValues.next_checkup_due) filled++;
-
-    // Emergency contact
-    if (watchedValues.emergency_contact?.name && watchedValues.emergency_contact?.phone) filled++;
-
-    // Primary care physician
-    if (watchedValues.primary_care_physician?.name && watchedValues.primary_care_physician?.phone) filled++;
-
     return Math.round((filled / total) * 100);
   }, [watchedValues, vaccinations, medicalConditions, allergies]);
 
@@ -132,7 +92,6 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
       logger.info('HEALTH_PROFILE', 'Saving comprehensive health info', {
         userId: profile?.userId,
         hasBloodType: !!data.bloodType,
-        hasEmergencyContact: !!data.emergency_contact,
       });
 
       const currentHealth = (profile as any)?.health as HealthProfileV2 | undefined;
@@ -144,10 +103,6 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
           basic: {
             bloodType: data.bloodType,
           },
-          last_checkup_date: data.last_checkup_date,
-          next_checkup_due: data.next_checkup_due,
-          emergency_contact: data.emergency_contact,
-          primary_care_physician: data.primary_care_physician,
         },
         updated_at: new Date().toISOString(),
       });
@@ -254,36 +209,6 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
         </GlassCard>
       </motion.div>
 
-      {/* BMI Info Card (from Identity tab data) */}
-      {calculatedBMI && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <GlassCard className="p-4" style={{
-            background: `radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 60%), var(--glass-opacity)`,
-            borderColor: 'rgba(16, 185, 129, 0.2)',
-          }}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <SpatialIcon Icon={ICONS.Activity} size={20} style={{ color: '#10B981' }} />
-                <div>
-                  <div className="text-white/90 font-medium text-sm">IMC (depuis onglet Identité)</div>
-                  <div className="text-white/60 text-xs">
-                    {calculatedBMI < 18.5 && 'Insuffisance pondérale'}
-                    {calculatedBMI >= 18.5 && calculatedBMI < 25 && 'Poids normal'}
-                    {calculatedBMI >= 25 && calculatedBMI < 30 && 'Surpoids'}
-                    {calculatedBMI >= 30 && 'Obésité'}
-                  </div>
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-green-400">{calculatedBMI}</div>
-            </div>
-          </GlassCard>
-        </motion.div>
-      )}
-
       {/* Blood Type Section */}
       <BloodTypeSection
         register={register}
@@ -305,7 +230,7 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
         isDirty={vaccinations.isDirty}
       />
 
-      {/* Medical Conditions and Medications Side by Side */}
+      {/* Medical Conditions and Allergies Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <MedicalConditionsCard
           conditions={medicalConditions.conditions}
@@ -313,8 +238,33 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
           setNewCondition={medicalConditions.setNewCondition}
           onAddCondition={medicalConditions.addCondition}
           onRemoveCondition={medicalConditions.removeCondition}
-          onDeclareNoConditions={medicalConditions.declareNoIssues}
-          hasDeclaredNoConditions={medicalConditions.hasDeclaredNoIssues}
+          onDeclareNoConditions={undefined}
+          hasDeclaredNoConditions={undefined}
+        />
+
+        <AllergiesSection
+          allergies={allergies.allergies}
+          onAddAllergy={allergies.onAddAllergy}
+          onRemoveAllergy={allergies.onRemoveAllergy}
+          onSave={allergies.onSave}
+          isSaving={allergies.isSaving}
+          isDirty={allergies.isDirty}
+        />
+      </div>
+
+      {/* Vaccinations and Medications Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <VaccinationsSection
+          vaccinations={vaccinations.vaccinations}
+          countryData={countryData}
+          onAddVaccination={vaccinations.onAddVaccination}
+          onUpdateVaccination={vaccinations.onUpdateVaccination}
+          onRemoveVaccination={vaccinations.onRemoveVaccination}
+          onToggleUpToDate={vaccinations.onToggleUpToDate}
+          upToDate={vaccinations.upToDate}
+          onSave={vaccinations.onSave}
+          isSaving={vaccinations.isSaving}
+          isDirty={vaccinations.isDirty}
         />
 
         <CurrentMedicationsCard
@@ -346,30 +296,6 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
           </button>
         </div>
       )}
-
-      {/* Allergies Section */}
-      <AllergiesSection
-        allergies={allergies.allergies}
-        onAddAllergy={allergies.onAddAllergy}
-        onRemoveAllergy={allergies.onRemoveAllergy}
-        onSave={allergies.onSave}
-        isSaving={allergies.isSaving}
-        isDirty={allergies.isDirty}
-      />
-
-      {/* Medical Follow-Up Section */}
-      <MedicalFollowUpSection
-        register={register}
-        errors={errors}
-        lastCheckupDate={watchedValues.last_checkup_date}
-        nextCheckupDue={watchedValues.next_checkup_due}
-      />
-
-      {/* Emergency Contacts Section */}
-      <EmergencyContactsSection
-        register={register}
-        errors={errors}
-      />
 
       {/* Global Save Button */}
       {isDirty && (

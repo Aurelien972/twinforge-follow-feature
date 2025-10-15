@@ -96,67 +96,32 @@ export const MedicalConditionsCard: React.FC<MedicalConditionsCardProps> = ({
           )}
         </div>
 
-        {/* No Conditions Declaration */}
-        {conditions.length === 0 && !hasDeclaredNoConditions && onDeclareNoConditions && (
-          <div className="mb-6">
-            <button
-              type="button"
-              onClick={onDeclareNoConditions}
-              className="w-full p-4 rounded-xl bg-green-500/10 border border-green-400/30 hover:bg-green-500/20 transition-colors"
-            >
-              <div className="flex items-center justify-center gap-3">
-                <SpatialIcon Icon={ICONS.Check} size={20} className="text-green-400" />
-                <div>
-                  <div className="text-green-300 font-semibold text-base">
-                    Je n'ai aucune condition médicale
-                  </div>
-                  <div className="text-green-400 text-xs mt-1">
-                    Cliquez ici si vous n'avez pas de maladie chronique ou condition particulière
-                  </div>
-                </div>
-              </div>
-            </button>
-          </div>
-        )}
-
-        {/* Confirmation if declared no conditions */}
-        {hasDeclaredNoConditions && conditions.length === 0 && (
-          <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-400/20">
-            <div className="flex items-center gap-3">
-              <SpatialIcon Icon={ICONS.CheckCircle} size={20} className="text-green-400" />
-              <div>
-                <div className="text-green-300 font-medium">Aucune condition médicale déclarée</div>
-                <div className="text-green-400 text-xs mt-0.5">
-                  Vous pouvez ajouter des conditions si votre situation évolue
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Conditions Input with Suggestions */}
         <div className="relative mb-4">
           <label className="block text-white/90 text-sm font-medium mb-3">
             Ajouter une condition médicale
           </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={newCondition}
-              onChange={(e) => {
-                setNewCondition(e.target.value);
-                setShowSuggestions(true);
-              }}
-              onFocus={() => setShowSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              className="glass-input pr-20"
-              placeholder="Ex: Diabète Type 2, Asthme..."
-            />
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={newCondition}
+                onChange={(e) => {
+                  setNewCondition(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                className="glass-input w-full"
+                placeholder="Ex: Diabète Type 2, Asthme..."
+              />
+            </div>
             <button
               type="button"
               onClick={onAddCondition}
               disabled={!newCondition.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 btn-glass py-1.5 px-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-glass py-2 px-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             >
               <SpatialIcon Icon={ICONS.Plus} size={14} className="inline mr-1" />
               Ajouter

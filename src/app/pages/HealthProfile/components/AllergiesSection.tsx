@@ -144,34 +144,29 @@ export const AllergiesSection: React.FC<AllergiesSectionProps> = ({
           borderColor: 'rgba(245, 158, 11, 0.2)',
         }}
       >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{
-                background: `
-                  radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                  linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.2))
-                `,
-                border: '2px solid rgba(245, 158, 11, 0.5)',
-                boxShadow: '0 0 20px rgba(245, 158, 11, 0.4)',
-              }}
-            >
-              <SpatialIcon Icon={ICONS.AlertTriangle} size={24} style={{ color: '#F59E0B' }} variant="pure" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-white font-semibold text-xl">Allergies</h3>
-              <p className="text-white/60 text-sm mt-1">Allergies alimentaires, médicamenteuses et environnementales</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="btn-glass py-2 px-4 text-sm"
+        <div className="flex items-center gap-3 mb-6">
+          <div
+            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{
+              background: `
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.2))
+              `,
+              border: '2px solid rgba(245, 158, 11, 0.5)',
+              boxShadow: '0 0 20px rgba(245, 158, 11, 0.4)',
+            }}
           >
-            <SpatialIcon Icon={showAddForm ? ICONS.X : ICONS.Plus} size={14} className="inline mr-2" />
-            {showAddForm ? 'Annuler' : 'Ajouter'}
-          </button>
+            <SpatialIcon Icon={ICONS.AlertTriangle} size={24} style={{ color: '#F59E0B' }} variant="pure" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-white font-semibold text-xl">Allergies</h3>
+            <p className="text-white/60 text-sm mt-1">Allergies alimentaires, médicamenteuses et environnementales</p>
+          </div>
+          {allergies.length > 0 && (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/20">
+              <span className="text-orange-300 font-bold text-sm">{allergies.length}</span>
+            </div>
+          )}
         </div>
 
         {/* Anaphylaxis Alert */}
@@ -193,14 +188,67 @@ export const AllergiesSection: React.FC<AllergiesSectionProps> = ({
           </motion.div>
         )}
 
-        {/* Add Form */}
+        {/* Simple Add Form */}
+        <div className="relative mb-4">
+          <label className="block text-white/90 text-sm font-medium mb-3">
+            Ajouter une allergie
+          </label>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={newAllergyName}
+                onChange={(e) => {
+                  setNewAllergyName(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                className="glass-input w-full"
+                placeholder="Ex: Arachides, Pénicilline..."
+              />
+
+              {/* Suggestions */}
+              {showSuggestions && newAllergyName.length > 0 && filteredSuggestions.length > 0 && (
+                <div className="absolute z-10 mt-2 w-full max-h-48 overflow-y-auto rounded-lg bg-gray-900/95 border border-white/10 backdrop-blur-xl shadow-2xl">
+                  <div className="p-2">
+                    <div className="text-white/50 text-xs px-3 py-2">Suggestions courantes:</div>
+                    {filteredSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => {
+                          setNewAllergyName(suggestion);
+                          setShowSuggestions(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-white text-sm"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="btn-glass py-2 px-4 text-sm flex-shrink-0"
+            >
+              <SpatialIcon Icon={showAddForm ? ICONS.ChevronUp : ICONS.ChevronDown} size={14} className="inline mr-1" />
+              {showAddForm ? 'Masquer' : 'Options'}
+            </button>
+          </div>
+        </div>
+
+        {/* Advanced Options (collapsible) */}
         <AnimatePresence>
           {showAddForm && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10"
+              className="mb-4 p-4 rounded-xl bg-white/5 border border-white/10"
             >
               <div className="space-y-4">
                 {/* Category Selection */}
@@ -226,44 +274,6 @@ export const AllergiesSection: React.FC<AllergiesSectionProps> = ({
                       );
                     })}
                   </div>
-                </div>
-
-                {/* Allergy Name with Suggestions */}
-                <div className="relative">
-                  <label className="block text-white/80 text-sm mb-2">Nom de l'allergie</label>
-                  <input
-                    type="text"
-                    value={newAllergyName}
-                    onChange={(e) => {
-                      setNewAllergyName(e.target.value);
-                      setShowSuggestions(true);
-                    }}
-                    onFocus={() => setShowSuggestions(true)}
-                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                    className="glass-input"
-                    placeholder="Ex: Arachides, Pénicilline..."
-                  />
-
-                  {/* Suggestions */}
-                  {showSuggestions && newAllergyName.length > 0 && filteredSuggestions.length > 0 && (
-                    <div className="absolute z-10 mt-2 w-full max-h-48 overflow-y-auto rounded-lg bg-gray-900/95 border border-white/10 backdrop-blur-xl shadow-2xl">
-                      <div className="p-2">
-                        {filteredSuggestions.map((suggestion, index) => (
-                          <button
-                            key={index}
-                            type="button"
-                            onClick={() => {
-                              setNewAllergyName(suggestion);
-                              setShowSuggestions(false);
-                            }}
-                            className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-white text-sm"
-                          >
-                            {suggestion}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Severity Selection */}
@@ -299,7 +309,7 @@ export const AllergiesSection: React.FC<AllergiesSectionProps> = ({
                   className="btn-glass w-full py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <SpatialIcon Icon={ICONS.Plus} size={14} className="inline mr-2" />
-                  Ajouter l'allergie
+                  Ajouter avec ces options
                 </button>
               </div>
             </motion.div>

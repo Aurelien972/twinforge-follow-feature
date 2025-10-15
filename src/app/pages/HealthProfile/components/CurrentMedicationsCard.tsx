@@ -96,24 +96,26 @@ export const CurrentMedicationsCard: React.FC<CurrentMedicationsCardProps> = ({
           <label className="block text-white/90 text-sm font-medium mb-3">
             Ajouter un médicament
           </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={newMedication}
-              onChange={(e) => {
-                setNewMedication(e.target.value);
-                setShowSuggestions(true);
-              }}
-              onFocus={() => setShowSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              className="glass-input pr-20"
-              placeholder="Ex: Metformine, Aspirine..."
-            />
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={newMedication}
+                onChange={(e) => {
+                  setNewMedication(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                className="glass-input w-full"
+                placeholder="Ex: Metformine, Aspirine..."
+              />
+            </div>
             <button
               type="button"
               onClick={onAddMedication}
               disabled={!newMedication.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 btn-glass py-1.5 px-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-glass py-2 px-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             >
               <SpatialIcon Icon={ICONS.Plus} size={14} className="inline mr-1" />
               Ajouter

@@ -88,7 +88,7 @@ export const HealthRiskBadges: React.FC<HealthRiskBadgesProps> = ({ countryData,
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {hasEndemicDiseases && (
               <RiskBadge
-                icon={ICONS.AlertTriangle}
+                icon="AlertTriangle"
                 label="Maladies Endémiques"
                 count={countryData.endemic_diseases!.length}
                 color="#F59E0B"
@@ -98,7 +98,7 @@ export const HealthRiskBadges: React.FC<HealthRiskBadgesProps> = ({ countryData,
 
             {hasMissingVaccines && (
               <RiskBadge
-                icon={ICONS.Shield}
+                icon="Shield"
                 label="Vaccins Recommandés"
                 count={countryData.vaccination_requirements!.recommended!.length}
                 color="#10B981"
@@ -108,7 +108,7 @@ export const HealthRiskBadges: React.FC<HealthRiskBadgesProps> = ({ countryData,
 
             {hasDeficiencies && (
               <RiskBadge
-                icon={ICONS.Pill}
+                icon="Pill"
                 label="Carences Communes"
                 count={countryData.common_deficiencies!.length}
                 color="#F59E0B"
@@ -118,7 +118,7 @@ export const HealthRiskBadges: React.FC<HealthRiskBadgesProps> = ({ countryData,
 
             {hasRisks && countryData.health_risks!.vector_borne_diseases && countryData.health_risks!.vector_borne_diseases.length > 0 && (
               <RiskBadge
-                icon={ICONS.Bug}
+                icon="Bug"
                 label="Maladies Vectorielles"
                 count={countryData.health_risks!.vector_borne_diseases.length}
                 color="#EF4444"
@@ -153,7 +153,7 @@ export const HealthRiskBadges: React.FC<HealthRiskBadgesProps> = ({ countryData,
 };
 
 interface RiskBadgeProps {
-  icon: string;
+  icon: keyof typeof ICONS;
   label: string;
   count: number;
   color: string;
@@ -161,6 +161,8 @@ interface RiskBadgeProps {
 }
 
 const RiskBadge: React.FC<RiskBadgeProps> = ({ icon, label, count, color, items }) => {
+  const IconComponent = ICONS[icon as keyof typeof ICONS] || ICONS.AlertCircle;
+
   return (
     <div
       className="p-3 rounded-lg"
@@ -171,7 +173,7 @@ const RiskBadge: React.FC<RiskBadgeProps> = ({ icon, label, count, color, items 
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <SpatialIcon Icon={ICONS[icon as keyof typeof ICONS]} size={14} style={{ color }} />
+          <SpatialIcon Icon={IconComponent} size={14} style={{ color }} />
           <span className="text-white/90 text-sm font-medium">{label}</span>
         </div>
         <span
