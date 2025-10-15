@@ -260,11 +260,6 @@ export function useProfileIdentityForm() {
       sectionSaving,
       hasRequiredChanges,
       hasOptionalChanges
-    },
-    autoSave: {
-      saveStatus,
-      lastSaved,
-      isWarmingUp
     }
   };
 }
