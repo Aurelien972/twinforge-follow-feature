@@ -198,7 +198,7 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
         >
           <div
             className="absolute inset-0 flex items-center justify-center"
-            style={{ pointerEvents: 'none' }}
+            style={{ pointerEvents: 'none !important' } as React.CSSProperties}
           >
             <div className="text-center space-y-4">
               <div 
@@ -336,7 +336,10 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
         </button>
 
         <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
+          <div
+            className="absolute inset-0 flex items-center"
+            style={{ pointerEvents: 'none' }}
+          >
             <div className="w-full border-t border-gray-700"></div>
           </div>
           <div className="relative flex justify-center text-xs">
