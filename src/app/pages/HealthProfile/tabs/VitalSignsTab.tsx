@@ -10,9 +10,14 @@ import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
 import { VitalSignsSection } from '../../Profile/components/health/VitalSignsSection';
 import { useVitalSignsFormTab } from '../hooks/useVitalSignsFormTab';
+import UnsavedChangesIndicator from '../../../../ui/components/UnsavedChangesIndicator';
+import { useUnsavedChangesWarning } from '../../../../hooks/useUnsavedChangesWarning';
 
 export const VitalSignsTab: React.FC = () => {
   const { form, state } = useVitalSignsFormTab();
+
+  // Warn user about unsaved changes
+  useUnsavedChangesWarning({ isDirty: form.isDirty });
 
   const getStatusColor = () => {
     if (state.vitalStatus.status === 'normal') return { color: '#10B981', label: 'Normal' };
@@ -24,6 +29,14 @@ export const VitalSignsTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Unsaved Changes Indicator */}
+      <UnsavedChangesIndicator
+        isDirty={form.isDirty}
+        onSave={form.handleSubmit}
+        isSaving={state.saving}
+        isValid={form.isValid}
+      />
+
       {/* Progress Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

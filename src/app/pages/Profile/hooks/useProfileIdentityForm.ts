@@ -12,7 +12,6 @@ import { useFeedback } from '../../../../hooks/useFeedback';
 import { profileIdentitySchema, type ProfileIdentityForm } from '../validation/profileIdentityValidation';
 import logger from '../../../../lib/utils/logger';
 import { useUnsavedChangesStore } from '../../../../system/store/unsavedChangesStore';
-import { useProfileAutoSave } from '../../../../hooks/useProfileAutoSave';
 
 export function useProfileIdentityForm() {
   const { profile, updateProfile, saving } = useUserStore();
@@ -48,43 +47,7 @@ export function useProfileIdentityForm() {
     useUnsavedChangesStore.getState().setTabDirty('identity', isDirty);
   }, [isDirty]);
 
-  // Optimized auto-save with tab awareness and warm-up period
-  // Stabilize autoSaveData with individual dependencies to avoid infinite loops
-  const autoSaveData = React.useMemo(() => ({
-    displayName: watchedValues.displayName,
-    sex: watchedValues.sex,
-    height_cm: watchedValues.height_cm,
-    weight_kg: watchedValues.weight_kg,
-    birthdate: watchedValues.birthdate || null,
-    target_weight_kg: watchedValues.target_weight_kg || null,
-    activity_level: watchedValues.activity_level || null,
-    objective: watchedValues.objective || null,
-    job_category: watchedValues.job_category || null,
-    phoneNumber: watchedValues.phone_number || null,
-    country: watchedValues.country || null,
-  }), [
-    watchedValues.displayName,
-    watchedValues.sex,
-    watchedValues.height_cm,
-    watchedValues.weight_kg,
-    watchedValues.birthdate,
-    watchedValues.target_weight_kg,
-    watchedValues.activity_level,
-    watchedValues.objective,
-    watchedValues.job_category,
-    watchedValues.phone_number,
-    watchedValues.country,
-  ]);
-
-  // Note: Form reset after auto-save is handled by useProfileAutoSave's onSaveSuccess callback
-  // which calls useUnsavedChangesStore.getState().resetTabDirty('identity')
-  const { saveStatus, lastSaved, isWarmingUp } = useProfileAutoSave(autoSaveData, {
-    tabKey: 'identity',
-    enabled: true,
-    showToasts: true,
-    warmUpMs: 2000,
-    debounceMs: 1500,
-  });
+  // Auto-save has been removed - manual save only
 
   // Section-specific save handlers
   const saveRequiredSection = async () => {

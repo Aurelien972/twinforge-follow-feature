@@ -10,12 +10,25 @@ import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
 import { FamilyHistorySection } from '../../Profile/components/health/FamilyHistorySection';
 import { useFamilyHistoryFormTab } from '../hooks/useFamilyHistoryFormTab';
+import UnsavedChangesIndicator from '../../../../ui/components/UnsavedChangesIndicator';
+import { useUnsavedChangesWarning } from '../../../../hooks/useUnsavedChangesWarning';
 
 export const FamilyHistoryTab: React.FC = () => {
   const { form, state } = useFamilyHistoryFormTab();
 
+  // Warn user about unsaved changes
+  useUnsavedChangesWarning({ isDirty: form.isDirty });
+
   return (
     <div className="space-y-6">
+      {/* Unsaved Changes Indicator */}
+      <UnsavedChangesIndicator
+        isDirty={form.isDirty}
+        onSave={form.handleSubmit}
+        isSaving={state.saving}
+        isValid={form.isValid}
+      />
+
       {/* Progress Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

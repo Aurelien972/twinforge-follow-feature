@@ -4,10 +4,9 @@
  */
 
 export * from './useFeedback';
-export * from './useSmartAutoSave';
-export * from './useProfileAutoSave';
 export * from './useFieldValidation';
 export * from './useProfileTabExitGuard';
+export * from './useUnsavedChangesWarning';
 export { usePerformanceMode } from './usePerformanceMode';
 export { useLazyLoad } from './useLazyLoad';
 export * from './useAnalysisProgress';

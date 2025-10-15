@@ -17,10 +17,15 @@ import {
   SexualActivityCard,
   STIScreeningCard,
 } from '../components/intimacy';
+import UnsavedChangesIndicator from '../../../../ui/components/UnsavedChangesIndicator';
+import { useUnsavedChangesWarning } from '../../../../hooks/useUnsavedChangesWarning';
 
 export const IntimacyTab: React.FC = () => {
   const { form, state } = useIntimacyFormTab();
   const userGender = state.userGender;
+
+  // Warn user about unsaved changes
+  useUnsavedChangesWarning({ isDirty: form.isDirty });
 
   // If no gender is set, show a message to complete profile
   if (!userGender) {
@@ -60,6 +65,14 @@ export const IntimacyTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Unsaved Changes Indicator */}
+      <UnsavedChangesIndicator
+        isDirty={form.isDirty}
+        onSave={form.handleSubmit}
+        isSaving={state.saving}
+        isValid={form.isValid}
+      />
+
       {/* Progress Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

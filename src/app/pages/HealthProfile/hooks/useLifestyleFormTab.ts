@@ -40,23 +40,26 @@ export function useLifestyleFormTab() {
   const healthV2 = (profile as any)?.health as HealthProfileV2 | undefined;
   const lifestyle = healthV2?.lifestyle;
 
+  // Prepare default values from profile
+  const defaultValues = React.useMemo(() => ({
+    smoking_status: lifestyle?.smoking_status,
+    smoking_years: lifestyle?.smoking_years,
+    alcohol_frequency: lifestyle?.alcohol_frequency,
+    alcohol_units_per_week: lifestyle?.alcohol_units_per_week,
+    sleep_hours_avg: lifestyle?.sleep_hours_avg,
+    sleep_quality: lifestyle?.sleep_quality,
+    stress_level: lifestyle?.stress_level,
+    anxiety_level: lifestyle?.anxiety_level,
+    mood_rating: lifestyle?.mood_rating,
+    hydration_liters_per_day: lifestyle?.hydration_liters_per_day,
+    screen_time_hours_per_day: lifestyle?.screen_time_hours_per_day,
+    takes_screen_breaks: lifestyle?.takes_screen_breaks !== undefined ? String(lifestyle.takes_screen_breaks) : undefined,
+  }), [lifestyle]);
+
   // Initialize form
   const form = useForm<LifestyleFormData>({
     resolver: zodResolver(lifestyleFormSchema),
-    defaultValues: {
-      smoking_status: lifestyle?.smoking_status,
-      smoking_years: lifestyle?.smoking_years,
-      alcohol_frequency: lifestyle?.alcohol_frequency,
-      alcohol_units_per_week: lifestyle?.alcohol_units_per_week,
-      sleep_hours_avg: lifestyle?.sleep_hours_avg,
-      sleep_quality: lifestyle?.sleep_quality,
-      stress_level: lifestyle?.stress_level,
-      anxiety_level: lifestyle?.anxiety_level,
-      mood_rating: lifestyle?.mood_rating,
-      hydration_liters_per_day: lifestyle?.hydration_liters_per_day,
-      screen_time_hours_per_day: lifestyle?.screen_time_hours_per_day,
-      takes_screen_breaks: lifestyle?.takes_screen_breaks !== undefined ? String(lifestyle.takes_screen_breaks) : undefined,
-    },
+    defaultValues,
     mode: 'onChange',
   });
 

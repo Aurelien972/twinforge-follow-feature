@@ -26,6 +26,8 @@ import { useToast } from '../../../../ui/components/ToastProvider';
 import { useFeedback } from '../../../../hooks/useFeedback';
 import logger from '../../../../lib/utils/logger';
 import type { HealthProfileV2 } from '../../../../domain/health';
+import UnsavedChangesIndicator from '../../../../ui/components/UnsavedChangesIndicator';
+import { useUnsavedChangesWarning } from '../../../../hooks/useUnsavedChangesWarning';
 
 // Schema for the comprehensive health form
 const comprehensiveHealthSchema = z.object({
@@ -64,8 +66,11 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
   });
 
   const { register, handleSubmit, formState, watch } = form;
-  const { errors, isDirty } = formState;
+  const { errors, isDirty, isValid } = formState;
   const watchedValues = watch();
+
+  // Warn user about unsaved changes
+  useUnsavedChangesWarning({ isDirty });
 
   // Calculate overall completion
   const completion = React.useMemo(() => {
@@ -132,6 +137,14 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
+      {/* Unsaved Changes Indicator */}
+      <UnsavedChangesIndicator
+        isDirty={isDirty}
+        onSave={onSubmit}
+        isSaving={saving}
+        isValid={isValid}
+      />
+
       {/* Progress Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

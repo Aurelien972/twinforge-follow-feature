@@ -10,12 +10,25 @@ import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
 import { TobaccoAlcoholCard, SleepCard, StressAnxietyCard, HydrationCard, ScreenTimeCard } from '../components/lifestyle';
 import { useLifestyleFormTab } from '../hooks/useLifestyleFormTab';
+import UnsavedChangesIndicator from '../../../../ui/components/UnsavedChangesIndicator';
+import { useUnsavedChangesWarning } from '../../../../hooks/useUnsavedChangesWarning';
 
 export const LifestyleTab: React.FC = () => {
   const { form, state } = useLifestyleFormTab();
 
+  // Warn user about unsaved changes
+  useUnsavedChangesWarning({ isDirty: form.isDirty });
+
   return (
     <div className="space-y-6">
+      {/* Unsaved Changes Indicator */}
+      <UnsavedChangesIndicator
+        isDirty={form.isDirty}
+        onSave={form.handleSubmit}
+        isSaving={state.saving}
+        isValid={form.isValid}
+      />
+
       {/* Progress Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
