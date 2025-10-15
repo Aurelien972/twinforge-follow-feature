@@ -21,6 +21,7 @@ import { HealthOverviewTab } from './tabs/HealthOverviewTab';
 import { BasicHealthTabEnhancedV2 } from './tabs/BasicHealthTabEnhancedV2';
 import { VitalSignsTab } from './tabs/VitalSignsTab';
 import { LifestyleTab } from './tabs/LifestyleTab';
+import { IntimacyTab } from './tabs/IntimacyTab';
 import { FamilyHistoryTab } from './tabs/FamilyHistoryTab';
 import logger from '../../../lib/utils/logger';
 
@@ -303,7 +304,7 @@ const HealthProfilePage: React.FC = () => {
         </Tabs.Panel>
 
         <Tabs.Panel value="intimacy">
-          <PlaceholderTab title="Intimité" icon="Heart" />
+          <IntimacyTab />
         </Tabs.Panel>
 
         <Tabs.Panel value="family-history">

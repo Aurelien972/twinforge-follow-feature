@@ -81,28 +81,6 @@ export const LifestyleTab: React.FC = () => {
         </GlassCard>
       </motion.div>
 
-      {/* Info Banner */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-      >
-        <GlassCard className="p-4" style={{
-          background: 'rgba(59, 130, 246, 0.05)',
-          borderColor: 'rgba(59, 130, 246, 0.2)',
-        }}>
-          <div className="flex items-start gap-3">
-            <SpatialIcon Icon={ICONS.Info} size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-blue-200 text-sm leading-relaxed">
-                Ces informations permettent de créer un profil complet de votre mode de vie.
-                Les données seront analysées par l'IA pour vous fournir des recommandations préventives personnalisées.
-              </p>
-            </div>
-          </div>
-        </GlassCard>
-      </motion.div>
-
       {/* Main Form */}
       <form onSubmit={form.handleSubmit}>
         <div className="space-y-6">

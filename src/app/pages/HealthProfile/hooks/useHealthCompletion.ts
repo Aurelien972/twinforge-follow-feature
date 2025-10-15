@@ -13,6 +13,7 @@ interface HealthCompletionBreakdown {
   familyHistory: number;
   vitalSigns: number;
   lifestyle: number;
+  intimacy: number;
   emergencyContacts: number;
   overall: number;
 }
@@ -27,6 +28,7 @@ export function useHealthCompletion(health?: HealthProfileV2): HealthCompletionB
         familyHistory: 0,
         vitalSigns: 0,
         lifestyle: 0,
+        intimacy: 0,
         emergencyContacts: 0,
         overall: 0,
       };
@@ -93,6 +95,16 @@ export function useHealthCompletion(health?: HealthProfileV2): HealthCompletionB
       (lifestyleFields.filter(Boolean).length / lifestyleFields.length) * 100
     );
 
+    // Calculate intimacy completion (common fields only, as gender-specific completeness is calculated in the hook)
+    const intimacyCommonFields = [
+      health.reproductive_health?.sexual_activity_frequency,
+      health.reproductive_health?.sexual_satisfaction,
+      health.reproductive_health?.last_sti_screening_date,
+    ];
+    const intimacyCompletion = Math.round(
+      (intimacyCommonFields.filter(Boolean).length / intimacyCommonFields.length) * 100
+    );
+
     // Calculate emergency contacts completion
     const emergencyContactsFields = [
       health.emergency_contact?.name,
@@ -122,6 +134,7 @@ export function useHealthCompletion(health?: HealthProfileV2): HealthCompletionB
       familyHistory: familyHistoryCompletion,
       vitalSigns: vitalSignsCompletion,
       lifestyle: lifestyleCompletion,
+      intimacy: intimacyCompletion,
       emergencyContacts: emergencyContactsCompletion,
       overall: overallCompletion,
     };
