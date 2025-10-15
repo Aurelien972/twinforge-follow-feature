@@ -8,6 +8,7 @@ import ProfileNutritionTab from './Profile/ProfileNutritionTab';
 import ProfileHealthTab from './Profile/ProfileHealthTab';
 import ProfileFastingTab from './Profile/ProfileFastingTab';
 import ProfileTrainingTab from './Profile/ProfileTrainingTab';
+import ProfileGeoTab from './Profile/ProfileGeoTab';
 import { useFeedback } from '../../hooks/useFeedback';
 import logger from '../../lib/utils/logger';
 import ProfileAvatarTab from './Profile/ProfileAvatarTab';
@@ -59,6 +60,14 @@ function getTabHeaderContent(activeTab: string) {
         circuit: 'training' as const,
         color: '#18E3FF',
       };
+    case 'geo':
+      return {
+        icon: 'MapPin' as const,
+        title: 'Geo & Environnement',
+        subtitle: 'Données géographiques et contexte sanitaire local',
+        circuit: 'home' as const,
+        color: '#EC4899',
+      };
     case 'avatar':
       return {
         icon: 'Camera' as const,
@@ -90,11 +99,11 @@ const Profile: React.FC = () => {
   const activeTab = React.useMemo(() => {
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['identity', 'nutrition', 'health', 'fasting', 'training', 'avatar'].includes(tabParam)) {
+    if (tabParam && ['identity', 'nutrition', 'health', 'fasting', 'training', 'geo', 'avatar'].includes(tabParam)) {
       return tabParam;
     }
     const hash = location.hash.replace('#', '');
-    return hash && ['identity', 'nutrition', 'health', 'fasting', 'preferences', 'avatar'].includes(hash) ? hash : 'identity';
+    return hash && ['identity', 'nutrition', 'health', 'fasting', 'preferences', 'geo', 'avatar'].includes(hash) ? hash : 'identity';
   }, [location.hash, location.search]);
   
   // Enable keyboard navigation for tabs
@@ -146,6 +155,9 @@ const Profile: React.FC = () => {
           <Tabs.Trigger value="health" icon="Heart">
             <span className="tab-text">Santé</span>
           </Tabs.Trigger>
+          <Tabs.Trigger value="geo" icon="MapPin">
+            <span className="tab-text">Geo</span>
+          </Tabs.Trigger>
           <Tabs.Trigger value="avatar" icon="Camera">
             <span className="tab-text">Avatar</span>
           </Tabs.Trigger>
@@ -170,7 +182,11 @@ const Profile: React.FC = () => {
         <Tabs.Panel value="fasting">
           <ProfileFastingTab />
         </Tabs.Panel>
-        
+
+        <Tabs.Panel value="geo">
+          <ProfileGeoTab />
+        </Tabs.Panel>
+
         <Tabs.Panel value="avatar">
           <ProfileAvatarTab />
         </Tabs.Panel>

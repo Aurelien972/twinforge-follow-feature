@@ -16,6 +16,7 @@ export const TAB_COLORS: Record<string, string> = {
   'profile:health': '#EF4444',      // Rouge pour santé
   'profile:fasting': '#F59E0B',     // Orange pour jeûne
   'profile:preferences': '#18E3FF', // Cyan pour training
+  'profile:geo': '#EC4899',         // Rose pour géographique
   'profile:avatar': '#A855F7',      // Violet pour avatar
 
   // Atelier de Recettes (Fridge)

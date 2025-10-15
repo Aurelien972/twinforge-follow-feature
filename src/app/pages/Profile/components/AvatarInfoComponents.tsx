@@ -104,16 +104,10 @@ export const AvatarStatusCard: React.FC<AvatarStatusCardProps> = ({ data }) => {
               {data.hasBodyScan && (
                 <div className="flex items-center gap-1 text-xs text-purple-300">
                   <SpatialIcon Icon={ICONS.User} size={12} />
-                  <span>Corps</span>
+                  <span>Corps 3D</span>
                 </div>
               )}
-              {data.hasFaceScan && (
-                <div className="flex items-center gap-1 text-xs text-purple-300">
-                  <SpatialIcon Icon={ICONS.Smile} size={12} />
-                  <span>Visage</span>
-                </div>
-              )}
-              {!data.hasBodyScan && !data.hasFaceScan && (
+              {!data.hasBodyScan && (
                 <span className="text-xs text-gray-400">Aucun scan disponible</span>
               )}
             </div>
@@ -128,12 +122,12 @@ export const AvatarStatusCard: React.FC<AvatarStatusCardProps> = ({ data }) => {
 
       {data.completionPercentage < 100 && (
         <button
-          onClick={() => navigate(data.hasBodyScan ? '/face-scan' : '/body-scan')}
+          onClick={() => navigate('/body-scan')}
           className="btn-glass--primary mt-6 w-full"
         >
           <div className="flex items-center justify-center gap-2">
             <SpatialIcon Icon={ICONS.Scan} size={16} />
-            <span>{data.hasBodyScan ? 'Scanner mon visage' : 'Scanner mon corps'}</span>
+            <span>Scanner mon corps</span>
           </div>
         </button>
       )}
@@ -185,8 +179,8 @@ export const LastScanCard: React.FC<LastScanCardProps> = ({ data }) => {
             <SpatialIcon Icon={ICONS.Info} size={16} className="text-purple-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-purple-200 text-sm leading-relaxed">
-                Vous n'avez pas encore effectué de scan corporel ou facial.
-                Commencez par scanner votre corps ou votre visage pour créer votre avatar numérique 3D.
+                Vous n'avez pas encore effectué de scan corporel.
+                Commencez par scanner votre corps pour créer votre avatar numérique 3D.
               </p>
             </div>
           </div>
@@ -238,25 +232,13 @@ export const LastScanCard: React.FC<LastScanCardProps> = ({ data }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-          <div className="flex items-center gap-2 mb-2">
-            <SpatialIcon Icon={ICONS.User} size={14} className="text-purple-400" />
-            <span className="text-white font-medium text-sm">Corps</span>
-          </div>
-          <div className="text-white/60 text-xs">
-            {data.hasBodyScan ? `${data.bodyScanCount} scan${data.bodyScanCount > 1 ? 's' : ''}` : 'Aucun scan'}
-          </div>
+      <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+        <div className="flex items-center gap-2 mb-2">
+          <SpatialIcon Icon={ICONS.User} size={14} className="text-purple-400" />
+          <span className="text-white font-medium text-sm">Scans Corporels</span>
         </div>
-
-        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-          <div className="flex items-center gap-2 mb-2">
-            <SpatialIcon Icon={ICONS.Smile} size={14} className="text-purple-400" />
-            <span className="text-white font-medium text-sm">Visage</span>
-          </div>
-          <div className="text-white/60 text-xs">
-            {data.hasFaceScan ? `${data.faceScanCount} scan${data.faceScanCount > 1 ? 's' : ''}` : 'Aucun scan'}
-          </div>
+        <div className="text-white/60 text-xs">
+          {data.hasBodyScan ? `${data.bodyScanCount} scan${data.bodyScanCount > 1 ? 's' : ''}` : 'Aucun scan'}
         </div>
       </div>
     </GlassCard>
@@ -315,19 +297,6 @@ export const QuickActionsCard: React.FC<QuickActionsCardProps> = ({ data }) => {
           </div>
         </button>
 
-        <button
-          onClick={() => navigate('/face-scan')}
-          className="btn-glass p-4 text-left hover:bg-white/5 transition-colors"
-        >
-          <div className="flex items-start gap-3">
-            <SpatialIcon Icon={ICONS.Camera} size={18} className="text-purple-400 mt-0.5" />
-            <div>
-              <div className="text-white font-medium text-sm mb-1">Scanner mon visage</div>
-              <div className="text-white/60 text-xs">Créer ou mettre à jour votre scan facial</div>
-            </div>
-          </div>
-        </button>
-
         {data.hasBodyScan && (
           <button
             onClick={() => navigate('/avatar')}
@@ -343,7 +312,7 @@ export const QuickActionsCard: React.FC<QuickActionsCardProps> = ({ data }) => {
           </button>
         )}
 
-        {data.hasBodyScan && data.hasFaceScan && (
+        {data.hasBodyScan && (
           <button
             onClick={() => navigate('/avatar?tab=projection')}
             className="btn-glass p-4 text-left hover:bg-white/5 transition-colors"
