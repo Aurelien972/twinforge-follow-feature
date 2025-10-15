@@ -1,17 +1,17 @@
 /**
  * Basic Health Form Hook
- * Manages form state for the Basic Health tab (V2)
+ * Manages form state for the Basic Health tab (V2) with improved error handling
  */
 
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useUserStore } from '../../../../system/store/userStore';
-import { useToast } from '../../../../ui/components/ToastProvider';
-import { useFeedback } from '../../../../hooks/useFeedback';
 import logger from '../../../../lib/utils/logger';
 import { z } from 'zod';
-import { basicHealthSectionSchema, vaccinationsSectionSchema, type BasicHealthSectionForm } from '../../Profile/validation/profileHealthValidationV2';
+import { basicHealthSectionSchema, vaccinationsSectionSchema } from '../../Profile/validation/profileHealthValidationV2';
+import { useHealthProfileSave } from './useHealthProfileSave';
+import { useHealthFormDirtyState } from './useHealthFormDirtyState';
 
 // Extended schema to include vaccinations in Basic tab
 const extendedBasicHealthSchema = basicHealthSectionSchema.extend({
@@ -22,9 +22,8 @@ type ExtendedBasicHealthForm = z.infer<typeof extendedBasicHealthSchema>;
 import type { HealthProfileV2 } from '../../../../domain/health';
 
 export function useBasicHealthForm() {
-  const { profile, updateProfile, saving } = useUserStore();
-  const { showToast } = useToast();
-  const { success } = useFeedback();
+  const { profile } = useUserStore();
+  const { saveSection, isSectionSaving } = useHealthProfileSave();
 
   // Extract V2 health data
   const healthV2 = (profile as any)?.health as HealthProfileV2 | undefined;
@@ -77,51 +76,26 @@ export function useBasicHealthForm() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      logger.info('HEALTH_PROFILE', 'Saving basic health info', {
+      logger.info('BASIC_HEALTH_FORM', 'Saving basic health info', {
         userId: profile?.userId,
         hasBloodType: !!data.bloodType,
-        hasHeight: !!data.height_cm,
-        hasWeight: !!data.weight_kg,
       });
 
-      const updatedBasic = {
-        bloodType: data.bloodType,
-      };
-
-      const currentHealth = (profile as any)?.health as HealthProfileV2 | undefined;
-
-      await updateProfile({
-        health: {
-          ...currentHealth,
-          version: '2.0' as const,
-          basic: updatedBasic,
-          vaccinations: data.vaccinations || currentHealth?.vaccinations,
+      await saveSection({
+        section: 'basic',
+        data: {
+          bloodType: data.bloodType,
         },
-        updated_at: new Date().toISOString(),
+        onSuccess: () => {
+          reset(data);
+          logger.info('BASIC_HEALTH_FORM', 'Successfully saved and reset form', {
+            bloodType: data.bloodType,
+          });
+        },
       });
-
-      success();
-      showToast({
-        type: 'success',
-        title: 'Informations de base sauvegardées',
-        message: 'Vos données médicales de base ont été mises à jour',
-        duration: 3000,
-      });
-
-      // Reset form with new values
-      reset(data);
-
     } catch (error) {
-      logger.error('HEALTH_PROFILE', 'Failed to save basic health info', {
+      logger.error('BASIC_HEALTH_FORM', 'Save failed (already handled by saveSection)', {
         error: error instanceof Error ? error.message : 'Unknown error',
-        userId: profile?.userId,
-      });
-
-      showToast({
-        type: 'error',
-        title: 'Erreur de sauvegarde',
-        message: 'Impossible de sauvegarder les informations de base',
-        duration: 4000,
       });
     }
   });
@@ -136,7 +110,7 @@ export function useBasicHealthForm() {
       watchedValues,
     },
     state: {
-      saving,
+      saving: isSectionSaving('basic'),
       completion,
       calculatedBMI,
     },

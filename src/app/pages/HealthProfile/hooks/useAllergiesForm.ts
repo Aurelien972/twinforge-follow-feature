@@ -1,14 +1,14 @@
 /**
  * Allergies Form Hook
- * Manages allergies state and operations
+ * Manages allergies state and operations with improved error handling
  */
 
 import React from 'react';
 import { useUserStore } from '../../../../system/store/userStore';
-import { useToast } from '../../../../ui/components/ToastProvider';
-import { useFeedback } from '../../../../hooks/useFeedback';
 import logger from '../../../../lib/utils/logger';
 import type { HealthProfileV2 } from '../../../../domain/health';
+import { useHealthProfileSave } from './useHealthProfileSave';
+import { useHealthFormDirtyState } from './useHealthFormDirtyState';
 
 interface Allergy {
   name: string;
@@ -17,34 +17,43 @@ interface Allergy {
 }
 
 export function useAllergiesForm() {
-  const { profile, updateProfile, saving } = useUserStore();
-  const { showToast } = useToast();
-  const { success } = useFeedback();
+  const { profile } = useUserStore();
+  const { saveSection, isSectionSaving } = useHealthProfileSave();
 
   // Extract V2 health data
   const healthV2 = (profile as any)?.health as HealthProfileV2 | undefined;
 
   // Parse allergies from medical_history.allergies (string array) to structured format
-  // For now, we store them as simple strings, but we could enhance the data model
   const [allergies, setAllergies] = React.useState<Allergy[]>([]);
-  const [isDirty, setIsDirty] = React.useState(false);
+  const [initialAllergies, setInitialAllergies] = React.useState<Allergy[]>([]);
 
-  // Initialize allergies (simplified - in real implementation, parse from stored data)
+  // Initialize allergies from database
   React.useEffect(() => {
     const storedAllergies = healthV2?.medical_history?.allergies || [];
-    // For now, treat all stored allergies as food/mild (would need schema update for full support)
     const parsedAllergies: Allergy[] = storedAllergies.map(name => ({
       name,
       category: 'food' as const,
       severity: 'mild' as const,
     }));
     setAllergies(parsedAllergies);
+    setInitialAllergies(parsedAllergies);
+
+    logger.debug('ALLERGIES_FORM', 'Initialized allergies from database', {
+      count: parsedAllergies.length,
+      allergies: parsedAllergies,
+    });
   }, [healthV2?.medical_history?.allergies]);
+
+  // Use intelligent dirty state detection
+  const { isDirty, changedFieldsCount, resetDirtyState } = useHealthFormDirtyState({
+    currentValues: { allergies },
+    initialValues: { allergies: initialAllergies },
+    formName: 'ALLERGIES',
+  });
 
   const handleAddAllergy = (allergy: Allergy) => {
     setAllergies((prev) => [...prev, allergy]);
-    setIsDirty(true);
-    logger.info('ALLERGIES', 'Added allergy', {
+    logger.info('ALLERGIES_FORM', 'Added allergy', {
       name: allergy.name,
       category: allergy.category,
       severity: allergy.severity,
@@ -53,56 +62,34 @@ export function useAllergiesForm() {
 
   const handleRemoveAllergy = (index: number) => {
     setAllergies((prev) => prev.filter((_, i) => i !== index));
-    setIsDirty(true);
-    logger.info('ALLERGIES', 'Removed allergy', { index });
+    logger.info('ALLERGIES_FORM', 'Removed allergy', { index });
   };
 
   const handleSave = async () => {
     try {
-      logger.info('ALLERGIES', 'Saving allergies', {
+      logger.info('ALLERGIES_FORM', 'Saving allergies', {
         userId: profile?.userId,
         count: allergies.length,
+        allergies: allergies.map(a => a.name),
       });
 
-      const currentHealth = (profile as any)?.health as HealthProfileV2 | undefined;
-
-      // Convert structured allergies back to string array for storage
+      // Convert structured allergies to string array for database
       const allergyNames = allergies.map(a => a.name);
 
-      await updateProfile({
-        health: {
-          ...currentHealth,
-          version: '2.0' as const,
-          medical_history: {
-            ...currentHealth?.medical_history,
-            conditions: currentHealth?.medical_history?.conditions || [],
-            medications: currentHealth?.medical_history?.medications || [],
-            allergies: allergyNames,
-          },
+      await saveSection({
+        section: 'allergies',
+        data: { allergies: allergyNames },
+        onSuccess: () => {
+          setInitialAllergies(allergies);
+          resetDirtyState({ allergies });
+          logger.info('ALLERGIES_FORM', 'Successfully saved and reset dirty state', {
+            count: allergies.length,
+          });
         },
-        updated_at: new Date().toISOString(),
       });
-
-      success();
-      showToast({
-        type: 'success',
-        title: 'Allergies sauvegardées',
-        message: 'Vos informations d\'allergies ont été mises à jour',
-        duration: 3000,
-      });
-
-      setIsDirty(false);
     } catch (error) {
-      logger.error('ALLERGIES', 'Failed to save allergies', {
+      logger.error('ALLERGIES_FORM', 'Save failed (already handled by saveSection)', {
         error: error instanceof Error ? error.message : 'Unknown error',
-        userId: profile?.userId,
-      });
-
-      showToast({
-        type: 'error',
-        title: 'Erreur de sauvegarde',
-        message: 'Impossible de sauvegarder les allergies',
-        duration: 4000,
       });
     }
   };
@@ -112,7 +99,8 @@ export function useAllergiesForm() {
     onAddAllergy: handleAddAllergy,
     onRemoveAllergy: handleRemoveAllergy,
     onSave: handleSave,
-    isSaving: saving,
+    isSaving: isSectionSaving('allergies'),
     isDirty,
+    changedFieldsCount,
   };
 }

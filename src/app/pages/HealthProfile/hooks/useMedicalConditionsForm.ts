@@ -1,133 +1,161 @@
 /**
  * useMedicalConditionsForm Hook
- * Manages medical conditions and medications form state
+ * Manages medical conditions and medications form state with improved error handling
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUserStore } from '../../../../system/store/userStore';
 import type { HealthProfileV2 } from '../../../../domain/health';
 import logger from '../../../../lib/utils/logger';
+import { useHealthProfileSave } from './useHealthProfileSave';
+import { useHealthFormDirtyState } from './useHealthFormDirtyState';
 
 export function useMedicalConditionsForm() {
-  const { profile, updateProfile } = useUserStore();
+  const { profile } = useUserStore();
+  const { saveSection, isSectionSaving } = useHealthProfileSave();
   const health = (profile as any)?.health as HealthProfileV2 | undefined;
 
   const [conditions, setConditions] = useState<string[]>([]);
   const [medications, setMedications] = useState<string[]>([]);
   const [newCondition, setNewCondition] = useState('');
   const [newMedication, setNewMedication] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
   const [hasDeclaredNoIssues, setHasDeclaredNoIssues] = useState(false);
+  const [initialState, setInitialState] = useState({
+    conditions: [] as string[],
+    medications: [] as string[],
+    hasDeclaredNoIssues: false,
+  });
 
   // Initialize from profile
   useEffect(() => {
-    if (health?.medical_history) {
-      setConditions(health.medical_history.conditions || []);
-      setMedications(health.medical_history.medications || []);
-    }
-    if (health) {
-      setHasDeclaredNoIssues(health.declaredNoIssues || false);
-    }
+    const conditionsData = health?.medical_history?.conditions || [];
+    const medicationsData = health?.medical_history?.medications || [];
+    const declaredNoIssues = health?.declaredNoIssues || false;
+
+    setConditions(conditionsData);
+    setMedications(medicationsData);
+    setHasDeclaredNoIssues(declaredNoIssues);
+    setInitialState({
+      conditions: conditionsData,
+      medications: medicationsData,
+      hasDeclaredNoIssues: declaredNoIssues,
+    });
+
+    logger.debug('MEDICAL_CONDITIONS_FORM', 'Initialized from database', {
+      conditionsCount: conditionsData.length,
+      medicationsCount: medicationsData.length,
+      declaredNoIssues,
+    });
   }, [health]);
+
+  // Use intelligent dirty state detection
+  const { isDirty, changedFieldsCount, resetDirtyState } = useHealthFormDirtyState({
+    currentValues: { conditions, medications, hasDeclaredNoIssues },
+    initialValues: initialState,
+    formName: 'MEDICAL_CONDITIONS',
+  });
 
   const addCondition = useCallback(() => {
     if (newCondition.trim()) {
       setConditions(prev => [...prev, newCondition.trim()]);
       setNewCondition('');
-      setIsDirty(true);
       if (hasDeclaredNoIssues) {
         setHasDeclaredNoIssues(false);
       }
+      logger.info('MEDICAL_CONDITIONS_FORM', 'Added condition', {
+        condition: newCondition.trim(),
+      });
     }
   }, [newCondition, hasDeclaredNoIssues]);
 
   const removeCondition = useCallback((index: number) => {
     setConditions(prev => prev.filter((_, i) => i !== index));
-    setIsDirty(true);
+    logger.info('MEDICAL_CONDITIONS_FORM', 'Removed condition', { index });
   }, []);
 
   const addMedication = useCallback(() => {
     if (newMedication.trim()) {
       setMedications(prev => [...prev, newMedication.trim()]);
       setNewMedication('');
-      setIsDirty(true);
       if (hasDeclaredNoIssues) {
         setHasDeclaredNoIssues(false);
       }
+      logger.info('MEDICAL_CONDITIONS_FORM', 'Added medication', {
+        medication: newMedication.trim(),
+      });
     }
   }, [newMedication, hasDeclaredNoIssues]);
 
   const removeMedication = useCallback((index: number) => {
     setMedications(prev => prev.filter((_, i) => i !== index));
-    setIsDirty(true);
+    logger.info('MEDICAL_CONDITIONS_FORM', 'Removed medication', { index });
   }, []);
 
   const declareNoIssues = useCallback(async () => {
     try {
-      setSaving(true);
+      logger.info('MEDICAL_CONDITIONS_FORM', 'Declaring no health issues');
 
-      const updatedHealth: HealthProfileV2 = {
-        ...health,
-        version: '2.0',
-        medical_history: {
-          ...(health?.medical_history || { conditions: [], medications: [] }),
+      await saveSection({
+        section: 'medical_conditions',
+        data: {
           conditions: [],
           medications: [],
+          declaredNoIssues: true,
         },
-        declaredNoIssues: true,
-      };
-
-      await updateProfile({
-        health: updatedHealth,
+        onSuccess: () => {
+          setConditions([]);
+          setMedications([]);
+          setHasDeclaredNoIssues(true);
+          setInitialState({
+            conditions: [],
+            medications: [],
+            hasDeclaredNoIssues: true,
+          });
+          resetDirtyState({
+            conditions: [],
+            medications: [],
+            hasDeclaredNoIssues: true,
+          });
+          logger.info('MEDICAL_CONDITIONS_FORM', 'Successfully declared no issues');
+        },
       });
-
-      setConditions([]);
-      setMedications([]);
-      setHasDeclaredNoIssues(true);
-      setIsDirty(false);
-
-      logger.info('MEDICAL_CONDITIONS', 'Declared no health issues');
     } catch (error) {
-      logger.error('MEDICAL_CONDITIONS', 'Failed to declare no issues', { error });
-      throw error;
-    } finally {
-      setSaving(false);
+      logger.error('MEDICAL_CONDITIONS_FORM', 'Failed to declare no issues', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
-  }, [health, updateProfile]);
+  }, [saveSection, resetDirtyState]);
 
   const saveChanges = useCallback(async () => {
     try {
-      setSaving(true);
-
-      const updatedHealth: HealthProfileV2 = {
-        ...health,
-        version: '2.0',
-        medical_history: {
-          ...(health?.medical_history || { conditions: [], medications: [] }),
-          conditions,
-          medications,
-        },
-        declaredNoIssues: conditions.length === 0 && medications.length === 0 ? hasDeclaredNoIssues : false,
-      };
-
-      await updateProfile({
-        health: updatedHealth,
-      });
-
-      setIsDirty(false);
-
-      logger.info('MEDICAL_CONDITIONS', 'Saved medical conditions and medications', {
+      logger.info('MEDICAL_CONDITIONS_FORM', 'Saving medical conditions and medications', {
         conditionsCount: conditions.length,
         medicationsCount: medications.length,
+        declaredNoIssues: hasDeclaredNoIssues,
+      });
+
+      await saveSection({
+        section: 'medical_conditions',
+        data: {
+          conditions,
+          medications,
+          declaredNoIssues: conditions.length === 0 && medications.length === 0 ? hasDeclaredNoIssues : false,
+        },
+        onSuccess: () => {
+          setInitialState({ conditions, medications, hasDeclaredNoIssues });
+          resetDirtyState({ conditions, medications, hasDeclaredNoIssues });
+          logger.info('MEDICAL_CONDITIONS_FORM', 'Successfully saved and reset dirty state', {
+            conditionsCount: conditions.length,
+            medicationsCount: medications.length,
+          });
+        },
       });
     } catch (error) {
-      logger.error('MEDICAL_CONDITIONS', 'Failed to save medical conditions', { error });
-      throw error;
-    } finally {
-      setSaving(false);
+      logger.error('MEDICAL_CONDITIONS_FORM', 'Save failed (already handled by saveSection)', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
-  }, [health, conditions, medications, hasDeclaredNoIssues, updateProfile]);
+  }, [conditions, medications, hasDeclaredNoIssues, saveSection, resetDirtyState]);
 
   return {
     conditions,
@@ -143,7 +171,8 @@ export function useMedicalConditionsForm() {
     declareNoIssues,
     hasDeclaredNoIssues,
     saveChanges,
-    saving,
+    saving: isSectionSaving('medical_conditions'),
     isDirty,
+    changedFieldsCount,
   };
 }

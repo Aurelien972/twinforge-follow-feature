@@ -1,34 +1,31 @@
 /**
  * Vaccinations Form Hook
- * Manages vaccination state and interactions
+ * Manages vaccination state and interactions with improved error handling
  */
 
 import React from 'react';
 import { useUserStore } from '../../../../system/store/userStore';
-import { useToast } from '../../../../ui/components/ToastProvider';
-import { useFeedback } from '../../../../hooks/useFeedback';
 import logger from '../../../../lib/utils/logger';
 import type { VaccinationRecord, HealthProfileV2, CountryHealthData } from '../../../../domain/health';
+import { useHealthProfileSave } from './useHealthProfileSave';
+import { useHealthFormDirtyState } from './useHealthFormDirtyState';
 
 export function useVaccinationsForm(countryData: CountryHealthData | null) {
-  const { profile, updateProfile, saving } = useUserStore();
-  const { showToast } = useToast();
-  const { success } = useFeedback();
+  const { profile } = useUserStore();
+  const { saveSection, isSectionSaving } = useHealthProfileSave();
 
   // Extract V2 health data
   const healthV2 = (profile as any)?.health as HealthProfileV2 | undefined;
-  const [vaccinations, setVaccinations] = React.useState<VaccinationRecord[]>(
-    healthV2?.vaccinations?.records || []
-  );
-  const [upToDate, setUpToDate] = React.useState(
-    healthV2?.vaccinations?.up_to_date || false
-  );
-  const [isDirty, setIsDirty] = React.useState(false);
+  const [vaccinations, setVaccinations] = React.useState<VaccinationRecord[]>([]);
+  const [upToDate, setUpToDate] = React.useState(false);
+  const [initialState, setInitialState] = React.useState({
+    vaccinations: [] as VaccinationRecord[],
+    upToDate: false,
+  });
 
   const handleAddVaccination = (vaccination: VaccinationRecord) => {
     setVaccinations((prev) => [...prev, vaccination]);
-    setIsDirty(true);
-    logger.info('VACCINATIONS', 'Added vaccination', { name: vaccination.name });
+    logger.info('VACCINATIONS_FORM', 'Added vaccination', { name: vaccination.name });
   };
 
   const handleUpdateVaccination = (index: number, vaccination: VaccinationRecord) => {
@@ -37,65 +34,70 @@ export function useVaccinationsForm(countryData: CountryHealthData | null) {
       updated[index] = vaccination;
       return updated;
     });
-    setIsDirty(true);
-    logger.info('VACCINATIONS', 'Updated vaccination', { index, name: vaccination.name });
+    logger.info('VACCINATIONS_FORM', 'Updated vaccination', { index, name: vaccination.name });
   };
 
   const handleRemoveVaccination = (index: number) => {
     setVaccinations((prev) => prev.filter((_, i) => i !== index));
-    setIsDirty(true);
-    logger.info('VACCINATIONS', 'Removed vaccination', { index });
+    logger.info('VACCINATIONS_FORM', 'Removed vaccination', { index });
   };
+
+  // Initialize from database
+  React.useEffect(() => {
+    const records = healthV2?.vaccinations?.records || [];
+    const isUpToDate = healthV2?.vaccinations?.up_to_date || false;
+
+    setVaccinations(records);
+    setUpToDate(isUpToDate);
+    setInitialState({
+      vaccinations: records,
+      upToDate: isUpToDate,
+    });
+
+    logger.debug('VACCINATIONS_FORM', 'Initialized vaccinations from database', {
+      recordsCount: records.length,
+      upToDate: isUpToDate,
+    });
+  }, [healthV2?.vaccinations]);
+
+  // Use intelligent dirty state detection
+  const { isDirty, changedFieldsCount, resetDirtyState } = useHealthFormDirtyState({
+    currentValues: { vaccinations, upToDate },
+    initialValues: initialState,
+    formName: 'VACCINATIONS',
+  });
 
   const handleToggleUpToDate = (checked: boolean) => {
     setUpToDate(checked);
-    setIsDirty(true);
-    logger.info('VACCINATIONS', 'Toggled up to date status', { checked });
+    logger.info('VACCINATIONS_FORM', 'Toggled up to date status', { checked });
   };
 
   const handleSave = async () => {
     try {
-      logger.info('VACCINATIONS', 'Saving vaccinations', {
+      logger.info('VACCINATIONS_FORM', 'Saving vaccinations', {
         userId: profile?.userId,
         count: vaccinations.length,
         upToDate,
       });
 
-      const currentHealth = (profile as any)?.health as HealthProfileV2 | undefined;
-
-      await updateProfile({
-        health: {
-          ...currentHealth,
-          version: '2.0' as const,
-          vaccinations: {
-            up_to_date: upToDate,
-            records: vaccinations,
-            last_reviewed: new Date().toISOString(),
-          },
+      await saveSection({
+        section: 'vaccinations',
+        data: {
+          up_to_date: upToDate,
+          records: vaccinations,
         },
-        updated_at: new Date().toISOString(),
+        onSuccess: () => {
+          setInitialState({ vaccinations, upToDate });
+          resetDirtyState({ vaccinations, upToDate });
+          logger.info('VACCINATIONS_FORM', 'Successfully saved and reset dirty state', {
+            recordsCount: vaccinations.length,
+            upToDate,
+          });
+        },
       });
-
-      success();
-      showToast({
-        type: 'success',
-        title: 'Vaccinations sauvegardées',
-        message: 'Vos informations de vaccination ont été mises à jour',
-        duration: 3000,
-      });
-
-      setIsDirty(false);
     } catch (error) {
-      logger.error('VACCINATIONS', 'Failed to save vaccinations', {
+      logger.error('VACCINATIONS_FORM', 'Save failed (already handled by saveSection)', {
         error: error instanceof Error ? error.message : 'Unknown error',
-        userId: profile?.userId,
-      });
-
-      showToast({
-        type: 'error',
-        title: 'Erreur de sauvegarde',
-        message: 'Impossible de sauvegarder les vaccinations',
-        duration: 4000,
       });
     }
   };
@@ -108,7 +110,8 @@ export function useVaccinationsForm(countryData: CountryHealthData | null) {
     onRemoveVaccination: handleRemoveVaccination,
     onToggleUpToDate: handleToggleUpToDate,
     onSave: handleSave,
-    isSaving: saving,
+    isSaving: isSectionSaving('vaccinations'),
     isDirty,
+    changedFieldsCount,
   };
 }

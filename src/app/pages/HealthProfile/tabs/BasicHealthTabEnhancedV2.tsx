@@ -66,11 +66,20 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
   });
 
   const { register, handleSubmit, formState, watch } = form;
-  const { errors, isDirty, isValid } = formState;
+  const { errors, isValid } = formState;
   const watchedValues = watch();
 
+  // Track overall dirty state intelligently
+  const [hasAnyChanges, setHasAnyChanges] = React.useState(false);
+
+  // Update overall dirty state based on all sections
+  React.useEffect(() => {
+    const anyDirty = formState.isDirty || vaccinations.isDirty || medicalConditions.isDirty || allergies.isDirty;
+    setHasAnyChanges(anyDirty);
+  }, [formState.isDirty, vaccinations.isDirty, medicalConditions.isDirty, allergies.isDirty]);
+
   // Warn user about unsaved changes
-  useUnsavedChangesWarning({ isDirty });
+  useUnsavedChangesWarning({ isDirty: hasAnyChanges });
 
   // Calculate overall completion
   const completion = React.useMemo(() => {
@@ -139,10 +148,16 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
     <form onSubmit={onSubmit} className="space-y-6">
       {/* Unsaved Changes Indicator */}
       <UnsavedChangesIndicator
-        isDirty={isDirty}
+        isDirty={hasAnyChanges}
         onSave={onSubmit}
         isSaving={saving}
         isValid={isValid}
+        modifiedFieldsCount={
+          (vaccinations.changedFieldsCount || 0) +
+          (medicalConditions.changedFieldsCount || 0) +
+          (allergies.changedFieldsCount || 0) +
+          (formState.isDirty ? 1 : 0)
+        }
       />
 
       {/* Progress Header */}
@@ -296,8 +311,8 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
         </div>
       )}
 
-      {/* Global Save Button */}
-      {isDirty && (
+      {/* Global Save Button - Only for blood type changes */}
+      {formState.isDirty && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -314,7 +329,7 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
               ) : (
                 <SpatialIcon Icon={ICONS.Save} size={18} />
               )}
-              <span>{saving ? 'Sauvegarde...' : 'Sauvegarder les modifications'}</span>
+              <span>{saving ? 'Sauvegarde...' : 'Sauvegarder le groupe sanguin'}</span>
             </div>
           </button>
         </motion.div>
