@@ -100,12 +100,25 @@ export function usePWAUpdate(): PWAUpdateState & PWAUpdateActions {
 
     // Listen for messages from Service Worker
     navigator.serviceWorker.addEventListener('message', (event) => {
-      if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
-        setIsUpdateAvailable(true);
-        setUpdateInfo(event.data.updateInfo || null);
-        
-        logger.info('PWA_UPDATE', 'Update message received from Service Worker', {
-          updateInfo: event.data.updateInfo,
+      try {
+        // Ensure event.data is an object, not a string
+        const data = typeof event.data === 'string'
+          ? JSON.parse(event.data)
+          : event.data;
+
+        if (data && data.type === 'UPDATE_AVAILABLE') {
+          setIsUpdateAvailable(true);
+          setUpdateInfo(data.updateInfo || null);
+
+          logger.info('PWA_UPDATE', 'Update message received from Service Worker', {
+            updateInfo: data.updateInfo,
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch (error) {
+        // Silently ignore parse errors from service worker messages
+        logger.warn('PWA_UPDATE', 'Failed to parse service worker message', {
+          error: error instanceof Error ? error.message : 'Unknown error',
           timestamp: new Date().toISOString()
         });
       }
