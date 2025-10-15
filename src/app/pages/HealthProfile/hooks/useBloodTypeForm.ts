@@ -1,6 +1,6 @@
 /**
  * useBloodTypeForm Hook
- * Manages blood type state and save functionality
+ * Manages blood type state and save functionality with improved initialization tracking
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -8,6 +8,7 @@ import { useUserStore } from '../../../../system/store/userStore';
 import type { HealthProfileV2 } from '../../../../domain/health';
 import logger from '../../../../lib/utils/logger';
 import { useHealthProfileSave } from './useHealthProfileSave';
+import { useHealthFormDirtyState } from './useHealthFormDirtyState';
 
 export type BloodType = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
 
@@ -17,21 +18,30 @@ export function useBloodTypeForm() {
   const health = (profile as any)?.health as HealthProfileV2 | undefined;
 
   const [bloodType, setBloodType] = useState<BloodType | undefined>(undefined);
-  const [initialBloodType, setInitialBloodType] = useState<BloodType | undefined>(undefined);
+  const [initialState, setInitialState] = useState<{ bloodType?: BloodType }>({
+    bloodType: undefined,
+  });
 
   // Initialize from profile
   useEffect(() => {
     const currentBloodType = health?.basic?.bloodType as BloodType | undefined;
     setBloodType(currentBloodType);
-    setInitialBloodType(currentBloodType);
+
+    // Always update initial state when database values change
+    setInitialState({ bloodType: currentBloodType });
 
     logger.debug('BLOOD_TYPE_FORM', 'Initialized from database', {
       bloodType: currentBloodType,
+      timestamp: new Date().toISOString(),
     });
   }, [health?.basic?.bloodType]);
 
-  // Check if dirty
-  const isDirty = bloodType !== initialBloodType;
+  // Use intelligent dirty state detection
+  const { isDirty, changedFieldsCount, resetDirtyState } = useHealthFormDirtyState({
+    currentValues: { bloodType },
+    initialValues: initialState,
+    formName: 'BLOOD_TYPE',
+  });
 
   const handleChange = useCallback((newBloodType: BloodType) => {
     setBloodType(newBloodType);
@@ -56,7 +66,8 @@ export function useBloodTypeForm() {
           bloodType,
         },
         onSuccess: () => {
-          setInitialBloodType(bloodType);
+          setInitialState({ bloodType });
+          resetDirtyState({ bloodType });
           logger.info('BLOOD_TYPE_FORM', 'Successfully saved and reset dirty state', {
             bloodType,
           });
@@ -67,7 +78,7 @@ export function useBloodTypeForm() {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
-  }, [bloodType, profile?.userId, saveSection]);
+  }, [bloodType, profile?.userId, saveSection, resetDirtyState]);
 
   return {
     bloodType,
@@ -75,5 +86,6 @@ export function useBloodTypeForm() {
     saveChanges,
     saving: isSectionSaving('basic'),
     isDirty,
+    changedFieldsCount,
   };
 }

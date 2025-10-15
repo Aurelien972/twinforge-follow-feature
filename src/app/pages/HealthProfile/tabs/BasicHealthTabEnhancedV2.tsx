@@ -2,13 +2,11 @@
  * BasicHealthTabEnhanced V2 Component
  * Complete redesign with all new health components
  * Comprehensive base health information management
+ * Uses centralized coordinator to prevent dirty state false positives
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -22,27 +20,16 @@ import { useCountryHealthData } from '../hooks/useCountryHealthData';
 import { useVaccinationsForm } from '../hooks/useVaccinationsForm';
 import { useMedicalConditionsForm } from '../hooks/useMedicalConditionsForm';
 import { useAllergiesForm } from '../hooks/useAllergiesForm';
-import { useToast } from '../../../../ui/components/ToastProvider';
+import { useBloodTypeForm } from '../hooks/useBloodTypeForm';
+import { useBasicHealthTabCoordinator } from '../hooks/useBasicHealthTabCoordinator';
 import { useFeedback } from '../../../../hooks/useFeedback';
 import logger from '../../../../lib/utils/logger';
-import type { HealthProfileV2 } from '../../../../domain/health';
 import UnsavedChangesIndicator from '../../../../ui/components/UnsavedChangesIndicator';
 import { useUnsavedChangesWarning } from '../../../../hooks/useUnsavedChangesWarning';
 
-// Schema for the comprehensive health form
-const comprehensiveHealthSchema = z.object({
-  bloodType: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
-});
-
-type ComprehensiveHealthForm = z.infer<typeof comprehensiveHealthSchema>;
-
 export const BasicHealthTabEnhancedV2: React.FC = () => {
-  const { profile, updateProfile, saving } = useUserStore();
-  const { showToast } = useToast();
+  const { profile, saving } = useUserStore();
   const { success } = useFeedback();
-
-  // Extract health data
-  const healthV2 = (profile as any)?.health as HealthProfileV2 | undefined;
 
   // Get country health data
   const countryData = useCountryHealthData(profile?.country);
@@ -56,30 +43,31 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
   // Allergies hook
   const allergies = useAllergiesForm();
 
-  // Main form for blood type
-  const form = useForm<ComprehensiveHealthForm>({
-    resolver: zodResolver(comprehensiveHealthSchema),
-    defaultValues: {
-      bloodType: healthV2?.basic?.bloodType,
+  // Blood type hook
+  const bloodTypeForm = useBloodTypeForm();
+
+  // Central coordinator for dirty state management
+  const coordinator = useBasicHealthTabCoordinator({
+    bloodTypeState: {
+      isDirty: bloodTypeForm.isDirty,
+      changedFieldsCount: bloodTypeForm.changedFieldsCount || 0,
     },
-    mode: 'onChange',
+    vaccinationsState: {
+      isDirty: vaccinations.isDirty,
+      changedFieldsCount: vaccinations.changedFieldsCount || 0,
+    },
+    medicalConditionsState: {
+      isDirty: medicalConditions.isDirty,
+      changedFieldsCount: medicalConditions.changedFieldsCount || 0,
+    },
+    allergiesState: {
+      isDirty: allergies.isDirty,
+      changedFieldsCount: allergies.changedFieldsCount || 0,
+    },
   });
 
-  const { register, handleSubmit, formState, watch } = form;
-  const { errors, isValid } = formState;
-  const watchedValues = watch();
-
-  // Track overall dirty state intelligently
-  const [hasAnyChanges, setHasAnyChanges] = React.useState(false);
-
-  // Update overall dirty state based on all sections
-  React.useEffect(() => {
-    const anyDirty = formState.isDirty || vaccinations.isDirty || medicalConditions.isDirty || allergies.isDirty;
-    setHasAnyChanges(anyDirty);
-  }, [formState.isDirty, vaccinations.isDirty, medicalConditions.isDirty, allergies.isDirty]);
-
   // Warn user about unsaved changes
-  useUnsavedChangesWarning({ isDirty: hasAnyChanges });
+  useUnsavedChangesWarning({ isDirty: coordinator.hasAnyChanges });
 
   // Calculate overall completion
   const completion = React.useMemo(() => {
@@ -87,7 +75,7 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
     let total = 4; // blood type, vaccinations, conditions/meds, allergies
 
     // Blood type
-    if (watchedValues.bloodType) filled++;
+    if (bloodTypeForm.bloodType) filled++;
 
     // Vaccinations
     if (vaccinations.upToDate || vaccinations.vaccinations.length > 0) filled++;
@@ -99,65 +87,63 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
     if (allergies.allergies.length > 0) filled++;
 
     return Math.round((filled / total) * 100);
-  }, [watchedValues, vaccinations, medicalConditions, allergies]);
+  }, [bloodTypeForm.bloodType, vaccinations, medicalConditions, allergies]);
 
-  const onSubmit = handleSubmit(async (data) => {
+  // Save all sections that have changes
+  const saveAllChanges = async () => {
     try {
-      logger.info('HEALTH_PROFILE', 'Saving basic health info', {
+      logger.info('BASIC_HEALTH_TAB', 'Starting coordinated save of all sections', {
         userId: profile?.userId,
-        hasBloodType: !!data.bloodType,
+        breakdown: coordinator.breakdown,
+        totalChangedFields: coordinator.totalChangedFields,
       });
 
-      const currentHealth = (profile as any)?.health as HealthProfileV2 | undefined;
+      // Save each section that has changes
+      const savePromises: Promise<void>[] = [];
 
-      await updateProfile({
-        health: {
-          ...currentHealth,
-          version: '2.0' as const,
-          basic: {
-            ...currentHealth?.basic,
-            bloodType: data.bloodType,
-          },
-        },
-        updated_at: new Date().toISOString(),
-      });
+      if (coordinator.breakdown.bloodType) {
+        savePromises.push(bloodTypeForm.saveChanges());
+      }
+
+      if (coordinator.breakdown.vaccinations) {
+        savePromises.push(vaccinations.onSave());
+      }
+
+      if (coordinator.breakdown.medicalConditions) {
+        savePromises.push(medicalConditions.saveChanges());
+      }
+
+      if (coordinator.breakdown.allergies) {
+        savePromises.push(allergies.onSave());
+      }
+
+      // Wait for all saves to complete
+      await Promise.all(savePromises);
+
+      // Reset coordinator dirty state
+      coordinator.resetAllDirtyStates();
 
       success();
-      showToast({
-        type: 'success',
-        title: 'Informations sauvegardées',
-        message: 'Vos données de santé ont été mises à jour',
-        duration: 3000,
+      logger.info('BASIC_HEALTH_TAB', 'All sections saved successfully', {
+        userId: profile?.userId,
       });
     } catch (error) {
-      logger.error('HEALTH_PROFILE', 'Failed to save health info', {
+      logger.error('BASIC_HEALTH_TAB', 'Failed to save all sections', {
         error: error instanceof Error ? error.message : 'Unknown error',
         userId: profile?.userId,
       });
-
-      showToast({
-        type: 'error',
-        title: 'Erreur de sauvegarde',
-        message: 'Impossible de sauvegarder les informations',
-        duration: 4000,
-      });
     }
-  });
+  };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <div className="space-y-6">
       {/* Unsaved Changes Indicator */}
       <UnsavedChangesIndicator
-        isDirty={hasAnyChanges}
-        onSave={onSubmit}
+        isDirty={coordinator.hasAnyChanges}
+        onSave={saveAllChanges}
         isSaving={saving}
-        isValid={isValid}
-        modifiedFieldsCount={
-          (vaccinations.changedFieldsCount || 0) +
-          (medicalConditions.changedFieldsCount || 0) +
-          (allergies.changedFieldsCount || 0) +
-          (formState.isDirty ? 1 : 0)
-        }
+        isValid={true}
+        modifiedFieldsCount={coordinator.totalChangedFields}
       />
 
       {/* Progress Header */}
@@ -311,6 +297,6 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
           </div>
         </GlassCard>
       </motion.div>
-    </form>
+    </div>
   );
 };
