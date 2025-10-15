@@ -28,17 +28,39 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
   React.useEffect(() => {
     console.log('CaptureGuide mounted, isValidating:', isValidating);
     console.log('CaptureGuide handlers:', { onCameraClick, onGalleryClick, onBarcodeClick });
+
+    // DEBUG: Global click listener
+    const globalClickHandler = (e: MouseEvent) => {
+      console.log('🖱️ GLOBAL CLICK DETECTED:', {
+        target: e.target,
+        currentTarget: e.currentTarget,
+        clientX: e.clientX,
+        clientY: e.clientY,
+        tagName: (e.target as HTMLElement)?.tagName,
+        className: (e.target as HTMLElement)?.className
+      });
+    };
+
+    document.addEventListener('click', globalClickHandler, true);
+
+    return () => {
+      document.removeEventListener('click', globalClickHandler, true);
+    };
   }, []);
 
   React.useEffect(() => {
     console.log('isValidating changed:', isValidating);
   }, [isValidating]);
 
+  console.log('🎨 CaptureGuide RENDER', { isValidating });
+
   return (
     <GlassCard
       interactive={false}
       className="p-6 relative glass-card--capture meal-capture-enter"
       style={{
+        position: 'relative',
+        zIndex: 10,
         background: `
           radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
           radial-gradient(circle at 70% 80%, rgba(34, 197, 94, 0.06) 0%, transparent 50%),
@@ -144,7 +166,23 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
         </div>
       </div>
       
-      <div className="space-y-6">
+      <div className="space-y-6" style={{ position: 'relative', zIndex: 1 }}>
+        {/* DEBUG: Simple test buttons */}
+        <div style={{ marginBottom: '1rem', padding: '1rem', background: 'red', opacity: 0.3 }}>
+          <button
+            onClick={() => console.log('TEST BUTTON 1 CLICKED')}
+            style={{ padding: '1rem', background: 'yellow', color: 'black', width: '100%', marginBottom: '0.5rem' }}
+          >
+            TEST BUTTON 1 - SIMPLE HTML
+          </button>
+          <button
+            onClick={() => console.log('TEST BUTTON 2 CLICKED')}
+            style={{ padding: '1rem', background: 'green', color: 'white', width: '100%' }}
+          >
+            TEST BUTTON 2 - SIMPLE HTML
+          </button>
+        </div>
+
         {/* Guide Overlay */}
         <div 
           className="relative aspect-[4/3] rounded-xl overflow-visible meal-capture-guide"

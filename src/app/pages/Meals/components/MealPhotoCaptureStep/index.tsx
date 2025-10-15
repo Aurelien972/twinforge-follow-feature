@@ -63,6 +63,11 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
   const [barcodeScanMode, setBarcodeScanMode] = useState<'camera' | 'upload' | null>(null);
+
+  // DEBUG: Log barcode scanner state
+  React.useEffect(() => {
+    console.log('🔍 BARCODE_SCANNER_STATE:', { showBarcodeScanner, barcodeScanMode });
+  }, [showBarcodeScanner, barcodeScanMode]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const barcodeImageInputRef = useRef<HTMLInputElement>(null);
