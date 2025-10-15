@@ -10,7 +10,7 @@ export type HealthProfileTab =
   | 'overview'
   | 'basic-info'
   | 'lifestyle'
-  | 'medical-history'
+  | 'intimacy'
   | 'family-history'
   | 'vital-signs';
 
@@ -49,11 +49,11 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     requiredForAI: true,
   },
   {
-    id: 'medical-history',
-    label: 'Historique',
-    icon: 'FileText',
-    description: 'Conditions, traitements, interventions',
-    color: '#EF4444',
+    id: 'intimacy',
+    label: 'Intimité',
+    icon: 'Heart',
+    description: 'Santé sexuelle et reproductive',
+    color: '#EC4899',
     requiredForAI: true,
   },
   {
@@ -87,7 +87,7 @@ export function useHealthProfileNavigation() {
     'overview': 100,
     'basic-info': 0,
     'lifestyle': 0,
-    'medical-history': 0,
+    'intimacy': 0,
     'family-history': 0,
     'vital-signs': 0,
   });

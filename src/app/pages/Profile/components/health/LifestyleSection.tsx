@@ -164,24 +164,6 @@ export const LifestyleSection: React.FC<LifestyleSectionProps> = ({ register, er
             1 = Très faible, 10 = Très élevé
           </p>
         </div>
-
-        <div>
-          <label htmlFor="lifestyle.physical_activity_level" className="block text-white/90 text-sm font-medium mb-2">
-            Niveau d'activité physique
-          </label>
-          <select
-            {...register('lifestyle.physical_activity_level')}
-            id="lifestyle.physical_activity_level"
-            className="glass-input"
-          >
-            <option value="">Sélectionnez</option>
-            <option value="sedentary">Sédentaire (peu ou pas d'exercice)</option>
-            <option value="light">Léger (exercice 1-3 jours/semaine)</option>
-            <option value="moderate">Modéré (exercice 3-5 jours/semaine)</option>
-            <option value="active">Actif (exercice 6-7 jours/semaine)</option>
-            <option value="athlete">Athlète (exercice intense quotidien)</option>
-          </select>
-        </div>
       </div>
     </div>
   );

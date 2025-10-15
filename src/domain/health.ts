@@ -74,14 +74,21 @@ export interface LifestyleData {
   sleep_hours_avg?: number;
   sleep_quality?: number;
   stress_level?: number;
-  physical_activity_level?: PhysicalActivityLevel;
+  anxiety_level?: number;
+  mood_rating?: number;
+  hydration_liters_per_day?: number;
+  screen_time_hours_per_day?: number;
+  takes_screen_breaks?: boolean;
   exercise_minutes_per_week?: number;
   diet_quality?: number;
 }
 
 export interface ReproductiveHealth {
+  // Female-specific fields
   menstrual_cycle_regular?: boolean;
   cycle_length_days?: number;
+  last_period_date?: string;
+  menstrual_symptoms?: string[];
   pregnancy_count?: number;
   pregnancy_history?: Array<{
     year: number;
@@ -90,7 +97,25 @@ export interface ReproductiveHealth {
   }>;
   menopause_status?: MenopauseStatus;
   menopause_age?: number;
-  contraception?: string;
+  menopause_symptoms?: string[];
+  contraception_type?: string;
+  contraception_start_date?: string;
+  contraception_side_effects?: string;
+
+  // Male-specific fields
+  male_fertility_concerns?: boolean;
+  male_fertility_details?: string;
+  erectile_function?: number;
+  libido_level?: number;
+  testosterone_concerns?: boolean;
+  prostate_checkup_date?: string;
+
+  // Common fields
+  sexual_activity_frequency?: 'never' | 'rarely' | 'monthly' | 'weekly' | 'daily';
+  sexual_satisfaction?: number;
+  sexual_concerns?: string;
+  last_sti_screening_date?: string;
+  sti_screening_results?: string;
 }
 
 export interface MentalHealthData {

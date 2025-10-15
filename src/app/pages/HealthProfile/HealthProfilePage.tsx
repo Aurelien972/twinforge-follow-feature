@@ -47,7 +47,7 @@ const HealthProfilePage: React.FC = () => {
     if (completion) {
       updateTabCompletion('basic-info', completion.basicInfo || 0);
       updateTabCompletion('lifestyle', completion.lifestyle);
-      updateTabCompletion('medical-history', completion.medicalHistory);
+      updateTabCompletion('intimacy', completion.intimacy || 0);
       updateTabCompletion('family-history', completion.familyHistory);
       updateTabCompletion('vital-signs', completion.vitalSigns);
     }
@@ -302,8 +302,8 @@ const HealthProfilePage: React.FC = () => {
           <LifestyleTab />
         </Tabs.Panel>
 
-        <Tabs.Panel value="medical-history">
-          <PlaceholderTab title="Historique" icon="FileText" />
+        <Tabs.Panel value="intimacy">
+          <PlaceholderTab title="Intimité" icon="Heart" />
         </Tabs.Panel>
 
         <Tabs.Panel value="family-history">
