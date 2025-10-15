@@ -112,6 +112,30 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
     }
   ];
 
+  const barcodeScanBenefits: Benefit[] = [
+    {
+      id: 'instant-analysis',
+      icon: 'Zap',
+      color: '#6366F1',
+      title: 'Analyse Instantanée',
+      description: 'Récupération immédiate des données nutritionnelles'
+    },
+    {
+      id: 'accurate-data',
+      icon: 'Database',
+      color: '#818CF8',
+      title: 'Données Précises',
+      description: 'Informations officielles des fabricants via OpenFoodFacts'
+    },
+    {
+      id: 'easy-tracking',
+      icon: 'Package',
+      color: '#4F46E5',
+      title: 'Suivi Simplifié',
+      description: 'Idéal pour les produits emballés et transformés'
+    }
+  ];
+
   const handleCameraClick = () => {
     console.log('Camera button clicked');
     console.log('fileInputRef.current:', fileInputRef.current);
@@ -479,18 +503,22 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
           {scanType === 'barcode-scan' && scannedBarcodes.length === 0 && scannedProducts.length === 0 && (
             <div className="mt-6">
               <GlassCard
-                className="p-6"
+                className="p-6 rounded-3xl"
                 style={{
                   background: `
-                    radial-gradient(circle at 30% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
-                    radial-gradient(circle at 70% 80%, rgba(79, 70, 229, 0.08) 0%, transparent 50%),
-                    var(--glass-opacity)
+                    radial-gradient(circle at 30% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
+                    radial-gradient(circle at 70% 80%, rgba(79, 70, 229, 0.1) 0%, transparent 50%),
+                    rgba(17, 24, 39, 0.95)
                   `,
-                  borderColor: 'rgba(99, 102, 241, 0.3)',
+                  borderColor: 'rgba(99, 102, 241, 0.4)',
+                  borderWidth: '2px',
+                  backdropFilter: 'blur(24px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(24px) saturate(180%)',
                   boxShadow: `
-                    0 12px 40px rgba(0, 0, 0, 0.25),
-                    0 0 30px rgba(99, 102, 241, 0.15),
-                    inset 0 2px 0 rgba(255, 255, 255, 0.15)
+                    0 20px 60px rgba(0, 0, 0, 0.3),
+                    0 0 40px rgba(99, 102, 241, 0.2),
+                    inset 0 2px 0 rgba(255, 255, 255, 0.15),
+                    inset 0 -2px 0 rgba(0, 0, 0, 0.1)
                   `
                 }}
               >
@@ -584,15 +612,16 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
 
                 <div className="space-y-4">
                   <div
-                    className="relative aspect-[4/3] rounded-xl overflow-visible"
+                    className="relative aspect-[4/3] rounded-2xl overflow-visible"
                     style={{
                       background: `
-                        radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
-                        radial-gradient(circle at 60% 70%, rgba(79, 70, 229, 0.08) 0%, transparent 50%),
-                        linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(79, 70, 229, 0.06))
+                        radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
+                        radial-gradient(circle at 60% 70%, rgba(79, 70, 229, 0.1) 0%, transparent 50%),
+                        linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.08))
                       `,
-                      border: '2px dashed rgba(99, 102, 241, 0.35)',
-                      backdropFilter: 'blur(8px) saturate(120%)'
+                      border: '2px dashed rgba(99, 102, 241, 0.4)',
+                      backdropFilter: 'blur(12px) saturate(130%)',
+                      WebkitBackdropFilter: 'blur(12px) saturate(130%)'
                     }}
                   >
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -853,6 +882,15 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
             benefits={mealScanBenefits}
             themeColor="#10B981"
             title="Pourquoi scanner mes repas ?"
+          />
+        )}
+
+        {/* Benefits Info Card - Show only when barcode-scan selected and no products */}
+        {scanType === 'barcode-scan' && scannedBarcodes.length === 0 && scannedProducts.length === 0 && (
+          <BenefitsInfoCard
+            benefits={barcodeScanBenefits}
+            themeColor="#6366F1"
+            title="Pourquoi scanner un code-barre ?"
           />
         )}
 

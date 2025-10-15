@@ -128,6 +128,8 @@ export const ICONS = {
   Tag: L.Tag,
   Sparkles: L.Sparkles,
   Filter: L.Filter,
+  Database: L.Database,
+  Server: L.Server,
 
   Ruler: L.Ruler,
   Scale: L.Scale,
@@ -231,6 +233,7 @@ export const ICONS = {
   Hourglass: L.Hourglass,
   BadgeCheck: L.BadgeCheck,
   Beef: L.Beef,
+  Drumstick: L.Beef,
   Fish: L.Fish,
   Wheat: L.Wheat,
   Salad: L.Salad,

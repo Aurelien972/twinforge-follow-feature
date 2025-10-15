@@ -164,23 +164,6 @@ const BarcodeAnalysisProcessingStep: React.FC<BarcodeAnalysisProcessingStepProps
           </div>
         </GlassCard>
       </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        <GlassCard className="p-4" style={{ background: 'rgba(99, 102, 241, 0.05)' }}>
-          <div className="flex items-start gap-3">
-            <SpatialIcon Icon={ICONS.Info} size={20} className="text-indigo-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-gray-300 text-sm">
-                Les données proviennent de la base collaborative OpenFoodFacts, une ressource gratuite et open-source contenant plus de 2 millions de produits.
-              </p>
-            </div>
-          </div>
-        </GlassCard>
-      </motion.div>
     </div>
   );
 };

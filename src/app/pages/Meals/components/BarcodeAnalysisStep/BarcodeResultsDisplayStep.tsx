@@ -183,23 +183,6 @@ const BarcodeResultsDisplayStep: React.FC<BarcodeResultsDisplayStepProps> = ({
         </GlassCard>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <GlassCard className="p-4" style={{ background: 'rgba(99, 102, 241, 0.05)' }}>
-          <div className="flex items-start gap-3">
-            <SpatialIcon Icon={ICONS.Database} size={20} className="text-indigo-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-gray-300 text-sm">
-                Données issues de OpenFoodFacts - Une base collaborative et open-source
-              </p>
-            </div>
-          </div>
-        </GlassCard>
-      </motion.div>
-
       <div
         className="fixed bottom-0 left-0 right-0 p-4 z-50"
         style={{
