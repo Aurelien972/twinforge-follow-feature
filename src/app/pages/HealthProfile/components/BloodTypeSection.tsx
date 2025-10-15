@@ -1,21 +1,17 @@
 /**
  * BloodTypeSection Component
  * Visual display and selection for blood type with compatibility info
+ * Now with integrated save functionality
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { motion, AnimatePresence } from 'framer-motion';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
-import type { HealthFormV2 } from '../../Profile/validation/profileHealthValidationV2';
+import { useBloodTypeForm, type BloodType } from '../hooks/useBloodTypeForm';
 
-interface BloodTypeSectionProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors<any>;
-  currentBloodType?: string;
-}
+interface BloodTypeSectionProps {}
 
 const BLOOD_TYPE_INFO: Record<string, { canReceiveFrom: string[]; canDonateTo: string[]; frequency: string }> = {
   'O-': { canReceiveFrom: ['O-'], canDonateTo: ['All'], frequency: '7%' },
@@ -28,12 +24,9 @@ const BLOOD_TYPE_INFO: Record<string, { canReceiveFrom: string[]; canDonateTo: s
   'AB+': { canReceiveFrom: ['All'], canDonateTo: ['AB+'], frequency: '3%' },
 };
 
-export const BloodTypeSection: React.FC<BloodTypeSectionProps> = ({
-  register,
-  errors,
-  currentBloodType,
-}) => {
-  const bloodTypeData = currentBloodType ? BLOOD_TYPE_INFO[currentBloodType] : null;
+export const BloodTypeSection: React.FC<BloodTypeSectionProps> = () => {
+  const { bloodType, onChange, saveChanges, saving, isDirty } = useBloodTypeForm();
+  const bloodTypeData = bloodType ? BLOOD_TYPE_INFO[bloodType] : null;
 
   return (
     <motion.div
@@ -77,15 +70,17 @@ export const BloodTypeSection: React.FC<BloodTypeSectionProps> = ({
             Sélectionnez votre groupe sanguin
           </label>
           <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
-            {Object.keys(BLOOD_TYPE_INFO).map((type) => (
+            {(Object.keys(BLOOD_TYPE_INFO) as BloodType[]).map((type) => (
               <label
                 key={type}
                 className="relative cursor-pointer group"
               >
                 <input
-                  {...register('bloodType')}
                   type="radio"
+                  name="bloodType"
                   value={type}
+                  checked={bloodType === type}
+                  onChange={() => onChange(type)}
                   className="peer sr-only"
                 />
                 <div
@@ -106,16 +101,10 @@ export const BloodTypeSection: React.FC<BloodTypeSectionProps> = ({
               </label>
             ))}
           </div>
-          {errors.bloodType && (
-            <p className="text-red-300 text-xs mt-2 flex items-center gap-1">
-              <SpatialIcon Icon={ICONS.AlertCircle} size={12} />
-              {errors.bloodType.message}
-            </p>
-          )}
         </div>
 
         {/* Blood Type Info Card - Show when selected */}
-        {currentBloodType && bloodTypeData && (
+        {bloodType && bloodTypeData && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -125,7 +114,7 @@ export const BloodTypeSection: React.FC<BloodTypeSectionProps> = ({
             <div className="flex items-center gap-2 mb-4">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/20">
                 <SpatialIcon Icon={ICONS.Droplet} size={16} className="text-red-400" />
-                <span className="text-red-300 font-bold text-lg">{currentBloodType}</span>
+                <span className="text-red-300 font-bold text-lg">{bloodType}</span>
               </div>
               <div className="text-white/60 text-sm">
                 Fréquence: <span className="text-white font-medium">{bloodTypeData.frequency}</span> de la population
@@ -183,7 +172,7 @@ export const BloodTypeSection: React.FC<BloodTypeSectionProps> = ({
             </div>
 
             {/* Special Status */}
-            {currentBloodType === 'O-' && (
+            {bloodType === 'O-' && (
               <div className="mt-4 p-3 rounded-lg bg-cyan-500/10 border border-cyan-400/20">
                 <div className="flex items-start gap-2">
                   <SpatialIcon Icon={ICONS.Star} size={16} className="text-cyan-400 mt-0.5" />
@@ -196,7 +185,7 @@ export const BloodTypeSection: React.FC<BloodTypeSectionProps> = ({
                 </div>
               </div>
             )}
-            {currentBloodType === 'AB+' && (
+            {bloodType === 'AB+' && (
               <div className="mt-4 p-3 rounded-lg bg-cyan-500/10 border border-cyan-400/20">
                 <div className="flex items-start gap-2">
                   <SpatialIcon Icon={ICONS.Star} size={16} className="text-cyan-400 mt-0.5" />
@@ -211,6 +200,39 @@ export const BloodTypeSection: React.FC<BloodTypeSectionProps> = ({
             )}
           </motion.div>
         )}
+
+        {/* Save Button */}
+        <AnimatePresence>
+          {isDirty && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="mt-6 flex justify-end"
+            >
+              <button
+                type="button"
+                onClick={saveChanges}
+                disabled={saving}
+                className="btn-glass px-6 py-2.5 text-sm"
+                style={{
+                  background: 'rgba(239, 68, 68, 0.2)',
+                  borderColor: 'rgba(239, 68, 68, 0.4)',
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  {saving ? (
+                    <SpatialIcon Icon={ICONS.Loader2} size={16} className="animate-spin" />
+                  ) : (
+                    <SpatialIcon Icon={ICONS.Save} size={16} />
+                  )}
+                  <span>{saving ? 'Sauvegarde...' : 'Sauvegarder'}</span>
+                </div>
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Info Banner */}
         <div className="mt-4 p-3 rounded-lg bg-orange-500/10 border border-orange-400/20">

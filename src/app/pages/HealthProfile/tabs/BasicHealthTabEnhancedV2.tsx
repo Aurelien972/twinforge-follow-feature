@@ -239,11 +239,7 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
       </motion.div>
 
       {/* Blood Type Section */}
-      <BloodTypeSection
-        register={register}
-        errors={errors}
-        currentBloodType={watchedValues.bloodType}
-      />
+      <BloodTypeSection />
 
       {/* Vaccinations Section */}
       <VaccinationsSection
@@ -269,6 +265,9 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
           onRemoveCondition={medicalConditions.removeCondition}
           onDeclareNoConditions={undefined}
           hasDeclaredNoConditions={undefined}
+          onSave={medicalConditions.saveChanges}
+          isSaving={medicalConditions.saving}
+          isDirty={medicalConditions.isDirty}
         />
 
         <AllergiesSection
@@ -288,52 +287,11 @@ export const BasicHealthTabEnhancedV2: React.FC = () => {
         setNewMedication={medicalConditions.setNewMedication}
         onAddMedication={medicalConditions.addMedication}
         onRemoveMedication={medicalConditions.removeMedication}
+        onSave={medicalConditions.saveChanges}
+        isSaving={medicalConditions.saving}
+        isDirty={medicalConditions.isDirty}
       />
 
-      {/* Save button for conditions and medications */}
-      {medicalConditions.isDirty && (
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={medicalConditions.saveChanges}
-            disabled={medicalConditions.saving}
-            className="btn-glass px-4 py-2 text-sm"
-          >
-            <div className="flex items-center gap-2">
-              {medicalConditions.saving ? (
-                <SpatialIcon Icon={ICONS.Loader2} size={14} className="animate-spin" />
-              ) : (
-                <SpatialIcon Icon={ICONS.Save} size={14} />
-              )}
-              <span>{medicalConditions.saving ? 'Sauvegarde...' : 'Sauvegarder les conditions'}</span>
-            </div>
-          </button>
-        </div>
-      )}
-
-      {/* Global Save Button - Only for blood type changes */}
-      {formState.isDirty && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex justify-end"
-        >
-          <button
-            type="submit"
-            disabled={saving}
-            className="btn-glass--primary px-8 py-3"
-          >
-            <div className="flex items-center gap-2">
-              {saving ? (
-                <SpatialIcon Icon={ICONS.Loader2} size={18} className="animate-spin" />
-              ) : (
-                <SpatialIcon Icon={ICONS.Save} size={18} />
-              )}
-              <span>{saving ? 'Sauvegarde...' : 'Sauvegarder le groupe sanguin'}</span>
-            </div>
-          </button>
-        </motion.div>
-      )}
 
       {/* Info Banner */}
       <motion.div

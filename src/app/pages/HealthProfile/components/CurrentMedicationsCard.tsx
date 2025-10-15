@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -15,6 +15,9 @@ interface CurrentMedicationsCardProps {
   setNewMedication: (value: string) => void;
   onAddMedication: () => void;
   onRemoveMedication: (index: number) => void;
+  onSave?: () => void;
+  isSaving?: boolean;
+  isDirty?: boolean;
 }
 
 const COMMON_MEDICATIONS = [
@@ -36,6 +39,9 @@ export const CurrentMedicationsCard: React.FC<CurrentMedicationsCardProps> = ({
   setNewMedication,
   onAddMedication,
   onRemoveMedication,
+  onSave,
+  isSaving,
+  isDirty,
 }) => {
   const [showSuggestions, setShowSuggestions] = React.useState(false);
 
@@ -180,6 +186,39 @@ export const CurrentMedicationsCard: React.FC<CurrentMedicationsCardProps> = ({
             <p className="text-xs mt-1">Incluez les traitements et suppléments réguliers</p>
           </div>
         )}
+
+        {/* Save Button */}
+        <AnimatePresence>
+          {isDirty && onSave && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="flex justify-end mt-6"
+            >
+              <button
+                type="button"
+                onClick={onSave}
+                disabled={isSaving}
+                className="btn-glass px-6 py-2.5 text-sm"
+                style={{
+                  background: 'rgba(239, 68, 68, 0.2)',
+                  borderColor: 'rgba(239, 68, 68, 0.4)',
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  {isSaving ? (
+                    <SpatialIcon Icon={ICONS.Loader2} size={16} className="animate-spin" />
+                  ) : (
+                    <SpatialIcon Icon={ICONS.Save} size={16} />
+                  )}
+                  <span>{isSaving ? 'Sauvegarde...' : 'Sauvegarder'}</span>
+                </div>
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Info Banner */}
         <div className="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-400/20">
