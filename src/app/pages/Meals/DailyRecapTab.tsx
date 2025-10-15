@@ -33,8 +33,8 @@ interface DailyRecapTabProps {
 
 const DailyRecapTab: React.FC<DailyRecapTabProps> = ({ onLoadingChange }) => {
   const location = useLocation();
-  const { profile } = useUserStore();
-  const userId = profile?.userId;
+  const { session } = useUserStore();
+  const userId = session?.user?.id;
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const { success, error: errorSound, click } = useFeedback();

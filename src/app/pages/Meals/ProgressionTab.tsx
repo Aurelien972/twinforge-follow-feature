@@ -18,8 +18,8 @@ import { getProgressionMetrics } from './components/MealInsights/progressionMetr
  */
 const ProgressionTab: React.FC = () => {
   const navigate = useNavigate();
-  const { profile } = useUserStore();
-  const userId = profile?.userId;
+  const { session } = useUserStore();
+  const userId = session?.user?.id;
 
   // Récupérer les repas des 7 derniers jours pour les métriques de progression
   const { data: weekMeals, isLoading: isWeekLoading } = useQuery({

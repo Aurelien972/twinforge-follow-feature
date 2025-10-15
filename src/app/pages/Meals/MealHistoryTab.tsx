@@ -18,11 +18,11 @@ import MealDetailModal from './components/shared/MealDetailModal';
  * Affiche l'historique complet avec possibilité de voir les détails
  */
 const MealHistoryTab: React.FC = () => {
-  const { profile } = useUserStore();
+  const { session } = useUserStore();
   const { click, glassClick, success, error: errorSound } = useFeedback();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
-  const userId = profile?.userId;
+  const userId = session?.user?.id;
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
   const [deletingMealId, setDeletingMealId] = useState<string | null>(null);
 
