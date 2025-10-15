@@ -26,7 +26,7 @@ import { GeographicTab } from './tabs/GeographicTab';
 import logger from '../../../lib/utils/logger';
 
 const HealthProfilePage: React.FC = () => {
-  const { activeTab, globalCompletion, updateTabCompletion, allTabs } = useHealthProfileNavigation();
+  const { activeTab, globalCompletion, updateTabCompletion, allTabs, getTabConfig } = useHealthProfileNavigation();
   const { migrating, migrationComplete, migrationError, retryMigration, skipMigration, forceSkip, canSkip, attemptsRemaining } = useHealthDataMigration();
   const { profile } = useUserStore();
 
@@ -233,6 +233,10 @@ const HealthProfilePage: React.FC = () => {
     return null;
   }
 
+  // Get current tab configuration for dynamic header color
+  const currentTabConfig = getTabConfig(activeTab);
+  const headerColor = currentTabConfig?.color || '#EF4444';
+
   return (
     <div className="space-y-6 w-full overflow-visible">
       <PageHeader
@@ -240,7 +244,7 @@ const HealthProfilePage: React.FC = () => {
         title="Mon Profil de Santé"
         subtitle="Médecine préventive par intelligence artificielle"
         circuit="health"
-        iconColor="#EF4444"
+        iconColor={headerColor}
       />
 
       {/* Bandeau d'avertissement si mode dégradé ou erreur */}

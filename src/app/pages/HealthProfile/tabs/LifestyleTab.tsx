@@ -24,10 +24,10 @@ export const LifestyleTab: React.FC = () => {
       >
         <GlassCard className="p-6" style={{
           background: `
-            radial-gradient(circle at 30% 20%, rgba(255, 152, 0, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.12) 0%, transparent 60%),
             var(--glass-opacity)
           `,
-          borderColor: 'rgba(255, 152, 0, 0.3)',
+          borderColor: 'rgba(245, 158, 11, 0.3)',
         }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -36,13 +36,13 @@ export const LifestyleTab: React.FC = () => {
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, rgba(255, 152, 0, 0.4), rgba(255, 152, 0, 0.2))
+                    linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.2))
                   `,
-                  border: '2px solid rgba(255, 152, 0, 0.5)',
-                  boxShadow: '0 0 30px rgba(255, 152, 0, 0.4)',
+                  border: '2px solid rgba(245, 158, 11, 0.5)',
+                  boxShadow: '0 0 30px rgba(245, 158, 11, 0.4)',
                 }}
               >
-                <SpatialIcon Icon={ICONS.Coffee} size={24} style={{ color: '#FF9800' }} variant="pure" />
+                <SpatialIcon Icon={ICONS.Coffee} size={24} style={{ color: '#F59E0B' }} variant="pure" />
               </div>
               <div>
                 <h2 className="text-white font-bold text-xl">Vie</h2>
@@ -54,8 +54,8 @@ export const LifestyleTab: React.FC = () => {
                 <div
                   className="w-3 h-3 rounded-full"
                   style={{
-                    background: '#FF9800',
-                    boxShadow: '0 0 8px rgba(255, 152, 0, 0.6)',
+                    background: '#F59E0B',
+                    boxShadow: '0 0 8px rgba(245, 158, 11, 0.6)',
                   }}
                 />
                 <span className="text-white font-bold text-lg">{state.completion}%</span>
@@ -69,8 +69,8 @@ export const LifestyleTab: React.FC = () => {
               <motion.div
                 className="h-3 rounded-full relative overflow-hidden"
                 style={{
-                  background: 'linear-gradient(90deg, #FF9800, rgba(255, 152, 0, 0.8))',
-                  boxShadow: '0 0 12px rgba(255, 152, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)',
+                  background: 'linear-gradient(90deg, #F59E0B, rgba(245, 158, 11, 0.8))',
+                  boxShadow: '0 0 12px rgba(245, 158, 11, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)',
                 }}
                 initial={{ width: 0 }}
                 animate={{ width: `${state.completion}%` }}

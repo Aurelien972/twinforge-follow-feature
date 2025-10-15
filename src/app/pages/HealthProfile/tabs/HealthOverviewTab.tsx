@@ -55,10 +55,10 @@ export const HealthOverviewTab: React.FC = () => {
             onClick={() => navigateToTab('geographic')}
             style={{
               background: `
-                radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 60%),
                 var(--glass-opacity)
               `,
-              borderColor: 'rgba(6, 182, 212, 0.4)',
+              borderColor: 'rgba(59, 130, 246, 0.4)',
             }}
           >
             <div className="flex items-center gap-4">
@@ -67,20 +67,20 @@ export const HealthOverviewTab: React.FC = () => {
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
+                    linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, 0.2))
                   `,
-                  border: '2px solid rgba(6, 182, 212, 0.5)',
-                  boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
+                  border: '2px solid rgba(59, 130, 246, 0.5)',
+                  boxShadow: '0 0 30px rgba(59, 130, 246, 0.4)',
                 }}
               >
-                <SpatialIcon Icon={ICONS.MapPin} size={24} style={{ color: '#06B6D4' }} variant="pure" />
+                <SpatialIcon Icon={ICONS.MapPin} size={24} style={{ color: '#3B82F6' }} variant="pure" />
               </div>
               <div className="flex-1">
                 <h3 className="text-white font-semibold text-lg mb-1">Environnement & Géographie</h3>
                 <p className="text-white/70 text-sm mb-2">
                   Consultez la météo, la qualité de l'air et le contexte sanitaire local pour {profile.country}
                 </p>
-                <div className="flex items-center gap-2 text-cyan-400 text-sm font-medium">
+                <div className="flex items-center gap-2 text-blue-400 text-sm font-medium">
                   <span>Accéder à l'onglet Géo</span>
                   <SpatialIcon Icon={ICONS.ArrowRight} size={14} />
                 </div>
@@ -188,20 +188,26 @@ export const HealthOverviewTab: React.FC = () => {
         </GlassCard>
 
         {/* Recent Updates */}
-        <GlassCard className="p-6">
+        <GlassCard className="p-6" style={{
+          background: `
+            radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.08) 0%, transparent 60%),
+            var(--glass-opacity)
+          `,
+          borderColor: 'rgba(239, 68, 68, 0.2)'
+        }}>
           <div className="flex items-center gap-3 mb-4">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                  linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.2))
+                  linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2))
                 `,
-                border: '2px solid rgba(168, 85, 247, 0.5)',
-                boxShadow: '0 0 30px rgba(168, 85, 247, 0.4)',
+                border: '2px solid rgba(239, 68, 68, 0.5)',
+                boxShadow: '0 0 30px rgba(239, 68, 68, 0.4)',
               }}
             >
-              <SpatialIcon Icon={ICONS.Clock} size={20} style={{ color: '#A855F7' }} variant="pure" />
+              <SpatialIcon Icon={ICONS.Clock} size={20} style={{ color: '#EF4444' }} variant="pure" />
             </div>
             <h3 className="text-white font-semibold text-lg">Dernières Mises à Jour</h3>
           </div>
@@ -217,27 +223,33 @@ export const HealthOverviewTab: React.FC = () => {
                 icon="MapPin"
                 text={`Contexte sanitaire: ${profile.country}`}
                 date={new Date().toLocaleDateString('fr-FR')}
-                color="#06B6D4"
+                color="#3B82F6"
               />
             )}
           </div>
         </GlassCard>
 
         {/* Quick Links */}
-        <GlassCard className="p-6">
+        <GlassCard className="p-6" style={{
+          background: `
+            radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.08) 0%, transparent 60%),
+            var(--glass-opacity)
+          `,
+          borderColor: 'rgba(239, 68, 68, 0.2)'
+        }}>
           <div className="flex items-center gap-3 mb-4">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                  linear-gradient(135deg, rgba(234, 179, 8, 0.4), rgba(234, 179, 8, 0.2))
+                  linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2))
                 `,
-                border: '2px solid rgba(234, 179, 8, 0.5)',
-                boxShadow: '0 0 30px rgba(234, 179, 8, 0.4)',
+                border: '2px solid rgba(239, 68, 68, 0.5)',
+                boxShadow: '0 0 30px rgba(239, 68, 68, 0.4)',
               }}
             >
-              <SpatialIcon Icon={ICONS.Zap} size={20} style={{ color: '#EAB308' }} variant="pure" />
+              <SpatialIcon Icon={ICONS.Zap} size={20} style={{ color: '#EF4444' }} variant="pure" />
             </div>
             <h3 className="text-white font-semibold text-lg">Actions Rapides</h3>
           </div>
@@ -269,10 +281,10 @@ export const HealthOverviewTab: React.FC = () => {
       >
         <GlassCard className="p-6" style={{
           background: `
-            radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.12) 0%, transparent 60%),
             var(--glass-opacity)
           `,
-          borderColor: 'rgba(6, 182, 212, 0.3)',
+          borderColor: 'rgba(239, 68, 68, 0.3)',
         }}>
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -283,7 +295,7 @@ export const HealthOverviewTab: React.FC = () => {
                 Complétez votre profil médical pour bénéficier d'analyses préventives personnalisées par intelligence artificielle.
                 Toutes vos données sont sécurisées et confidentielles.
               </p>
-              <div className="flex items-center gap-2 text-cyan-300 text-sm">
+              <div className="flex items-center gap-2 text-red-300 text-sm">
                 <SpatialIcon Icon={ICONS.Lock} size={14} />
                 <span>Conforme RGPD • Données chiffrées • 100% confidentiel</span>
               </div>
@@ -294,13 +306,13 @@ export const HealthOverviewTab: React.FC = () => {
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
+                    linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2))
                   `,
-                  border: '2px solid rgba(6, 182, 212, 0.5)',
-                  boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
+                  border: '2px solid rgba(239, 68, 68, 0.5)',
+                  boxShadow: '0 0 30px rgba(239, 68, 68, 0.4)',
                 }}
               >
-                <SpatialIcon Icon={ICONS.Sparkles} size={28} style={{ color: '#06B6D4' }} variant="pure" />
+                <SpatialIcon Icon={ICONS.Sparkles} size={28} style={{ color: '#EF4444' }} variant="pure" />
               </div>
             </div>
           </div>

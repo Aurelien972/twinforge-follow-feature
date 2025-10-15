@@ -40,23 +40,23 @@ export const GeographicTab: React.FC = () => {
         >
           <GlassCard className="p-8 text-center" style={{
             background: `
-              radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 60%),
+              radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
               var(--glass-opacity)
             `,
-            borderColor: 'rgba(6, 182, 212, 0.2)',
+            borderColor: 'rgba(59, 130, 246, 0.2)',
           }}>
             <div
               className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                  linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
+                  linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, 0.2))
                 `,
-                border: '2px solid rgba(6, 182, 212, 0.5)',
-                boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
+                border: '2px solid rgba(59, 130, 246, 0.5)',
+                boxShadow: '0 0 30px rgba(59, 130, 246, 0.4)',
               }}
             >
-              <SpatialIcon Icon={ICONS.MapPin} size={32} style={{ color: '#06B6D4' }} variant="pure" />
+              <SpatialIcon Icon={ICONS.MapPin} size={32} style={{ color: '#3B82F6' }} variant="pure" />
             </div>
             <h2 className="text-white font-bold text-2xl mb-3">Pays non renseigné</h2>
             <p className="text-white/70 text-base leading-relaxed mb-6">
@@ -90,10 +90,10 @@ export const GeographicTab: React.FC = () => {
       >
         <GlassCard className="p-6" style={{
           background: `
-            radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 60%),
             var(--glass-opacity)
           `,
-          borderColor: 'rgba(6, 182, 212, 0.3)',
+          borderColor: 'rgba(59, 130, 246, 0.3)',
         }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -102,13 +102,13 @@ export const GeographicTab: React.FC = () => {
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
+                    linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, 0.2))
                   `,
-                  border: '2px solid rgba(6, 182, 212, 0.5)',
-                  boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
+                  border: '2px solid rgba(59, 130, 246, 0.5)',
+                  boxShadow: '0 0 30px rgba(59, 130, 246, 0.4)',
                 }}
               >
-                <SpatialIcon Icon={ICONS.MapPin} size={24} style={{ color: '#06B6D4' }} variant="pure" />
+                <SpatialIcon Icon={ICONS.MapPin} size={24} style={{ color: '#3B82F6' }} variant="pure" />
               </div>
               <div>
                 <h2 className="text-white font-bold text-xl">Environnement Géographique</h2>
@@ -245,13 +245,13 @@ export const GeographicTab: React.FC = () => {
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                  linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
+                  linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, 0.2))
                 `,
-                border: '2px solid rgba(6, 182, 212, 0.5)',
-                boxShadow: '0 0 20px rgba(6, 182, 212, 0.4)',
+                border: '2px solid rgba(59, 130, 246, 0.5)',
+                boxShadow: '0 0 20px rgba(59, 130, 246, 0.4)',
               }}
             >
-              <SpatialIcon Icon={ICONS.Globe} size={20} style={{ color: '#06B6D4' }} variant="pure" />
+              <SpatialIcon Icon={ICONS.Globe} size={20} style={{ color: '#3B82F6' }} variant="pure" />
             </div>
             <div>
               <h3 className="text-white font-semibold text-lg">Contexte Sanitaire Local</h3>

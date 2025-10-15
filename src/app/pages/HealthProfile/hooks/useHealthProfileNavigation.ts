@@ -29,7 +29,7 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     label: 'Vue',
     icon: 'LayoutDashboard',
     description: 'Tableau de bord et métriques clés',
-    color: '#06B6D4',
+    color: '#EF4444',
     requiredForAI: false,
   },
   {
@@ -45,7 +45,7 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     label: 'Vie',
     icon: 'Coffee',
     description: 'Habitudes quotidiennes',
-    color: '#FF9800',
+    color: '#F59E0B',
     requiredForAI: true,
   },
   {
@@ -57,20 +57,20 @@ export const HEALTH_PROFILE_TABS: TabConfig[] = [
     requiredForAI: true,
   },
   {
-    id: 'geographic',
-    label: 'Géo',
-    icon: 'MapPin',
-    description: 'Environnement, météo, qualité de l\'air',
-    color: '#06B6D4',
-    requiredForAI: false,
-  },
-  {
     id: 'vital-signs',
     label: 'Vitales',
     icon: 'Activity',
     description: 'Tension, fréquence cardiaque, glycémie',
-    color: '#EF4444',
+    color: '#8B5CF6',
     requiredForAI: true,
+  },
+  {
+    id: 'geographic',
+    label: 'Géo',
+    icon: 'MapPin',
+    description: 'Environnement, météo, qualité de l\'air',
+    color: '#3B82F6',
+    requiredForAI: false,
   },
 ];
 

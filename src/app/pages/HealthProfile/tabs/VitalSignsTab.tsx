@@ -17,7 +17,7 @@ export const VitalSignsTab: React.FC = () => {
   const getStatusColor = () => {
     if (state.vitalStatus.status === 'normal') return { color: '#10B981', label: 'Normal' };
     if (state.vitalStatus.status === 'attention') return { color: '#F59E0B', label: 'Attention' };
-    return { color: '#EF4444', label: 'À surveiller' };
+    return { color: '#8B5CF6', label: 'À surveiller' };
   };
 
   const statusColor = getStatusColor();
@@ -32,10 +32,10 @@ export const VitalSignsTab: React.FC = () => {
       >
         <GlassCard className="p-6" style={{
           background: `
-            radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 60%),
             var(--glass-opacity)
           `,
-          borderColor: 'rgba(239, 68, 68, 0.3)',
+          borderColor: 'rgba(139, 92, 246, 0.3)',
         }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -44,13 +44,13 @@ export const VitalSignsTab: React.FC = () => {
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.2))
+                    linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(139, 92, 246, 0.2))
                   `,
-                  border: '2px solid rgba(239, 68, 68, 0.5)',
-                  boxShadow: '0 0 30px rgba(239, 68, 68, 0.4)',
+                  border: '2px solid rgba(139, 92, 246, 0.5)',
+                  boxShadow: '0 0 30px rgba(139, 92, 246, 0.4)',
                 }}
               >
-                <SpatialIcon Icon={ICONS.Activity} size={24} style={{ color: '#EF4444' }} variant="pure" />
+                <SpatialIcon Icon={ICONS.Activity} size={24} style={{ color: '#8B5CF6' }} variant="pure" />
               </div>
               <div>
                 <h2 className="text-white font-bold text-xl">Vitales</h2>
@@ -62,8 +62,8 @@ export const VitalSignsTab: React.FC = () => {
                 <div
                   className="w-3 h-3 rounded-full"
                   style={{
-                    background: '#EF4444',
-                    boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)',
+                    background: '#8B5CF6',
+                    boxShadow: '0 0 8px rgba(139, 92, 246, 0.6)',
                   }}
                 />
                 <span className="text-white font-bold text-lg">{state.completion}%</span>
@@ -77,8 +77,8 @@ export const VitalSignsTab: React.FC = () => {
               <motion.div
                 className="h-3 rounded-full relative overflow-hidden"
                 style={{
-                  background: 'linear-gradient(90deg, #EF4444, rgba(239, 68, 68, 0.8))',
-                  boxShadow: '0 0 12px rgba(239, 68, 68, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)',
+                  background: 'linear-gradient(90deg, #8B5CF6, rgba(139, 92, 246, 0.8))',
+                  boxShadow: '0 0 12px rgba(139, 92, 246, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)',
                 }}
                 initial={{ width: 0 }}
                 animate={{ width: `${state.completion}%` }}
@@ -154,10 +154,10 @@ export const VitalSignsTab: React.FC = () => {
         <form onSubmit={form.handleSubmit}>
           <GlassCard className="p-6" style={{
             background: `
-              radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.08) 0%, transparent 60%),
+              radial-gradient(circle at 30% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
               var(--glass-opacity)
             `,
-            borderColor: 'rgba(239, 68, 68, 0.2)',
+            borderColor: 'rgba(139, 92, 246, 0.2)',
           }}>
             <VitalSignsSection
               register={form.register}

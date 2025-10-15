@@ -20,10 +20,10 @@ export const SleepCard: React.FC<SleepCardProps> = ({ register, control, errors 
   return (
     <GlassCard className="p-6" style={{
       background: `
-        radial-gradient(circle at 30% 20%, rgba(147, 51, 234, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 60%),
         var(--glass-opacity)
       `,
-      borderColor: 'rgba(147, 51, 234, 0.2)'
+      borderColor: 'rgba(245, 158, 11, 0.2)'
     }}>
       <div className="flex items-center gap-3 mb-6">
         <div
@@ -31,13 +31,13 @@ export const SleepCard: React.FC<SleepCardProps> = ({ register, control, errors 
           style={{
             background: `
               radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-              linear-gradient(135deg, rgba(147, 51, 234, 0.4), rgba(147, 51, 234, 0.2))
+              linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.2))
             `,
-            border: '2px solid rgba(147, 51, 234, 0.5)',
-            boxShadow: '0 0 30px rgba(147, 51, 234, 0.4)',
+            border: '2px solid rgba(245, 158, 11, 0.5)',
+            boxShadow: '0 0 30px rgba(245, 158, 11, 0.4)',
           }}
         >
-          <SpatialIcon Icon={ICONS.Moon} size={24} style={{ color: '#9333EA' }} variant="pure" />
+          <SpatialIcon Icon={ICONS.Moon} size={24} style={{ color: '#F59E0B' }} variant="pure" />
         </div>
         <div>
           <h3 className="text-white font-semibold text-xl">Sommeil</h3>
@@ -81,7 +81,7 @@ export const SleepCard: React.FC<SleepCardProps> = ({ register, control, errors 
                 helperText="1 = Très mauvais, 10 = Excellent"
                 lowLabel="Mauvais"
                 highLabel="Excellent"
-                color="#9333EA"
+                color="#F59E0B"
               />
             )}
           />

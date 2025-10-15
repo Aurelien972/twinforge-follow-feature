@@ -73,6 +73,14 @@ export const TAB_COLORS: Record<string, string> = {
   // Notifications
   'recentes': '#EC4899',    // Rose pour récentes
   'parametres': '#8B5CF6',  // Violet pour paramètres
+
+  // Health Profile (Profil de Santé) - Utilise le contexte "health"
+  'health:overview': '#EF4444',      // Rouge pour vue d'ensemble
+  'health:basic-info': '#06B6D4',    // Cyan pour informations de base
+  'health:lifestyle': '#F59E0B',     // Jaune pour style de vie
+  'health:intimacy': '#EC4899',      // Rose pour intimité
+  'health:vital-signs': '#8B5CF6',   // Violet pour signes vitaux
+  'health:geographic': '#3B82F6',    // Bleu pour géographique
 };
 
 /**
