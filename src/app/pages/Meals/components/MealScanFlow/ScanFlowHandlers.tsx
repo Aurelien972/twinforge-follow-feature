@@ -482,18 +482,31 @@ export function useScanFlowHandlers({
 
   // Gérer l'ajout d'un code-barre détecté
   const handleBarcodeDetected = React.useCallback((barcode: ScannedBarcode) => {
-    setScanFlowState(prev => ({
-      ...prev,
-      scannedBarcodes: [...prev.scannedBarcodes, barcode],
-      analysisError: null,
-    }));
+    setScanFlowState(prev => {
+      // Vérifier si ce barcode existe déjà
+      const exists = prev.scannedBarcodes.some(b => b.barcode === barcode.barcode);
 
-    logger.info('MEAL_SCAN_FLOW', 'Barcode detected and added', {
-      clientScanId: clientScanIdRef.current,
-      barcode: barcode.barcode,
-      totalScannedBarcodes: scanFlowState.scannedBarcodes.length + 1,
+      if (exists) {
+        logger.warn('MEAL_SCAN_FLOW', 'Barcode already detected, skipping duplicate', {
+          clientScanId: clientScanIdRef.current,
+          barcode: barcode.barcode,
+        });
+        return prev;
+      }
+
+      logger.info('MEAL_SCAN_FLOW', 'Barcode detected and added', {
+        clientScanId: clientScanIdRef.current,
+        barcode: barcode.barcode,
+        totalScannedBarcodes: prev.scannedBarcodes.length + 1,
+      });
+
+      return {
+        ...prev,
+        scannedBarcodes: [...prev.scannedBarcodes, barcode],
+        analysisError: null,
+      };
     });
-  }, [setScanFlowState, clientScanIdRef, scanFlowState.scannedBarcodes.length]);
+  }, [setScanFlowState, clientScanIdRef]);
 
   // Gérer le changement de portion d'un code-barre
   const handleBarcodePortionChange = React.useCallback((barcode: string, newMultiplier: number) => {

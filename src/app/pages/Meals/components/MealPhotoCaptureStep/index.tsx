@@ -270,7 +270,7 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
             <div className="space-y-3">
               {scannedBarcodes.map((barcodeItem) => (
                 <GlassCard
-                  key={barcodeItem.barcode}
+                  key={`${barcodeItem.barcode}-${barcodeItem.scannedAt}`}
                   className="p-4"
                   style={{
                     background: 'rgba(99, 102, 241, 0.08)',
