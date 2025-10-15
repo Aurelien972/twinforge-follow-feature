@@ -20,7 +20,21 @@ const queryClient = new QueryClient({
       gcTime: 24 * 60 * 60 * 1000, // 24 hours - keep data longer in cache
       retry: 1,
       refetchOnWindowFocus: false, // Prevent unnecessary refetches
-      refetchOnMount: false, // Use cached data when available
+      refetchOnMount: (query) => {
+        // CRITICAL: Allow refetch on mount for real-time data that changes frequently
+        const queryKey = query.queryKey;
+
+        // Always refetch meals data on mount (user just saved a meal)
+        if (queryKey.includes('meals-today')) return true;
+        if (queryKey.includes('meals-week')) return true;
+        if (queryKey.includes('meals-recent')) return true;
+
+        // Always refetch daily summaries (depends on meals data)
+        if (queryKey.includes('daily-ai-summary')) return true;
+
+        // Don't refetch other queries on mount
+        return false;
+      },
       refetchOnReconnect: false, // Prevent refetch on network reconnect
     },
     mutations: {

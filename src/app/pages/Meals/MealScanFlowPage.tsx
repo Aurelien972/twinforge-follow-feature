@@ -175,7 +175,7 @@ const MealScanFlowPage: React.FC = () => {
     }
 
     setIsSaving(true);
-    
+
     try {
       logger.info('MEAL_SCAN_SAVE', 'Starting meal save and reset process', {
         userId,
@@ -247,15 +247,48 @@ const MealScanFlowPage: React.FC = () => {
 
       // Sauvegarder le repas
       const savedMeal = await mealsRepo.saveMeal(mealData);
-      
-      // Invalider les requêtes pour mise à jour UI
+
+      logger.info('MEAL_SCAN_SAVE', 'Meal saved to database, starting cache update', {
+        mealId: savedMeal.id,
+        userId,
+        timestamp: new Date().toISOString()
+      });
+
+      // OPTIMISATION CRITIQUE: Mise à jour optimiste du cache avant invalidation
+      // Cela garantit que l'UI affiche immédiatement le nouveau repas
+      const existingMeals = queryClient.getQueryData<any[]>(['meals-today', userId]) || [];
+      queryClient.setQueryData(['meals-today', userId], [savedMeal, ...existingMeals]);
+
+      logger.info('MEAL_SCAN_SAVE', 'Optimistic cache update applied', {
+        mealId: savedMeal.id,
+        newMealsCount: existingMeals.length + 1,
+        timestamp: new Date().toISOString()
+      });
+
+      // OPTIMISATION CRITIQUE: Forcer le refetch synchrone des queries actives
+      // refetchType: 'active' garantit que seules les queries montées sont rafraîchies
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['meals-today', userId] }),
-        queryClient.invalidateQueries({ queryKey: ['meals-week', userId] }),
+        queryClient.refetchQueries({
+          queryKey: ['meals-today', userId],
+          type: 'active'
+        }),
+        queryClient.refetchQueries({
+          queryKey: ['meals-week', userId],
+          type: 'active'
+        }),
+        queryClient.refetchQueries({
+          queryKey: ['meals-recent', userId],
+          type: 'active'
+        }),
         queryClient.invalidateQueries({ queryKey: ['meals-month', userId] }),
         queryClient.invalidateQueries({ queryKey: ['meals-history', userId] }),
         queryClient.invalidateQueries({ queryKey: ['daily-ai-summary', userId] })
       ]);
+
+      logger.info('MEAL_SCAN_SAVE', 'Query refetch completed', {
+        mealId: savedMeal.id,
+        timestamp: new Date().toISOString()
+      });
 
       // Audio feedback de succès
       success();
@@ -284,11 +317,17 @@ const MealScanFlowPage: React.FC = () => {
         clientScanIdRef.current = null;
         processingGuardRef.current = false;
 
-        // Attendre un tick pour que l'état soit mis à jour
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // OPTIMISATION CRITIQUE: Attendre légèrement plus longtemps pour que le cache soit à jour
+        // Cela garantit que le DailyRecapTab affiche les données fraîches immédiatement
+        await new Promise(resolve => setTimeout(resolve, 150));
 
-        // Navigation vers la page des repas
-        navigate('/meals');
+        logger.info('MEAL_SCAN_SAVE', 'Navigating to meals page with fresh cache', {
+          mealId: savedMeal.id,
+          timestamp: new Date().toISOString()
+        });
+
+        // Navigation vers la page des repas avec état pour indiquer une sauvegarde récente
+        navigate('/meals', { state: { freshMealSaved: true, mealId: savedMeal.id } });
       }
       
     } catch (error) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'react-router-dom';
 import { mealsRepo } from '../../../system/data/repositories/mealsRepo';
 import { useUserStore } from '../../../system/store/userStore';
 import { format } from 'date-fns';
@@ -31,11 +32,16 @@ interface DailyRecapTabProps {
 }
 
 const DailyRecapTab: React.FC<DailyRecapTabProps> = ({ onLoadingChange }) => {
+  const location = useLocation();
   const { profile } = useUserStore();
   const userId = profile?.userId;
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const { success, error: errorSound, click } = useFeedback();
+
+  // Détecter si on arrive depuis une sauvegarde de repas récente
+  const freshMealSaved = location.state?.freshMealSaved;
+  const savedMealId = location.state?.mealId;
   
   // ÉTAT DE LA MODALE GÉRÉ AU NIVEAU DU TAB
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
@@ -57,13 +63,41 @@ const DailyRecapTab: React.FC<DailyRecapTabProps> = ({ onLoadingChange }) => {
     queryKey: ['meals-today', userId],
     queryFn: async () => {
       if (!userId) return [];
+      logger.info('DAILY_RECAP_TAB', 'Fetching today meals', {
+        userId,
+        freshMealSaved,
+        savedMealId,
+        timestamp: new Date().toISOString()
+      });
       return mealsRepo.getTodayMeals(userId);
     },
     enabled: !!userId,
-    staleTime: 30 * 1000, // 30 secondes pour mise à jour plus rapide
+    staleTime: 0, // CRITIQUE: Aucun cache pour garantir des données fraîches
     refetchOnWindowFocus: true, // Refetch quand la fenêtre reprend le focus
-    refetchInterval: 60 * 1000, // Refetch toutes les minutes
+    refetchOnMount: true, // CRITIQUE: Toujours refetch au montage du composant
   });
+
+  // OPTIMISATION CRITIQUE: Force refetch si on détecte une sauvegarde récente
+  React.useEffect(() => {
+    if (freshMealSaved && userId) {
+      logger.info('DAILY_RECAP_TAB', 'Fresh meal detected, forcing immediate refetch', {
+        savedMealId,
+        userId,
+        timestamp: new Date().toISOString()
+      });
+
+      // Force refetch immédiat
+      queryClient.refetchQueries({
+        queryKey: ['meals-today', userId],
+        type: 'active'
+      });
+
+      // Nettoyer l'état de navigation après utilisation
+      if (location.state) {
+        window.history.replaceState({}, document.title);
+      }
+    }
+  }, [freshMealSaved, savedMealId, userId, queryClient, location.state]);
 
   // Récupérer le résumé IA quotidien
   const { data: dailySummary, isLoading: isSummaryLoading } = useQuery({
@@ -204,12 +238,16 @@ const DailyRecapTab: React.FC<DailyRecapTabProps> = ({ onLoadingChange }) => {
     }
   }, [userId, queryClient, success, errorSound, showToast]);
 
-  // Show skeleton when loading or when no data exists
-  if (isLoading) {
+  // OPTIMISATION: Afficher le contenu immédiatement si on a des données en cache
+  // Même si isLoading est true (refetch en arrière-plan)
+  const hasCachedData = todayMeals !== undefined;
+
+  // Show skeleton only when truly loading for the first time
+  if (isLoading && !hasCachedData) {
     return <DailyRecapSkeleton />;
   }
 
-  // Show skeleton when no meals data exists (empty state with loading appearance)
+  // Show skeleton when no meals data exists at all (empty state with loading appearance)
   if (todayStats.mealsCount === 0 && !todayMeals) {
     return <DailyRecapSkeleton />;
   }
