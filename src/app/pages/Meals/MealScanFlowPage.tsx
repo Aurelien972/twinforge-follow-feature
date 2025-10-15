@@ -462,17 +462,6 @@ const MealScanFlowPage: React.FC = () => {
     }
   };
 
-  // Handle retry AI
-  const handleRetryAI = () => {
-    // Scroll to top when retrying
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    scanFlowHandlers.handleRetryAI();
-  };
-
-  // Handle manual entry
-  const handleManualEntry = () => {
-    navigate('/meals/add');
-  };
 
   // Early return si pas d'auth
   if (!authReady) {
@@ -578,15 +567,36 @@ const MealScanFlowPage: React.FC = () => {
   const renderContent = () => {
     if (scanFlowState.analysisError && scanFlowState.currentStep === 'processing') {
       return (
-        <ErrorDisplay
-          error={scanFlowState.analysisError}
-          onRetry={handleRetryAI}
-          onManualEntry={handleManualEntry}
-          fallbackAvailable={true}
-        />
+        <GlassCard className="p-8 text-center">
+          <div className="mb-6">
+            <SpatialIcon Icon={ICONS.AlertCircle} size={48} className="text-red-400 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-white mb-2">Erreur d'analyse</h2>
+            <p className="text-gray-300">{scanFlowState.analysisError}</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate('/meals')}
+              className="flex-1 btn-glass--secondary-nav"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <SpatialIcon Icon={ICONS.ArrowLeft} size={16} />
+                <span>Retour</span>
+              </div>
+            </button>
+            <button
+              onClick={scanFlowHandlers.handleRetake}
+              className="flex-1 btn-glass--primary"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <SpatialIcon Icon={ICONS.RotateCcw} size={16} />
+                <span>Réessayer</span>
+              </div>
+            </button>
+          </div>
+        </GlassCard>
       );
     }
-    
+
     switch (scanFlowState.currentStep) {
       case 'capture':
         return (
