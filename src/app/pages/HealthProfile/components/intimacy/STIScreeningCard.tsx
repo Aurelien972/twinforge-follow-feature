@@ -18,10 +18,10 @@ export const STIScreeningCard: React.FC<STIScreeningCardProps> = ({ register, er
   return (
     <GlassCard className="p-6" style={{
       background: `
-        radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 30% 20%, rgba(236, 72, 153, 0.08) 0%, transparent 60%),
         var(--glass-opacity)
       `,
-      borderColor: 'rgba(6, 182, 212, 0.2)'
+      borderColor: 'rgba(236, 72, 153, 0.2)'
     }}>
       <div className="flex items-center gap-3 mb-6">
         <div
@@ -29,13 +29,13 @@ export const STIScreeningCard: React.FC<STIScreeningCardProps> = ({ register, er
           style={{
             background: `
               radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-              linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
+              linear-gradient(135deg, rgba(236, 72, 153, 0.4), rgba(236, 72, 153, 0.2))
             `,
-            border: '2px solid rgba(6, 182, 212, 0.5)',
-            boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
+            border: '2px solid rgba(236, 72, 153, 0.5)',
+            boxShadow: '0 0 30px rgba(236, 72, 153, 0.4)',
           }}
         >
-          <SpatialIcon Icon={ICONS.TestTube} size={24} style={{ color: '#06B6D4' }} variant="pure" />
+          <SpatialIcon Icon={ICONS.TestTube} size={24} style={{ color: '#EC4899' }} variant="pure" />
         </div>
         <div>
           <h3 className="text-white font-semibold text-xl">Dépistage IST</h3>
@@ -89,11 +89,11 @@ export const STIScreeningCard: React.FC<STIScreeningCardProps> = ({ register, er
         </div>
 
         <div className="md:col-span-2">
-          <div className="p-4 rounded-xl bg-cyan-500/10 border border-cyan-400/20">
+          <div className="p-4 rounded-xl bg-pink-500/10 border border-pink-400/20">
             <div className="flex items-start gap-3">
-              <SpatialIcon Icon={ICONS.Info} size={18} className="text-cyan-400 mt-0.5 flex-shrink-0" />
+              <SpatialIcon Icon={ICONS.Info} size={18} className="text-pink-400 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-cyan-200 text-sm leading-relaxed">
+                <p className="text-pink-200 text-sm leading-relaxed">
                   Le dépistage régulier des IST est essentiel pour la santé sexuelle, même en l'absence de symptômes.
                   Ces informations sont strictement confidentielles et protégées.
                 </p>

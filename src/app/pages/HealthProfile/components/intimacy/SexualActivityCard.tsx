@@ -20,10 +20,10 @@ export const SexualActivityCard: React.FC<SexualActivityCardProps> = ({ register
   return (
     <GlassCard className="p-6" style={{
       background: `
-        radial-gradient(circle at 30% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 30% 20%, rgba(236, 72, 153, 0.08) 0%, transparent 60%),
         var(--glass-opacity)
       `,
-      borderColor: 'rgba(249, 115, 22, 0.2)'
+      borderColor: 'rgba(236, 72, 153, 0.2)'
     }}>
       <div className="flex items-center gap-3 mb-6">
         <div
@@ -31,13 +31,13 @@ export const SexualActivityCard: React.FC<SexualActivityCardProps> = ({ register
           style={{
             background: `
               radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-              linear-gradient(135deg, rgba(249, 115, 22, 0.4), rgba(249, 115, 22, 0.2))
+              linear-gradient(135deg, rgba(236, 72, 153, 0.4), rgba(236, 72, 153, 0.2))
             `,
-            border: '2px solid rgba(249, 115, 22, 0.5)',
-            boxShadow: '0 0 30px rgba(249, 115, 22, 0.4)',
+            border: '2px solid rgba(236, 72, 153, 0.5)',
+            boxShadow: '0 0 30px rgba(236, 72, 153, 0.4)',
           }}
         >
-          <SpatialIcon Icon={ICONS.Heart} size={24} style={{ color: '#F97316' }} variant="pure" />
+          <SpatialIcon Icon={ICONS.Heart} size={24} style={{ color: '#EC4899' }} variant="pure" />
         </div>
         <div>
           <h3 className="text-white font-semibold text-xl">Activité Sexuelle</h3>
@@ -82,7 +82,7 @@ export const SexualActivityCard: React.FC<SexualActivityCardProps> = ({ register
                 helperText="1 = Très insatisfait, 10 = Très satisfait"
                 lowLabel="Insatisfait"
                 highLabel="Très satisfait"
-                color="#F97316"
+                color="#EC4899"
               />
             )}
           />
