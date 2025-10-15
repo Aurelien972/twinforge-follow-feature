@@ -47,53 +47,6 @@ export const BasicHealthSection: React.FC<BasicHealthSectionProps> = ({ register
         )}
       </div>
 
-      {/* Measurements Section - Simplified Labels */}
-      <div>
-        <h4 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
-          <SpatialIcon Icon={ICONS.Ruler} size={16} className="text-cyan-400" />
-          Mensurations
-        </h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <input
-              {...register('basic.height_cm', { valueAsNumber: true })}
-              type="number"
-              id="basic.height_cm"
-              min="120"
-              max="230"
-              step="1"
-              className="glass-input"
-              placeholder="Taille en cm (ex: 175)"
-            />
-            {errors.basic?.height_cm && (
-              <p className="text-red-300 text-xs mt-1 flex items-center gap-1">
-                <SpatialIcon Icon={ICONS.AlertCircle} size={12} />
-                {errors.basic.height_cm.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <input
-              {...register('basic.weight_kg', { valueAsNumber: true })}
-              type="number"
-              id="basic.weight_kg"
-              min="30"
-              max="300"
-              step="0.1"
-              className="glass-input"
-              placeholder="Poids en kg (ex: 70)"
-            />
-            {errors.basic?.weight_kg && (
-              <p className="text-red-300 text-xs mt-1 flex items-center gap-1">
-                <SpatialIcon Icon={ICONS.AlertCircle} size={12} />
-                {errors.basic.weight_kg.message}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Vaccinations Section */}
       <div>
         <h4 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">

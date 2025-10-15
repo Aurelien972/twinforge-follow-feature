@@ -35,8 +35,6 @@ export function useBasicHealthForm() {
     resolver: zodResolver(extendedBasicHealthSchema),
     defaultValues: {
       bloodType: basicInfo?.bloodType,
-      height_cm: basicInfo?.height_cm,
-      weight_kg: basicInfo?.weight_kg,
       vaccinations: healthV2?.vaccinations ? {
         up_to_date: healthV2.vaccinations.up_to_date,
         records: healthV2.vaccinations.records || [],
@@ -49,26 +47,24 @@ export function useBasicHealthForm() {
   const { errors, isDirty, isValid } = formState;
   const watchedValues = watch();
 
-  // Calculate BMI automatically
+  // Calculate BMI using data from Identity tab
   const calculatedBMI = React.useMemo(() => {
-    const height = watchedValues.height_cm;
-    const weight = watchedValues.weight_kg;
+    const height = profile?.height_cm;
+    const weight = profile?.weight_kg;
 
     if (!height || !weight || height <= 0) return undefined;
 
     const heightInMeters = height / 100;
     const bmi = weight / (heightInMeters * heightInMeters);
     return Math.round(bmi * 10) / 10;
-  }, [watchedValues.height_cm, watchedValues.weight_kg]);
+  }, [profile?.height_cm, profile?.weight_kg]);
 
   // Calculate completion percentage
   const completion = React.useMemo(() => {
     let filled = 0;
-    let total = 3; // bloodType, height_cm, weight_kg
+    let total = 1; // bloodType only
 
     if (watchedValues.bloodType) filled++;
-    if (watchedValues.height_cm && watchedValues.height_cm > 0) filled++;
-    if (watchedValues.weight_kg && watchedValues.weight_kg > 0) filled++;
 
     // Add vaccination to completion if it exists
     if (watchedValues.vaccinations?.up_to_date !== undefined) {
@@ -90,9 +86,6 @@ export function useBasicHealthForm() {
 
       const updatedBasic = {
         bloodType: data.bloodType,
-        height_cm: data.height_cm,
-        weight_kg: data.weight_kg,
-        bmi: calculatedBMI,
       };
 
       const currentHealth = (profile as any)?.health as HealthProfileV2 | undefined;

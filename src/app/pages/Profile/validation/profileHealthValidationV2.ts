@@ -109,9 +109,6 @@ const medicalHistorySchema = z.object({
 
 const basicHealthInfoSchema = z.object({
   bloodType: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
-  height_cm: z.number().min(120).max(230).optional(),
-  weight_kg: z.number().min(30).max(300).optional(),
-  bmi: z.number().min(10).max(60).optional(),
 });
 
 const emergencyContactSchema = z.object({
@@ -161,8 +158,6 @@ export type HealthForm = z.infer<typeof healthSchema>;
 
 export const basicHealthSectionSchema = z.object({
   bloodType: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
-  height_cm: z.number().min(120).max(230).optional(),
-  weight_kg: z.number().min(30).max(300).optional(),
 });
 
 export const medicalHistorySectionSchema = z.object({
