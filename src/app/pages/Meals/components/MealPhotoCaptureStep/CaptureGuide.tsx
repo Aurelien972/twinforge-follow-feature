@@ -25,8 +25,18 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
 }) => {
   const [showBarcodeOptions, setShowBarcodeOptions] = React.useState(false);
 
+  React.useEffect(() => {
+    console.log('CaptureGuide mounted, isValidating:', isValidating);
+    console.log('CaptureGuide handlers:', { onCameraClick, onGalleryClick, onBarcodeClick });
+  }, []);
+
+  React.useEffect(() => {
+    console.log('isValidating changed:', isValidating);
+  }, [isValidating]);
+
   return (
-    <GlassCard 
+    <GlassCard
+      interactive={false}
       className="p-6 relative glass-card--capture meal-capture-enter"
       style={{
         background: `
@@ -198,10 +208,20 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
         
         <button
           onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             console.log('CaptureGuide: Camera button onClick fired', e);
+            console.log('isValidating:', isValidating);
+            console.log('Calling onCameraClick...');
             onCameraClick();
           }}
-          className="w-full btn-glass--primary btn-breathing-css touch-feedback-css"
+          onMouseDown={(e) => {
+            console.log('Camera button mouseDown');
+          }}
+          onTouchStart={(e) => {
+            console.log('Camera button touchStart');
+          }}
+          className="w-full btn-glass--primary touch-feedback-css"
           disabled={isValidating}
           type="button"
           style={{
@@ -241,8 +261,18 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
 
         <button
           onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             console.log('CaptureGuide: Gallery button onClick fired', e);
+            console.log('isValidating:', isValidating);
+            console.log('Calling onGalleryClick...');
             onGalleryClick();
+          }}
+          onMouseDown={(e) => {
+            console.log('Gallery button mouseDown');
+          }}
+          onTouchStart={(e) => {
+            console.log('Gallery button touchStart');
           }}
           className="w-full btn-glass btn-glass--secondary-nav touch-feedback-css"
           disabled={isValidating}
