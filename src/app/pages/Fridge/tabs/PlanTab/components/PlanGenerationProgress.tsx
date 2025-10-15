@@ -1,0 +1,166 @@
+/**
+ * Plan Generation Progress Component
+ * Component for displaying meal plan generation progress
+ */
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import GlassCard from '../../../../../../ui/cards/GlassCard';
+import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
+import { ICONS } from '../../../../../../ui/icons/registry';
+
+interface PlanGenerationProgressProps {
+  progress: number;
+  loadingMessage: string;
+  currentLoadingTitle: string;
+  currentLoadingSubtitle: string;
+}
+
+/**
+ * Plan Generation Progress Component - Progression de Génération
+ */
+const PlanGenerationProgress: React.FC<PlanGenerationProgressProps> = ({
+  progress,
+  loadingMessage,
+  currentLoadingTitle,
+  currentLoadingSubtitle
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <GlassCard 
+        className="p-8 text-center"
+        style={{
+          background: `
+            radial-gradient(circle at 30% 20%, color-mix(in srgb, #8B5CF6 15%, transparent) 0%, transparent 60%),
+            radial-gradient(circle at 70% 80%, color-mix(in srgb, #A855F7 12%, transparent) 0%, transparent 50%),
+            var(--glass-opacity)
+          `,
+          borderColor: 'color-mix(in srgb, #8B5CF6 30%, transparent)',
+          boxShadow: `
+            0 12px 40px rgba(0, 0, 0, 0.25),
+            0 0 30px color-mix(in srgb, #8B5CF6 20%, transparent),
+            inset 0 2px 0 rgba(255, 255, 255, 0.15)
+          `
+        }}
+      >
+        <div className="space-y-6">
+          {/* Icône de Génération */}
+          <motion.div
+            className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
+            style={{
+              background: `
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                linear-gradient(135deg, color-mix(in srgb, #8B5CF6 35%, transparent), color-mix(in srgb, #8B5CF6 25%, transparent))
+              `,
+              border: '2px solid color-mix(in srgb, #8B5CF6 50%, transparent)',
+              boxShadow: '0 0 30px color-mix(in srgb, #8B5CF6 40%, transparent)'
+            }}
+            animate={{ 
+              scale: [1, 1.05, 1],
+              opacity: [0.8, 1, 0.8]
+            }}
+            transition={{ 
+              duration: 2, 
+              repeat: Infinity 
+            }}
+          >
+            <SpatialIcon Icon={ICONS.Calendar} size={40} style={{ color: '#8B5CF6' }} />
+          </motion.div>
+
+          {/* Titre et Message */}
+          <div>
+            <motion.h3 
+              className="text-3xl font-bold text-white mb-3"
+              key={currentLoadingTitle}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              style={{
+                textShadow: '0 0 20px color-mix(in srgb, #8B5CF6 60%, transparent)'
+              }}
+            >
+              {currentLoadingTitle || 'Génération du Plan Nutritionnel'}
+            </motion.h3>
+            
+            <motion.p 
+              className="text-white/90 text-xl mb-2"
+              key={currentLoadingSubtitle}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
+              {currentLoadingSubtitle || 'Préparation de votre plan personnalisé'}
+            </motion.p>
+            
+            {loadingMessage && (
+              <motion.p 
+                className="text-white/70 text-sm"
+                key={loadingMessage}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                {loadingMessage}
+              </motion.p>
+            )}
+          </div>
+
+          {/* Barre de Progression */}
+          <div className="max-w-md mx-auto space-y-3">
+            <div className="flex justify-between text-sm text-white/70">
+              <span>Progression</span>
+              <span>{Math.round(progress)}%</span>
+            </div>
+            <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
+              <motion.div
+                className="h-3 rounded-full relative overflow-hidden"
+                style={{
+                  background: `linear-gradient(90deg, 
+                    #8B5CF6, 
+                    #A855F7, 
+                    #C084FC
+                  )`,
+                  boxShadow: `
+                    0 0 16px color-mix(in srgb, #8B5CF6 70%, transparent),
+                    inset 0 1px 0 rgba(255,255,255,0.4)
+                  `,
+                  width: `${progress}%`
+                }}
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+              >
+                {/* Shimmer Effect */}
+                <div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: `linear-gradient(90deg, 
+                      transparent 0%, 
+                      rgba(255,255,255,0.6) 50%, 
+                      transparent 100%
+                    )`,
+                    animation: 'progressShimmer 2s ease-in-out infinite'
+                  }}
+                />
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Étapes de Génération */}
+          <div className="text-sm text-white/60">
+            <div className="flex items-center justify-center gap-2">
+              <SpatialIcon Icon={ICONS.Zap} size={14} style={{ color: '#8B5CF6' }} />
+              <span>Analyse de la Forge • Optimisation nutritionnelle • Planification de la Forge</span>
+            </div>
+          </div>
+        </div>
+      </GlassCard>
+    </motion.div>
+  );
+};
+
+export default PlanGenerationProgress;

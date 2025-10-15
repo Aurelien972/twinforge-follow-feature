@@ -1,0 +1,138 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import GlassCard from '../../../../../../ui/cards/GlassCard';
+import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
+import { ICONS } from '../../../../../../ui/icons/registry';
+
+/**
+ * Recipe Generation Loader - Animated loader for recipe generation
+ * Displays during recipe generation process with spinning animation
+ */
+const RecipeGenerationLoader: React.FC = () => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5 }}
+      className="mb-6"
+    >
+      <GlassCard 
+        className="p-8 text-center"
+        style={{
+          background: `
+            radial-gradient(circle at 30% 20%, color-mix(in srgb, #EC4899 12%, transparent) 0%, transparent 60%),
+            radial-gradient(circle at 70% 80%, color-mix(in srgb, #F472B6 8%, transparent) 0%, transparent 50%),
+            rgba(255, 255, 255, 0.05)
+          `,
+          borderColor: 'color-mix(in srgb, #EC4899 25%, transparent)',
+          boxShadow: `
+            0 12px 40px rgba(0, 0, 0, 0.25),
+            0 0 30px color-mix(in srgb, #EC4899 15%, transparent),
+            0 0 60px color-mix(in srgb, #F472B6 10%, transparent),
+            inset 0 2px 0 rgba(255, 255, 255, 0.15)
+          `
+        }}
+      >
+        <div className="space-y-6">
+          {/* Animated Icon */}
+          <div className="flex justify-center">
+            <div 
+              className="w-20 h-20 rounded-full flex items-center justify-center"
+              style={{
+                background: `
+                  radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                  linear-gradient(135deg, color-mix(in srgb, #EC4899 35%, transparent), color-mix(in srgb, #EC4899 25%, transparent))
+                `,
+                border: '2px solid color-mix(in srgb, #EC4899 50%, transparent)',
+                boxShadow: '0 0 30px color-mix(in srgb, #EC4899 40%, transparent)'
+              }}
+            >
+              <SpatialIcon 
+                Icon={ICONS.Sparkles} 
+                size={40} 
+                className="text-white"
+                motionAnimate={{ rotate: 360 }}
+                motionTransition={{ 
+                  repeat: Infinity, 
+                  duration: 2, 
+                  ease: "linear" 
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Loading Text */}
+          <div className="space-y-2">
+            <h3 
+              className="text-2xl font-bold text-white"
+              style={{
+                textShadow: '0 0 20px rgba(236, 72, 153, 0.5), 0 0 40px rgba(236, 72, 153, 0.3)'
+              }}
+            >
+              Création de recettes en cours...
+            </h3>
+            <p 
+              className="text-white/80 text-lg"
+              style={{
+                textShadow: '0 0 10px rgba(244, 114, 182, 0.3)'
+              }}
+            >
+              La Forge Spatiale travaille...
+            </p>
+          </div>
+
+          {/* Animated Dots */}
+          <div className="flex justify-center gap-2">
+            {[0, 1, 2].map((index) => (
+              <motion.div
+                key={index}
+                className="w-3 h-3 bg-white/80 rounded-full"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.5, 1, 0.5]
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  delay: index * 0.2,
+                  ease: "easeInOut"
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Progress Indicator */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-center gap-2 text-sm text-white/70">
+              <SpatialIcon 
+                Icon={ICONS.Clock} 
+                size={16} 
+                className="text-pink-400" 
+              />
+              <span>Analyse des ingrédients et création des recettes...</span>
+            </div>
+            
+            {/* Animated Progress Bar */}
+            <div className="w-full max-w-xs mx-auto h-2 bg-white/10 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full"
+                animate={{
+                  x: ['-100%', '100%']
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                style={{ width: '50%' }}
+              />
+            </div>
+          </div>
+        </div>
+      </GlassCard>
+    </motion.div>
+  );
+};
+
+export default RecipeGenerationLoader;

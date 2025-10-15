@@ -1,0 +1,46 @@
+import React from 'react';
+import SpatialIcon from '../../../../ui/icons/SpatialIcon';
+import { ICONS } from '../../../../ui/icons/registry';
+
+interface FridgeScanExitButtonProps {
+  isActive: boolean;
+  currentStep: string;
+  onManualExit: () => void;
+}
+
+/**
+ * Component to render the exit button conditionally
+ */
+const FridgeScanExitButton: React.FC<FridgeScanExitButtonProps> = ({
+  isActive,
+  currentStep,
+  onManualExit
+}) => {
+  
+  // Only show exit button if active and not on photo step or validation step
+  if (!isActive || currentStep === 'photo' || currentStep === 'validation') {
+    return null;
+  }
+
+  return (
+    <div className="flex justify-center pt-6">
+      <button
+        onClick={onManualExit}
+        className="btn-glass--warning px-6 py-3"
+        title="Quitter l'atelier de recettes"
+        style={{
+          background: 'color-mix(in srgb, #EF4444 15%, transparent)',
+          borderColor: 'color-mix(in srgb, #EF4444 30%, transparent)',
+          color: '#EF4444'
+        }}
+      >
+        <div className="flex items-center gap-2">
+          <SpatialIcon Icon={ICONS.X} size={16} />
+          <span>Quitter l'Atelier de Recettes</span>
+        </div>
+      </button>
+    </div>
+  );
+};
+
+export default FridgeScanExitButton;
