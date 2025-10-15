@@ -196,7 +196,10 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
             backdropFilter: 'blur(8px) saturate(120%)'
           }}
         >
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ pointerEvents: 'none' }}
+          >
             <div className="text-center space-y-4">
               <div 
                 className="w-24 h-24 mx-auto rounded-full flex items-center justify-center relative"
