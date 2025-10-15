@@ -11,7 +11,7 @@ import { useFastingPipeline, useFastingElapsedSeconds, useFastingProgressPercent
 import { getCurrentFastingPhase, getMotivationalMessage } from '../../../../../lib/nutrition/fastingPhases';
 import { formatElapsedTime } from '../../utils/fastingUtils';
 import { getProtocolById } from '../../../../../lib/nutrition/fastingProtocols';
-import { useFastingTimer, formatTimeHM } from '../../../../../hooks/useFastingTimer';
+import { useFastingTimer, formatTimeHMS } from '../../../../../hooks/useFastingTimer';
 
 interface FastingCTAProps {
   className?: string;
@@ -314,7 +314,7 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
               <div className="space-y-3">
                 <div className="text-center">
                   <div className="text-5xl md:text-6xl font-black mb-2" style={{ color: urgencyConfig.color }}>
-                    {formatTimeHM(elapsedSeconds)}
+                    {formatTimeHMS(elapsedSeconds)}
                   </div>
                   <div className="text-lg md:text-xl text-white/90 font-semibold">
                     Objectif : {session.targetHours}h • {progressPercentage.toFixed(1)}% accompli

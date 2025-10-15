@@ -5,7 +5,7 @@ import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import { useExitModalStore } from '@/system/store/exitModalStore';
-import { useFastingTimer, formatTimeHM } from '@/hooks/useFastingTimer';
+import { useFastingTimer, formatTimeHMS } from '@/hooks/useFastingTimer';
 
 interface FastingSession {
   id?: string;
@@ -143,7 +143,7 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
         <div className="space-y-3">
           <h2 className="text-3xl font-bold" style={{ color: '#F59E0B' }}>Session Active</h2>
           <div className="text-6xl font-black" style={{ color: '#F59E0B' }}>
-            {formatTimeHM(elapsedSeconds)}
+            {formatTimeHMS(elapsedSeconds)}
           </div>
           <p className="text-white/80 text-lg">
             Objectif : {session?.targetHours}h • {progressPercentage?.toFixed(1) || '0.0'}% accompli

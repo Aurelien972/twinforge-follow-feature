@@ -127,35 +127,28 @@ const initializeCachePersistence = async () => {
         shouldDehydrateQuery: (query) => {
           // Only persist specific query types to avoid bloating localStorage
           const queryKey = query.queryKey;
-          
-          // DIAGNOSTIC: Log pour vérifier la déshydratation des insights d'activité
-          if (queryKey.includes('insights')) {
-            console.log('🔍 [REACT_QUERY_PERSISTENCE] Checking insights query for dehydration', {
-              queryKey,
-              shouldDehydrate: true,
-              queryData: query.state.data ? 'has_data' : 'no_data',
-              timestamp: new Date().toISOString()
-            });
-          }
-          
+
+          // Don't persist fasting queries - they change in real-time and cause persistence loops
+          if (queryKey.includes('fasting')) return false;
+
           // Persist activity insights (expensive AI calls)
           if (queryKey.includes('insights')) return true;
-          
+
           // Persist activity progression data
           if (queryKey.includes('progression')) return true;
-          
+
           // Persist trend analyses
           if (queryKey.includes('trend-analysis')) return true;
-          
+
           // Persist daily summaries
           if (queryKey.includes('daily-summary')) return true;
-          
+
           // Don't persist real-time data like daily activities
           if (queryKey.includes('daily') && !queryKey.includes('summary')) return false;
-          
+
           // Don't persist user profile (changes frequently)
           if (queryKey.includes('profile')) return false;
-          
+
           // Default: persist other queries
           return true;
         },
@@ -163,24 +156,6 @@ const initializeCachePersistence = async () => {
     });
     
     persistenceInitialized = true;
-    
-    // DIAGNOSTIC: Vérifier le contenu du localStorage après initialisation
-    setTimeout(() => {
-      try {
-        const cacheContent = localStorage.getItem('twinforge-react-query-cache');
-        const parsedCache = cacheContent ? JSON.parse(cacheContent) : null;
-        
-        console.log('🔍 [REACT_QUERY_PERSISTENCE] LocalStorage cache content after initialization', {
-          hasCacheContent: !!cacheContent,
-          cacheSize: cacheContent?.length || 0,
-          cacheKeys: parsedCache ? Object.keys(parsedCache) : [],
-          hasInsightsData: parsedCache && JSON.stringify(parsedCache).includes('insights'),
-          timestamp: new Date().toISOString()
-        });
-      } catch (error) {
-        console.warn('Failed to inspect localStorage cache:', error);
-      }
-    }, 1000);
     
     logger.info('REACT_QUERY_PERSISTENCE', 'Cache persistence initialized successfully', {
       cacheSize: Object.keys(localStorage).filter(key => key.startsWith('twinforge-react-query')).length,

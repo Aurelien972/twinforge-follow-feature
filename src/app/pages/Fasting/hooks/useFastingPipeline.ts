@@ -187,16 +187,8 @@ export const useFastingPipeline = create<FastingPipelineState>()(
           // const { supabase } = await import('../../../system/supabase/client');
           // await supabase.from('fasting_sessions').insert(sessionData);
 
-          // Invalider les caches pour les données de jeûne
-          const queryClient = useQueryClient.getState ? useQueryClient.getState() : null;
-          if (queryClient) {
-            queryClient.invalidateQueries({
-              queryKey: ['fasting', 'daily', state.session.userId]
-            });
-            queryClient.invalidateQueries({
-              queryKey: ['fasting', 'history', state.session.userId]
-            });
-          }
+          // Note: Query invalidation is handled in the saveFastingSession wrapper function
+          // to avoid persistence loops and ensure proper cleanup
 
           // Reset pipeline state
           set({
@@ -353,10 +345,20 @@ export function useFastingPipelineWithActions() {
   const saveFastingSession = async () => {
     try {
       await store.saveFastingSession();
-      
-      // Invalidate all fasting-related queries
-      queryClient.invalidateQueries({ queryKey: ['fasting'] });
-      
+
+      // Invalidate specific fasting queries without refetch to avoid persistence loops
+      const userId = store.session?.userId;
+      if (userId) {
+        await queryClient.invalidateQueries({
+          queryKey: ['fasting', 'daily', userId],
+          refetchType: 'none' // Don't refetch immediately
+        });
+        await queryClient.invalidateQueries({
+          queryKey: ['fasting', 'history', userId],
+          refetchType: 'none'
+        });
+      }
+
       success();
       showToast({
         type: 'success',
@@ -364,6 +366,9 @@ export function useFastingPipelineWithActions() {
         message: 'Votre session de jeûne a été enregistrée',
         duration: 3000
       });
+
+      // Small delay before navigation to ensure state updates complete
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Redirection vers l'onglet Aujourd'hui
       navigate('/fasting#daily');

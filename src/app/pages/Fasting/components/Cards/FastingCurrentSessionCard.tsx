@@ -11,7 +11,7 @@ import {
 } from '@/lib/nutrition/fastingPhases';
 import { formatElapsedTime } from '@/app/pages/Fasting/utils/fastingUtils';
 import { useFastingElapsedSeconds, useFastingProgressPercentage } from '../../hooks/useFastingPipeline';
-import { useFastingTimer, formatTimeHM } from '@/hooks/useFastingTimer';
+import { useFastingTimer, formatTimeHMS } from '@/hooks/useFastingTimer';
 
 interface FastingSession {
   id?: string;
@@ -123,7 +123,7 @@ const FastingCurrentSessionCard: React.FC<FastingCurrentSessionCardProps> = ({
           <div className="text-center space-y-4">
             <div>
               <div className="text-5xl font-black text-white mb-2">
-                {formatTimeHM(elapsedSeconds)}
+                {formatTimeHMS(elapsedSeconds)}
               </div>
               <p className="text-white/70 text-lg">
                 Objectif : {session.targetHours}h • {progressPercentage.toFixed(1)}% accompli
