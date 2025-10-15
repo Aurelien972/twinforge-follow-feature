@@ -270,6 +270,24 @@ export const mealsRepo = {
         data: data,
       });
 
+      // If there's an error with a Response context, try to read the response body
+      if (error && error.context instanceof Response) {
+        try {
+          const responseClone = error.context.clone();
+          const errorBody = await responseClone.text();
+          console.error('🔴 RESPONSE BODY from edge function (status 400):', errorBody);
+
+          try {
+            const errorJson = JSON.parse(errorBody);
+            console.error('🔴 PARSED ERROR from edge function:', errorJson);
+          } catch (e) {
+            console.error('🔴 Could not parse error body as JSON:', e);
+          }
+        } catch (e) {
+          console.error('🔴 Could not read response body:', e);
+        }
+      }
+
       logger.info('MEALS_REPO', 'Received response from meal-analyzer', {
         userId: request.user_id,
         hasData: !!data,
