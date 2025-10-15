@@ -234,6 +234,12 @@ export function useScanFlowHandlers({
     try {
       // Étape 1: Analyser les codes-barres détectés
       if (scanFlowState.scannedBarcodes.length > 0) {
+        logger.info('MEAL_SCAN_FLOW', 'Starting barcode analysis', {
+          clientScanId,
+          barcodesCount: scanFlowState.scannedBarcodes.length,
+          barcodes: scanFlowState.scannedBarcodes.map(b => b.barcode),
+        });
+
         setScanFlowState(prev => ({
           ...prev,
           progress: 30,
@@ -241,9 +247,16 @@ export function useScanFlowHandlers({
         }));
 
         const analyzedProducts: ScannedProduct[] = [];
+        const failedBarcodes: Array<{barcode: string; reason: string}> = [];
 
         for (let i = 0; i < scanFlowState.scannedBarcodes.length; i++) {
           const barcodeItem = scanFlowState.scannedBarcodes[i];
+
+          logger.info('MEAL_SCAN_FLOW', `Analyzing barcode ${i + 1}/${scanFlowState.scannedBarcodes.length}`, {
+            clientScanId,
+            barcode: barcodeItem.barcode,
+            portionMultiplier: barcodeItem.portionMultiplier,
+          });
 
           try {
             const result = await openFoodFactsService.getProductByBarcode(barcodeItem.barcode);
@@ -261,15 +274,44 @@ export function useScanFlowHandlers({
                   portionMultiplier: barcodeItem.portionMultiplier,
                   scannedAt: barcodeItem.scannedAt,
                 });
+
+                logger.info('MEAL_SCAN_FLOW', 'Barcode analyzed successfully', {
+                  clientScanId,
+                  barcode: barcodeItem.barcode,
+                  productName: result.product.name,
+                  calories: mealItem.calories,
+                });
+              } else {
+                failedBarcodes.push({barcode: barcodeItem.barcode, reason: 'Failed to convert to meal item'});
+                logger.warn('MEAL_SCAN_FLOW', 'Failed to convert product to meal item', {
+                  clientScanId,
+                  barcode: barcodeItem.barcode,
+                });
               }
+            } else {
+              failedBarcodes.push({barcode: barcodeItem.barcode, reason: result.error || 'Product not found'});
+              logger.warn('MEAL_SCAN_FLOW', 'Product not found for barcode', {
+                clientScanId,
+                barcode: barcodeItem.barcode,
+                error: result.error,
+              });
             }
           } catch (error) {
-            logger.warn('MEAL_SCAN_FLOW', 'Failed to analyze barcode', {
+            failedBarcodes.push({barcode: barcodeItem.barcode, reason: error instanceof Error ? error.message : 'Unknown error'});
+            logger.error('MEAL_SCAN_FLOW', 'Exception during barcode analysis', {
               clientScanId,
               barcode: barcodeItem.barcode,
-              error: error instanceof Error ? error.message : String(error)
+              error: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
             });
           }
+
+          // Update progress for each barcode
+          setScanFlowState(prev => ({
+            ...prev,
+            progress: 30 + (15 * (i + 1) / scanFlowState.scannedBarcodes.length),
+            progressSubMessage: `Analyse ${i + 1}/${scanFlowState.scannedBarcodes.length} codes-barres...`,
+          }));
         }
 
         // Ajouter les produits analysés au state
@@ -279,11 +321,29 @@ export function useScanFlowHandlers({
           scannedBarcodes: [], // Vider les codes-barres après analyse
         }));
 
-        logger.info('MEAL_SCAN_FLOW', 'Barcodes analyzed successfully', {
+        logger.info('MEAL_SCAN_FLOW', 'Barcodes analysis completed', {
           clientScanId,
+          totalBarcodes: scanFlowState.scannedBarcodes.length,
           analyzedCount: analyzedProducts.length,
-          failedCount: scanFlowState.scannedBarcodes.length - analyzedProducts.length,
+          failedCount: failedBarcodes.length,
+          failedDetails: failedBarcodes,
+          analyzedProducts: analyzedProducts.map(p => ({
+            barcode: p.barcode,
+            name: p.name,
+            calories: p.mealItem.calories,
+          })),
         });
+
+        // Show error if all barcodes failed
+        if (analyzedProducts.length === 0 && failedBarcodes.length > 0) {
+          const errorMsg = `Impossible d'analyser les codes-barres: ${failedBarcodes.map(f => f.reason).join(', ')}`;
+          logger.error('MEAL_SCAN_FLOW', 'All barcodes failed to analyze', {
+            clientScanId,
+            failedBarcodes,
+          });
+          onAnalysisError(errorMsg);
+          return;
+        }
       }
 
       setScanFlowState(prev => ({
@@ -480,24 +540,50 @@ export function useScanFlowHandlers({
     });
   }, [setScanFlowState, clientScanIdRef, scanFlowState.scannedProducts.length]);
 
+  // Track last barcode detection time to prevent rapid duplicates
+  const lastBarcodeDetectionRef = React.useRef<{barcode: string; timestamp: number} | null>(null);
+
   // Gérer l'ajout d'un code-barre détecté
   const handleBarcodeDetected = React.useCallback((barcode: ScannedBarcode) => {
     setScanFlowState(prev => {
-      // Vérifier si ce barcode existe déjà
-      const exists = prev.scannedBarcodes.some(b => b.barcode === barcode.barcode);
+      const now = Date.now();
+      const DUPLICATE_COOLDOWN_MS = 2000; // 2 seconds cooldown
 
-      if (exists) {
-        logger.warn('MEAL_SCAN_FLOW', 'Barcode already detected, skipping duplicate', {
+      // Check if this is a rapid duplicate (same barcode within cooldown period)
+      if (lastBarcodeDetectionRef.current &&
+          lastBarcodeDetectionRef.current.barcode === barcode.barcode &&
+          (now - lastBarcodeDetectionRef.current.timestamp) < DUPLICATE_COOLDOWN_MS) {
+        logger.warn('MEAL_SCAN_FLOW', 'Rapid duplicate barcode detected, applying cooldown', {
           clientScanId: clientScanIdRef.current,
           barcode: barcode.barcode,
+          timeSinceLastScan: now - lastBarcodeDetectionRef.current.timestamp,
+          cooldownMs: DUPLICATE_COOLDOWN_MS,
         });
         return prev;
       }
+
+      // Check if barcode already exists in current session
+      const exists = prev.scannedBarcodes.some(b => b.barcode === barcode.barcode);
+      if (exists) {
+        logger.warn('MEAL_SCAN_FLOW', 'Barcode already in session, skipping', {
+          clientScanId: clientScanIdRef.current,
+          barcode: barcode.barcode,
+          existingCount: prev.scannedBarcodes.length,
+        });
+        return prev;
+      }
+
+      // Update last detection timestamp
+      lastBarcodeDetectionRef.current = {
+        barcode: barcode.barcode,
+        timestamp: now,
+      };
 
       logger.info('MEAL_SCAN_FLOW', 'Barcode detected and added', {
         clientScanId: clientScanIdRef.current,
         barcode: barcode.barcode,
         totalScannedBarcodes: prev.scannedBarcodes.length + 1,
+        timestamp: barcode.scannedAt,
       });
 
       return {

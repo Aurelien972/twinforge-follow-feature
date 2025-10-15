@@ -224,39 +224,74 @@ export const mealsRepo = {
       userId: request.user_id,
       hasImageUrl: !!request.image_url,
       hasImageData: !!request.image_data,
+      imageDataLength: request.image_data?.length || 0,
       hasUserContext: !!request.user_profile_context,
       userObjective: request.user_profile_context?.objective,
       userAllergies: request.user_profile_context?.nutrition?.allergies?.length || 0,
       mealType: request.meal_type,
+      hasScannedProducts: !!(request.scanned_products && request.scanned_products.length > 0),
+      scannedProductsCount: request.scanned_products?.length || 0,
       timestamp: new Date().toISOString()
     });
 
     try {
+      const payload = {
+        ...request,
+        timestamp: new Date().toISOString()
+      };
+
+      logger.info('MEALS_REPO', 'Invoking meal-analyzer edge function', {
+        userId: request.user_id,
+        payloadKeys: Object.keys(payload),
+        payloadSize: JSON.stringify(payload).length,
+        hasImage: !!(payload.image_url || payload.image_data),
+        hasScannedProducts: !!(payload.scanned_products && payload.scanned_products.length > 0),
+        timestamp: new Date().toISOString()
+      });
+
       const { data, error } = await supabase.functions.invoke('meal-analyzer', {
-        body: {
-          ...request,
-          timestamp: new Date().toISOString()
-        },
+        body: payload,
+      });
+
+      logger.info('MEALS_REPO', 'Received response from meal-analyzer', {
+        userId: request.user_id,
+        hasData: !!data,
+        hasError: !!error,
+        errorMessage: error?.message,
+        dataSuccess: data?.success,
+        timestamp: new Date().toISOString()
       });
 
       if (error) {
         logger.error('MEALS_REPO', 'Meal analysis edge function error', {
           error: error.message,
+          errorContext: error.context,
           userId: request.user_id,
           hasUserContext: !!request.user_profile_context,
+          hasScannedProducts: !!(request.scanned_products && request.scanned_products.length > 0),
           timestamp: new Date().toISOString()
         });
-        throw new Error(`Analysis failed: ${error.message}`);
+        throw new Error(`Analyse échouée: ${error.message}`);
       }
 
-      if (!data || !data.success) {
-        logger.error('MEALS_REPO', 'Meal analysis failed', {
-          data,
+      if (!data) {
+        logger.error('MEALS_REPO', 'No data received from edge function', {
           userId: request.user_id,
           hasUserContext: !!request.user_profile_context,
           timestamp: new Date().toISOString()
         });
-        throw new Error(data?.error || 'Analysis failed');
+        throw new Error('Aucune donnée reçue du service d\'analyse');
+      }
+
+      if (!data.success) {
+        logger.error('MEALS_REPO', 'Meal analysis returned success:false', {
+          data,
+          dataError: data.error,
+          userId: request.user_id,
+          hasUserContext: !!request.user_profile_context,
+          timestamp: new Date().toISOString()
+        });
+        throw new Error(data.error || 'Analyse échouée sans détails');
       }
 
       logger.info('MEALS_REPO', 'Meal analysis completed successfully', {
@@ -264,11 +299,14 @@ export const mealsRepo = {
         userId: request.user_id,
         totalCalories: data.total_calories,
         detectedFoodsCount: data.detected_foods?.length || 0,
+        detectedFoods: data.detected_foods?.map((f: any) => f.name).join(', '),
         confidence: data.confidence,
         insightsCount: data.personalized_insights?.length || 0,
         aiModelUsed: data.analysis_metadata?.ai_model_used,
-        tokensUsed: data.analysis_metadata?.tokens_used,
+        tokensUsed: data.analysis_metadata?.tokens_used?.total || 0,
         processingTime: data.analysis_metadata?.processing_time_ms,
+        fallbackUsed: data.analysis_metadata?.fallback_used || false,
+        aiPowered: data.ai_powered,
         timestamp: new Date().toISOString()
       });
 
@@ -276,7 +314,7 @@ export const mealsRepo = {
 
     } catch (error) {
       // Gestion spéciale pour les requêtes interrompues (navigation/fermeture app)
-      if (error instanceof TypeError && 
+      if (error instanceof TypeError &&
           (error.message === 'Failed to fetch' || error.message === 'undefined')) {
         logger.info('MEALS_REPO', 'Meal analysis request interrupted (user navigation/app closed)', {
           userId: request.user_id,
@@ -288,10 +326,18 @@ export const mealsRepo = {
 
       logger.error('MEALS_REPO', 'Meal analysis exception', {
         error: error instanceof Error ? error.message : 'Unknown error',
+        errorName: error instanceof Error ? error.name : 'UnknownError',
+        errorStack: error instanceof Error ? error.stack : undefined,
         userId: request.user_id,
         hasUserContext: !!request.user_profile_context,
+        hasScannedProducts: !!(request.scanned_products && request.scanned_products.length > 0),
         timestamp: new Date().toISOString()
       });
+
+      // Re-throw with user-friendly message if possible
+      if (error instanceof Error) {
+        throw new Error(`Erreur lors de l'analyse: ${error.message}`);
+      }
       throw error;
     }
   },
