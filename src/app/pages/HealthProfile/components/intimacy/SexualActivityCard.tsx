@@ -4,17 +4,19 @@
  */
 
 import React from 'react';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { UseFormRegister, FieldErrors, Controller, Control } from 'react-hook-form';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { RatingSlider } from '../../../../../ui/components/RatingSlider';
 
 interface SexualActivityCardProps {
   register: UseFormRegister<any>;
+  control: Control<any>;
   errors: FieldErrors<any>;
 }
 
-export const SexualActivityCard: React.FC<SexualActivityCardProps> = ({ register, errors }) => {
+export const SexualActivityCard: React.FC<SexualActivityCardProps> = ({ register, control, errors }) => {
   return (
     <GlassCard className="p-6" style={{
       background: `
@@ -69,22 +71,21 @@ export const SexualActivityCard: React.FC<SexualActivityCardProps> = ({ register
         </div>
 
         <div>
-          <label htmlFor="sexual_satisfaction" className="block text-white/90 text-sm font-medium mb-2">
-            Niveau de satisfaction (1-10)
-          </label>
-          <input
-            {...register('sexual_satisfaction', { valueAsNumber: true })}
-            type="number"
-            id="sexual_satisfaction"
-            min="1"
-            max="10"
-            step="1"
-            className="glass-input"
-            placeholder="7"
+          <Controller
+            name="sexual_satisfaction"
+            control={control}
+            render={({ field }) => (
+              <RatingSlider
+                value={field.value}
+                onChange={field.onChange}
+                label="Niveau de satisfaction"
+                helperText="1 = Très insatisfait, 10 = Très satisfait"
+                lowLabel="Insatisfait"
+                highLabel="Très satisfait"
+                color="#F97316"
+              />
+            )}
           />
-          <p className="text-white/50 text-xs mt-1">
-            1 = Très insatisfait, 10 = Très satisfait
-          </p>
           {errors.sexual_satisfaction && (
             <p className="text-red-300 text-xs mt-2 flex items-center gap-1">
               <SpatialIcon Icon={ICONS.AlertCircle} size={12} />

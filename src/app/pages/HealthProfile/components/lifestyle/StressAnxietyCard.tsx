@@ -4,17 +4,19 @@
  */
 
 import React from 'react';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { UseFormRegister, FieldErrors, Controller, Control } from 'react-hook-form';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { RatingSlider } from '../../../../../ui/components/RatingSlider';
 
 interface StressAnxietyCardProps {
   register: UseFormRegister<any>;
+  control: Control<any>;
   errors: FieldErrors<any>;
 }
 
-export const StressAnxietyCard: React.FC<StressAnxietyCardProps> = ({ register, errors }) => {
+export const StressAnxietyCard: React.FC<StressAnxietyCardProps> = ({ register, control, errors }) => {
   return (
     <GlassCard className="p-6" style={{
       background: `
@@ -43,25 +45,23 @@ export const StressAnxietyCard: React.FC<StressAnxietyCardProps> = ({ register, 
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="space-y-6">
         <div>
-          <label htmlFor="stress_level" className="block text-white/90 text-sm font-medium mb-2 flex items-center gap-2">
-            <SpatialIcon Icon={ICONS.Activity} size={14} />
-            Niveau de stress quotidien (1-10)
-          </label>
-          <input
-            {...register('stress_level', { valueAsNumber: true })}
-            type="number"
-            id="stress_level"
-            min="1"
-            max="10"
-            step="1"
-            className="glass-input"
-            placeholder="5"
+          <Controller
+            name="stress_level"
+            control={control}
+            render={({ field }) => (
+              <RatingSlider
+                value={field.value}
+                onChange={field.onChange}
+                label="Niveau de stress quotidien"
+                helperText="1 = Très faible, 10 = Très élevé"
+                lowLabel="Faible"
+                highLabel="Élevé"
+                color="#3B82F6"
+              />
+            )}
           />
-          <p className="text-white/50 text-xs mt-1">
-            1 = Très faible, 10 = Très élevé
-          </p>
           {errors.stress_level && (
             <p className="text-red-300 text-xs mt-2 flex items-center gap-1">
               <SpatialIcon Icon={ICONS.AlertCircle} size={12} />
@@ -71,23 +71,21 @@ export const StressAnxietyCard: React.FC<StressAnxietyCardProps> = ({ register, 
         </div>
 
         <div>
-          <label htmlFor="anxiety_level" className="block text-white/90 text-sm font-medium mb-2 flex items-center gap-2">
-            <SpatialIcon Icon={ICONS.AlertCircle} size={14} />
-            Niveau d'anxiété (1-10)
-          </label>
-          <input
-            {...register('anxiety_level', { valueAsNumber: true })}
-            type="number"
-            id="anxiety_level"
-            min="1"
-            max="10"
-            step="1"
-            className="glass-input"
-            placeholder="5"
+          <Controller
+            name="anxiety_level"
+            control={control}
+            render={({ field }) => (
+              <RatingSlider
+                value={field.value}
+                onChange={field.onChange}
+                label="Niveau d'anxiété"
+                helperText="1 = Très faible, 10 = Très élevé"
+                lowLabel="Faible"
+                highLabel="Élevé"
+                color="#3B82F6"
+              />
+            )}
           />
-          <p className="text-white/50 text-xs mt-1">
-            1 = Très faible, 10 = Très élevé
-          </p>
           {errors.anxiety_level && (
             <p className="text-red-300 text-xs mt-2 flex items-center gap-1">
               <SpatialIcon Icon={ICONS.AlertCircle} size={12} />
@@ -97,23 +95,21 @@ export const StressAnxietyCard: React.FC<StressAnxietyCardProps> = ({ register, 
         </div>
 
         <div>
-          <label htmlFor="mood_rating" className="block text-white/90 text-sm font-medium mb-2 flex items-center gap-2">
-            <SpatialIcon Icon={ICONS.Smile} size={14} />
-            Humeur générale (1-10)
-          </label>
-          <input
-            {...register('mood_rating', { valueAsNumber: true })}
-            type="number"
-            id="mood_rating"
-            min="1"
-            max="10"
-            step="1"
-            className="glass-input"
-            placeholder="7"
+          <Controller
+            name="mood_rating"
+            control={control}
+            render={({ field }) => (
+              <RatingSlider
+                value={field.value}
+                onChange={field.onChange}
+                label="Humeur générale"
+                helperText="1 = Très mauvaise, 10 = Excellente"
+                lowLabel="Mauvaise"
+                highLabel="Excellente"
+                color="#3B82F6"
+              />
+            )}
           />
-          <p className="text-white/50 text-xs mt-1">
-            1 = Très mauvaise, 10 = Excellente
-          </p>
           {errors.mood_rating && (
             <p className="text-red-300 text-xs mt-2 flex items-center gap-1">
               <SpatialIcon Icon={ICONS.AlertCircle} size={12} />

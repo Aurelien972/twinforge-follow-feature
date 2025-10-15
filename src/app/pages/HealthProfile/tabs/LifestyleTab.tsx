@@ -99,7 +99,7 @@ export const LifestyleTab: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <SleepCard register={form.register} errors={form.errors} />
+            <SleepCard register={form.register} control={form.control} errors={form.errors} />
           </motion.div>
 
           {/* Stress & Anxiety Card */}
@@ -108,7 +108,7 @@ export const LifestyleTab: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <StressAnxietyCard register={form.register} errors={form.errors} />
+            <StressAnxietyCard register={form.register} control={form.control} errors={form.errors} />
           </motion.div>
 
           {/* Hydration Card */}

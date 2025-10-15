@@ -155,6 +155,9 @@ export const ICONS = {
   Cigarette: L.Cigarette,
   Wine: L.Wine,
   Pill: L.Pill,
+  Baby: L.Baby,
+  TestTube: L.TestTube,
+  TestTubes: L.TestTubes,
 
   Play: L.Play,
   MapPin: L.MapPin,

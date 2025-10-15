@@ -89,7 +89,8 @@ export function useHealthCompletion(health?: HealthProfileV2): HealthCompletionB
       health.lifestyle?.smoking_status,
       health.lifestyle?.alcohol_frequency,
       health.lifestyle?.sleep_hours_avg,
-      health.lifestyle?.physical_activity_level,
+      health.lifestyle?.stress_level,
+      health.lifestyle?.hydration_liters_per_day,
     ];
     const lifestyleCompletion = Math.round(
       (lifestyleFields.filter(Boolean).length / lifestyleFields.length) * 100

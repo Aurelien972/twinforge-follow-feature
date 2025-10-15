@@ -157,6 +157,7 @@ export const IntimacyTab: React.FC = () => {
             >
               <MaleReproductiveHealthCard
                 register={form.register}
+                control={form.control}
                 errors={form.errors}
               />
             </motion.div>
@@ -208,6 +209,7 @@ export const IntimacyTab: React.FC = () => {
           >
             <SexualActivityCard
               register={form.register}
+              control={form.control}
               errors={form.errors}
             />
           </motion.div>

@@ -105,7 +105,7 @@ export function useIntimacyFormTab() {
     mode: 'onChange',
   });
 
-  const { register, handleSubmit, formState, watch, reset } = form;
+  const { register, handleSubmit, formState, watch, reset, control } = form;
   const { errors, isDirty, isValid } = formState;
   const watchedValues = watch();
 
@@ -265,6 +265,7 @@ export function useIntimacyFormTab() {
   return {
     form: {
       register,
+      control,
       handleSubmit: onSubmit,
       errors,
       isDirty,

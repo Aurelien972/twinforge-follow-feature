@@ -4,17 +4,19 @@
  */
 
 import React from 'react';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { UseFormRegister, FieldErrors, Controller, Control } from 'react-hook-form';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { RatingSlider } from '../../../../../ui/components/RatingSlider';
 
 interface MaleReproductiveHealthCardProps {
   register: UseFormRegister<any>;
+  control: Control<any>;
   errors: FieldErrors<any>;
 }
 
-export const MaleReproductiveHealthCard: React.FC<MaleReproductiveHealthCardProps> = ({ register, errors }) => {
+export const MaleReproductiveHealthCard: React.FC<MaleReproductiveHealthCardProps> = ({ register, control, errors }) => {
   return (
     <GlassCard className="p-6" style={{
       background: `
@@ -85,22 +87,21 @@ export const MaleReproductiveHealthCard: React.FC<MaleReproductiveHealthCardProp
         </div>
 
         <div>
-          <label htmlFor="erectile_function" className="block text-white/90 text-sm font-medium mb-2">
-            Fonction érectile (1-10)
-          </label>
-          <input
-            {...register('erectile_function', { valueAsNumber: true })}
-            type="number"
-            id="erectile_function"
-            min="1"
-            max="10"
-            step="1"
-            className="glass-input"
-            placeholder="7"
+          <Controller
+            name="erectile_function"
+            control={control}
+            render={({ field }) => (
+              <RatingSlider
+                value={field.value}
+                onChange={field.onChange}
+                label="Fonction érectile"
+                helperText="1 = Très faible, 10 = Excellente"
+                lowLabel="Faible"
+                highLabel="Excellente"
+                color="#3B82F6"
+              />
+            )}
           />
-          <p className="text-white/50 text-xs mt-1">
-            1 = Très faible, 10 = Excellente
-          </p>
           {errors.erectile_function && (
             <p className="text-red-300 text-xs mt-2 flex items-center gap-1">
               <SpatialIcon Icon={ICONS.AlertCircle} size={12} />
@@ -110,22 +111,21 @@ export const MaleReproductiveHealthCard: React.FC<MaleReproductiveHealthCardProp
         </div>
 
         <div>
-          <label htmlFor="libido_level" className="block text-white/90 text-sm font-medium mb-2">
-            Niveau de libido (1-10)
-          </label>
-          <input
-            {...register('libido_level', { valueAsNumber: true })}
-            type="number"
-            id="libido_level"
-            min="1"
-            max="10"
-            step="1"
-            className="glass-input"
-            placeholder="7"
+          <Controller
+            name="libido_level"
+            control={control}
+            render={({ field }) => (
+              <RatingSlider
+                value={field.value}
+                onChange={field.onChange}
+                label="Niveau de libido"
+                helperText="1 = Très faible, 10 = Très élevée"
+                lowLabel="Faible"
+                highLabel="Élevée"
+                color="#3B82F6"
+              />
+            )}
           />
-          <p className="text-white/50 text-xs mt-1">
-            1 = Très faible, 10 = Très élevée
-          </p>
           {errors.libido_level && (
             <p className="text-red-300 text-xs mt-2 flex items-center gap-1">
               <SpatialIcon Icon={ICONS.AlertCircle} size={12} />
