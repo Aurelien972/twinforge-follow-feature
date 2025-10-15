@@ -45,20 +45,36 @@ function deepEqual(obj1: any, obj2: any): boolean {
  * Normalize values to handle empty strings, null, undefined consistently
  */
 function normalizeValue(value: any): any {
+  // Handle null, undefined, and empty string
   if (value === '' || value === null || value === undefined) {
     return null;
   }
 
-  if (typeof value === 'object' && !Array.isArray(value)) {
-    const normalized: any = {};
-    for (const key in value) {
-      normalized[key] = normalizeValue(value[key]);
+  // Handle empty arrays - treat as null for comparison
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return null;
     }
-    return normalized;
+    return value.map(normalizeValue);
   }
 
-  if (Array.isArray(value)) {
-    return value.map(normalizeValue);
+  // Handle objects
+  if (typeof value === 'object' && value !== null) {
+    const normalized: any = {};
+    for (const key in value) {
+      const normalizedValue = normalizeValue(value[key]);
+      // Only include properties that are not null
+      if (normalizedValue !== null) {
+        normalized[key] = normalizedValue;
+      }
+    }
+    // Return null for empty objects
+    return Object.keys(normalized).length === 0 ? null : normalized;
+  }
+
+  // Handle booleans - false is a valid value, don't normalize to null
+  if (typeof value === 'boolean') {
+    return value;
   }
 
   return value;

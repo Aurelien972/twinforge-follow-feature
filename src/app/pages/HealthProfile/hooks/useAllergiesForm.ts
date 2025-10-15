@@ -35,12 +35,16 @@ export function useAllergiesForm() {
       category: 'food' as const,
       severity: 'mild' as const,
     }));
+
     setAllergies(parsedAllergies);
+
+    // Always update initial state when database values change
     setInitialAllergies(parsedAllergies);
 
     logger.debug('ALLERGIES_FORM', 'Initialized allergies from database', {
       count: parsedAllergies.length,
       allergies: parsedAllergies,
+      timestamp: new Date().toISOString(),
     });
   }, [healthV2?.medical_history?.allergies]);
 

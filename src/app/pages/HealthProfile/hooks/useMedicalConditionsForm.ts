@@ -35,6 +35,8 @@ export function useMedicalConditionsForm() {
     setConditions(conditionsData);
     setMedications(medicationsData);
     setHasDeclaredNoIssues(declaredNoIssues);
+
+    // Always update initial state when database values change
     setInitialState({
       conditions: conditionsData,
       medications: medicationsData,
@@ -45,8 +47,13 @@ export function useMedicalConditionsForm() {
       conditionsCount: conditionsData.length,
       medicationsCount: medicationsData.length,
       declaredNoIssues,
+      timestamp: new Date().toISOString(),
     });
-  }, [health]);
+  }, [
+    health?.medical_history?.conditions,
+    health?.medical_history?.medications,
+    health?.declaredNoIssues,
+  ]);
 
   // Use intelligent dirty state detection
   const { isDirty, changedFieldsCount, resetDirtyState } = useHealthFormDirtyState({

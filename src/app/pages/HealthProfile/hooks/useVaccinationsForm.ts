@@ -49,6 +49,8 @@ export function useVaccinationsForm(countryData: CountryHealthData | null) {
 
     setVaccinations(records);
     setUpToDate(isUpToDate);
+
+    // Always update initial state when database values change
     setInitialState({
       vaccinations: records,
       upToDate: isUpToDate,
@@ -57,8 +59,9 @@ export function useVaccinationsForm(countryData: CountryHealthData | null) {
     logger.debug('VACCINATIONS_FORM', 'Initialized vaccinations from database', {
       recordsCount: records.length,
       upToDate: isUpToDate,
+      timestamp: new Date().toISOString(),
     });
-  }, [healthV2?.vaccinations]);
+  }, [healthV2?.vaccinations?.records, healthV2?.vaccinations?.up_to_date]);
 
   // Use intelligent dirty state detection
   const { isDirty, changedFieldsCount, resetDirtyState } = useHealthFormDirtyState({

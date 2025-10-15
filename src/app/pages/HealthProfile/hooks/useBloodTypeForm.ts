@@ -51,7 +51,7 @@ export function useBloodTypeForm() {
       });
 
       await saveSection({
-        section: 'blood_type',
+        section: 'basic',
         data: {
           bloodType,
         },
@@ -73,7 +73,7 @@ export function useBloodTypeForm() {
     bloodType,
     onChange: handleChange,
     saveChanges,
-    saving: isSectionSaving('blood_type'),
+    saving: isSectionSaving('basic'),
     isDirty,
   };
 }
