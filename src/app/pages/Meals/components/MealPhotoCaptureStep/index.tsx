@@ -11,7 +11,7 @@ import ScannedProductCard from './ScannedProductCard';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
-import type { ScannedProduct } from '../MealScanFlow/ScanFlowState';
+import type { ScannedProduct, ScannedBarcode } from '../MealScanFlow/ScanFlowState';
 
 interface CapturedMealPhoto {
   file: File;
@@ -27,11 +27,15 @@ interface CapturedMealPhoto {
 
 interface MealPhotoCaptureStepProps {
   capturedPhoto: CapturedMealPhoto | null;
+  scannedBarcodes: ScannedBarcode[];
   scannedProducts: ScannedProduct[];
   onPhotoCapture: (file: File, captureReport: any) => void;
+  onBarcodeDetected: (barcode: ScannedBarcode) => void;
   onProductScanned: (product: ScannedProduct) => void;
   onProductPortionChange: (barcode: string, multiplier: number) => void;
   onProductRemove: (barcode: string) => void;
+  onBarcodePortionChange: (barcode: string, multiplier: number) => void;
+  onBarcodeRemove: (barcode: string) => void;
   onRetake: () => void;
   onBack: () => void;
   onProceedToProcessing: () => void;
@@ -48,11 +52,15 @@ interface MealPhotoCaptureStepProps {
  */
 const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
   capturedPhoto,
+  scannedBarcodes,
   scannedProducts,
   onPhotoCapture,
+  onBarcodeDetected,
   onProductScanned,
   onProductPortionChange,
   onProductRemove,
+  onBarcodePortionChange,
+  onBarcodeRemove,
   onRetake,
   onBack,
   onProceedToProcessing,
@@ -150,8 +158,8 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
     setShowBarcodeScanner(false);
   };
 
-  const handleProductScanned = (product: ScannedProduct) => {
-    onProductScanned(product);
+  const handleBarcodeDetected = (barcode: ScannedBarcode) => {
+    onBarcodeDetected(barcode);
     setShowBarcodeScanner(false);
   };
 
@@ -246,32 +254,61 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
           </AnimatePresence>
         )}
 
-        {/* Scanned Products List */}
-        {scannedProducts.length > 0 && (
+        {/* Scanned Barcodes List */}
+        {scannedBarcodes.length > 0 && (
           <div className="mt-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-white font-semibold text-base flex items-center gap-2">
                 <SpatialIcon Icon={ICONS.ScanBarcode} size={20} className="text-indigo-400" />
-                <span>Produits scannés</span>
+                <span>Codes-barres détectés</span>
                 <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold">
-                  {scannedProducts.length}
+                  {scannedBarcodes.length}
                 </span>
               </h3>
             </div>
 
             <div className="space-y-3">
-              {scannedProducts.map((product) => (
-                <ScannedProductCard
-                  key={product.barcode}
-                  product={product}
-                  onPortionChange={onProductPortionChange}
-                  onRemove={onProductRemove}
-                />
+              {scannedBarcodes.map((barcodeItem) => (
+                <GlassCard
+                  key={barcodeItem.barcode}
+                  className="p-4"
+                  style={{
+                    background: 'rgba(99, 102, 241, 0.08)',
+                    borderColor: 'rgba(99, 102, 241, 0.3)',
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div
+                        className="w-12 h-12 rounded-lg flex items-center justify-center"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(79, 70, 229, 0.2))',
+                          border: '1px solid rgba(99, 102, 241, 0.4)',
+                        }}
+                      >
+                        <SpatialIcon Icon={ICONS.ScanBarcode} size={24} className="text-indigo-300" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-white font-semibold text-sm mb-1">{barcodeItem.barcode}</p>
+                        <p className="text-indigo-300 text-xs">En attente d'analyse</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => onBarcodeRemove(barcodeItem.barcode)}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-red-500/20"
+                      style={{
+                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                      }}
+                    >
+                      <SpatialIcon Icon={ICONS.X} size={16} className="text-red-400" />
+                    </button>
+                  </div>
+                </GlassCard>
               ))}
             </div>
 
-            {/* Option to add photo for scanned products */}
-            {!capturedPhoto && scannedProducts.length > 0 && (
+            {/* Option to add photo for scanned barcodes */}
+            {!capturedPhoto && scannedBarcodes.length > 0 && (
               <div className="mt-4">
                 <GlassCard
                   className="p-4 text-center"
@@ -317,8 +354,34 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
           </div>
         )}
 
+        {/* Scanned Products List (already analyzed) */}
+        {scannedProducts.length > 0 && (
+          <div className="mt-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-white font-semibold text-base flex items-center gap-2">
+                <SpatialIcon Icon={ICONS.Check} size={20} className="text-green-400" />
+                <span>Produits analysés</span>
+                <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-300 text-xs font-bold">
+                  {scannedProducts.length}
+                </span>
+              </h3>
+            </div>
+
+            <div className="space-y-3">
+              {scannedProducts.map((product) => (
+                <ScannedProductCard
+                  key={product.barcode}
+                  product={product}
+                  onPortionChange={onProductPortionChange}
+                  onRemove={onProductRemove}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Ready for Processing */}
-        {(capturedPhoto || scannedProducts.length > 0) && (
+        {(capturedPhoto || scannedBarcodes.length > 0 || scannedProducts.length > 0) && (
           <div
             ref={readyForProcessingRef}
             className="mt-8"
@@ -327,14 +390,16 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
               onProceedToProcessing={onProceedToProcessing}
               isProcessingInProgress={isProcessingInProgress}
               hasPhoto={!!capturedPhoto}
+              hasScannedBarcodes={scannedBarcodes.length > 0}
               hasScannedProducts={scannedProducts.length > 0}
+              scannedBarcodesCount={scannedBarcodes.length}
               scannedProductsCount={scannedProducts.length}
             />
           </div>
         )}
 
         {/* Benefits Info Card - Show only when no photo or products */}
-        {!capturedPhoto && scannedProducts.length === 0 && (
+        {!capturedPhoto && scannedBarcodes.length === 0 && scannedProducts.length === 0 && (
           <BenefitsInfoCard
             benefits={mealScanBenefits}
             themeColor="#10B981"
@@ -421,7 +486,7 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
       {/* Barcode Scanner Inline Component */}
       {showBarcodeScanner && (
         <BarcodeScannerView
-          onProductScanned={handleProductScanned}
+          onBarcodeDetected={handleBarcodeDetected}
           onClose={handleBarcodeClose}
           mode={barcodeScanMode}
           uploadedImage={barcodeScanMode === 'upload' ? barcodeImageInputRef.current?.files?.[0] : undefined}

@@ -592,11 +592,16 @@ const MealScanFlowPage: React.FC = () => {
         return (
           <MealPhotoCaptureStep
             capturedPhoto={scanFlowState.capturedPhoto}
+            scannedBarcodes={scanFlowState.scannedBarcodes}
             scannedProducts={scanFlowState.scannedProducts}
             onPhotoCapture={scanFlowHandlers.handlePhotoCapture}
+            onBarcodeDetected={scanFlowHandlers.handleBarcodeDetected}
             onProductScanned={scanFlowHandlers.handleProductScanned}
             onProductPortionChange={scanFlowHandlers.handleProductPortionChange}
             onProductRemove={scanFlowHandlers.handleProductRemove}
+            onBarcodePortionChange={scanFlowHandlers.handleBarcodePortionChange}
+            onBarcodeRemove={scanFlowHandlers.handleBarcodeRemove}
+            onRetake={scanFlowHandlers.handleRetake}
             onBack={() => navigate('/meals')}
             onProceedToProcessing={scanFlowHandlers.handleProceedToProcessing}
             isProcessingInProgress={scanFlowState.isProcessing}

@@ -2,7 +2,7 @@ import React from 'react';
 import { nanoid } from 'nanoid';
 import { type UserProfileContext } from '../../../../../system/data/repositories/mealsRepo';
 import logger from '../../../../../lib/utils/logger';
-import type { CapturedMealPhoto, ScanFlowState, ScannedProduct } from './ScanFlowState';
+import type { CapturedMealPhoto, ScanFlowState, ScannedProduct, ScannedBarcode } from './ScanFlowState';
 import { openFoodFactsService } from '../../../../../system/services/openFoodFactsService';
 
 /**
@@ -214,7 +214,7 @@ export function useScanFlowHandlers({
 
   // Procéder au traitement
   const handleProceedToProcessing = React.useCallback(async () => {
-    if (processingGuardRef.current || (!scanFlowState.capturedPhoto && scanFlowState.scannedProducts.length === 0) || !userId) {
+    if (processingGuardRef.current || (!scanFlowState.capturedPhoto && scanFlowState.scannedBarcodes.length === 0 && scanFlowState.scannedProducts.length === 0) || !userId) {
       return;
     }
 
@@ -224,14 +224,68 @@ export function useScanFlowHandlers({
       isProcessing: true,
       currentStep: 'processing',
       analysisError: null,
-      progress: 40,
+      progress: 20,
       progressMessage: 'Analyse du Carburant',
-      progressSubMessage: 'Démarrage de l\'analyse IA...'
+      progressSubMessage: 'Démarrage de l\'analyse...'
     }));
 
     const clientScanId = clientScanIdRef.current!;
 
     try {
+      // Étape 1: Analyser les codes-barres détectés
+      if (scanFlowState.scannedBarcodes.length > 0) {
+        setScanFlowState(prev => ({
+          ...prev,
+          progress: 30,
+          progressSubMessage: `Analyse de ${scanFlowState.scannedBarcodes.length} code${scanFlowState.scannedBarcodes.length > 1 ? 's-barres' : '-barre'}...`
+        }));
+
+        const analyzedProducts: ScannedProduct[] = [];
+
+        for (let i = 0; i < scanFlowState.scannedBarcodes.length; i++) {
+          const barcodeItem = scanFlowState.scannedBarcodes[i];
+
+          try {
+            const result = await openFoodFactsService.getProductByBarcode(barcodeItem.barcode);
+
+            if (result.success && result.product) {
+              const mealItem = openFoodFactsService.convertToMealItem(result.product, barcodeItem.portionMultiplier);
+
+              if (mealItem) {
+                analyzedProducts.push({
+                  barcode: result.product.barcode,
+                  name: result.product.name,
+                  brand: result.product.brand,
+                  image_url: result.product.image_url,
+                  mealItem,
+                  portionMultiplier: barcodeItem.portionMultiplier,
+                  scannedAt: barcodeItem.scannedAt,
+                });
+              }
+            }
+          } catch (error) {
+            logger.warn('MEAL_SCAN_FLOW', 'Failed to analyze barcode', {
+              clientScanId,
+              barcode: barcodeItem.barcode,
+              error: error instanceof Error ? error.message : String(error)
+            });
+          }
+        }
+
+        // Ajouter les produits analysés au state
+        setScanFlowState(prev => ({
+          ...prev,
+          scannedProducts: [...prev.scannedProducts, ...analyzedProducts],
+          scannedBarcodes: [], // Vider les codes-barres après analyse
+        }));
+
+        logger.info('MEAL_SCAN_FLOW', 'Barcodes analyzed successfully', {
+          clientScanId,
+          analyzedCount: analyzedProducts.length,
+          failedCount: scanFlowState.scannedBarcodes.length - analyzedProducts.length,
+        });
+      }
+
       setScanFlowState(prev => ({
         ...prev,
         progress: 50,
@@ -351,7 +405,7 @@ export function useScanFlowHandlers({
       setScanFlowState(prev => ({ ...prev, isProcessing: false }));
       processingGuardRef.current = false;
     }
-  }, [scanFlowState.capturedPhoto, scanFlowState.scannedProducts, userId, profile, setScanFlowState, clientScanIdRef, processingGuardRef, onAnalysisError, onSuccess]);
+  }, [scanFlowState.capturedPhoto, scanFlowState.scannedBarcodes, scanFlowState.scannedProducts, userId, profile, setScanFlowState, clientScanIdRef, processingGuardRef, onAnalysisError, onSuccess]);
 
   // Gérer l'ajout d'un produit scanné
   const handleProductScanned = React.useCallback((product: ScannedProduct) => {
@@ -426,6 +480,51 @@ export function useScanFlowHandlers({
     });
   }, [setScanFlowState, clientScanIdRef, scanFlowState.scannedProducts.length]);
 
+  // Gérer l'ajout d'un code-barre détecté
+  const handleBarcodeDetected = React.useCallback((barcode: ScannedBarcode) => {
+    setScanFlowState(prev => ({
+      ...prev,
+      scannedBarcodes: [...prev.scannedBarcodes, barcode],
+      analysisError: null,
+    }));
+
+    logger.info('MEAL_SCAN_FLOW', 'Barcode detected and added', {
+      clientScanId: clientScanIdRef.current,
+      barcode: barcode.barcode,
+      totalScannedBarcodes: scanFlowState.scannedBarcodes.length + 1,
+    });
+  }, [setScanFlowState, clientScanIdRef, scanFlowState.scannedBarcodes.length]);
+
+  // Gérer le changement de portion d'un code-barre
+  const handleBarcodePortionChange = React.useCallback((barcode: string, newMultiplier: number) => {
+    setScanFlowState(prev => ({
+      ...prev,
+      scannedBarcodes: prev.scannedBarcodes.map(item =>
+        item.barcode === barcode ? { ...item, portionMultiplier: newMultiplier } : item
+      ),
+    }));
+
+    logger.info('MEAL_SCAN_FLOW', 'Barcode portion changed', {
+      clientScanId: clientScanIdRef.current,
+      barcode,
+      newMultiplier,
+    });
+  }, [setScanFlowState, clientScanIdRef]);
+
+  // Gérer la suppression d'un code-barre
+  const handleBarcodeRemove = React.useCallback((barcode: string) => {
+    setScanFlowState(prev => ({
+      ...prev,
+      scannedBarcodes: prev.scannedBarcodes.filter(item => item.barcode !== barcode),
+    }));
+
+    logger.info('MEAL_SCAN_FLOW', 'Barcode removed', {
+      clientScanId: clientScanIdRef.current,
+      barcode,
+      remainingBarcodes: scanFlowState.scannedBarcodes.length - 1,
+    });
+  }, [setScanFlowState, clientScanIdRef, scanFlowState.scannedBarcodes.length]);
+
   return {
     handlePhotoCapture,
     handleRetake,
@@ -433,5 +532,8 @@ export function useScanFlowHandlers({
     handleProductScanned,
     handleProductPortionChange,
     handleProductRemove,
+    handleBarcodeDetected,
+    handleBarcodePortionChange,
+    handleBarcodeRemove,
   };
 }

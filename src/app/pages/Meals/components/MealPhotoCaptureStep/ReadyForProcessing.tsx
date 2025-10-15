@@ -9,7 +9,9 @@ interface ReadyForProcessingProps {
   onProceedToProcessing: () => void;
   isProcessingInProgress: boolean;
   hasPhoto: boolean;
+  hasScannedBarcodes: boolean;
   hasScannedProducts: boolean;
+  scannedBarcodesCount: number;
   scannedProductsCount: number;
 }
 
@@ -21,22 +23,36 @@ const ReadyForProcessing: React.FC<ReadyForProcessingProps> = ({
   onProceedToProcessing,
   isProcessingInProgress,
   hasPhoto,
+  hasScannedBarcodes,
   hasScannedProducts,
+  scannedBarcodesCount,
   scannedProductsCount,
 }) => {
   const { success } = useFeedback();
 
   // Générer le message contextuel selon ce qui a été capturé
   const getContextualMessage = () => {
-    if (hasPhoto && hasScannedProducts) {
+    const totalItems = scannedBarcodesCount + scannedProductsCount;
+
+    if (hasPhoto && (hasScannedBarcodes || hasScannedProducts)) {
       return {
-        title: 'Photo et produits scannés !',
-        subtitle: `Votre photo et ${scannedProductsCount} produit${scannedProductsCount > 1 ? 's' : ''} scanné${scannedProductsCount > 1 ? 's' : ''} sont prêts pour l'analyse TwinForge.`,
+        title: 'Photo et codes-barres détectés !',
+        subtitle: `Votre photo${hasScannedBarcodes ? ` et ${scannedBarcodesCount} code${scannedBarcodesCount > 1 ? 's-barres' : '-barre'}` : ''}${hasScannedProducts ? ` et ${scannedProductsCount} produit${scannedProductsCount > 1 ? 's' : ''}` : ''} sont prêts pour l'analyse complète.`,
+      };
+    } else if (hasScannedBarcodes && hasScannedProducts) {
+      return {
+        title: `${totalItems} élément${totalItems > 1 ? 's' : ''} détecté${totalItems > 1 ? 's' : ''} !`,
+        subtitle: `${scannedBarcodesCount} code${scannedBarcodesCount > 1 ? 's-barres' : '-barre'} et ${scannedProductsCount} produit${scannedProductsCount > 1 ? 's' : ''} prêts pour l'analyse.`,
+      };
+    } else if (hasScannedBarcodes) {
+      return {
+        title: `${scannedBarcodesCount} code${scannedBarcodesCount > 1 ? 's-barres' : '-barre'} détecté${scannedBarcodesCount > 1 ? 's' : ''} !`,
+        subtitle: 'Vos codes-barres sont prêts pour l\'analyse nutritionnelle avancée.',
       };
     } else if (hasScannedProducts) {
       return {
         title: `${scannedProductsCount} produit${scannedProductsCount > 1 ? 's' : ''} scanné${scannedProductsCount > 1 ? 's' : ''} !`,
-        subtitle: 'Vos produits sont prêts pour l\'analyse nutritionnelle TwinForge.',
+        subtitle: 'Vos produits sont prêts pour l\'analyse nutritionnelle.',
       };
     } else {
       return {

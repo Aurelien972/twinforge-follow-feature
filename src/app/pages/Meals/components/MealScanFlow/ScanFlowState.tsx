@@ -15,6 +15,13 @@ export interface CapturedMealPhoto {
   captureReport: any;
 }
 
+export interface ScannedBarcode {
+  barcode: string;
+  image_url?: string;
+  scannedAt: string;
+  portionMultiplier: number;
+}
+
 export interface ScannedProduct {
   barcode: string;
   name: string;
@@ -29,6 +36,7 @@ export interface ScanFlowState {
   currentStep: MealScanStep;
   captureMode: CaptureMode;
   capturedPhoto: CapturedMealPhoto | null;
+  scannedBarcodes: ScannedBarcode[];
   scannedProducts: ScannedProduct[];
   analysisResults: any;
   isProcessing: boolean;
@@ -44,6 +52,7 @@ export const initialScanFlowState: ScanFlowState = {
   currentStep: 'capture',
   captureMode: 'photo',
   capturedPhoto: null,
+  scannedBarcodes: [],
   scannedProducts: [],
   analysisResults: null,
   isProcessing: false,
