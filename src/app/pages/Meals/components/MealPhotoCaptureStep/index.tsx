@@ -6,6 +6,9 @@ import ReadyForProcessing from './ReadyForProcessing';
 import NavigationControls from './NavigationControls';
 import MealProgressHeader from '../MealProgressHeader';
 import BenefitsInfoCard, { Benefit } from '../../../../../ui/cards/BenefitsInfoCard';
+import BarcodeScannerView from './BarcodeScannerView';
+import ScannedProductCard from './ScannedProductCard';
+import type { ScannedProduct } from '../MealScanFlow/ScanFlowState';
 
 interface CapturedMealPhoto {
   file: File;
@@ -21,7 +24,11 @@ interface CapturedMealPhoto {
 
 interface MealPhotoCaptureStepProps {
   capturedPhoto: CapturedMealPhoto | null;
+  scannedProducts: ScannedProduct[];
   onPhotoCapture: (file: File, captureReport: any) => void;
+  onProductScanned: (product: ScannedProduct) => void;
+  onProductPortionChange: (barcode: string, multiplier: number) => void;
+  onProductRemove: (barcode: string) => void;
   onRetake: () => void;
   onBack: () => void;
   onProceedToProcessing: () => void;
@@ -38,7 +45,11 @@ interface MealPhotoCaptureStepProps {
  */
 const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
   capturedPhoto,
+  scannedProducts,
   onPhotoCapture,
+  onProductScanned,
+  onProductPortionChange,
+  onProductRemove,
   onRetake,
   onBack,
   onProceedToProcessing,
@@ -50,6 +61,7 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
 }) => {
   const [isValidating, setIsValidating] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
@@ -83,6 +95,19 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
 
   const handleGalleryClick = () => {
     galleryInputRef.current?.click();
+  };
+
+  const handleBarcodeClick = () => {
+    setShowBarcodeScanner(true);
+  };
+
+  const handleBarcodeClose = () => {
+    setShowBarcodeScanner(false);
+  };
+
+  const handleProductScanned = (product: ScannedProduct) => {
+    onProductScanned(product);
+    setShowBarcodeScanner(false);
   };
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,6 +172,7 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
               isValidating={isValidating}
               onCameraClick={handleCameraClick}
               onGalleryClick={handleGalleryClick}
+              onBarcodeClick={handleBarcodeClick}
             />
           </div>
         ) : (
@@ -168,8 +194,28 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
           </AnimatePresence>
         )}
 
+        {/* Scanned Products List */}
+        {scannedProducts.length > 0 && (
+          <div className="mt-6 space-y-3">
+            <h3 className="text-white font-semibold text-sm mb-3 flex items-center gap-2">
+              <span>Produits scannés</span>
+              <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs">
+                {scannedProducts.length}
+              </span>
+            </h3>
+            {scannedProducts.map((product) => (
+              <ScannedProductCard
+                key={product.barcode}
+                product={product}
+                onPortionChange={onProductPortionChange}
+                onRemove={onProductRemove}
+              />
+            ))}
+          </div>
+        )}
+
         {/* Ready for Processing */}
-        {capturedPhoto && (
+        {(capturedPhoto || scannedProducts.length > 0) && (
           <div
             ref={readyForProcessingRef}
             className="mt-8"
@@ -181,8 +227,8 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
           </div>
         )}
 
-        {/* Benefits Info Card - Show only when no photo captured */}
-        {!capturedPhoto && (
+        {/* Benefits Info Card - Show only when no photo or products */}
+        {!capturedPhoto && scannedProducts.length === 0 && (
           <BenefitsInfoCard
             benefits={mealScanBenefits}
             themeColor="#10B981"
@@ -211,7 +257,7 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
       />
 
       {/* Navigation Controls - Fixed at bottom */}
-      <div 
+      <div
         className="fixed bottom-0 left-0 right-0 p-4 z-50"
       >
         <NavigationControls
@@ -219,6 +265,14 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
           onBack={onBack}
         />
       </div>
+
+      {/* Barcode Scanner Modal */}
+      {showBarcodeScanner && (
+        <BarcodeScannerView
+          onProductScanned={handleProductScanned}
+          onClose={handleBarcodeClose}
+        />
+      )}
     </div>
   );
 };

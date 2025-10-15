@@ -8,6 +8,7 @@ interface CaptureGuideProps {
   isValidating: boolean;
   onCameraClick: () => void;
   onGalleryClick: () => void;
+  onBarcodeClick: () => void;
 }
 
 /**
@@ -18,6 +19,7 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
   isValidating,
   onCameraClick,
   onGalleryClick,
+  onBarcodeClick,
 }) => {
 
   return (
@@ -248,6 +250,41 @@ const CaptureGuide: React.FC<CaptureGuideProps> = ({
           <div className="flex items-center justify-center gap-2">
             <SpatialIcon Icon={ICONS.Image} size={18} />
             <span className="font-medium">Galerie</span>
+          </div>
+        </button>
+
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-700"></div>
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-gray-900/80 px-3 text-gray-400">ou</span>
+          </div>
+        </div>
+
+        <button
+          onClick={onBarcodeClick}
+          className="w-full btn-glass touch-feedback-css"
+          disabled={isValidating}
+          style={{
+            background: `
+              linear-gradient(135deg,
+                rgba(99, 102, 241, 0.15),
+                rgba(79, 70, 229, 0.1)
+              )
+            `,
+            borderColor: 'rgba(99, 102, 241, 0.3)',
+            backdropFilter: 'blur(12px) saturate(130%)',
+            boxShadow: `
+              0 4px 16px rgba(0, 0, 0, 0.15),
+              0 0 20px rgba(99, 102, 241, 0.15),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15)
+            `
+          }}
+        >
+          <div className="flex items-center justify-center gap-2">
+            <SpatialIcon Icon={ICONS.ScanBarcode} size={18} className="text-indigo-300" />
+            <span className="font-medium text-indigo-200">Scanner Code-Barre</span>
           </div>
         </button>
       </div>

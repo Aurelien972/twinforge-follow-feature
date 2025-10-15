@@ -234,12 +234,21 @@ const MealScanFlowPage: React.FC = () => {
         }
       }
 
+      // Combiner les items détectés par IA et les produits scannés
+      const allItems = [
+        ...(scanFlowState.analysisResults.detected_foods || []),
+        ...(scanFlowState.scannedProducts.map(p => p.mealItem) || []),
+      ];
+
+      // Recalculer les totaux si on a des produits scannés en plus
+      const totalCalories = allItems.reduce((sum, item) => sum + item.calories, 0);
+
       // Préparer les données du repas
       const mealData = {
         user_id: userId,
         timestamp: new Date().toISOString(),
-        items: scanFlowState.analysisResults.detected_foods || [],
-        total_kcal: scanFlowState.analysisResults.total_calories || 0,
+        items: allItems,
+        total_kcal: totalCalories || scanFlowState.analysisResults.total_calories || 0,
         meal_type: (scanFlowState.analysisResults.meal_type || 'dinner') as 'breakfast' | 'lunch' | 'dinner' | 'snack',
         meal_name: scanFlowState.analysisResults.meal_name,
         photo_url: photoUrl, // Use uploaded photo URL instead of blob URL
@@ -579,7 +588,11 @@ const MealScanFlowPage: React.FC = () => {
         return (
           <MealPhotoCaptureStep
             capturedPhoto={scanFlowState.capturedPhoto}
+            scannedProducts={scanFlowState.scannedProducts}
             onPhotoCapture={scanFlowHandlers.handlePhotoCapture}
+            onProductScanned={scanFlowHandlers.handleProductScanned}
+            onProductPortionChange={scanFlowHandlers.handleProductPortionChange}
+            onProductRemove={scanFlowHandlers.handleProductRemove}
             onBack={() => navigate('/meals')}
             onProceedToProcessing={scanFlowHandlers.handleProceedToProcessing}
             isProcessingInProgress={scanFlowState.isProcessing}

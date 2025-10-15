@@ -2,7 +2,8 @@ import React from 'react';
 import { nanoid } from 'nanoid';
 import { type UserProfileContext } from '../../../../../system/data/repositories/mealsRepo';
 import logger from '../../../../../lib/utils/logger';
-import type { CapturedMealPhoto, ScanFlowState } from './ScanFlowState';
+import type { CapturedMealPhoto, ScanFlowState, ScannedProduct } from './ScanFlowState';
+import { openFoodFactsService } from '../../../../../system/services/openFoodFactsService';
 
 /**
  * Convert File to Base64 for API transmission
@@ -213,7 +214,7 @@ export function useScanFlowHandlers({
 
   // Procéder au traitement
   const handleProceedToProcessing = React.useCallback(async () => {
-    if (processingGuardRef.current || !scanFlowState.capturedPhoto || !userId) {
+    if (processingGuardRef.current || (!scanFlowState.capturedPhoto && scanFlowState.scannedProducts.length === 0) || !userId) {
       return;
     }
 
@@ -236,17 +237,32 @@ export function useScanFlowHandlers({
         progress: 50,
         progressSubMessage: 'Identification des aliments...'
       }));
-      
+
       // Construction du contexte utilisateur complet pour l'IA GPT-5 mini
       const userContext = buildUserProfileContext(profile);
 
-      const analysisRequest = {
+      const analysisRequest: any = {
         user_id: userId,
-        image_data: await convertFileToBase64(scanFlowState.capturedPhoto.file),
         meal_type: 'dinner' as const,
         timestamp: new Date().toISOString(),
         user_profile_context: userContext,
       };
+
+      // Si on a une photo, l'ajouter
+      if (scanFlowState.capturedPhoto) {
+        analysisRequest.image_data = await convertFileToBase64(scanFlowState.capturedPhoto.file);
+      }
+
+      // Si on a des produits scannés, les ajouter
+      if (scanFlowState.scannedProducts.length > 0) {
+        analysisRequest.scanned_products = scanFlowState.scannedProducts.map(p => ({
+          barcode: p.barcode,
+          name: p.name,
+          brand: p.brand,
+          mealItem: p.mealItem,
+          portionMultiplier: p.portionMultiplier,
+        }));
+      }
 
       // Log du contexte transmis pour audit
       logger.info('MEAL_SCAN_FLOW', 'Transmitting complete user context to analysis', {
@@ -319,25 +335,103 @@ export function useScanFlowHandlers({
         aiModelUsed: analysisResponse.analysis_metadata?.ai_model_used,
         tokensUsed: analysisResponse.analysis_metadata?.tokens_used,
         analysisId: analysisResponse.analysis_id,
-        philosophy: 'analysis_with_complete_user_context'
+        hasPhoto: !!scanFlowState.capturedPhoto,
+        scannedProductsCount: scanFlowState.scannedProducts.length,
+        philosophy: 'analysis_with_complete_user_context_and_hybrid_input'
       });
 
     } catch (error) {
-      logger.error('MEAL_SCAN_FLOW', 'Analysis failed', { 
+      logger.error('MEAL_SCAN_FLOW', 'Analysis failed', {
         clientScanId,
         error: error instanceof Error ? error.message : 'Unknown error'
       });
-      
+
       onAnalysisError(error instanceof Error ? error.message : 'Unknown error occurred');
     } finally {
       setScanFlowState(prev => ({ ...prev, isProcessing: false }));
       processingGuardRef.current = false;
     }
-  }, [scanFlowState.capturedPhoto, userId, profile, setScanFlowState, clientScanIdRef, processingGuardRef, onAnalysisError, onSuccess]);
+  }, [scanFlowState.capturedPhoto, scanFlowState.scannedProducts, userId, profile, setScanFlowState, clientScanIdRef, processingGuardRef, onAnalysisError, onSuccess]);
+
+  // Gérer l'ajout d'un produit scanné
+  const handleProductScanned = React.useCallback((product: ScannedProduct) => {
+    setScanFlowState(prev => ({
+      ...prev,
+      scannedProducts: [...prev.scannedProducts, product],
+      analysisError: null,
+    }));
+
+    logger.info('MEAL_SCAN_FLOW', 'Product scanned and added', {
+      clientScanId: clientScanIdRef.current,
+      barcode: product.barcode,
+      productName: product.name,
+      totalScannedProducts: scanFlowState.scannedProducts.length + 1,
+    });
+  }, [setScanFlowState, clientScanIdRef, scanFlowState.scannedProducts.length]);
+
+  // Gérer le changement de portion
+  const handleProductPortionChange = React.useCallback((barcode: string, newMultiplier: number) => {
+    setScanFlowState(prev => ({
+      ...prev,
+      scannedProducts: prev.scannedProducts.map(product => {
+        if (product.barcode === barcode) {
+          const updatedMealItem = openFoodFactsService.convertToMealItem(
+            {
+              barcode: product.barcode,
+              name: product.name,
+              brand: product.brand,
+              image_url: product.image_url,
+              portion_size: product.mealItem.portion_size,
+              nutrition_per_100g: {
+                calories: product.mealItem.calories / product.portionMultiplier,
+                proteins: product.mealItem.proteins / product.portionMultiplier,
+                carbs: product.mealItem.carbs / product.portionMultiplier,
+                fats: product.mealItem.fats / product.portionMultiplier,
+                fiber: product.mealItem.fiber ? product.mealItem.fiber / product.portionMultiplier : undefined,
+                sugar: product.mealItem.sugar ? product.mealItem.sugar / product.portionMultiplier : undefined,
+                sodium: product.mealItem.sodium ? product.mealItem.sodium / product.portionMultiplier : undefined,
+              },
+            },
+            newMultiplier
+          );
+
+          return {
+            ...product,
+            portionMultiplier: newMultiplier,
+            mealItem: updatedMealItem!,
+          };
+        }
+        return product;
+      }),
+    }));
+
+    logger.info('MEAL_SCAN_FLOW', 'Product portion changed', {
+      clientScanId: clientScanIdRef.current,
+      barcode,
+      newMultiplier,
+    });
+  }, [setScanFlowState, clientScanIdRef]);
+
+  // Gérer la suppression d'un produit
+  const handleProductRemove = React.useCallback((barcode: string) => {
+    setScanFlowState(prev => ({
+      ...prev,
+      scannedProducts: prev.scannedProducts.filter(p => p.barcode !== barcode),
+    }));
+
+    logger.info('MEAL_SCAN_FLOW', 'Product removed', {
+      clientScanId: clientScanIdRef.current,
+      barcode,
+      remainingProducts: scanFlowState.scannedProducts.length - 1,
+    });
+  }, [setScanFlowState, clientScanIdRef, scanFlowState.scannedProducts.length]);
 
   return {
     handlePhotoCapture,
     handleRetake,
     handleProceedToProcessing,
+    handleProductScanned,
+    handleProductPortionChange,
+    handleProductRemove,
   };
 }

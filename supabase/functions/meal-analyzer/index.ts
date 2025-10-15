@@ -1,9 +1,18 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.54.0';
 
+interface ScannedProductData {
+  barcode: string;
+  name: string;
+  brand?: string;
+  mealItem: DetectedFood;
+  portionMultiplier: number;
+}
+
 interface MealAnalysisRequest {
   user_id: string;
   image_url?: string;
   image_data?: string; // Base64 encoded image data
+  scanned_products?: ScannedProductData[]; // Products from barcode scanning
   meal_type?: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   timestamp?: string;
   user_profile_context?: {
@@ -807,11 +816,11 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    if (!requestBody.image_url && !requestBody.image_data) {
+    if (!requestBody.image_url && !requestBody.image_data && (!requestBody.scanned_products || requestBody.scanned_products.length === 0)) {
       return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'Missing required field: image_url or image_data',
+        JSON.stringify({
+          success: false,
+          error: 'Missing required field: image_url, image_data, or scanned_products',
           ai_powered: false
         }),
         {
@@ -883,17 +892,53 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // Call OpenAI Vision API with retry logic
-    const { result: analysisResult, tokenUsage, aiModel, fallbackUsed, fallbackReason } = 
-      await callOpenAIVisionWithRetry(imageDataForAnalysis!, requestBody.user_profile_context);
+    // Call OpenAI Vision API with retry logic (if image is provided)
+    let analysisResult: Partial<MealAnalysisResponse> = {};
+    let tokenUsage: TokenUsage = { input: 0, output: 0, total: 0, cost_estimate_usd: 0 };
+    let aiModel = 'none';
+    let fallbackUsed = false;
+    let fallbackReason: string | undefined;
+
+    if (imageDataForAnalysis) {
+      const apiResult = await callOpenAIVisionWithRetry(imageDataForAnalysis, requestBody.user_profile_context);
+      analysisResult = apiResult.result;
+      tokenUsage = apiResult.tokenUsage;
+      aiModel = apiResult.aiModel;
+      fallbackUsed = apiResult.fallbackUsed;
+      fallbackReason = apiResult.fallbackReason;
+    }
 
     const processingTime = Date.now() - startTime;
+
+    // Combine scanned products with AI-detected foods
+    let allDetectedFoods: DetectedFood[] = [...(analysisResult.detected_foods || [])];
+
+    if (requestBody.scanned_products && requestBody.scanned_products.length > 0) {
+      console.log('MEAL_ANALYZER', 'Adding scanned products to analysis', {
+        analysisId,
+        scannedProductsCount: requestBody.scanned_products.length,
+        products: requestBody.scanned_products.map(p => ({ barcode: p.barcode, name: p.name })),
+        timestamp: new Date().toISOString()
+      });
+
+      const scannedFoods: DetectedFood[] = requestBody.scanned_products.map(p => p.mealItem);
+      allDetectedFoods = [...allDetectedFoods, ...scannedFoods];
+    }
+
+    // Recalculate totals with all foods (AI + scanned)
+    const totalCalories = allDetectedFoods.reduce((sum, food) => sum + food.calories, 0);
+    const totalProteins = allDetectedFoods.reduce((sum, food) => sum + food.proteins, 0);
+    const totalCarbs = allDetectedFoods.reduce((sum, food) => sum + food.carbs, 0);
+    const totalFats = allDetectedFoods.reduce((sum, food) => sum + food.fats, 0);
+    const totalFiber = allDetectedFoods.reduce((sum, food) => sum + (food.fiber || 0), 0);
+    const totalSugar = allDetectedFoods.reduce((sum, food) => sum + (food.sugar || 0), 0);
+    const totalSodium = allDetectedFoods.reduce((sum, food) => sum + (food.sodium || 0), 0);
 
     // Truncate insights if too long
     const truncatedInsights = (analysisResult.personalized_insights || []).map(insight => {
       const { content: truncatedMessage, truncated: messageTruncated } = truncateResponse(insight.message, 200);
       const { content: truncatedReasoning, truncated: reasoningTruncated } = truncateResponse(insight.reasoning, 150);
-      
+
       return {
         ...insight,
         message: truncatedMessage,
@@ -907,16 +952,16 @@ Deno.serve(async (req: Request) => {
       success: true,
       meal_name: analysisResult.meal_name || 'Repas analysé',
       analysis_id: analysisId,
-      total_calories: analysisResult.total_calories || 0,
-      macronutrients: analysisResult.macronutrients || {
-        proteins: 0,
-        carbs: 0,
-        fats: 0,
-        fiber: 0,
-        sugar: 0,
-        sodium: 0,
+      total_calories: totalCalories,
+      macronutrients: {
+        proteins: totalProteins,
+        carbs: totalCarbs,
+        fats: totalFats,
+        fiber: totalFiber,
+        sugar: totalSugar,
+        sodium: totalSodium,
       },
-      detected_foods: analysisResult.detected_foods || [],
+      detected_foods: allDetectedFoods,
       meal_type: requestBody.meal_type || 'dinner',
       confidence: analysisResult.confidence || 0.5,
       analysis_metadata: {
