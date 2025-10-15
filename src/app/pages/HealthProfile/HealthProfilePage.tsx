@@ -318,7 +318,7 @@ const HealthProfilePage: React.FC = () => {
   );
 };
 
-const PlaceholderTab: React.FC<{ title: string; icon: keyof typeof ICONS }> = ({ title, icon }) => {
+const PlaceholderTab: React.FC<{ title: string; icon: string }> = ({ title, icon }) => {
   return (
     <div className="min-h-[400px] flex items-center justify-center">
       <GlassCard className="p-8 max-w-md text-center">
@@ -332,7 +332,7 @@ const PlaceholderTab: React.FC<{ title: string; icon: keyof typeof ICONS }> = ({
             border: '2px solid rgba(100, 116, 139, 0.5)',
           }}
         >
-          <SpatialIcon Icon={ICONS[icon]} size={32} className="text-slate-400" />
+          <SpatialIcon Icon={ICONS[icon as keyof typeof ICONS]} size={32} className="text-slate-400" />
         </div>
         <h2 className="text-white font-semibold text-xl mb-2">{title}</h2>
         <p className="text-white/60 text-sm">
