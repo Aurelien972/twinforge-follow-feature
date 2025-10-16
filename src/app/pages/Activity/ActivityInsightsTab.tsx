@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { useBlocker } from 'react-router-dom';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
@@ -300,7 +301,12 @@ const ActivityInsightsTab: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6"
+    >
       {/* Sélecteur de Période */}
       <ProgressionPeriodSelector
         selectedPeriod={selectedPeriod}
@@ -392,7 +398,7 @@ const ActivityInsightsTab: React.FC = () => {
           )}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
