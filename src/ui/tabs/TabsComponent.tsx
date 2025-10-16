@@ -104,7 +104,7 @@ const TabsList: React.FC<{
   
   // Track active tab index for indicators
   React.useEffect(() => {
-    const currentIndex = tabTriggers.findIndex(trigger => 
+    const currentIndex = tabTriggers.findIndex(trigger =>
       trigger.getAttribute('aria-selected') === 'true' ||
       trigger.getAttribute('value') === activeTab
     );
@@ -112,6 +112,37 @@ const TabsList: React.FC<{
       setActiveTabIndex(currentIndex);
     }
   }, [activeTab, tabTriggers]);
+
+  // Auto-scroll to active tab when activeTab changes (e.g., from navigation)
+  React.useEffect(() => {
+    if (!listRef.current) return;
+
+    // Find the active tab button
+    const activeTabButton = listRef.current.querySelector(`button[id="tab-${activeTab}"]`) as HTMLElement;
+
+    if (activeTabButton) {
+      // Check if the tab is actually out of view
+      const container = listRef.current;
+      const tabRect = activeTabButton.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+
+      const isOutOfView =
+        tabRect.left < containerRect.left ||
+        tabRect.right > containerRect.right;
+
+      // Only scroll if there's overflow or tab is out of view
+      if (hasOverflow || isOutOfView) {
+        // Use a small delay to ensure the tab is rendered and positioned
+        setTimeout(() => {
+          activeTabButton.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center'
+          });
+        }, 100);
+      }
+    }
+  }, [activeTab, hasOverflow]);
   
   // Calculate tab indicators - one per tab
   const scrollIndicators = React.useMemo(() => {
