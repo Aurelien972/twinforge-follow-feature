@@ -20,16 +20,12 @@ function hexToRgbArray(hex: string): [number, number, number] {
   return [r, g, b];
 }
 
-/** Sélection de section tolérante (clé ou titre) */
-function pickSection(
+/** Sélection de section par clé */
+function getSection(
   sections: { key?: string; title: string; actions: QuickAction[] }[],
-  keys: string[],
-  titleIncludes: string[]
+  key: string
 ) {
-  const byKey = sections.find((s) => s.key && keys.includes(s.key));
-  if (byKey) return byKey;
-  const lowerInc = titleIncludes.map((t) => t.toLowerCase());
-  return sections.find((s) => lowerInc.some((inc) => s.title?.toLowerCase?.().includes(inc)));
+  return sections.find((s) => s.key === key) || { title: '', actions: [] };
 }
 
 interface CentralActionsMenuProps {
@@ -38,10 +34,9 @@ interface CentralActionsMenuProps {
 }
 
 /**
- * CentralActionsMenu
- * - Outils de Suivi : tuiles 2×2 (grandes cartes)
- * - Atelier des Saveurs : petits boutons (pills) 2×2 — même style que "Générateur d'Entraînement"
- * - Atelier Workout : petits boutons (pills)
+ * CentralActionsMenu - Version simplifiée
+ * Trois catégories: Alimentation, Activité, Santé
+ * Tous les boutons sont des pills (petits boutons) 2x2
  */
 const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
   const navigate = useNavigate();
@@ -49,32 +44,11 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
   const { click, success } = useFeedback();
   const { close: closeOverlay } = useOverlayStore();
 
-  // Catégorie Alimentation
-  const foodTrackingSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['tracking-food'], ['outils de suivi']) ??
-    { title: 'Outils de Suivi', actions: [] };
-
-  const foodGeneratorsSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['generators-food'], ['générateurs']) ??
-    { title: 'Générateurs', actions: [] };
-
-  // Catégorie Activité
-  const activityTrackingSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['tracking-activity'], ['outils de suivi']) ??
-    { title: 'Outils de Suivi', actions: [] };
-
-  const activityGeneratorsSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['generators-activity'], ['générateurs']) ??
-    { title: 'Générateurs', actions: [] };
-
-  // Catégorie Santé
-  const healthTrackingSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['tracking-health'], ['outils de suivi']) ??
-    { title: 'Outils de Suivi', actions: [] };
-
-  const homeSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['navigation', 'home', 'main'], ['navigation', 'accueil']) ??
-    { title: 'Navigation', actions: [] };
+  // Récupération des sections par clé
+  const alimentationSection = getSection(QUICK_ACTION_SECTIONS, 'alimentation');
+  const activiteSection = getSection(QUICK_ACTION_SECTIONS, 'activite');
+  const santeSection = getSection(QUICK_ACTION_SECTIONS, 'sante');
+  const homeSection = getSection(QUICK_ACTION_SECTIONS, 'navigation');
 
   const homeAction =
     homeSection.actions.find(
@@ -84,8 +58,8 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
     ) || null;
 
   const handleActionClick = (action: QuickAction, isTile: boolean = false, event?: React.MouseEvent) => {
-    if (!action?.available) {
-      logger.warn('CENTRAL_ACTIONS', 'Action not available', { actionId: action?.id });
+    if (!action?.available || action?.comingSoon) {
+      logger.warn('CENTRAL_ACTIONS', 'Action not available', { actionId: action?.id, comingSoon: action?.comingSoon });
       return;
     }
 
@@ -180,77 +154,32 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
     ? { duration: 0.2, ease: [0.25, 0.1, 0.25, 1] as any }
     : { type: 'spring' as const, stiffness: 280, damping: 22, mass: 0.9 };
 
-  /** Grandes tuiles (suivi) */
-  const PrimaryTile: React.FC<{ action: QuickAction; index: number }> = ({ action, index }) => {
-    const [r, g, b] = hexToRgbArray(action.color || '#7A5AF8');
-    return (
-      <motion.button
-        key={action.id}
-        onClick={(e) => handleActionClick(action, true, e)}
-        className="glass-card rounded-2xl p-2 text-left overflow-hidden"
-        style={{
-          minHeight: 72,
-          background: 'var(--glass-opacity-base)',
-          border: `1px solid rgba(${r}, ${g}, ${b}, 0.28)`,
-          boxShadow:
-            '0 8px 26px rgba(0,0,0,0.25), 0 0 28px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.15)'
-        }}
-        initial={{ opacity: 0, y: 12, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ ...springy, delay: reduceMotion ? 0 : index * 0.04 }}
-        whileHover={reduceMotion ? {} : { scale: 1.02, y: -2 }}
-        whileTap={reduceMotion ? {} : { scale: 0.98 }}
-        role="menuitem"
-        aria-label={action.description || action.label}
-      >
-        <div className="flex items-start gap-2">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{
-              background: `linear-gradient(135deg, rgba(${r}, ${g}, ${b}, 0.35), rgba(${r}, ${g}, ${b}, 0.2))`,
-              border: `1px solid rgba(${r}, ${g}, ${b}, 0.45)`,
-              borderRadius: '0.75rem',
-              overflow: 'hidden'
-            }}
-          >
-            <SpatialIcon Icon={ICONS[action.icon]} size={18} style={{ color: action.color }} />
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <div className="text-white font-semibold text-[12px] leading-tight">
-              {action.label}
-            </div>
-            {action.subtitle && (
-              <div className="text-white/70 text-[10px] leading-tight mt-0.5 w-full">
-                {action.subtitle}
-              </div>
-            )}
-          </div>
-        </div>
-      </motion.button>
-    );
-  };
-
-  /** Petits boutons (pills) — style identique Workout */
+  /** Boutons d'action (pills) */
   const SecondaryPill: React.FC<{ action: QuickAction; index: number }> = ({ action, index }) => {
     const [r, g, b] = hexToRgbArray(action.color || '#18E3FF');
+    const isComingSoon = action.comingSoon || !action.available;
+
     return (
       <motion.button
         key={action.id}
         onClick={(e) => handleActionClick(action, false, e)}
-        className="glass-card rounded-xl px-2 py-1.5 flex items-center gap-1.5 w-full"
+        disabled={isComingSoon}
+        className="glass-card rounded-xl px-2 py-1.5 flex items-center gap-1.5 w-full relative"
         style={{
           background: 'var(--glass-opacity-base)',
           border: `1px solid rgba(${r}, ${g}, ${b}, 0.24)`,
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 14px rgba(0,0,0,0.18)'
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 14px rgba(0,0,0,0.18)',
+          opacity: isComingSoon ? 0.5 : 1,
+          cursor: isComingSoon ? 'not-allowed' : 'pointer'
         }}
         initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+        animate={{ opacity: isComingSoon ? 0.5 : 1, y: 0 }}
         transition={{ ...springy, delay: reduceMotion ? 0 : index * 0.05 }}
-        whileHover={reduceMotion ? {} : { y: -1, scale: 1.02 }}
-        whileTap={reduceMotion ? {} : { scale: 0.98 }}
+        whileHover={reduceMotion || isComingSoon ? {} : { y: -1, scale: 1.02 }}
+        whileTap={reduceMotion || isComingSoon ? {} : { scale: 0.98 }}
         role="menuitem"
         aria-label={action.description || action.label}
+        aria-disabled={isComingSoon}
       >
         <div
           className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -273,6 +202,18 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
             </div>
           )}
         </div>
+        {isComingSoon && (
+          <div
+            className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold"
+            style={{
+              background: 'linear-gradient(135deg, rgba(251, 146, 60, 0.9), rgba(251, 113, 133, 0.9))',
+              color: 'white',
+              boxShadow: '0 2px 8px rgba(251, 146, 60, 0.4)'
+            }}
+          >
+            SOON
+          </div>
+        )}
       </motion.button>
     );
   };
@@ -398,111 +339,52 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
             </div>
 
             {/* ========== CATÉGORIE: ALIMENTATION ========== */}
-            <div className="mb-3">
-              <div className="px-1.5 mb-1.5">
-                <h3 className="text-[#10B981] text-[11px] uppercase tracking-wider font-bold">
-                  Alimentation
-                </h3>
+            {alimentationSection.actions.length > 0 && (
+              <div className="mb-3">
+                <div className="px-1.5 mb-1.5">
+                  <h3 className="text-white/70 text-[11px] uppercase tracking-wider font-bold">
+                    Alimentation
+                  </h3>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {alimentationSection.actions.map((a, i) => (
+                    <SecondaryPill key={a.id} action={a} index={i} />
+                  ))}
+                </div>
               </div>
-
-              {/* Outils de Suivi */}
-              {foodTrackingSection.actions.length > 0 && (
-                <div className="mb-2.5">
-                  <div className="px-1.5 mb-1.5">
-                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
-                      Outils de suivi
-                    </h4>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {foodTrackingSection.actions.map((a, i) => (
-                      <SecondaryPill key={a.id} action={a} index={i} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Générateurs */}
-              {foodGeneratorsSection.actions.length > 0 && (
-                <div>
-                  <div className="px-1.5 mb-1.5">
-                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
-                      Générateurs
-                    </h4>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {foodGeneratorsSection.actions.map((a, i) => (
-                      <SecondaryPill key={a.id} action={a} index={i} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* ========== CATÉGORIE: ACTIVITÉ ========== */}
-            <div className="mb-3">
-              <div className="px-1.5 mb-1.5">
-                <h3 className="text-[#3B82F6] text-[11px] uppercase tracking-wider font-bold">
-                  Activité
-                </h3>
+            {activiteSection.actions.length > 0 && (
+              <div className="mb-3">
+                <div className="px-1.5 mb-1.5">
+                  <h3 className="text-white/70 text-[11px] uppercase tracking-wider font-bold">
+                    Activité
+                  </h3>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {activiteSection.actions.map((a, i) => (
+                    <SecondaryPill key={a.id} action={a} index={i} />
+                  ))}
+                </div>
               </div>
-
-              {/* Outils de Suivi */}
-              {activityTrackingSection.actions.length > 0 && (
-                <div className="mb-2.5">
-                  <div className="px-1.5 mb-1.5">
-                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
-                      Outils de suivi
-                    </h4>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {activityTrackingSection.actions.map((a, i) => (
-                      <SecondaryPill key={a.id} action={a} index={i} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Générateurs */}
-              {activityGeneratorsSection.actions.length > 0 && (
-                <div>
-                  <div className="px-1.5 mb-1.5">
-                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
-                      Générateurs
-                    </h4>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {activityGeneratorsSection.actions.map((a, i) => (
-                      <SecondaryPill key={a.id} action={a} index={i} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* ========== CATÉGORIE: SANTÉ ========== */}
-            <div>
-              <div className="px-1.5 mb-1.5">
-                <h3 className="text-[#EF4444] text-[11px] uppercase tracking-wider font-bold">
-                  Santé
-                </h3>
-              </div>
-
-              {/* Outils de Suivi */}
-              {healthTrackingSection.actions.length > 0 && (
-                <div>
-                  <div className="px-1.5 mb-1.5">
-                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
-                      Outils de suivi
-                    </h4>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {healthTrackingSection.actions.map((a, i) => (
-                      <SecondaryPill key={a.id} action={a} index={i} />
-                    ))}
-                  </div>
+            {santeSection.actions.length > 0 && (
+              <div>
+                <div className="px-1.5 mb-1.5">
+                  <h3 className="text-white/70 text-[11px] uppercase tracking-wider font-bold">
+                    Santé
+                  </h3>
                 </div>
-              )}
-            </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {santeSection.actions.map((a, i) => (
+                    <SecondaryPill key={a.id} action={a} index={i} />
+                  ))}
+                </div>
+              </div>
+            )}
             </div>
           </div>
         </motion.div>

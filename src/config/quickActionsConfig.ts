@@ -14,7 +14,8 @@ export interface QuickAction {
   color: string;
   available: boolean;
   description: string;
-  onClick?: () => void; // optionnel, déjà appelé côté composant
+  comingSoon?: boolean;
+  onClick?: () => void;
 }
 
 export interface QuickActionSection {
@@ -37,7 +38,7 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
         subtitle: 'Vue d\'ensemble TwinForge',
         icon: 'Home',
         route: '/',
-        color: '#F7931E', // Orange brand color matching sidebar
+        color: '#F7931E',
         available: true,
         description: 'Retourner au tableau de bord principal'
       }
@@ -45,10 +46,9 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
   },
 
   // ==================== CATÉGORIE: ALIMENTATION ====================
-  // --- Outils de Suivi Alimentation
   {
-    key: 'tracking-food',
-    title: 'Outils de Suivi',
+    key: 'alimentation',
+    title: 'Alimentation',
     actions: [
       {
         id: 'scan-meal',
@@ -61,24 +61,6 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
         description: 'Analyser un repas avec précision'
       },
       {
-        id: 'start-fasting',
-        label: 'Tracker de Jeûne',
-        subtitle: 'Gérez vos sessions',
-        icon: 'Timer',
-        route: '/fasting/input',
-        color: '#F59E0B',
-        available: true,
-        description: 'Commencer une période de jeûne'
-      }
-    ]
-  },
-
-  // --- Générateurs Alimentation
-  {
-    key: 'generators-food',
-    title: 'Générateurs',
-    actions: [
-      {
         id: 'generate-recipe',
         label: 'Générateur de Recettes',
         subtitle: 'Recettes personnalisées',
@@ -90,7 +72,7 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
       },
       {
         id: 'generate-meal-plan',
-        label: 'Générateur de Plan',
+        label: 'Générateur de Plans',
         subtitle: 'Plan alimentaire hebdo',
         icon: 'Calendar',
         route: '/fridge#plan',
@@ -107,18 +89,27 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
         color: '#F59E0B',
         available: true,
         description: 'Créer une liste de courses optimisée'
+      },
+      {
+        id: 'scan-fridge',
+        label: 'Scanner de Frigo',
+        subtitle: 'Inventaire intelligent',
+        icon: 'Scan',
+        route: '/fridge/scan',
+        color: '#06B6D4',
+        available: true,
+        description: 'Scanner votre frigo pour créer un inventaire'
       }
     ]
   },
 
   // ==================== CATÉGORIE: ACTIVITÉ ====================
-  // --- Outils de Suivi Activité
   {
-    key: 'tracking-activity',
-    title: 'Outils de Suivi',
+    key: 'activite',
+    title: 'Activité',
     actions: [
       {
-        id: 'forge-energy',
+        id: 'track-activity',
         label: "Tracker d'Activité",
         subtitle: "Enregistrez vos séances",
         icon: 'Activity',
@@ -126,34 +117,7 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
         color: '#3B82F6',
         available: true,
         description: "Enregistrer une nouvelle séance d'activité"
-      }
-    ]
-  },
-
-  // --- Générateurs Activité
-  {
-    key: 'generators-activity',
-    title: 'Générateurs',
-    actions: [
-      {
-        id: 'generate-training',
-        label: "Générateur d'Entraînement",
-        subtitle: 'Programme personnalisé',
-        icon: 'Target',
-        route: '/training/pipeline',
-        color: '#18E3FF',
-        available: true,
-        description: "Plan d'entraînement personnalisé"
-      }
-    ]
-  },
-
-  // ==================== CATÉGORIE: SANTÉ ====================
-  // --- Outils de Suivi Santé
-  {
-    key: 'tracking-health',
-    title: 'Outils de Suivi',
-    actions: [
+      },
       {
         id: 'body-scan',
         label: 'Scanner Corporel',
@@ -163,6 +127,34 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
         color: '#D946EF',
         available: true,
         description: 'Scanner et analyser votre corps en 3D'
+      }
+    ]
+  },
+
+  // ==================== CATÉGORIE: SANTÉ ====================
+  {
+    key: 'sante',
+    title: 'Santé',
+    actions: [
+      {
+        id: 'start-fasting',
+        label: 'Tracker de Jeûne',
+        subtitle: 'Gérez vos sessions',
+        icon: 'Timer',
+        route: '/fasting/input',
+        color: '#F59E0B',
+        available: true,
+        description: 'Commencer une période de jeûne'
+      },
+      {
+        id: 'forge-vitale',
+        label: 'Forge Vitale',
+        subtitle: 'Bientôt disponible',
+        icon: 'Heart',
+        color: '#EF4444',
+        available: false,
+        comingSoon: true,
+        description: 'Suivi de santé complet (bientôt disponible)'
       }
     ]
   }
