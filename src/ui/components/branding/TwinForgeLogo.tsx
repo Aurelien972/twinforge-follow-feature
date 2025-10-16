@@ -61,7 +61,7 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               lineHeight: 1,
               textTransform: 'uppercase',
               position: 'relative',
-              top: '1px',
+              top: '2.5px',
               filter: isHovered
                 ? 'drop-shadow(0 0 12px rgba(253, 200, 48, 0.5))'
                 : 'drop-shadow(0 0 6px rgba(247, 147, 30, 0.3))',
@@ -120,7 +120,7 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
             lineHeight: 1,
             textTransform: 'uppercase',
             position: 'relative',
-            top: '0.5px',
+            top: '1.5px',
             filter: isHovered
               ? 'drop-shadow(0 0 10px rgba(253, 200, 48, 0.4))'
               : 'drop-shadow(0 0 5px rgba(247, 147, 30, 0.25))',

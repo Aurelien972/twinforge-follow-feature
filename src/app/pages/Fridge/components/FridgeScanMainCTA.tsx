@@ -42,99 +42,44 @@ const FridgeScanMainCTA: React.FC = () => {
       }}
     >
       {/* Carrés Animés aux 4 Coins */}
-      {[
-        { top: '20px', left: '20px', rotation: 0 },
-        { top: '20px', right: '20px', rotation: 90 },
-        { bottom: '20px', left: '20px', rotation: 270 },
-        { bottom: '20px', right: '20px', rotation: 180 }
-      ].map((position, index) => (
-        <motion.div
-          key={`corner-${index}`}
-          className="absolute rounded-lg pointer-events-none"
-          style={{
-            ...position,
-            width: '10px',
-            height: '10px',
-            background: `
-              linear-gradient(135deg,
-                color-mix(in srgb, #EC4899 60%, transparent),
-                color-mix(in srgb, #F472B6 40%, transparent)
-              )
-            `,
-            border: '2px solid color-mix(in srgb, #EC4899 70%, transparent)',
-            boxShadow: `
-              0 0 20px color-mix(in srgb, #EC4899 50%, transparent),
-              inset 0 2px 0 rgba(255,255,255,0.3)
-            `
-          }}
-          animate={{
-            rotate: [position.rotation, position.rotation + 360],
-            scale: [1, 1.1, 1],
-            opacity: [0.7, 1, 0.7]
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: index * 0.2
-          }}
-        />
-      ))}
+      <div className="training-hero-corners" aria-hidden="true">
+        {[0, 1, 2, 3].map((i) => (
+          <motion.div
+            key={i}
+            className="corner-particle"
+            style={{
+              position: 'absolute',
+              width: '12px',
+              height: '12px',
+              borderRadius: '2px',
+              background: 'linear-gradient(135deg, #EC4899, rgba(244, 114, 182, 0.8))',
+              boxShadow: '0 0 20px #EC4899',
+              top: i < 2 ? '12px' : 'auto',
+              bottom: i >= 2 ? '12px' : 'auto',
+              left: i % 2 === 0 ? '12px' : 'auto',
+              right: i % 2 === 1 ? '12px' : 'auto'
+            }}
+            initial={{
+              rotate: i % 2 === 0 ? 45 : -45
+            }}
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.6, 1, 0.6],
+              rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              delay: i * 0.2,
+              ease: [0.4, 0, 0.2, 1]
+            }}
+          />
+        ))}
+      </div>
 
       <div className="relative z-10 space-y-8">
         {/* Conteneur Icône Principale avec Bulles */}
         <div className="relative inline-block">
-          {/* Bulles Animées autour de l'Icône */}
-          {[
-            { size: 16, distance: 80, angle: 45, delay: 0 },
-            { size: 20, distance: 90, angle: 135, delay: 0.3 },
-            { size: 14, distance: 85, angle: 225, delay: 0.6 },
-            { size: 18, distance: 95, angle: 315, delay: 0.9 }
-          ].map((bubble, index) => (
-            <motion.div
-              key={`bubble-${index}`}
-              className="absolute rounded-full pointer-events-none"
-              style={{
-                width: `${bubble.size}px`,
-                height: `${bubble.size}px`,
-                left: '50%',
-                top: '50%',
-                background: `
-                  radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6) 0%, transparent 70%),
-                  linear-gradient(135deg,
-                    color-mix(in srgb, #EC4899 70%, transparent),
-                    color-mix(in srgb, #F472B6 50%, transparent)
-                  )
-                `,
-                border: '2px solid color-mix(in srgb, #EC4899 80%, transparent)',
-                boxShadow: `
-                  0 0 20px color-mix(in srgb, #EC4899 60%, transparent),
-                  inset 0 2px 4px rgba(255,255,255,0.4)
-                `
-              }}
-              animate={{
-                x: [
-                  0,
-                  Math.cos((bubble.angle * Math.PI) / 180) * bubble.distance,
-                  0
-                ],
-                y: [
-                  0,
-                  Math.sin((bubble.angle * Math.PI) / 180) * bubble.distance,
-                  0
-                ],
-                scale: [1, 1.2, 1],
-                opacity: [0.6, 1, 0.6]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                delay: bubble.delay
-              }}
-            />
-          ))}
-
           {/* Icône Principale avec Animation de Respiration */}
           <motion.div
             className="w-28 h-28 mx-auto rounded-full flex items-center justify-center relative"
@@ -184,6 +129,57 @@ const FridgeScanMainCTA: React.FC = () => {
                 ease: 'easeOut'
               }}
             />
+
+            {/* Bulles Animées jaillissant de l'Icône */}
+            {[
+              { size: 16, distance: 80, angle: 45, delay: 0 },
+              { size: 20, distance: 90, angle: 135, delay: 0.3 },
+              { size: 14, distance: 85, angle: 225, delay: 0.6 },
+              { size: 18, distance: 95, angle: 315, delay: 0.9 }
+            ].map((bubble, index) => (
+              <motion.div
+                key={`bubble-${index}`}
+                className="absolute rounded-full pointer-events-none"
+                style={{
+                  width: `${bubble.size}px`,
+                  height: `${bubble.size}px`,
+                  left: '50%',
+                  top: '50%',
+                  marginLeft: `-${bubble.size / 2}px`,
+                  marginTop: `-${bubble.size / 2}px`,
+                  background: `
+                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6) 0%, transparent 70%),
+                    linear-gradient(135deg,
+                      color-mix(in srgb, #EC4899 70%, transparent),
+                      color-mix(in srgb, #F472B6 50%, transparent)
+                    )
+                  `,
+                  border: '2px solid color-mix(in srgb, #EC4899 80%, transparent)',
+                  boxShadow: `
+                    0 0 20px color-mix(in srgb, #EC4899 60%, transparent),
+                    inset 0 2px 4px rgba(255,255,255,0.4)
+                  `
+                }}
+                animate={{
+                  x: [
+                    0,
+                    Math.cos((bubble.angle * Math.PI) / 180) * bubble.distance
+                  ],
+                  y: [
+                    0,
+                    Math.sin((bubble.angle * Math.PI) / 180) * bubble.distance
+                  ],
+                  scale: [0.5, 1.2],
+                  opacity: [1, 0]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeOut',
+                  delay: bubble.delay
+                }}
+              />
+            ))}
           </motion.div>
         </div>
 

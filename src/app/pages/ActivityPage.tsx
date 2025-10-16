@@ -69,12 +69,17 @@ const ActivityPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { showFeedback } = useFeedback();
-  
-  const [activeTab, setActiveTab] = React.useState('daily');
+
+  // Derive activeTab from URL hash, fallback to 'daily'
+  const activeTab = React.useMemo(() => {
+    const hash = location.hash.replace('#', '');
+    const decodedHash = hash ? decodeURIComponent(hash) : '';
+    return decodedHash || 'daily';
+  }, [location.hash]);
+
   const headerContent = getTabHeaderContent(activeTab);
-  
+
   const handleTabChange = (value: string) => {
-    setActiveTab(value);
     logger.info('Activity tab changed', { tab: value });
   };
 
@@ -95,10 +100,10 @@ const ActivityPage: React.FC = () => {
 
       <Tabs defaultValue="daily" className="w-full" onValueChange={handleTabChange} forgeContext="activity">
         <Tabs.List>
-          <Tabs.Trigger value="daily">Tracker</Tabs.Trigger>
-          <Tabs.Trigger value="insights">Insights</Tabs.Trigger>
-          <Tabs.Trigger value="progression">Progression</Tabs.Trigger>
-          <Tabs.Trigger value="history">Historique</Tabs.Trigger>
+          <Tabs.Trigger value="daily" icon="Activity">Tracker</Tabs.Trigger>
+          <Tabs.Trigger value="insights" icon="BarChart3">Insights</Tabs.Trigger>
+          <Tabs.Trigger value="progression" icon="TrendingUp">Progression</Tabs.Trigger>
+          <Tabs.Trigger value="history" icon="History">Historique</Tabs.Trigger>
         </Tabs.List>
 
         <Tabs.Panel value="daily" className="mt-6">
