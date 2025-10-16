@@ -7,7 +7,7 @@ import { ICONS } from '../../../../../ui/icons/registry';
 import { useFeedback } from '../../../../../hooks/useFeedback';
 import { usePreferredMotion } from '../../../../../system/device/DeviceProvider';
 import { useUserStore } from '@/system/store/userStore';
-import { useFastingPipeline, useFastingElapsedSeconds, useFastingProgressPercentage } from '../../hooks/useFastingPipeline';
+import { useFastingPipeline, useFastingElapsedSeconds, useFastingProgressPercentage, useFastingTimerTick } from '../../hooks/useFastingPipeline';
 import { getCurrentFastingPhase, getMotivationalMessage } from '../../../../../lib/nutrition/fastingPhases';
 import { formatElapsedTime } from '../../utils/fastingUtils';
 import { getProtocolById } from '../../../../../lib/nutrition/fastingProtocols';
@@ -147,7 +147,10 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
   const reduceMotion = usePreferredMotion() === 'reduced';
   const { profile } = useUserStore();
   const { isActive, session } = useFastingPipeline();
-  
+
+  // Enable real-time timer updates
+  useFastingTimerTick();
+
   // Use dynamic selectors for real-time updates
   const elapsedSeconds = useFastingElapsedSeconds();
   const progressPercentage = useFastingProgressPercentage();

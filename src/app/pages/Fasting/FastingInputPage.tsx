@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useFastingPipelineWithActions, useFastingElapsedSeconds, useFastingProgressPercentage } from './hooks/useFastingPipeline';
+import { useFastingPipelineWithActions, useFastingElapsedSeconds, useFastingProgressPercentage, useFastingTimerTick } from './hooks/useFastingPipeline';
 import {
   FastingProgressHeader,
   FastingMetabolicPhasesCard,
@@ -21,7 +21,10 @@ const FastingInputPage: React.FC = () => {
   const fastingStore = useFastingPipelineWithActions();
   const { currentStep, isActive, session, steps, actions } = fastingStore;
   const { profile, session: userSession } = useUserStore();
-  
+
+  // Enable real-time timer updates
+  useFastingTimerTick();
+
   // Use dynamic selectors for real-time updates
   const elapsedSeconds = useFastingElapsedSeconds();
   const progressPercentage = useFastingProgressPercentage();

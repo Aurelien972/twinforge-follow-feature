@@ -3,6 +3,7 @@
  * Gestion persistante de l'état de la pipeline de jeûne intermittent
  */
 
+import React from 'react';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { useNavigate } from 'react-router-dom';
@@ -275,15 +276,40 @@ export const useFastingElapsedSeconds = () => {
 export const useFastingProgressPercentage = () => {
   return useFastingPipeline((state) => {
     if (!state.session?.targetHours) return 0;
-    
+
     if (!state.isActive || !state.session?.startTime) return 0;
-    
+
     const now = Date.now();
     const startTime = new Date(state.session.startTime).getTime();
     const elapsedSeconds = Math.floor((now - startTime) / 1000);
     const targetSeconds = state.session.targetHours * 60 * 60;
     return Math.min(100, (elapsedSeconds / targetSeconds) * 100);
   });
+};
+
+/**
+ * Hook pour forcer la mise à jour du timer en temps réel
+ * Déclenche automatiquement tick() toutes les secondes quand une session est active
+ */
+export const useFastingTimerTick = () => {
+  const isActive = useFastingPipeline((state) => state.isActive);
+  const tick = useFastingPipeline((state) => state.tick);
+
+  React.useEffect(() => {
+    if (!isActive) return;
+
+    // Déclencher tick() immédiatement
+    tick();
+
+    // Puis toutes les secondes
+    const intervalId = setInterval(() => {
+      tick();
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [isActive, tick]);
 };
 
 // Hook wrapper for easier usage with feedback and toast

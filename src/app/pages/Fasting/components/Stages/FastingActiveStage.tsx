@@ -5,6 +5,7 @@ import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import { useExitModalStore } from '@/system/store/exitModalStore';
+import { useFastingTimerTick } from '../../hooks/useFastingPipeline';
 
 interface FastingSession {
   id?: string;
@@ -39,6 +40,9 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
   onStopFasting,
   formatElapsedTime
 }) => {
+  // Enable real-time timer updates
+  useFastingTimerTick();
+
   const { showModal: showExitModal } = useExitModalStore();
 
   const handleStopFasting = () => {

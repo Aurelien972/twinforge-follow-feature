@@ -4,7 +4,7 @@ import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import GlassCard from '@/ui/cards/GlassCard';
 import logger from '@/lib/utils/logger';
-import { useFastingElapsedSeconds, useFastingProgressPercentage } from '../../hooks/useFastingPipeline';
+import { useFastingElapsedSeconds, useFastingProgressPercentage, useFastingTimerTick } from '../../hooks/useFastingPipeline';
 
 // Types pour la pipeline de jeûne
 interface FastingStep {
@@ -57,7 +57,10 @@ const FastingProgressHeaderInner: React.FC<FastingProgressHeaderProps> = ({
 }) => {
   const isMobile = useIsMobile();
   const lastLoggedRef = useRef<{ step: string; progress: number } | null>(null);
-  
+
+  // Enable real-time timer updates
+  useFastingTimerTick();
+
   // Use dynamic selectors for real-time updates when active
   const dynamicElapsedSeconds = useFastingElapsedSeconds();
   const dynamicProgressPercentage = useFastingProgressPercentage();

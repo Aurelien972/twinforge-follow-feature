@@ -3,14 +3,14 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
-import { 
-  getCurrentFastingPhase, 
-  getPhaseProgress, 
+import {
+  getCurrentFastingPhase,
+  getPhaseProgress,
   getMotivationalMessage,
   estimateCaloriesBurnedInPhase
 } from '@/lib/nutrition/fastingPhases';
 import { formatElapsedTime } from '@/app/pages/Fasting/utils/fastingUtils';
-import { useFastingElapsedSeconds, useFastingProgressPercentage } from '../../hooks/useFastingPipeline';
+import { useFastingElapsedSeconds, useFastingProgressPercentage, useFastingTimerTick } from '../../hooks/useFastingPipeline';
 
 interface FastingSession {
   id?: string;
@@ -37,6 +37,9 @@ const FastingCurrentSessionCard: React.FC<FastingCurrentSessionCardProps> = ({
   session,
   userWeight = 70
 }) => {
+  // Enable real-time timer updates
+  useFastingTimerTick();
+
   // Use dynamic selectors for real-time updates
   const elapsedSeconds = useFastingElapsedSeconds();
   const progressPercentage = useFastingProgressPercentage();
