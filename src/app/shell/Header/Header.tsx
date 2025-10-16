@@ -48,7 +48,7 @@ export const Header = React.memo(() => {
       >
         <div className="w-full h-full flex items-center justify-between gap-2 px-4 md:px-6">
           {/* Left */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3" style={{ height: '100%' }}>
             {/* Bouton Retour - Référence visuelle */}
             <BackButton />
             <HeaderLogo />
