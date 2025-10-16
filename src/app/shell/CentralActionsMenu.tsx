@@ -155,9 +155,8 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
     ? { duration: 0.2, ease: [0.25, 0.1, 0.25, 1] as any }
     : { type: 'spring' as const, stiffness: 280, damping: 22, mass: 0.9 };
 
-  /** Boutons d'action (pills) */
+  /** Boutons d'action (pills) - HARMONISÉ avec système icon-container */
   const SecondaryPill: React.FC<{ action: QuickAction; index: number }> = ({ action, index }) => {
-    const [r, g, b] = hexToRgbArray(action.color || '#18E3FF');
     const isComingSoon = action.comingSoon || !action.available;
 
     return (
@@ -167,31 +166,23 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
         disabled={isComingSoon}
         className="glass-card rounded-xl px-2 py-1.5 flex items-center gap-1.5 w-full relative"
         style={{
-          background: 'var(--glass-opacity-base)',
-          border: `1px solid rgba(${r}, ${g}, ${b}, 0.24)`,
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 14px rgba(0,0,0,0.18)',
+          // Variable CSS pour la couleur de circuit dynamique
+          '--pill-circuit-color': action.color || '#18E3FF',
           opacity: isComingSoon ? 0.5 : 1,
           cursor: isComingSoon ? 'not-allowed' : 'pointer'
-        }}
+        } as React.CSSProperties}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: isComingSoon ? 0.5 : 1, y: 0 }}
         transition={{ ...springy, delay: reduceMotion ? 0 : index * 0.05 }}
-        whileHover={reduceMotion || isComingSoon ? {} : { y: -1, scale: 1.02 }}
-        whileTap={reduceMotion || isComingSoon ? {} : { scale: 0.98 }}
+        whileHover={reduceMotion || isComingSoon ? {} : {}}
+        whileTap={reduceMotion || isComingSoon ? {} : {}}
         role="menuitem"
         aria-label={action.description || action.label}
         aria-disabled={isComingSoon}
       >
-        <div
-          className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{
-            background: `linear-gradient(135deg, rgba(${r}, ${g}, ${b}, 0.3), rgba(${r}, ${g}, ${b}, 0.18))`,
-            border: `1px solid rgba(${r}, ${g}, ${b}, 0.4)`,
-            borderRadius: '0.5rem',
-            overflow: 'hidden'
-          }}
-        >
-          <SpatialIcon Icon={ICONS[action.icon]} size={13} style={{ color: action.color }} />
+        {/* Icon container harmonisé - géré par CSS avec --pill-circuit-color */}
+        <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0">
+          <SpatialIcon Icon={ICONS[action.icon]} size={13} />
         </div>
         <div className="flex-1 min-w-0 text-left">
           <div className="text-[11px] font-semibold text-white leading-tight break-words">

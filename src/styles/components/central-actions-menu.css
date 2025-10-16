@@ -244,67 +244,121 @@
   -webkit-backdrop-filter: none !important;
 }
 
-/* Enhanced tile glass cards - clean with proper border radius */
+/* =========================================
+   SYSTÈME DE PILLS COLORÉS - HARMONISÉ AVEC BOTTOM BAR & SIDEBAR
+   Icon containers séparés avec couleurs circuit dynamiques
+   ========================================= */
+
+/* Pill button base - maintenant avec couleur de fond complète */
 .central-actions-panel .glass-card {
   position: relative;
-  overflow: hidden;
-  border-radius: 12px; /* Force rounded corners */
-
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-    var(--liquid-tile-bg);
-
-  backdrop-filter: blur(var(--liquid-tile-blur)) saturate(var(--liquid-tile-saturate));
-  -webkit-backdrop-filter: blur(var(--liquid-tile-blur)) saturate(var(--liquid-tile-saturate));
-
-  /* Removed box-shadow to prevent rectangular shadows */
-
-  /* Ensure no rectangular shadows escape */
+  overflow: visible !important;
+  border-radius: 12px;
   isolation: isolate;
   transform: translateZ(0);
 
+  /* Base transparente pour laisser l'icon-container briller */
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  transition:
+    transform var(--liquid-transition-medium);
+}
+
+/* Icon container dans les pills - système harmonisé */
+.central-actions-panel .glass-card .w-6.h-6 {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 10px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: visible;
+  flex-shrink: 0;
+
+  /* Liquid glass pill effect avec couleur dynamique - HARMONISÉ */
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22) 0%, transparent 60%),
+    radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 18%, transparent) 0%, transparent 70%),
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 28%, transparent),
+      color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 16%, transparent));
+
+  border: 1.5px solid color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 45%, transparent) !important;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 0 20px color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 25%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.25) !important;
+
   transition:
     transform var(--liquid-transition-medium),
+    background var(--liquid-transition-fast),
     box-shadow var(--liquid-transition-fast),
     border-color var(--liquid-transition-fast);
+
+  transform: translateZ(0);
+  will-change: transform, filter;
 }
 
-/* Tile hover enhancement */
-@media (hover: hover) and (pointer: fine) {
-  .central-actions-panel .glass-card:hover {
-    transform: scale(1.03) translateY(-2px) translateZ(0);
-    /* Removed box-shadow to prevent rectangular shadows */
-  }
-
-  .central-actions-panel .glass-card:hover::before {
-    opacity: 1;
-  }
-}
-
-/* Tile active state */
-.central-actions-panel .glass-card:active {
-  transform: scale(0.98) translateZ(0);
-}
-
-/* Corner highlight on tiles - FIXED: contained within borders */
-.central-actions-panel .glass-card::before {
+/* Corner highlight effect on pill icon containers */
+.central-actions-panel .glass-card .w-6.h-6::before {
   content: '';
   position: absolute;
   top: 2px;
   left: 2px;
-  right: 65%;
-  bottom: 65%;
+  right: 50%;
+  bottom: 50%;
   border-radius: inherit;
   background: radial-gradient(
-    circle at 15% 15%,
-    rgba(255, 255, 255, 0.15) 0%,
-    rgba(255, 255, 255, 0.06) 35%,
+    circle at 20% 20%,
+    rgba(255,255,255,0.5) 0%,
     transparent 60%
   );
-  opacity: 0.35;
+  opacity: 0.7;
   pointer-events: none;
-  transition: opacity var(--liquid-transition-fast);
-  overflow: hidden;
+}
+
+/* Icône colorée dans l'icon-container */
+.central-actions-panel .glass-card .w-6.h-6 svg {
+  color: var(--pill-circuit-color, #18E3FF) !important;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 50%, transparent)) !important;
+  transition: filter 0.2s ease;
+}
+
+/* Hover effect harmonisé - focus sur l'icon-container */
+@media (hover: hover) and (pointer: fine) {
+  .central-actions-panel .glass-card:hover {
+    transform: translateY(-1px) translateZ(0);
+  }
+
+  .central-actions-panel .glass-card:hover .w-6.h-6 {
+    transform: scale(1.08) translateZ(0);
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.2),
+      0 0 28px color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 32%, transparent),
+      0 0 56px color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 18%, transparent),
+      inset 0 1px 0 rgba(255,255,255,0.3);
+    border-color: color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 60%, transparent) !important;
+  }
+
+  .central-actions-panel .glass-card:hover .w-6.h-6 svg {
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 70%, transparent)) !important;
+  }
+}
+
+/* Active state - subtle press */
+.central-actions-panel .glass-card:active {
+  transform: translateY(0) translateZ(0);
+}
+
+.central-actions-panel .glass-card:active .w-6.h-6 {
+  transform: scale(0.96) translateZ(0);
+  transition-duration: 0.1s;
 }
 
 /* Icon container glass enhancement */
@@ -561,14 +615,21 @@
     min-height: 32px !important;
   }
 
-  /* Réduire les icônes des petits boutons sur mobile */
-  .central-actions-panel button.rounded-xl > div:first-child {
-    width: 24px !important;
-    height: 24px !important;
+  /* Réduire les icon-containers sur mobile - maintien du style harmonisé */
+  .central-actions-panel .glass-card .w-6.h-6 {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 8px !important;
+
+    /* Optimisation des effets pour mobile */
+    box-shadow:
+      0 3px 10px rgba(0, 0, 0, 0.12),
+      0 0 16px color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 20%, transparent),
+      inset 0 1px 0 rgba(255,255,255,0.2) !important;
   }
 
-  /* Réduire la taille des icônes dans les petits boutons */
-  .central-actions-panel button.rounded-xl svg {
+  /* Réduire la taille des icônes dans les icon-containers */
+  .central-actions-panel .glass-card .w-6.h-6 svg {
     width: 12px !important;
     height: 12px !important;
   }
@@ -638,6 +699,15 @@
   .central-actions-panel button.rounded-full svg {
     width: 12px !important;
     height: 12px !important;
+  }
+
+  /* Désactiver les hover effects sur mobile pour meilleure performance */
+  .central-actions-panel .glass-card:hover .w-6.h-6 {
+    transform: translateZ(0) !important;
+    box-shadow:
+      0 3px 10px rgba(0, 0, 0, 0.12),
+      0 0 16px color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 20%, transparent),
+      inset 0 1px 0 rgba(255,255,255,0.2) !important;
   }
 
   /* Avatar Twin Button - Mobile compact - OPTIMIZED */
