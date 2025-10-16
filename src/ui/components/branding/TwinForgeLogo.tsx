@@ -68,7 +68,7 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
 
   return (
     <div
-      className={`flex items-start ${className}`}
+      className={`flex items-center ${className}`}
       style={{
         transition: 'all 300ms ease-out',
         gap: '8px',
@@ -77,7 +77,9 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
     >
       <div style={{
         position: 'relative',
-        marginTop: '0px'
+        display: 'flex',
+        alignItems: 'center',
+        height: '42px'
       }}>
         <ForgeHammerIcon
           width={36}
@@ -91,7 +93,7 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
         flexDirection: 'column',
         gap: '2px',
         alignItems: 'flex-start',
-        marginTop: '1px'
+        justifyContent: 'center'
       }}>
         <span
           style={{
