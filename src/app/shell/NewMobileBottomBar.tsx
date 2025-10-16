@@ -12,14 +12,23 @@ import CentralActionsMenu from './CentralActionsMenu';
 
 /**
  * Configuration des boutons de la nouvelle barre inférieure
+ * 7 boutons : 3 à gauche - 1 central (éclair) - 3 à droite
+ * Le bouton de chat est maintenant flottant au-dessus de la bottom bar
  */
 const BOTTOM_BAR_BUTTONS = [
   {
-    id: 'nutrition',
-    label: 'Nutrition',
+    id: 'meal-scan',
+    label: 'Scanner Repas',
     icon: 'Utensils' as const,
-    route: '/meals',
+    route: '/meals/scan',
     color: '#10B981', // Vert nutrition
+  },
+  {
+    id: 'fridge-scan',
+    label: 'Scanner Frigo',
+    icon: 'Refrigerator' as const,
+    route: '/fridge/scan',
+    color: '#14B8A6', // Turquoise
   },
   {
     id: 'activity',
@@ -35,12 +44,6 @@ const BOTTOM_BAR_BUTTONS = [
     isCentral: true,
   },
   {
-    id: 'chat',
-    icon: 'MessageSquare' as const,
-    color: '#F7931E', // Logo Orange (même couleur que central)
-    isChat: true,
-  },
-  {
     id: 'fasting',
     label: 'Jeûne',
     icon: 'Timer' as const,
@@ -48,8 +51,15 @@ const BOTTOM_BAR_BUTTONS = [
     color: '#F59E0B', // Orange jeûne
   },
   {
+    id: 'training',
+    label: 'Coaching',
+    icon: 'Dumbbell' as const,
+    route: '/training',
+    color: '#EC4899', // Rose coaching
+  },
+  {
     id: 'twin',
-    label: 'Twin',
+    label: 'Twin 3D',
     icon: 'User' as const,
     route: '/avatar',
     color: '#8B5CF6', // Violet
@@ -75,15 +85,13 @@ function BarButton({
   const handleClick = () => {
     if (button.isCentral) {
       centralButtonClick(!active);
-    } else if (button.isChat) {
-      Haptics.press();
     } else {
       bottomBarClick(button.color, active);
     }
     onClick();
   };
 
-  const isBigButton = button.isCentral || button.isChat;
+  const isBigButton = button.isCentral;
   const iconSize = isBigButton ? 28 : 20;
 
   return (
@@ -91,8 +99,6 @@ function BarButton({
       onClick={handleClick}
       className={`new-bottom-bar-button ${
         button.isCentral ? 'new-bottom-bar-button--central central-action-button' : ''
-      } ${
-        button.isChat ? 'new-bottom-bar-button--chat' : ''
       }`}
       style={{
         '--button-color': button.color,
@@ -104,20 +110,15 @@ function BarButton({
       aria-label={
         button.isCentral
           ? 'Ouvrir le menu d\'actions'
-          : button.isChat
-          ? 'Ouvrir le chat'
           : `Aller à ${button.label}`
       }
     >
-      <div className={`new-bottom-bar-icon-container ${active ? 'new-bottom-bar-icon-container--active' : ''} ${button.isChat && hasUnread ? 'new-bottom-bar-icon-container--unread' : ''}`}>
+      <div className={`new-bottom-bar-icon-container ${active ? 'new-bottom-bar-icon-container--active' : ''}`}>
         <SpatialIcon
           Icon={ICONS[button.icon]}
           size={iconSize}
           style={{
-            color: active || (button.isChat && hasUnread) ? button.color : 'rgba(255, 255, 255, 0.5)',
-            filter: button.isChat && hasUnread
-              ? `drop-shadow(0 0 14px color-mix(in srgb, ${button.color} 60%, transparent))`
-              : undefined
+            color: active ? button.color : 'rgba(255, 255, 255, 0.5)'
           }}
         />
       </div>
@@ -126,46 +127,14 @@ function BarButton({
           {button.label}
         </div>
       )}
-
-      {/* Badge Count for chat unread messages */}
-      {button.isChat && hasUnread && unreadCount && unreadCount > 0 && (
-        <AnimatePresence>
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            className="chat-notification-badge"
-            style={{
-              position: 'absolute',
-              top: '6px',
-              right: '6px',
-              minWidth: '18px',
-              height: '18px',
-              padding: '0 5px',
-              borderRadius: '9px',
-              background: `radial-gradient(circle at 30% 30%, ${button.color} 0%, color-mix(in srgb, ${button.color} 80%, #000) 100%)`,
-              border: '2px solid rgba(11, 14, 23, 0.9)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '10px',
-              fontWeight: 'bold',
-              color: 'white',
-              boxShadow: `0 0 16px color-mix(in srgb, ${button.color} 60%, transparent), 0 2px 8px rgba(0, 0, 0, 0.4)`,
-              zIndex: 2
-            }}
-          >
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </motion.div>
-        </AnimatePresence>
-      )}
     </motion.button>
   );
 }
 
 /**
  * New Mobile Bottom Bar - Barre de navigation inférieure redesignée
- * 6 boutons en pleine largeur avec bouton central pour actions rapides et bouton chat
+ * 7 boutons : Scanner Repas - Scanner Frigo - Activité - ACTION (éclair) - Jeûne - Coaching - Twin 3D
+ * Le bouton de chat est maintenant flottant au-dessus du coin droit de la bottom bar
  */
 const NewMobileBottomBar: React.FC = () => {
   const { pathname } = useLocation();
@@ -173,18 +142,9 @@ const NewMobileBottomBar: React.FC = () => {
   const { isOpen, toggle, close } = useOverlayStore();
   const centralMenuOpen = isOpen('centralMenu');
 
-  const {
-    isOpen: chatIsOpen,
-    toggle: toggleChat,
-    hasUnreadMessages,
-    unreadCount
-  } = useGlobalChatStore();
-
   const handleButtonClick = (button: typeof BOTTOM_BAR_BUTTONS[0]) => {
     if (button.isCentral) {
       toggle('centralMenu');
-    } else if (button.isChat) {
-      toggleChat();
     } else if (button.route) {
       navigate(button.route);
       close();
@@ -193,7 +153,6 @@ const NewMobileBottomBar: React.FC = () => {
 
   const isButtonActive = (button: typeof BOTTOM_BAR_BUTTONS[0]) => {
     if (button.isCentral) return centralMenuOpen;
-    if (button.isChat) return chatIsOpen;
     return button.route ? pathname.startsWith(button.route) : false;
   };
 
@@ -218,8 +177,6 @@ const NewMobileBottomBar: React.FC = () => {
                 button={button}
                 active={isButtonActive(button)}
                 onClick={() => handleButtonClick(button)}
-                hasUnread={button.isChat ? hasUnreadMessages : undefined}
-                unreadCount={button.isChat ? unreadCount : undefined}
               />
             ))}
           </div>

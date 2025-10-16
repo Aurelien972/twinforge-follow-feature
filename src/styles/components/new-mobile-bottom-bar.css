@@ -162,19 +162,7 @@
   min-width: var(--new-bottom-bar-central-button-size);
   min-height: var(--new-bottom-bar-central-button-size);
   border-radius: 20px;
-  flex: 1.5; /* Réduit pour faire place au bouton chat */
-  position: relative;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Bouton chat (même taille que central) */
-.new-bottom-bar-button--chat {
-  min-width: var(--new-bottom-bar-central-button-size);
-  min-height: var(--new-bottom-bar-central-button-size);
-  border-radius: 20px;
-  flex: 1.5; /* Même importance que le bouton central */
+  flex: 1.3; /* Ajusté pour 7 boutons */
   position: relative;
   background: transparent !important;
   border: none !important;
@@ -209,22 +197,6 @@
   }
 
   .new-bottom-bar-button--central:hover .new-bottom-bar-icon-container {
-    box-shadow:
-      var(--liquid-pill-shadow),
-      0 0 35px rgba(247, 147, 30, 0.35),
-      0 0 70px rgba(253, 200, 48, 0.2),
-      0 4px 20px rgba(0,0,0,0.25);
-    border-color: rgba(247, 147, 30, 0.5);
-  }
-
-  .new-bottom-bar-button--chat:hover {
-    background: transparent !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-    transform: scale(1.08) translateY(-2px) translateZ(0);
-  }
-
-  .new-bottom-bar-button--chat:hover .new-bottom-bar-icon-container {
     box-shadow:
       var(--liquid-pill-shadow),
       0 0 35px rgba(247, 147, 30, 0.35),
@@ -291,59 +263,6 @@
     0 0 30px rgba(247, 147, 30, 0.2);
 }
 
-/* Chat button - même style que central */
-.new-bottom-bar-button--chat .new-bottom-bar-icon-container {
-  width: 64px;
-  height: 64px;
-
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22) 0%, transparent 50%),
-    radial-gradient(circle at 70% 70%, rgba(247, 147, 30, 0.12) 0%, transparent 60%),
-    var(--liquid-pill-bg);
-
-  border: 1.5px solid rgba(247, 147, 30, 0.3);
-  box-shadow:
-    var(--liquid-pill-shadow),
-    0 0 30px rgba(247, 147, 30, 0.2);
-}
-
-/* Chat button with unread messages - enhanced glow */
-.new-bottom-bar-icon-container--unread {
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28) 0%, transparent 50%),
-    radial-gradient(circle at 70% 70%, rgba(247, 147, 30, 0.25) 0%, transparent 60%),
-    var(--liquid-pill-bg) !important;
-
-  border: 1.5px solid rgba(247, 147, 30, 0.5) !important;
-  box-shadow:
-    var(--liquid-pill-shadow),
-    0 0 35px rgba(247, 147, 30, 0.35),
-    0 0 60px rgba(253, 200, 48, 0.2) !important;
-  animation: chatUnreadPulse 2s ease-in-out infinite;
-}
-
-/* Tablet-specific positioning for chat notification badge */
-@media (min-width: 768px) and (max-width: 1024px) {
-  .chat-notification-badge {
-    top: 4px !important;
-    right: 4px !important;
-  }
-}
-
-@keyframes chatUnreadPulse {
-  0%, 100% {
-    box-shadow:
-      var(--liquid-pill-shadow),
-      0 0 30px rgba(247, 147, 30, 0.3),
-      0 0 55px rgba(253, 200, 48, 0.18);
-  }
-  50% {
-    box-shadow:
-      var(--liquid-pill-shadow),
-      0 0 40px rgba(247, 147, 30, 0.4),
-      0 0 70px rgba(253, 200, 48, 0.25);
-  }
-}
 
 /* Corner highlight effect on pills */
 .new-bottom-bar-icon-container::before {
@@ -404,28 +323,7 @@
   transform: scale(1.08) translateZ(0);
 }
 
-/* État actif spécifique pour le bouton chat */
-.new-bottom-bar-button--chat .new-bottom-bar-icon-container--active {
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.32) 0%, transparent 60%),
-    radial-gradient(circle at 70% 70%, rgba(247, 147, 30, 0.25) 0%, transparent 70%),
-    linear-gradient(135deg,
-      rgba(255, 107, 53, 0.35),
-      rgba(253, 200, 48, 0.20));
-
-  border: 2px solid rgba(247, 147, 30, 0.65);
-
-  box-shadow:
-    var(--liquid-pill-shadow),
-    0 0 30px rgba(247, 147, 30, 0.4),
-    0 0 60px rgba(253, 200, 48, 0.25),
-    0 0 90px rgba(253, 200, 48, 0.15),
-    inset 0 2px 0 rgba(255,255,255,0.35);
-
-  transform: scale(1.08) translateZ(0);
-}
-
-@keyframes activePulse {
+/* @keyframes activePulse {
   0%, 100% {
     box-shadow:
       var(--liquid-pill-shadow),
@@ -476,8 +374,7 @@
     height: 36px;
   }
 
-  .new-bottom-bar-button--central .new-bottom-bar-icon-container,
-  .new-bottom-bar-button--chat .new-bottom-bar-icon-container {
+  .new-bottom-bar-button--central .new-bottom-bar-icon-container {
     width: 52px;
     height: 52px;
   }

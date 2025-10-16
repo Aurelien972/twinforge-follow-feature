@@ -1,8 +1,8 @@
 /**
  * Chat Notification Bubble Styles
  * VisionOS 26 inspired glassmorphism notification
- * Banner pleine largeur au-dessus de la bottom bar sur mobile/tablette
- * Petit popup à gauche sur desktop
+ * Positionée à gauche du bouton de chat, alignée horizontalement
+ * Marge de 8px entre la bulle et le bouton de chat
  */
 
 .chat-notification-bubble {
@@ -39,22 +39,23 @@
     border-color var(--liquid-transition-fast);
 }
 
-/* Desktop version - popup à gauche de la bulle de chat */
+/* Desktop version - popup à gauche du bouton de chat */
 .chat-notification-bubble--desktop {
-  padding: 16px 20px;
+  padding: 14px 18px;
   border-radius: 16px;
-  margin-bottom: 4px;
+  width: 280px;
+  max-width: 280px;
 }
 
-/* Mobile/Tablet version - banner pleine largeur au-dessus de la bottom bar */
+/* Mobile/Tablet version - à gauche du bouton de chat */
 .chat-notification-bubble--mobile {
-  padding: 14px 20px;
-  border-radius: var(--new-bottom-bar-border-radius);
+  padding: 12px 16px;
+  border-radius: 16px;
   width: auto !important;
-  max-width: none !important;
-  bottom: calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 12px) !important;
+  max-width: calc(100vw - 56px - 8px - 8px - 16px) !important; /* 100vw - largeur bouton chat - marge droite - marge entre bulle et bouton - marge gauche */
+  bottom: calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px) !important;
   left: 8px !important;
-  right: 8px !important;
+  right: calc(56px + 8px + 8px) !important; /* largeur bouton chat + marge droite + espacement */
   top: auto !important;
   transform: none !important;
 }
@@ -126,6 +127,8 @@
 @media (min-width: 1025px) {
   .chat-notification-bubble--desktop {
     padding: 16px 20px;
+    width: 320px;
+    max-width: 320px;
   }
 
   .chat-notification-bubble--desktop .chat-notification-bubble__message {
@@ -136,24 +139,12 @@
 /* Tablet */
 @media (min-width: 769px) and (max-width: 1024px) {
   .chat-notification-bubble--mobile {
-    padding: 16px 24px;
-    border-radius: var(--new-bottom-bar-border-radius);
-    left: 8px;
-    right: 8px;
-  }
-
-  .chat-notification-bubble--mobile .chat-notification-bubble__message {
-    font-size: 15px;
-  }
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-  .chat-notification-bubble--mobile {
     padding: 14px 18px;
-    border-radius: var(--new-bottom-bar-border-radius);
-    left: 8px;
-    right: 8px;
+    border-radius: 16px;
+    max-width: calc(100vw - 58px - 8px - 8px - 16px) !important; /* 100vw - largeur bouton chat tablette - marges */
+    bottom: calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px) !important;
+    left: 8px !important;
+    right: calc(58px + 8px + 8px) !important; /* largeur bouton chat + marge droite + espacement */
   }
 
   .chat-notification-bubble--mobile .chat-notification-bubble__message {
@@ -161,17 +152,35 @@
   }
 }
 
-/* Small mobile */
-@media (max-width: 480px) {
+/* Mobile */
+@media (max-width: 768px) {
   .chat-notification-bubble--mobile {
     padding: 12px 16px;
-    border-radius: var(--new-bottom-bar-border-radius);
-    left: 8px;
-    right: 8px;
+    border-radius: 16px;
+    max-width: calc(100vw - 56px - 8px - 8px - 16px) !important; /* 100vw - largeur bouton chat - marges */
+    bottom: calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px) !important;
+    left: 8px !important;
+    right: calc(56px + 8px + 8px) !important;
   }
 
   .chat-notification-bubble--mobile .chat-notification-bubble__message {
     font-size: 13px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .chat-notification-bubble--mobile {
+    padding: 10px 14px;
+    border-radius: 14px;
+    max-width: calc(100vw - 56px - 8px - 8px - 16px) !important;
+    bottom: calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px) !important;
+    left: 8px !important;
+    right: calc(56px + 8px + 8px) !important;
+  }
+
+  .chat-notification-bubble--mobile .chat-notification-bubble__message {
+    font-size: 12px;
   }
 }
 

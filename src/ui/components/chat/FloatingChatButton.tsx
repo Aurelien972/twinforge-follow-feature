@@ -86,7 +86,7 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
       className={`floating-chat-button ${isStep2Active ? 'floating-chat-button--step2' : ''} ${className}`}
       style={{
         position: 'fixed',
-        right: (isOpen && !isDesktop) ? '-100px' : (isDesktop ? '24px' : '20px'),
+        right: (isOpen && !isDesktop) ? '-100px' : (isDesktop ? '24px' : '8px'),
         bottom: isDesktop ? '24px' : 'calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px)',
         zIndex: Z_INDEX.FLOATING_CHAT_BUTTON,
         borderRadius: '50%',
@@ -96,6 +96,8 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
         justifyContent: 'center',
         padding: '0',
         isolation: 'isolate',
+        width: isDesktop ? '60px' : '56px',
+        height: isDesktop ? '60px' : '56px',
         background: hasUnreadMessages
           ? `
               radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 30%, transparent) 0%, transparent 50%),

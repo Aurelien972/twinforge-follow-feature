@@ -75,25 +75,24 @@ const ChatNotificationBubble: React.FC<ChatNotificationBubbleProps> = ({ buttonR
         const buttonRect = buttonRef.current.getBoundingClientRect();
         const notificationRect = notificationRef.current.getBoundingClientRect();
         const notificationWidth = 320;
-        const gap = 16;
+        const gap = 8; // Espacement de 8px entre la bulle et le bouton
 
         // Obtenir les vraies positions du bouton
         const buttonWidth = buttonRect.width;
         const buttonHeight = buttonRect.height;
         const notificationHeight = notificationRect.height || 56;
 
-        // Position horizontale : à gauche du bouton
+        // Position horizontale : à gauche du bouton avec gap de 8px
         // Le bouton est à right: 24px de l'écran
         const right = window.innerWidth - buttonRect.left + gap;
 
-        // Position verticale : centre de la notification = centre du bouton
+        // Position verticale : ALIGNÉE HORIZONTALEMENT avec le bouton
         // Le centre du bouton en coordonnées de fenêtre
         const buttonCenterY = buttonRect.top + (buttonHeight / 2);
 
-        // La notification doit avoir son centre au même Y
+        // La notification doit avoir son centre au même Y que le bouton
         // On calcule le top de la notification pour que son centre soit à buttonCenterY
-        // Ajout de 2px pour un alignement parfait
-        const notificationTop = buttonCenterY - (notificationHeight / 2) + 2;
+        const notificationTop = buttonCenterY - (notificationHeight / 2);
 
         setPositionStyles({
           position: 'fixed',
@@ -108,7 +107,7 @@ const ChatNotificationBubble: React.FC<ChatNotificationBubbleProps> = ({ buttonR
         setPositionStyles({
           position: 'fixed',
           bottom: '24px',
-          right: '108px',
+          right: '92px', // 60px (largeur bouton) + 8px (gap) + 24px (marge droite)
           transform: 'none',
           width: '320px',
           maxWidth: '320px'
