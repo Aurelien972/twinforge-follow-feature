@@ -3,7 +3,7 @@ import type { SuggestedFridgeItem } from '../../../../system/store/fridgeScan/ty
 import CaptureMainCTA from './CaptureMainCTA';
 import CapturedPhotosDisplay from './CapturedPhotosDisplay';
 import AnalyzeCTA from './AnalyzeCTA';
-import CaptureTipsCard from './CaptureTipsCard';
+import WhyScanMyFridgeCard from './WhyScanMyFridgeCard';
 import LoadingAnalysisCard from './LoadingAnalysisCard';
 import ContextualInfoCard from './ContextualInfoCard';
 import ComplementStage from '../stages/ComplementStage';
@@ -100,7 +100,7 @@ const FridgeScanStageRenderer: React.FC<FridgeScanStageRendererProps> = ({
               />
             )}
             
-            <CaptureTipsCard />
+            <WhyScanMyFridgeCard />
           </div>
         );
 

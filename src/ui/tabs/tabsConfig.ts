@@ -22,7 +22,7 @@ export const TAB_COLORS: Record<string, string> = {
   // Atelier de Recettes (Fridge)
   'scanner': '#EC4899',     // Rose pour scanner
   'inventaire': '#06B6D4',  // Cyan pour inventaire
-  'recipes': '#EC4899',     // Rose pour recettes
+  'recipes': '#10B981',     // Vert pour recettes
   'plan': '#8B5CF6',        // Violet pour plan
   'courses': '#F59E0B',     // Orange pour courses
 

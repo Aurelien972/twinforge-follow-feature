@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import PageHeader from '../../ui/page/PageHeader';
 import Tabs from '../../ui/tabs/TabsComponent';
 import ScannerTab from './Fridge/tabs/ScannerTab';
@@ -13,6 +14,44 @@ import ShoppingListTab from './Fridge/tabs/ShoppingListTab';
  * Page principale avec système d'onglets pour la gestion d'inventaire, recettes, plans et courses
  */
 const FridgePage: React.FC = () => {
+  const location = useLocation();
+
+  // Configuration des titres, sous-titres et couleurs par onglet
+  const tabConfig = useMemo(() => {
+    const hash = location.hash.replace('#', '');
+    const activeTab = hash ? decodeURIComponent(hash) : 'scanner';
+
+    const configs: Record<string, { title: string; subtitle: string; iconColor: string }> = {
+      scanner: {
+        title: 'Scanner',
+        subtitle: 'Capturez votre inventaire',
+        iconColor: '#EC4899'
+      },
+      inventaire: {
+        title: 'Inventaire',
+        subtitle: 'Gérez vos ingrédients',
+        iconColor: '#06B6D4'
+      },
+      recipes: {
+        title: 'Recettes',
+        subtitle: 'Créations culinaires personnalisées',
+        iconColor: '#10B981'
+      },
+      plan: {
+        title: 'Plan',
+        subtitle: 'Planification hebdomadaire',
+        iconColor: '#8B5CF6'
+      },
+      courses: {
+        title: 'Courses',
+        subtitle: 'Liste de courses optimisée',
+        iconColor: '#F59E0B'
+      }
+    };
+
+    return configs[activeTab] || configs.scanner;
+  }, [location.hash]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -22,10 +61,10 @@ const FridgePage: React.FC = () => {
     >
       <PageHeader
         icon="ChefHat"
-        title="Forge Culinaire"
-        subtitle="Recettes & Plans"
+        title={tabConfig.title}
+        subtitle={tabConfig.subtitle}
         circuit="fridge"
-        iconColor="#EC4899"
+        iconColor={tabConfig.iconColor}
       />
 
       <Tabs defaultValue="scanner" forgeContext="fridge">

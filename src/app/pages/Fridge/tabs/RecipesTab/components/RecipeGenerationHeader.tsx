@@ -65,9 +65,9 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
       <GlassCard
         className="p-5"
         style={{
-          background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(219, 39, 119, 0.05) 100%)',
-          borderColor: 'rgba(236, 72, 153, 0.2)',
-          boxShadow: '0 8px 32px rgba(236, 72, 153, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+          borderColor: 'rgba(16, 185, 129, 0.2)',
+          boxShadow: '0 8px 32px rgba(16, 185, 129, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
         }}
       >
         {/* Header */}
@@ -79,10 +79,10 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                  linear-gradient(135deg, color-mix(in srgb, #ec4899 35%, transparent), color-mix(in srgb, #ec4899 25%, transparent))
+                  linear-gradient(135deg, color-mix(in srgb, #10B981 35%, transparent), color-mix(in srgb, #10B981 25%, transparent))
                 `,
-                border: '2px solid color-mix(in srgb, #ec4899 50%, transparent)',
-                boxShadow: '0 0 30px color-mix(in srgb, #ec4899 40%, transparent)'
+                border: '2px solid color-mix(in srgb, #10B981 50%, transparent)',
+                boxShadow: '0 0 30px color-mix(in srgb, #10B981 40%, transparent)'
               }}
             >
               <SpatialIcon 

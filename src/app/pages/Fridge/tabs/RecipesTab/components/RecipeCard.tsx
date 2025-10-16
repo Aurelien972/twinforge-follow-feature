@@ -181,7 +181,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
         </div>
 
         {/* Image de la Recette */}
-        <div className="relative mb-4 h-48 rounded-lg overflow-hidden bg-gradient-to-br from-pink-500/20 to-rose-500/20">
+        <div className="relative mb-4 h-48 rounded-lg overflow-hidden bg-gradient-to-br from-green-500/20 to-emerald-500/20">
           {isLoading || recipe.isGeneratingImage ? (
             <div className="w-full h-full bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-sm border border-white/10 rounded-lg flex items-center justify-center">
               <div className="space-y-3 text-center">
@@ -321,7 +321,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
             <ul className="text-xs text-white/70 space-y-1">
               {recipe.reasons.slice(0, 2).map((reason, reasonIndex) => (
                 <li key={reasonIndex} className="flex items-start gap-1">
-                  <span className="text-pink-400 mt-0.5">•</span>
+                  <span className="text-green-400 mt-0.5">•</span>
                   <span>{reason}</span>
                 </li>
               ))}

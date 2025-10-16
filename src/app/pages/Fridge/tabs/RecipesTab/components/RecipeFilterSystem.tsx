@@ -76,15 +76,15 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
       className="p-4 space-y-6"
       style={{
         background: `
-          radial-gradient(circle at 30% 20%, color-mix(in srgb, #EC4899 12%, transparent) 0%, transparent 60%),
-          radial-gradient(circle at 70% 80%, color-mix(in srgb, #F472B6 8%, transparent) 0%, transparent 50%),
+          radial-gradient(circle at 30% 20%, color-mix(in srgb, #10B981 12%, transparent) 0%, transparent 60%),
+          radial-gradient(circle at 70% 80%, color-mix(in srgb, #34D399 8%, transparent) 0%, transparent 50%),
           rgba(255, 255, 255, 0.05)
         `,
-        borderColor: 'color-mix(in srgb, #EC4899 25%, transparent)',
+        borderColor: 'color-mix(in srgb, #10B981 25%, transparent)',
         boxShadow: `
           0 12px 40px rgba(0, 0, 0, 0.25),
-          0 0 30px color-mix(in srgb, #EC4899 15%, transparent),
-          0 0 60px color-mix(in srgb, #F472B6 10%, transparent),
+          0 0 30px color-mix(in srgb, #10B981 15%, transparent),
+          0 0 60px color-mix(in srgb, #34D399 10%, transparent),
           inset 0 2px 0 rgba(255, 255, 255, 0.15)
         `
       }}
@@ -97,16 +97,16 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
             style={{
               background: `
                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                linear-gradient(135deg, color-mix(in srgb, #ec4899 35%, transparent), color-mix(in srgb, #ec4899 25%, transparent))
+                linear-gradient(135deg, color-mix(in srgb, #10B981 35%, transparent), color-mix(in srgb, #10B981 25%, transparent))
               `,
-              border: '2px solid color-mix(in srgb, #ec4899 50%, transparent)',
-              boxShadow: '0 0 30px color-mix(in srgb, #ec4899 40%, transparent)'
+              border: '2px solid color-mix(in srgb, #10B981 50%, transparent)',
+              boxShadow: '0 0 30px color-mix(in srgb, #10B981 40%, transparent)'
             }}
           >
-            <SpatialIcon 
-              Icon={ICONS.Filter} 
-              size={20} 
-              style={{ color: '#EC4899' }}
+            <SpatialIcon
+              Icon={ICONS.Filter}
+              size={20}
+              style={{ color: '#10B981' }}
             />
           </div>
           <div>
@@ -125,9 +125,9 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
           disabled={isGenerating}
           className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
-            background: 'color-mix(in srgb, #EC4899 15%, transparent)',
-            border: '1px solid color-mix(in srgb, #EC4899 30%, transparent)',
-            color: 'color-mix(in srgb, #EC4899 80%, white)'
+            background: 'color-mix(in srgb, #10B981 15%, transparent)',
+            border: '1px solid color-mix(in srgb, #10B981 30%, transparent)',
+            color: 'color-mix(in srgb, #10B981 80%, white)'
           }}
         >
           <SpatialIcon 
@@ -163,7 +163,7 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
                 placeholder="Rechercher une recette..."
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                 disabled={isGenerating}
               />
             </div>
@@ -180,7 +180,7 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
                   placeholder="Ex: 30"
                   value={maxPrepTime || ''}
                   onChange={(e) => setMaxPrepTime?.(e.target.value ? parseInt(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                   disabled={isGenerating}
                   min="1"
                   max="180"
@@ -197,7 +197,7 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
                   placeholder="Ex: 45"
                   value={maxCookTime || ''}
                   onChange={(e) => setMaxCookTime?.(e.target.value ? parseInt(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                   disabled={isGenerating}
                   min="1"
                   max="300"
@@ -214,7 +214,7 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
                   placeholder="Ex: 2"
                   value={minServings || ''}
                   onChange={(e) => setMinServings?.(e.target.value ? parseInt(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                   disabled={isGenerating}
                   min="1"
                   max="12"
@@ -229,7 +229,7 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
                 {hasActiveFilters && (
                   <button
                     onClick={clearAllFilters}
-                    className="text-xs text-pink-400 hover:text-pink-300 transition-colors"
+                    className="text-xs text-green-400 hover:text-green-300 transition-colors"
                     disabled={isGenerating}
                   >
                     Effacer tout
@@ -247,7 +247,7 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
                       disabled={isGenerating}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                         isSelected
-                          ? 'bg-pink-500 text-white shadow-lg'
+                          ? 'bg-green-500 text-white shadow-lg'
                           : 'bg-white/10 text-white/70 hover:bg-white/20'
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
                       whileHover={!isGenerating ? { scale: 1.05 } : {}}
@@ -280,9 +280,9 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
             <SpatialIcon 
               Icon={ICONS.Filter} 
               size={14} 
-              className="text-pink-400"
+              className="text-green-400"
             />
-            <span className="text-pink-400">
+            <span className="text-green-400">
               Filtres actifs
             </span>
           </div>
