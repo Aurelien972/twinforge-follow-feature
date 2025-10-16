@@ -180,35 +180,55 @@ const FastingInsightsTab: React.FC = () => {
       {insightsData && insightsData.insights.length === 0 && !isLoading && (
         <GlassCard className="p-8 text-center" style={{
           background: `
-            radial-gradient(circle at 30% 20%, color-mix(in srgb, #06B6D4 8%, transparent) 0%, transparent 60%),
+            radial-gradient(circle at 30% 20%, color-mix(in srgb, #10B981 15%, transparent) 0%, transparent 60%),
+            radial-gradient(circle at 70% 80%, color-mix(in srgb, #10B981 12%, transparent) 0%, transparent 50%),
+            linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%),
             var(--glass-opacity)
           `,
-          borderColor: 'color-mix(in srgb, #06B6D4 20%, transparent)'
+          borderColor: 'color-mix(in srgb, #10B981 30%, transparent)',
+          boxShadow: `
+            0 12px 40px rgba(0, 0, 0, 0.25),
+            0 0 30px color-mix(in srgb, #10B981 20%, transparent),
+            inset 0 2px 0 rgba(255, 255, 255, 0.15)
+          `
         }}>
           <div className="space-y-4">
-            <div 
-              className="w-16 h-16 mx-auto rounded-full flex items-center justify-center"
-              style={{
-                background: 'color-mix(in srgb, #06B6D4 15%, transparent)',
-                border: '2px solid color-mix(in srgb, #06B6D4 25%, transparent)'
-              }}
-            >
-              <SpatialIcon Icon={ICONS.Timer} size={32} style={{ color: '#06B6D4' }} />
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div
+                className="w-20 h-20 rounded-full flex items-center justify-center"
+                style={{
+                  background: `
+                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
+                    linear-gradient(135deg, color-mix(in srgb, #10B981 30%, transparent), color-mix(in srgb, #10B981 20%, transparent))
+                  `,
+                  border: '2px solid color-mix(in srgb, #10B981 40%, transparent)',
+                  boxShadow: '0 0 30px color-mix(in srgb, #10B981 30%, transparent)'
+                }}
+              >
+                <SpatialIcon Icon={ICONS.Lightbulb} size={40} style={{ color: '#10B981' }} />
+              </div>
+              <div className="text-left">
+                <h3 className="text-2xl font-bold text-white">Insights en Construction</h3>
+                <p className="text-white/70 text-base">Plus de sessions nécessaires</p>
+              </div>
             </div>
 
             <div>
-              <h3 className="text-xl font-bold text-white mb-2">
-                Données Insuffisantes pour l'IA
-              </h3>
-              <p className="text-white/70 text-base leading-relaxed max-w-md mx-auto">
-                La Forge Spatiale nécessite plus de données pour générer des insights IA personnalisés. 
-                Complétez votre profil et ajoutez des sessions de jeûne pour débloquer l'analyse avancée.
+              <p className="text-white/70 text-base leading-relaxed max-w-lg mx-auto">
+                Enregistrez plus de sessions de jeûne pour débloquer des insights IA personnalisés
+                et découvrir des analyses avancées de votre discipline temporelle.
               </p>
             </div>
-            
+
             <button
               onClick={() => navigate('/fasting/input')}
-              className="btn-glass--primary px-6 py-3"
+              className="px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200"
+              style={{
+                background: 'linear-gradient(135deg, color-mix(in srgb, #10B981 80%, transparent), color-mix(in srgb, #10B981 60%, transparent))',
+                border: '2px solid color-mix(in srgb, #10B981 60%, transparent)',
+                boxShadow: `0 12px 40px color-mix(in srgb, #10B981 40%, transparent), 0 0 60px color-mix(in srgb, #10B981 30%, transparent)`,
+                color: '#fff'
+              }}
             >
               <div className="flex items-center gap-2">
                 <SpatialIcon Icon={ICONS.Timer} size={16} />

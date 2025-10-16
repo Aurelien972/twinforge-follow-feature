@@ -31,7 +31,7 @@ function getConsistencyTheme(consistency: TodayFastingStats['consistency']) {
       };
     case 'needs_improvement':
       return {
-        color: '#06B6D4',
+        color: '#F59E0B',
         icon: 'TrendingUp' as const,
         badge: 'À améliorer',
         description: 'Continuez vos efforts'

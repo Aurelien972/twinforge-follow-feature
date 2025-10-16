@@ -80,7 +80,7 @@ const FastingPeriodSelector: React.FC<FastingPeriodSelectorProps> = ({
         {periods.map((period) => {
           const isAvailable = isPeriodAvailable(period.value);
           const isSelected = selectedPeriod === period.value;
-          const accentColor = '#10B981'; // Vert pour la Forge Temporelle
+          const accentColor = '#10B981'; // Vert pour l'onglet Insights
 
           return (
             <button

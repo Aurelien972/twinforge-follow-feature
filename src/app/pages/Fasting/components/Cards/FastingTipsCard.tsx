@@ -32,39 +32,39 @@ const FastingTipsCard: React.FC = () => {
   ];
 
   return (
-    <GlassCard 
+    <GlassCard
       className="p-6"
       style={{
         background: `
-          radial-gradient(circle at 30% 20%, color-mix(in srgb, #10B981 8%, transparent) 0%, transparent 60%),
+          radial-gradient(circle at 30% 20%, color-mix(in srgb, #F59E0B 8%, transparent) 0%, transparent 60%),
           var(--glass-opacity)
         `,
-        borderColor: 'color-mix(in srgb, #10B981 20%, transparent)',
+        borderColor: 'color-mix(in srgb, #F59E0B 20%, transparent)',
         boxShadow: `
           0 8px 32px rgba(0, 0, 0, 0.2),
-          0 0 20px color-mix(in srgb, #10B981 15%, transparent),
+          0 0 20px color-mix(in srgb, #F59E0B 15%, transparent),
           inset 0 1px 0 rgba(255, 255, 255, 0.12)
         `
       }}
     >
       <div className="space-y-4">
         <div className="flex items-center gap-3 mb-4">
-          <div 
+          <div
             className="w-10 h-10 rounded-full flex items-center justify-center"
             style={{
               background: `
                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-                linear-gradient(135deg, color-mix(in srgb, #10B981 30%, transparent), color-mix(in srgb, #10B981 20%, transparent))
+                linear-gradient(135deg, color-mix(in srgb, #F59E0B 30%, transparent), color-mix(in srgb, #F59E0B 20%, transparent))
               `,
-              border: '2px solid color-mix(in srgb, #10B981 40%, transparent)',
-              boxShadow: '0 0 20px color-mix(in srgb, #10B981 30%, transparent)'
+              border: '2px solid color-mix(in srgb, #F59E0B 40%, transparent)',
+              boxShadow: '0 0 20px color-mix(in srgb, #F59E0B 30%, transparent)'
             }}
           >
-            <SpatialIcon Icon={ICONS.Heart} size={16} style={{ color: '#10B981' }} />
+            <SpatialIcon Icon={ICONS.Heart} size={16} style={{ color: '#F59E0B' }} />
           </div>
           <div>
-            <h4 className="text-green-300 font-semibold text-lg">Conseils de Jeûne</h4>
-            <p className="text-green-200 text-sm">Optimisez votre session</p>
+            <h4 className="text-white font-semibold text-lg">Conseils de Jeûne</h4>
+            <p className="text-white/60 text-sm">Optimisez votre session</p>
           </div>
         </div>
 

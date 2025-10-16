@@ -143,38 +143,62 @@ const FastingHistoryTab: React.FC = () => {
             /* No Sessions State */
             <GlassCard className="p-8 text-center" style={{
               background: `
-                radial-gradient(circle at 30% 20%, color-mix(in srgb, #06B6D4 8%, transparent) 0%, transparent 60%),
+                radial-gradient(circle at 30% 20%, color-mix(in srgb, #8B5CF6 15%, transparent) 0%, transparent 60%),
+                radial-gradient(circle at 70% 80%, color-mix(in srgb, #8B5CF6 12%, transparent) 0%, transparent 50%),
+                linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%),
                 var(--glass-opacity)
               `,
-              borderColor: 'color-mix(in srgb, #06B6D4 20%, transparent)'
+              borderColor: 'color-mix(in srgb, #8B5CF6 30%, transparent)',
+              boxShadow: `
+                0 12px 40px rgba(0, 0, 0, 0.25),
+                0 0 30px color-mix(in srgb, #8B5CF6 20%, transparent),
+                inset 0 2px 0 rgba(255, 255, 255, 0.15)
+              `
             }}>
               <div className="space-y-4">
-                <div 
-                  className="w-16 h-16 mx-auto rounded-full flex items-center justify-center"
-                  style={{
-                    background: 'color-mix(in srgb, #06B6D4 15%, transparent)',
-                    border: '2px solid color-mix(in srgb, #06B6D4 25%, transparent)'
-                  }}
-                >
-                  <SpatialIcon Icon={ICONS.Timer} size={32} style={{ color: '#06B6D4' }} />
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <div
+                    className="w-20 h-20 rounded-full flex items-center justify-center"
+                    style={{
+                      background: `
+                        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
+                        linear-gradient(135deg, color-mix(in srgb, #8B5CF6 30%, transparent), color-mix(in srgb, #8B5CF6 20%, transparent))
+                      `,
+                      border: '2px solid color-mix(in srgb, #8B5CF6 40%, transparent)',
+                      boxShadow: '0 0 30px color-mix(in srgb, #8B5CF6 30%, transparent)'
+                    }}
+                  >
+                    <SpatialIcon Icon={ICONS.History} size={40} style={{ color: '#8B5CF6' }} />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-2xl font-bold text-white">
+                      {Object.keys(filters).length > 0 ? 'Aucune Session Trouvée' : 'Commencez Votre Historique'}
+                    </h3>
+                    <p className="text-white/70 text-base">
+                      {Object.keys(filters).length > 0 ? 'Aucun résultat' : 'Vos sessions vous attendent'}
+                    </p>
+                  </div>
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-2">
-                    {Object.keys(filters).length > 0 ? 'Aucune Session Trouvée' : 'Commencez Votre Historique'}
-                  </h3>
-                  <p className="text-white/70 text-base leading-relaxed max-w-md mx-auto">
-                    {Object.keys(filters).length > 0 ? 
+                  <p className="text-white/70 text-base leading-relaxed max-w-lg mx-auto">
+                    {Object.keys(filters).length > 0 ?
                       'Aucune session ne correspond aux filtres sélectionnés. Essayez de modifier vos critères de recherche.' :
                       'Votre historique de jeûne apparaîtra ici après vos premières sessions. Commencez dès maintenant votre forge temporelle !'
                     }
                   </p>
                 </div>
-                
+
                 {Object.keys(filters).length === 0 && (
                   <button
                     onClick={() => window.location.href = '/fasting/input'}
-                    className="btn-glass--primary px-6 py-3"
+                    className="px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200"
+                    style={{
+                      background: 'linear-gradient(135deg, color-mix(in srgb, #8B5CF6 80%, transparent), color-mix(in srgb, #8B5CF6 60%, transparent))',
+                      border: '2px solid color-mix(in srgb, #8B5CF6 60%, transparent)',
+                      boxShadow: `0 12px 40px color-mix(in srgb, #8B5CF6 40%, transparent), 0 0 60px color-mix(in srgb, #8B5CF6 30%, transparent)`,
+                      color: '#fff'
+                    }}
                   >
                     <div className="flex items-center gap-2">
                       <SpatialIcon Icon={ICONS.Timer} size={16} />
