@@ -183,7 +183,8 @@ export function navFor(): NavSection[] {
             {
               to: '/activity#insights',
               icon: 'BarChart3',
-              label: 'Insights'
+              label: 'Insights',
+              color: '#10B981' // Vert
             },
             {
               to: '/activity#progression',

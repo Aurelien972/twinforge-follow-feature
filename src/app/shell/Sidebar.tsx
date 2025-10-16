@@ -71,7 +71,7 @@ const NavItem = React.memo(({
     }
   };
 
-  // Check if any sub-item is active
+  // Check if any sub-item is active (but not for applying background, only for icon color)
   const hasActiveSubItem = hasSubItems && subItems.some(subItem => {
     const subPath = subItem.to.split('#')[0];
     const subHash = subItem.to.split('#')[1];
@@ -79,6 +79,9 @@ const NavItem = React.memo(({
     const currentHash = location.hash.replace('#', '') || 'daily';
     return currentPath === subPath && (!subHash || currentHash === subHash);
   });
+
+  // Check if we're on the exact main page (for background styling)
+  const isOnMainPage = location.pathname === to;
 
   // Déterminer la classe CSS en fonction du type
   let itemClass = 'sidebar-item';
@@ -116,8 +119,8 @@ const NavItem = React.memo(({
         role={isPrimary ? 'link' : 'menuitem'}
         style={{ '--item-circuit-color': itemColor } as React.CSSProperties}
       >
-        {/* Icon container with glass pill effect */}
-        <div className={`sidebar-item-icon-container ${isActive || hasActiveSubItem ? 'sidebar-item-icon-container--active' : ''}`}>
+        {/* Icon container with glass pill effect - background only when on exact page */}
+        <div className={`sidebar-item-icon-container ${isActive ? 'sidebar-item-icon-container--active' : ''}`}>
           <SpatialIcon
             Icon={Icon}
             size={isPrimary ? 22 : isTwin ? 20 : 18}

@@ -101,7 +101,7 @@ function AuthWrapper({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (isLoading) {
-    return <LoadingFallback />;
+    return <LoadingFallback title="Bienvenue sur TwinForge" subtitle="Vérification de votre session..." />;
   }
 
   if (showAuthForm) {
