@@ -99,7 +99,7 @@ export function navFor(): NavSection[] {
             {
               to: '/meals#daily',
               icon: 'ScanLine',
-              label: 'Scanner',
+              label: 'Scanner de repas',
               isPrimarySubMenu: true
             },
             {
