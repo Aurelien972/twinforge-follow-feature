@@ -392,7 +392,7 @@
 /* Performance optimizations for mobile */
 @media (max-width: 768px) {
   .central-actions-panel {
-    padding: 10px !important;
+    padding: 8px !important;
   }
 
   .central-actions-panel::after {
@@ -405,46 +405,95 @@
     -webkit-backdrop-filter: blur(14px) saturate(140%);
   }
 
-  /* Optimiser encore plus l'espace vertical sur mobile */
+  /* Optimiser l'espace vertical sur mobile - tout doit être visible sans scroll */
   .central-actions-scroll-container {
-    max-height: calc(100vh - var(--new-bottom-bar-height) - 80px) !important;
-  }
-
-  /* Réduire les grandes tuiles sur mobile */
-  .central-actions-panel .glass-card.rounded-2xl {
-    min-height: 64px !important;
-    padding: 6px !important;
-  }
-
-  /* Réduire les icônes des grandes tuiles sur mobile */
-  .central-actions-panel .glass-card.rounded-2xl .w-10 {
-    width: 32px !important;
-    height: 32px !important;
+    max-height: calc(100vh - var(--new-bottom-bar-height) - var(--new-bottom-bar-bottom-offset) - 100px) !important;
+    overflow-y: auto !important;
   }
 
   /* Réduire les petits boutons sur mobile */
   .central-actions-panel button.rounded-xl {
-    padding: 4px 6px !important;
+    padding: 3px 5px !important;
+    min-height: 32px !important;
   }
 
-  /* Espacements entre sections optimisés mais aérés */
-  .central-actions-panel > div > div > div[class*="mt-"] {
-    margin-top: 12px !important;
+  /* Réduire les icônes des petits boutons sur mobile */
+  .central-actions-panel button.rounded-xl > div:first-child {
+    width: 24px !important;
+    height: 24px !important;
   }
 
-  /* Gap des grilles sur mobile - aéré */
-  .central-actions-panel .grid {
-    gap: 8px !important;
+  /* Réduire la taille des icônes dans les petits boutons */
+  .central-actions-panel button.rounded-xl svg {
+    width: 12px !important;
+    height: 12px !important;
   }
 
-  /* Header aéré */
-  .central-actions-panel .flex.items-center.justify-between {
-    margin-bottom: 10px !important;
+  /* Réduire la taille du texte des labels */
+  .central-actions-panel button.rounded-xl .text-\\[11px\\] {
+    font-size: 10px !important;
   }
 
-  /* Titres de section aérés */
-  .central-actions-panel h4 {
+  /* Réduire la taille du texte des sous-titres */
+  .central-actions-panel button.rounded-xl .text-\\[9px\\] {
+    font-size: 8px !important;
+    margin-top: 1px !important;
+  }
+
+  /* Espacements entre catégories réduits */
+  .central-actions-panel > div > div > div.mb-3 {
+    margin-bottom: 8px !important;
+  }
+
+  /* Espacements entre sous-sections réduits */
+  .central-actions-panel > div > div > div > div.mb-2\\.5 {
     margin-bottom: 6px !important;
+  }
+
+  /* Gap des grilles sur mobile - compact */
+  .central-actions-panel .grid {
+    gap: 6px !important;
+  }
+
+  /* Header compact */
+  .central-actions-panel .flex.items-center.justify-between {
+    margin-bottom: 6px !important;
+  }
+
+  /* Titres de catégories H3 compacts */
+  .central-actions-panel h3 {
+    font-size: 10px !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* Titres de sections H4 compacts */
+  .central-actions-panel h4 {
+    font-size: 8px !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* Padding des divs de sections */
+  .central-actions-panel .px-1\\.5 {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+
+  .central-actions-panel .mb-1\\.5 {
+    margin-bottom: 4px !important;
+  }
+
+  /* Bouton Dashboard compact */
+  .central-actions-panel button.rounded-full {
+    padding: 4px 8px !important;
+  }
+
+  .central-actions-panel button.rounded-full .text-\\[10px\\] {
+    font-size: 9px !important;
+  }
+
+  .central-actions-panel button.rounded-full svg {
+    width: 12px !important;
+    height: 12px !important;
   }
 }
 

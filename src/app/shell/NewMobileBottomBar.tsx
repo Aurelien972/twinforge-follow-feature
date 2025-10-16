@@ -20,14 +20,14 @@ const BOTTOM_BAR_BUTTONS = [
     id: 'meal-scan',
     label: 'Repas',
     icon: 'Utensils' as const,
-    route: '/meals/scan',
+    route: '/meals',
     color: '#10B981', // Vert nutrition
   },
   {
     id: 'fridge-scan',
     label: 'Frigo',
     icon: 'Refrigerator' as const,
-    route: '/fridge/scan',
+    route: '/fridge',
     color: '#14B8A6', // Turquoise
   },
   {

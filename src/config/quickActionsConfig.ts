@@ -44,116 +44,125 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
     ]
   },
 
-  // --- SUIVI : 4 tuiles principales
+  // ==================== CATÉGORIE: ALIMENTATION ====================
+  // --- Outils de Suivi Alimentation
   {
-    key: 'tracking',
+    key: 'tracking-food',
     title: 'Outils de Suivi',
     actions: [
       {
         id: 'scan-meal',
         label: 'Scanner de Repas',
-        subtitle: 'Capturez et analysez vos repas',
+        subtitle: 'Analysez vos repas',
         icon: 'Camera',
         route: '/meals/scan',
-        color: '#10B981', // Vert nutrition
+        color: '#10B981',
         available: true,
         description: 'Analyser un repas avec précision'
       },
       {
-        id: 'forge-energy',
-        label: "Tracker d'Activité",
-        subtitle: "Enregistrez votre séance d'activité",
-        icon: 'Activity',
-        route: '/activity/input',
-        color: '#3B82F6', // Bleu activité
-        available: true,
-        description: "Enregistrer une nouvelle séance d'activité"
-      },
-      {
         id: 'start-fasting',
         label: 'Tracker de Jeûne',
-        subtitle: 'Démarrez ou terminez une session',
+        subtitle: 'Gérez vos sessions',
         icon: 'Timer',
         route: '/fasting/input',
-        color: '#F59E0B', // Orange jeûne
+        color: '#F59E0B',
         available: true,
         description: 'Commencer une période de jeûne'
-      },
-      {
-        id: 'body-scan',
-        label: 'Scanner Corporel',
-        subtitle: 'Analysez votre morphologie en 3D',
-        icon: 'Scan',
-        route: '/body-scan',
-        color: '#D946EF', // Fuchsia
-        available: true,
-        description: 'Scanner et analyser votre corps en 3D'
       }
     ]
   },
 
-  // --- ATELIER DES SAVEURS : 4 boutons en 2x2
+  // --- Générateurs Alimentation
   {
-    key: 'flavors',
-    title: 'Atelier des Saveurs',
+    key: 'generators-food',
+    title: 'Générateurs',
     actions: [
       {
-        id: 'fridge-scan',
-        label: 'Scanner de Frigo',
-        subtitle: 'Détectez les ingrédients de votre frigo',
-        icon: 'Refrigerator',
-        route: '/fridge/scan',
-        color: '#06B6D4', // Cyan
-        available: true,
-        description: 'Scanner votre frigo pour des recettes'
-      },
-      {
         id: 'generate-recipe',
-        label: 'Générateur de recettes',
-        subtitle: '',
+        label: 'Générateur de Recettes',
+        subtitle: 'Recettes personnalisées',
         icon: 'ChefHat',
         route: '/fridge#recipes',
-        color: '#EC4899', // Rose
+        color: '#EC4899',
         available: true,
         description: 'Générer des recettes personnalisées'
       },
       {
         id: 'generate-meal-plan',
-        label: 'Générateur de plan repas',
-        subtitle: '',
+        label: 'Générateur de Plan',
+        subtitle: 'Plan alimentaire hebdo',
         icon: 'Calendar',
         route: '/fridge#plan',
-        color: '#8B5CF6', // Violet
+        color: '#8B5CF6',
         available: true,
         description: 'Générer un plan de repas personnalisé'
       },
       {
         id: 'generate-shopping-list',
-        label: 'Générateur de liste de courses',
-        subtitle: '',
+        label: 'Générateur de Courses',
+        subtitle: 'Liste optimisée',
         icon: 'ShoppingCart',
         route: '/fridge#courses',
-        color: '#F59E0B', // Orange
+        color: '#F59E0B',
         available: true,
         description: 'Créer une liste de courses optimisée'
       }
     ]
   },
 
-  // --- WORKOUT
+  // ==================== CATÉGORIE: ACTIVITÉ ====================
+  // --- Outils de Suivi Activité
   {
-    key: 'workout',
-    title: 'Atelier Workout',
+    key: 'tracking-activity',
+    title: 'Outils de Suivi',
+    actions: [
+      {
+        id: 'forge-energy',
+        label: "Tracker d'Activité",
+        subtitle: "Enregistrez vos séances",
+        icon: 'Activity',
+        route: '/activity/input',
+        color: '#3B82F6',
+        available: true,
+        description: "Enregistrer une nouvelle séance d'activité"
+      }
+    ]
+  },
+
+  // --- Générateurs Activité
+  {
+    key: 'generators-activity',
+    title: 'Générateurs',
     actions: [
       {
         id: 'generate-training',
         label: "Générateur d'Entraînement",
-        subtitle: '',
+        subtitle: 'Programme personnalisé',
         icon: 'Target',
         route: '/training/pipeline',
         color: '#18E3FF',
         available: true,
         description: "Plan d'entraînement personnalisé"
+      }
+    ]
+  },
+
+  // ==================== CATÉGORIE: SANTÉ ====================
+  // --- Outils de Suivi Santé
+  {
+    key: 'tracking-health',
+    title: 'Outils de Suivi',
+    actions: [
+      {
+        id: 'body-scan',
+        label: 'Scanner Corporel',
+        subtitle: 'Morphologie 3D',
+        icon: 'Scan',
+        route: '/body-scan',
+        color: '#D946EF',
+        available: true,
+        description: 'Scanner et analyser votre corps en 3D'
       }
     ]
   }

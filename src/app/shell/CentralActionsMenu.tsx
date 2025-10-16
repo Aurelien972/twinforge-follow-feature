@@ -49,17 +49,28 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
   const { click, success } = useFeedback();
   const { close: closeOverlay } = useOverlayStore();
 
-  const trackingSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['tracking'], ['outils de suivi', 'suivi']) ??
+  // Catégorie Alimentation
+  const foodTrackingSection =
+    pickSection(QUICK_ACTION_SECTIONS, ['tracking-food'], ['outils de suivi']) ??
     { title: 'Outils de Suivi', actions: [] };
 
-  const flavorsSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['flavors', 'saveurs'], ['atelier des saveurs', 'saveurs']) ??
-    { title: 'Atelier des Saveurs', actions: [] };
+  const foodGeneratorsSection =
+    pickSection(QUICK_ACTION_SECTIONS, ['generators-food'], ['générateurs']) ??
+    { title: 'Générateurs', actions: [] };
 
-  const workoutSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['workout'], ['atelier workout', 'workout']) ??
-    { title: 'Atelier Workout', actions: [] };
+  // Catégorie Activité
+  const activityTrackingSection =
+    pickSection(QUICK_ACTION_SECTIONS, ['tracking-activity'], ['outils de suivi']) ??
+    { title: 'Outils de Suivi', actions: [] };
+
+  const activityGeneratorsSection =
+    pickSection(QUICK_ACTION_SECTIONS, ['generators-activity'], ['générateurs']) ??
+    { title: 'Générateurs', actions: [] };
+
+  // Catégorie Santé
+  const healthTrackingSection =
+    pickSection(QUICK_ACTION_SECTIONS, ['tracking-health'], ['outils de suivi']) ??
+    { title: 'Outils de Suivi', actions: [] };
 
   const homeSection =
     pickSection(QUICK_ACTION_SECTIONS, ['navigation', 'home', 'main'], ['navigation', 'accueil']) ??
@@ -252,9 +263,16 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
         >
           <SpatialIcon Icon={ICONS[action.icon]} size={13} style={{ color: action.color }} />
         </div>
-        <span className="text-[11px] font-semibold text-white leading-tight break-words flex-1 text-left">
-          {action.label}
-        </span>
+        <div className="flex-1 min-w-0 text-left">
+          <div className="text-[11px] font-semibold text-white leading-tight break-words">
+            {action.label}
+          </div>
+          {action.subtitle && (
+            <div className="text-[9px] text-white/65 leading-tight mt-0.5 break-words">
+              {action.subtitle}
+            </div>
+          )}
+        </div>
       </motion.button>
     );
   };
@@ -337,7 +355,7 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
               }}
             >
             {/* HEADER */}
-            <div className="flex items-center justify-between mb-3 px-1.5">
+            <div className="flex items-center justify-between mb-2.5 px-1.5">
               <div className="flex items-center gap-2">
                 <div aria-hidden className="h-1.5 w-10 rounded-full bg-white/40" />
                 <span className="text-white/80 text-xs font-semibold tracking-wider uppercase">
@@ -348,7 +366,7 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
               {homeAction && (
                 <button
                   onClick={(e) => handleActionClick(homeAction, false, e)}
-                  className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1.5"
+                  className="glass-card rounded-full px-2.5 py-1 flex items-center gap-1.5"
                   style={{
                     background: `
                       radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18) 0%, transparent 60%),
@@ -365,70 +383,126 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
                 >
                   <SpatialIcon
                     Icon={ICONS.Home}
-                    size={14}
+                    size={13}
                     style={{
                       color: '#FDC830',
                       filter: 'drop-shadow(0 0 4px rgba(253, 200, 48, 0.5))'
                     }}
                   />
-                  <span className="text-[11px] font-semibold" style={{
+                  <span className="text-[10px] font-semibold" style={{
                     color: 'rgba(255, 255, 255, 0.95)',
                     textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
-                  }}>Tableau de Bord</span>
+                  }}>Dashboard</span>
                 </button>
               )}
             </div>
 
-            {/* OUTILS DE SUIVI — grandes tuiles 2×2 */}
-            {trackingSection.actions.length > 0 && (
-              <div>
-                <div className="px-1.5 mb-2">
-                  <h4 className="text-white/70 text-[10px] uppercase tracking-wider font-semibold">
-                    Outils de suivi
-                  </h4>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  {trackingSection.actions.map((a, i) => (
-                    <PrimaryTile key={a.id} action={a} index={i} />
-                  ))}
-                </div>
+            {/* ========== CATÉGORIE: ALIMENTATION ========== */}
+            <div className="mb-3">
+              <div className="px-1.5 mb-1.5">
+                <h3 className="text-[#10B981] text-[11px] uppercase tracking-wider font-bold">
+                  Alimentation
+                </h3>
               </div>
-            )}
 
-            {/* ATELIER DES SAVEURS — pills 2×2 (petits boutons) */}
-            {flavorsSection.actions.length > 0 && (
-              <div className="mt-4">
-                <div className="px-1.5 mb-2">
-                  <h4 className="text-white/70 text-[10px] uppercase tracking-wider font-semibold">
-                    Atelier des Saveurs
-                  </h4>
+              {/* Outils de Suivi */}
+              {foodTrackingSection.actions.length > 0 && (
+                <div className="mb-2.5">
+                  <div className="px-1.5 mb-1.5">
+                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
+                      Outils de suivi
+                    </h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {foodTrackingSection.actions.map((a, i) => (
+                      <SecondaryPill key={a.id} action={a} index={i} />
+                    ))}
+                  </div>
                 </div>
+              )}
 
-                <div className="grid grid-cols-2 gap-2">
-                  {flavorsSection.actions.map((a, i) => (
-                    <SecondaryPill key={a.id} action={a} index={i} />
-                  ))}
+              {/* Générateurs */}
+              {foodGeneratorsSection.actions.length > 0 && (
+                <div>
+                  <div className="px-1.5 mb-1.5">
+                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
+                      Générateurs
+                    </h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {foodGeneratorsSection.actions.map((a, i) => (
+                      <SecondaryPill key={a.id} action={a} index={i} />
+                    ))}
+                  </div>
                 </div>
+              )}
+            </div>
+
+            {/* ========== CATÉGORIE: ACTIVITÉ ========== */}
+            <div className="mb-3">
+              <div className="px-1.5 mb-1.5">
+                <h3 className="text-[#3B82F6] text-[11px] uppercase tracking-wider font-bold">
+                  Activité
+                </h3>
               </div>
-            )}
 
-            {/* ATELIER WORKOUT — pills (2 par ligne si + d'un) */}
-            {workoutSection.actions.length > 0 && (
-              <div className="mt-4">
-                <div className="px-1.5 mb-2">
-                  <h4 className="text-white/70 text-[10px] uppercase tracking-wider font-semibold">
-                    Atelier Workout
-                  </h4>
+              {/* Outils de Suivi */}
+              {activityTrackingSection.actions.length > 0 && (
+                <div className="mb-2.5">
+                  <div className="px-1.5 mb-1.5">
+                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
+                      Outils de suivi
+                    </h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {activityTrackingSection.actions.map((a, i) => (
+                      <SecondaryPill key={a.id} action={a} index={i} />
+                    ))}
+                  </div>
                 </div>
+              )}
 
-                <div className="grid grid-cols-2 gap-2">
-                  {workoutSection.actions.map((a, i) => (
-                    <SecondaryPill key={a.id} action={a} index={i} />
-                  ))}
+              {/* Générateurs */}
+              {activityGeneratorsSection.actions.length > 0 && (
+                <div>
+                  <div className="px-1.5 mb-1.5">
+                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
+                      Générateurs
+                    </h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {activityGeneratorsSection.actions.map((a, i) => (
+                      <SecondaryPill key={a.id} action={a} index={i} />
+                    ))}
+                  </div>
                 </div>
+              )}
+            </div>
+
+            {/* ========== CATÉGORIE: SANTÉ ========== */}
+            <div>
+              <div className="px-1.5 mb-1.5">
+                <h3 className="text-[#EF4444] text-[11px] uppercase tracking-wider font-bold">
+                  Santé
+                </h3>
               </div>
-            )}
+
+              {/* Outils de Suivi */}
+              {healthTrackingSection.actions.length > 0 && (
+                <div>
+                  <div className="px-1.5 mb-1.5">
+                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
+                      Outils de suivi
+                    </h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {healthTrackingSection.actions.map((a, i) => (
+                      <SecondaryPill key={a.id} action={a} index={i} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             </div>
           </div>
         </motion.div>
