@@ -1,0 +1,349 @@
+/* =========================================
+   ULTRA PERFORMANCE MODE - Flat Design with Forge Colors
+   Zero glassmorphism, minimal animations, 60fps on iPhone 7/8
+   ========================================= */
+
+.ultra-performance-mode,
+html.perf-ultra {
+  /* Disable all expensive effects */
+  --glass-blur-adaptive: 0px;
+  --glass-saturate: 100%;
+  --animation-duration-adaptive: 0ms;
+  --enable-will-change: 0;
+}
+
+/* =========================================
+   FLAT CARD DESIGN - Colored with Forge Theme
+   ========================================= */
+
+.ultra-performance-mode .glass-card,
+html.perf-ultra .glass-card,
+.ultra-performance-mode .glass-base,
+html.perf-ultra .glass-base {
+  /* Remove glassmorphism completely */
+  backdrop-filter: none !important;
+
+  /* Flat gradient with forge colors */
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 8%, #0f172a) 0%,
+    color-mix(in srgb, var(--color-plasma-cyan) 3%, #0a0f1e) 100%
+  ) !important;
+
+  /* Colored border with forge theme */
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent) !important;
+
+  /* Flat shadow - no blur */
+  box-shadow:
+    0 2px 0 color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent) !important;
+
+  /* No expensive transforms */
+  transform: none !important;
+  will-change: auto !important;
+  contain: layout style !important;
+}
+
+/* Hover state - simple color change */
+.ultra-performance-mode .glass-card:hover,
+html.perf-ultra .glass-card:hover {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 12%, #0f172a) 0%,
+    color-mix(in srgb, var(--color-plasma-cyan) 5%, #0a0f1e) 100%
+  ) !important;
+
+  border-color: color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent) !important;
+
+  box-shadow:
+    0 3px 0 color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent) !important;
+
+  transform: none !important;
+  transition: background 80ms ease, border-color 80ms ease !important;
+}
+
+/* Active/pressed state */
+.ultra-performance-mode .glass-card:active,
+html.perf-ultra .glass-card:active {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 6%, #0a0f1e) 0%,
+    color-mix(in srgb, var(--color-plasma-cyan) 2%, #080d18) 100%
+  ) !important;
+
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--color-plasma-cyan) 8%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent) !important;
+}
+
+/* =========================================
+   BUTTONS - Flat with Forge Colors
+   ========================================= */
+
+.ultra-performance-mode .btn-glass,
+html.perf-ultra .btn-glass,
+.ultra-performance-mode button[class*="glass"],
+html.perf-ultra button[class*="glass"] {
+  backdrop-filter: none !important;
+
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-plasma-cyan) 18%, #0f172a) 0%,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 15%, #0a0f1e) 100%
+  ) !important;
+
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 35%, transparent) !important;
+
+  box-shadow:
+    0 2px 0 color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent) !important;
+
+  color: var(--color-plasma-cyan) !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+.ultra-performance-mode .btn-glass:hover,
+html.perf-ultra .btn-glass:hover {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-plasma-cyan) 25%, #0f172a) 0%,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 20%, #0a0f1e) 100%
+  ) !important;
+
+  border-color: color-mix(in srgb, var(--color-plasma-cyan) 45%, transparent) !important;
+  transform: none !important;
+  transition: background 80ms ease, border-color 80ms ease !important;
+}
+
+/* =========================================
+   PRIMARY ACCENT ELEMENTS
+   ========================================= */
+
+.ultra-performance-mode [class*="primary"],
+html.perf-ultra [class*="primary"] {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-ember-copper) 20%, #1e1b4b) 0%,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 30%, #0f0a2e) 100%
+  ) !important;
+
+  border-color: color-mix(in srgb, var(--color-ember-copper) 40%, transparent) !important;
+  color: #fff !important;
+}
+
+/* =========================================
+   DISABLE ALL EXPENSIVE EFFECTS
+   ========================================= */
+
+.ultra-performance-mode .glass-sheen,
+html.perf-ultra .glass-sheen,
+.ultra-performance-mode .glass-card::before,
+html.perf-ultra .glass-card::before,
+.ultra-performance-mode .glass-card::after,
+html.perf-ultra .glass-card::after,
+.ultra-performance-mode .ambient-glow::after,
+html.perf-ultra .ambient-glow::after,
+.ultra-performance-mode [data-hover-effect],
+html.perf-ultra [data-hover-effect] {
+  display: none !important;
+  content: none !important;
+}
+
+/* Disable all backdrop-filter usage */
+.ultra-performance-mode [style*="backdrop-filter"],
+html.perf-ultra [style*="backdrop-filter"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   DISABLE ANIMATIONS & TRANSITIONS
+   ========================================= */
+
+.ultra-performance-mode *,
+html.perf-ultra * {
+  animation-duration: 0ms !important;
+  animation-delay: 0ms !important;
+  transition-duration: 80ms !important;
+  transition-property: background, border-color, color !important;
+}
+
+/* Disable framer-motion animations */
+.ultra-performance-mode [style*="transform"],
+html.perf-ultra [style*="transform"] {
+  transform: none !important;
+}
+
+/* =========================================
+   SIMPLIFY 3D ELEMENTS
+   ========================================= */
+
+.ultra-performance-mode .transform-gpu,
+html.perf-ultra .transform-gpu,
+.ultra-performance-mode .preserve-3d,
+html.perf-ultra .preserve-3d {
+  transform: none !important;
+  transform-style: flat !important;
+  perspective: none !important;
+}
+
+/* Disable 3D viewer expensive effects */
+.ultra-performance-mode canvas,
+html.perf-ultra canvas {
+  image-rendering: pixelated !important;
+}
+
+/* =========================================
+   MOBILE OPTIMIZATIONS
+   ========================================= */
+
+.ultra-performance-mode .gpu-layer,
+html.perf-ultra .gpu-layer {
+  transform: none !important;
+  will-change: auto !important;
+}
+
+/* Disable scroll effects */
+.ultra-performance-mode [data-scroll-reveal],
+html.perf-ultra [data-scroll-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* =========================================
+   SIDEBAR & NAVIGATION - Flat Design
+   ========================================= */
+
+.ultra-performance-mode .sidebar-liquid-glass,
+html.perf-ultra .sidebar-liquid-glass {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 10%, #0a0f1e) 0%,
+    #0a0f1e 100%
+  ) !important;
+
+  border-right: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent) !important;
+  backdrop-filter: none !important;
+}
+
+.ultra-performance-mode .header-liquid-glass,
+html.perf-ultra .header-liquid-glass {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 8%, #0f172a) 0%,
+    color-mix(in srgb, var(--color-plasma-cyan) 3%, #0a0f1e) 100%
+  ) !important;
+
+  border-bottom: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent) !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--color-plasma-cyan) 8%, transparent) !important;
+}
+
+/* =========================================
+   BOTTOM BAR - Flat Mobile Design
+   ========================================= */
+
+.ultra-performance-mode .new-mobile-bottom-bar,
+html.perf-ultra .new-mobile-bottom-bar {
+  background: linear-gradient(
+    0deg,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 12%, #0a0f1e) 0%,
+    color-mix(in srgb, var(--color-plasma-cyan) 4%, #0f172a) 100%
+  ) !important;
+
+  border-top: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent) !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent) !important;
+}
+
+/* =========================================
+   INPUTS & FORMS - Flat Design
+   ========================================= */
+
+.ultra-performance-mode input,
+html.perf-ultra input,
+.ultra-performance-mode textarea,
+html.perf-ultra textarea,
+.ultra-performance-mode select,
+html.perf-ultra select {
+  background: color-mix(in srgb, var(--color-deep-forge-indigo) 10%, #0a0f1e) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent) !important;
+  backdrop-filter: none !important;
+}
+
+.ultra-performance-mode input:focus,
+html.perf-ultra input:focus,
+.ultra-performance-mode textarea:focus,
+html.perf-ultra textarea:focus {
+  border-color: color-mix(in srgb, var(--color-plasma-cyan) 40%, transparent) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent) !important;
+}
+
+/* =========================================
+   MODALS & DRAWERS - Flat Design
+   ========================================= */
+
+.ultra-performance-mode .modal-content,
+html.perf-ultra .modal-content,
+.ultra-performance-mode .drawer-panel,
+html.perf-ultra .drawer-panel {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 12%, #0f172a) 0%,
+    color-mix(in srgb, var(--color-plasma-cyan) 4%, #0a0f1e) 100%
+  ) !important;
+
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent) !important;
+  backdrop-filter: none !important;
+}
+
+/* Modal backdrop - solid color */
+.ultra-performance-mode .modal-backdrop,
+html.perf-ultra .modal-backdrop {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: none !important;
+}
+
+/* =========================================
+   ACCENT ELEMENTS - Ember Copper Highlights
+   ========================================= */
+
+.ultra-performance-mode [class*="accent"],
+html.perf-ultra [class*="accent"],
+.ultra-performance-mode .badge,
+html.perf-ultra .badge {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-ember-copper) 25%, #1e1b4b) 0%,
+    color-mix(in srgb, var(--color-ember-copper) 15%, #0f0a2e) 100%
+  ) !important;
+
+  border: 1px solid color-mix(in srgb, var(--color-ember-copper) 40%, transparent) !important;
+  color: #fff !important;
+}
+
+/* =========================================
+   PERFORMANCE INDICATORS
+   ========================================= */
+
+.ultra-performance-mode .perf-indicator,
+html.perf-ultra .perf-indicator {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  padding: 8px 16px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-ember-copper) 20%, #1e1b4b) 0%,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 25%, #0f0a2e) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--color-ember-copper) 35%, transparent);
+  border-radius: 12px;
+  color: var(--color-ember-copper);
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 9000;
+  pointer-events: none;
+}
