@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
@@ -76,7 +77,12 @@ const ProfileHealthTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6"
+    >
       {/* Progress Header */}
       <ProgressBar
         percentage={completionPercentage}
@@ -248,7 +254,7 @@ const ProfileHealthTab: React.FC = () => {
           </GlassCard>
         )}
       </form>
-    </div>
+    </motion.div>
   );
 };
 

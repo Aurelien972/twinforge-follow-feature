@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
@@ -6,7 +7,12 @@ import WearableStatusCard from './components/WearableStatusCard';
 
 const ProfileTrainingTab: React.FC = () => {
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6"
+    >
       <GlassCard className="p-6">
         <div className="flex items-center gap-3 mb-4">
           <div
@@ -40,7 +46,7 @@ const ProfileTrainingTab: React.FC = () => {
       </GlassCard>
 
       <WearableStatusCard />
-    </div>
+    </motion.div>
   );
 };
 

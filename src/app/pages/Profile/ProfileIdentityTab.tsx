@@ -39,7 +39,12 @@ const ProfileIdentityTab = React.memo(() => {
   const completionPercentage = calculateIdentityCompletion(profile);
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6"
+    >
       {/* Enhanced Progress Header */}
       <ProgressBar
         percentage={completionPercentage}
@@ -537,7 +542,7 @@ const ProfileIdentityTab = React.memo(() => {
           </GlassCard>
         )}
       </form>
-    </div>
+    </motion.div>
   );
 });
 
