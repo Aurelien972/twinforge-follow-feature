@@ -92,7 +92,8 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
         flexDirection: 'column',
         gap: '2px',
         alignItems: 'flex-start',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        transform: 'translateY(2px)'
       }}>
         <span
           style={{
