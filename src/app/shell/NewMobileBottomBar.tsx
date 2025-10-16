@@ -18,14 +18,14 @@ import CentralActionsMenu from './CentralActionsMenu';
 const BOTTOM_BAR_BUTTONS = [
   {
     id: 'meal-scan',
-    label: 'Scanner Repas',
+    label: 'Repas',
     icon: 'Utensils' as const,
     route: '/meals/scan',
     color: '#10B981', // Vert nutrition
   },
   {
     id: 'fridge-scan',
-    label: 'Scanner Frigo',
+    label: 'Frigo',
     icon: 'Refrigerator' as const,
     route: '/fridge/scan',
     color: '#14B8A6', // Turquoise
@@ -59,7 +59,7 @@ const BOTTOM_BAR_BUTTONS = [
   },
   {
     id: 'twin',
-    label: 'Twin 3D',
+    label: 'Twin',
     icon: 'User' as const,
     route: '/avatar',
     color: '#8B5CF6', // Violet
