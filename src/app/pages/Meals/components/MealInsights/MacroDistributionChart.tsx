@@ -169,8 +169,8 @@ const MacroDistributionChart: React.FC<MacroDistributionChartProps> = ({
         </div>
 
         {/* Graphique en Donut */}
-        <div className="h-64 relative mb-6">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-64 relative mb-6" style={{ minHeight: '256px', width: '100%' }}>
+          <ResponsiveContainer width="100%" height="100%" minHeight={256}>
             <PieChart>
               <defs>
                 {data.map((macro, index) => (

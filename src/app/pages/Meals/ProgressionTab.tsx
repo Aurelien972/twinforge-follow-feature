@@ -9,6 +9,7 @@ import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import ProgressionMetrics from './components/MealInsights/ProgressionMetrics';
 import CalorieTrendChart from './components/MealInsights/CalorieTrendChart';
+import MacroDistributionChart from './components/MealInsights/MacroDistributionChart';
 import NutritionHeatmap from './components/MealInsights/NutritionHeatmap';
 import { getProgressionMetrics } from './components/MealInsights/progressionMetricsUtils';
 
@@ -55,16 +56,16 @@ const ProgressionTab: React.FC = () => {
   // Préparer les données pour les graphiques
   const chartData = React.useMemo(() => {
     if (!monthMeals) return { dailyCalories: [], macroDistribution: [] };
-    
+
     // Données pour le graphique de tendance calorique (30 derniers jours)
     const dailyCaloriesMap = new Map<string, number>();
-    
+
     monthMeals.forEach(meal => {
       const date = format(new Date(meal.timestamp), 'yyyy-MM-dd');
       const current = dailyCaloriesMap.get(date) || 0;
       dailyCaloriesMap.set(date, current + (meal.total_kcal || 0));
     });
-    
+
     const dailyCalories = Array.from(dailyCaloriesMap.entries())
       .map(([date, calories]) => ({
         date,
@@ -73,9 +74,50 @@ const ProgressionTab: React.FC = () => {
       }))
       .sort((a, b) => a.date.localeCompare(b.date))
       .slice(-14); // Derniers 14 jours pour lisibilité
-    
-    return { dailyCalories };
-  }, [monthMeals]);
+
+    // Données pour la distribution des macros (semaine en cours)
+    let totalProteins = 0;
+    let totalCarbs = 0;
+    let totalFats = 0;
+
+    weekMeals?.forEach(meal => {
+      if (meal.items && Array.isArray(meal.items)) {
+        meal.items.forEach((item: any) => {
+          totalProteins += item.proteins || 0;
+          totalCarbs += item.carbs || 0;
+          totalFats += item.fats || 0;
+        });
+      }
+    });
+
+    const totalMacros = totalProteins + totalCarbs + totalFats;
+
+    const macroDistribution = totalMacros > 0 ? [
+      {
+        name: 'Protéines',
+        value: totalProteins,
+        percentage: (totalProteins / totalMacros) * 100,
+        color: '#EF4444',
+        target: profile?.calculated_metrics?.target_protein_percentage || 30,
+      },
+      {
+        name: 'Glucides',
+        value: totalCarbs,
+        percentage: (totalCarbs / totalMacros) * 100,
+        color: '#F59E0B',
+        target: profile?.calculated_metrics?.target_carbs_percentage || 40,
+      },
+      {
+        name: 'Lipides',
+        value: totalFats,
+        percentage: (totalFats / totalMacros) * 100,
+        color: '#10B981',
+        target: profile?.calculated_metrics?.target_fats_percentage || 30,
+      },
+    ] : [];
+
+    return { dailyCalories, macroDistribution };
+  }, [monthMeals, weekMeals, profile]);
 
   // État de chargement initial
   if (isWeekLoading || isMonthLoading) {
@@ -156,12 +198,23 @@ const ProgressionTab: React.FC = () => {
         />
       )}
 
-      {/* Graphique de Tendance Calorique */}
-      <CalorieTrendChart 
-        data={chartData.dailyCalories}
-        targetCalories={progressionMetrics?.targetCalories || 2000}
-        objective={profile?.objective}
-      />
+      {/* Graphiques Principaux */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Graphique de Tendance Calorique */}
+        <CalorieTrendChart
+          data={chartData.dailyCalories}
+          targetCalories={progressionMetrics?.targetCalories || 2000}
+          objective={profile?.objective}
+        />
+
+        {/* Distribution des Macronutriments */}
+        {chartData.macroDistribution.length > 0 && (
+          <MacroDistributionChart
+            data={chartData.macroDistribution}
+            profile={profile}
+          />
+        )}
+      </div>
 
       {/* Heatmap Nutritionnelle */}
       {monthMeals && monthMeals.length > 7 && (

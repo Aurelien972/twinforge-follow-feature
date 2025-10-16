@@ -131,8 +131,8 @@ const CalorieTrendChart: React.FC<CalorieTrendChartProps> = ({
         </div>
 
         {/* Graphique */}
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-64" style={{ minHeight: '256px', width: '100%' }}>
+          <ResponsiveContainer width="100%" height="100%" minHeight={256}>
             <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <defs>
                 <linearGradient id="calorieGradient" x1="0" y1="0" x2="0" y2="1">
