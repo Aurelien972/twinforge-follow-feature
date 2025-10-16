@@ -8,11 +8,13 @@ export interface FastingPhase {
   name: string;
   startHours: number;
   endHours: number;
+  durationRange: [number, number]; // [startHours, endHours] for compatibility
   description: string;
   benefits: string[];
   color: string;
   icon: string;
   metabolicState: string;
+  caloriesBurnRate: 'low' | 'medium' | 'high' | 'very_high';
 }
 
 /**
@@ -24,6 +26,7 @@ export const FASTING_PHASES: FastingPhase[] = [
     name: 'Phase Anabolique',
     startHours: 0,
     endHours: 4,
+    durationRange: [0, 4],
     description: 'Digestion et absorption des nutriments',
     benefits: [
       'Pic d\'insuline',
@@ -32,13 +35,15 @@ export const FASTING_PHASES: FastingPhase[] = [
     ],
     color: '#10B981',
     icon: 'Sprout',
-    metabolicState: 'Anabolisme'
+    metabolicState: 'Anabolisme',
+    caloriesBurnRate: 'low'
   },
   {
     id: 'postabsorptive',
     name: 'Phase Post-Absorptive',
     startHours: 4,
     endHours: 8,
+    durationRange: [4, 8],
     description: 'Épuisement du glucose sanguin',
     benefits: [
       'Transition métabolique',
@@ -47,13 +52,15 @@ export const FASTING_PHASES: FastingPhase[] = [
     ],
     color: '#F59E0B',
     icon: 'BatteryCharging',
-    metabolicState: 'Transition'
+    metabolicState: 'Transition',
+    caloriesBurnRate: 'medium'
   },
   {
     id: 'gluconeogenesis',
     name: 'Gluconéogenèse',
     startHours: 8,
     endHours: 12,
+    durationRange: [8, 12],
     description: 'Production de glucose à partir des protéines',
     benefits: [
       'Synthèse de glucose',
@@ -62,13 +69,15 @@ export const FASTING_PHASES: FastingPhase[] = [
     ],
     color: '#EF4444',
     icon: 'Flame',
-    metabolicState: 'Gluconéogenèse'
+    metabolicState: 'Gluconéogenèse',
+    caloriesBurnRate: 'medium'
   },
   {
     id: 'ketosis',
     name: 'Cétose',
     startHours: 12,
     endHours: 18,
+    durationRange: [12, 18],
     description: 'Utilisation des graisses comme source d\'énergie',
     benefits: [
       'Production de cétones',
@@ -78,13 +87,15 @@ export const FASTING_PHASES: FastingPhase[] = [
     ],
     color: '#8B5CF6',
     icon: 'Zap',
-    metabolicState: 'Cétose'
+    metabolicState: 'Cétose',
+    caloriesBurnRate: 'high'
   },
   {
     id: 'deep_ketosis',
     name: 'Cétose Profonde',
     startHours: 18,
     endHours: 24,
+    durationRange: [18, 24],
     description: 'Optimisation de la combustion des graisses',
     benefits: [
       'Autophagie cellulaire',
@@ -94,13 +105,15 @@ export const FASTING_PHASES: FastingPhase[] = [
     ],
     color: '#EC4899',
     icon: 'Sparkles',
-    metabolicState: 'Cétose Profonde'
+    metabolicState: 'Cétose Profonde',
+    caloriesBurnRate: 'very_high'
   },
   {
     id: 'extended',
     name: 'Jeûne Étendu',
     startHours: 24,
     endHours: Infinity,
+    durationRange: [24, Infinity],
     description: 'Bénéfices thérapeutiques avancés',
     benefits: [
       'Autophagie maximale',
@@ -110,7 +123,8 @@ export const FASTING_PHASES: FastingPhase[] = [
     ],
     color: '#06B6D4',
     icon: 'Dna',
-    metabolicState: 'Jeûne Étendu'
+    metabolicState: 'Jeûne Étendu',
+    caloriesBurnRate: 'very_high'
   }
 ];
 
