@@ -17,21 +17,13 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
   if (isDesktop) {
     return (
       <div
-        className={`flex items-center justify-center ${className}`}
+        className={`flex items-center ${className}`}
         style={{
           transition: 'all 300ms ease-out',
-          height: '100%',
-          isolation: 'isolate'
+          height: '100%'
         }}
       >
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '2px',
-          height: 'auto',
-          position: 'relative'
-        }}>
+        <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: '0' }}>
           <span
             style={{
               fontFamily: "'Montserrat', sans-serif",
@@ -41,12 +33,6 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               color: '#E5E7EB',
               lineHeight: 1,
               textTransform: 'uppercase',
-              display: 'inline-block',
-              whiteSpace: 'nowrap',
-              verticalAlign: 'middle',
-              WebkitFontSmoothing: 'antialiased',
-              MozOsxFontSmoothing: 'grayscale',
-              textRendering: 'optimizeLegibility',
               filter: isHovered
                 ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.3))'
                 : 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.15))',
@@ -67,12 +53,6 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               backgroundClip: 'text',
               lineHeight: 1,
               textTransform: 'uppercase',
-              display: 'inline-block',
-              whiteSpace: 'nowrap',
-              verticalAlign: 'middle',
-              WebkitFontSmoothing: 'antialiased',
-              MozOsxFontSmoothing: 'grayscale',
-              textRendering: 'optimizeLegibility',
               filter: isHovered
                 ? 'drop-shadow(0 0 12px rgba(253, 200, 48, 0.5))'
                 : 'drop-shadow(0 0 6px rgba(247, 147, 30, 0.3))',
@@ -88,20 +68,17 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
 
   return (
     <div
-      className={`flex items-center justify-center ${className}`}
+      className={`flex items-center ${className}`}
       style={{
         transition: 'all 300ms ease-out',
         gap: '8px',
-        position: 'relative',
-        isolation: 'isolate'
+        position: 'relative'
       }}
     >
       <div style={{
         position: 'relative',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0
+        alignItems: 'center'
       }}>
         <ForgeHammerIcon
           width={42}
@@ -113,10 +90,9 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '1px',
+        gap: '2px',
         alignItems: 'flex-start',
-        justifyContent: 'center',
-        position: 'relative'
+        justifyContent: 'center'
       }}>
         <span
           style={{
@@ -127,11 +103,6 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
             color: '#E5E7EB',
             lineHeight: 1,
             textTransform: 'uppercase',
-            display: 'block',
-            whiteSpace: 'nowrap',
-            WebkitFontSmoothing: 'antialiased',
-            MozOsxFontSmoothing: 'grayscale',
-            textRendering: 'optimizeLegibility',
             filter: isHovered
               ? 'drop-shadow(0 0 6px rgba(255, 255, 255, 0.3))'
               : 'drop-shadow(0 0 3px rgba(255, 255, 255, 0.15))',
@@ -152,11 +123,6 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
             backgroundClip: 'text',
             lineHeight: 1,
             textTransform: 'uppercase',
-            display: 'block',
-            whiteSpace: 'nowrap',
-            WebkitFontSmoothing: 'antialiased',
-            MozOsxFontSmoothing: 'grayscale',
-            textRendering: 'optimizeLegibility',
             filter: isHovered
               ? 'drop-shadow(0 0 10px rgba(253, 200, 48, 0.4))'
               : 'drop-shadow(0 0 5px rgba(247, 147, 30, 0.25))',

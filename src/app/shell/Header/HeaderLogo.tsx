@@ -36,21 +36,13 @@ export const HeaderLogo: React.FC = () => {
   return (
     <>
       {/* Desktop Logo - Format rectangulaire */}
-      <div className="hidden lg:block" style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+      <div className="hidden lg:block">
         <button
           onClick={handleLogoClick}
           onPointerDown={handlePointerDown}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          className="focus-ring rounded-lg transition-colors cursor-pointer"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '48px',
-            padding: '0 8px',
-            position: 'relative'
-          }}
+          className="focus-ring rounded-lg transition-colors cursor-pointer flex items-center justify-center h-full"
           aria-label="Retour au tableau de bord"
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -59,37 +51,26 @@ export const HeaderLogo: React.FC = () => {
             }
           }}
         >
-          <motion.div
-            className="relative transition-all duration-300 ease-out"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%'
-            }}
-            animate={isHovered ? { scale: 1.05 } : { scale: 1 }}
-            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            <TwinForgeLogo variant="desktop" isHovered={isHovered} />
-          </motion.div>
+          <div className="flex items-center justify-center h-full">
+            <motion.div
+              className="relative transition-all duration-300 ease-out"
+              animate={isHovered ? { scale: 1.05 } : { scale: 1 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <TwinForgeLogo variant="desktop" isHovered={isHovered} />
+            </motion.div>
+          </div>
         </button>
       </div>
 
       {/* Mobile Logo - Version unique optimisée */}
-      <div className="lg:hidden" style={{ display: 'flex', alignItems: 'center' }}>
+      <div className="lg:hidden">
         <button
           onClick={handleLogoClick}
           onPointerDown={handlePointerDown}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          className="focus-ring rounded-lg transition-colors cursor-pointer"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '4px',
-            position: 'relative'
-          }}
+          className="focus-ring rounded-lg transition-colors cursor-pointer flex items-center justify-center"
           aria-label="Retour au tableau de bord"
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -100,11 +81,6 @@ export const HeaderLogo: React.FC = () => {
         >
           <motion.div
             className="relative"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
             animate={isHovered ? { scale: 1.05 } : { scale: 1 }}
             transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
           >
