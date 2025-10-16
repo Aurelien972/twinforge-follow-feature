@@ -50,13 +50,13 @@
 @keyframes progressShimmer  { 0%{transform:translateX(-100%) translateZ(0);} 100%{transform:translateX(200%) translateZ(0);} }
 
 @keyframes breathing-glow {
-  0%,100%{ transform:scale(1) translateZ(0); opacity:.6; }
-  50%    { transform:scale(1.05) translateZ(0); opacity:1; }
+  0%,100%{ transform:scale(1) translateZ(0); opacity:.7; }
+  50%    { transform:scale(1.02) translateZ(0); opacity:.9; }
 }
 
 @keyframes icon-pulse-css {
-  0%,100%{ transform:scale(1) translateZ(0); opacity:.95; }
-  50%    { transform:scale(1.08) translateZ(0); opacity:1; }
+  0%,100%{ transform:scale(1) translateZ(0); opacity:.9; }
+  50%    { transform:scale(1.03) translateZ(0); opacity:.95; }
 }
 
 @keyframes icon-spin-css {
@@ -139,13 +139,24 @@
    MOBILE OPTIMIZATIONS
    ========================================= */
 
-@media (max-width: 768px) and (hover: none) {
-  /* Slightly slower durations on mobile to save battery */
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+  /* Reduce animations drastically on mobile to save battery and reduce visual noise */
   :root{
-    --animation-duration-fast: 200ms;
-    --animation-duration-medium: 300ms;
-    --animation-duration-slow: 500ms;
-    --animation-duration-slower: 800ms;
+    --animation-duration-fast: 80ms;
+    --animation-duration-medium: 150ms;
+    --animation-duration-slow: 250ms;
+    --animation-duration-slower: 400ms;
+    --interaction-scale-hover: 1.005;
+    --interaction-scale-active: 0.99;
+  }
+
+  /* Désactiver toutes les animations décoratives */
+  .breathing-icon,
+  .icon-pulse-css,
+  .icon-breathing-css,
+  .particle-css {
+    animation: none !important;
+    transform: translateZ(0) !important;
   }
 }
 
@@ -153,15 +164,24 @@
    LOW-END DEVICE OPTIMIZATIONS
    ========================================= */
 
-@media (max-width: 480px) and (prefers-reduced-motion: no-preference) {
-  .breathing-icon  { opacity:.8 !important; transform: translateZ(0) !important; }
-  .icon-pulse-css  { opacity:.9 !important; transform: translateZ(0) !important; }
-  .particle-css   { opacity:.8 !important; transform: translateY(-6px) scale(1.1) translateZ(0) !important; }
+@media (max-width: 480px), (hover: none) and (pointer: coarse) {
+  /* Simplifier drastiquement sur petits mobiles */
+  .breathing-icon,
+  .icon-pulse-css,
+  .particle-css {
+    opacity:.85 !important;
+    transform: translateZ(0) !important;
+    animation: none !important;
+  }
 
-  .loader-essential { animation: icon-spin-css 3s linear infinite !important; }
+  .loader-essential {
+    animation: icon-spin-css 3s linear infinite !important;
+  }
 
   /* Shorten transitions globally */
-  * { transition-duration: .1s !important; }
+  * {
+    transition-duration: .08s !important;
+  }
 }
 
 /* =========================================

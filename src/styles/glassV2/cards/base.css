@@ -44,15 +44,29 @@
   clip-path: inset(0 round inherit);
 }
 
-/* Ensure hover effects can breathe */
-.glass-card:hover {
-  /* Create isolated stacking context only on hover */
-  position: relative;
-  z-index: var(--z-dropdown);
-  isolation: isolate;
-  transform: translateY(-2px) scale(var(--interaction-scale-hover)) translateZ(0);
-  will-change: var(--will-change-transform);
-  overflow: visible;
+/* Ensure hover effects can breathe - DESKTOP UNIQUEMENT */
+@media (hover: hover) and (pointer: fine) {
+  .glass-card:hover {
+    /* Create isolated stacking context only on hover */
+    position: relative;
+    z-index: var(--z-dropdown);
+    isolation: isolate;
+    transform: translateY(-1px) scale(1.01) translateZ(0);
+    will-change: var(--will-change-transform);
+    overflow: visible;
+  }
+}
+
+/* Désactiver hover sur mobile/tactile */
+@media (hover: none), (pointer: coarse) {
+  .glass-card:hover {
+    position: static !important;
+    z-index: auto !important;
+    isolation: auto !important;
+    transform: none !important;
+    will-change: auto !important;
+    overflow: hidden !important;
+  }
 }
 
 /* Glass card pseudo-elements for depth - uses centralized variables */
@@ -95,12 +109,18 @@
   }
 }
 
-/* CRITICAL: Force border-radius inheritance on mobile */
-@media (max-width: 768px) {
+/* CRITICAL: Force border-radius inheritance and disable animations on mobile */
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+  .glass-card {
+    /* Simplifier transitions sur mobile */
+    transition: background 80ms ease, border-color 80ms ease !important;
+  }
+
   .glass-card::before,
   .glass-card::after {
     border-radius: inherit !important;
     -webkit-border-radius: inherit !important;
     -moz-border-radius: inherit !important;
+    transition: opacity 60ms ease !important;
   }
 }

@@ -76,9 +76,14 @@
   /* Interaction States */
   --interaction-scale-hover: 1.02;
   --interaction-scale-active: 0.98;
-  --interaction-scale-tap: 0.95;
+  --interaction-scale-tap: 0.97;
   --interaction-opacity-hover: 1;
-  --interaction-opacity-active: 0.92;
+  --interaction-opacity-active: 0.95;
+
+  /* Mobile-specific Interaction States */
+  --interaction-scale-hover-mobile: 1.005;
+  --interaction-scale-active-mobile: 0.98;
+  --interaction-opacity-active-mobile: 0.95;
   
   /* Spacing System - 8px Grid */
   --spacing-xs: 4px;

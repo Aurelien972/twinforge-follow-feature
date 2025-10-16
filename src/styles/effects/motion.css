@@ -50,24 +50,21 @@
   border-radius: inherit;
 }
 
-/* Enhanced breathing glow for photo card icons */
+/* Enhanced breathing glow for photo card icons - Réduit et desktop uniquement */
 @keyframes breathing-glow {
-  0%, 100% { 
-    transform: scale(1) translateZ(0); 
-    opacity: 0.8; 
-    box-shadow: 
-      0 0 30px color-mix(in srgb, var(--icon-color, var(--color-plasma-cyan)) 50%, transparent),
-      0 0 60px color-mix(in srgb, var(--icon-color, var(--color-plasma-cyan)) 35%, transparent),
-      0 0 90px color-mix(in srgb, var(--icon-color, var(--color-plasma-cyan)) 25%, transparent);
+  0%, 100% {
+    transform: scale(1) translateZ(0);
+    opacity: 0.8;
+    box-shadow:
+      0 0 20px color-mix(in srgb, var(--icon-color, var(--color-plasma-cyan)) 40%, transparent),
+      0 0 40px color-mix(in srgb, var(--icon-color, var(--color-plasma-cyan)) 25%, transparent);
   }
-  50% { 
-    transform: scale(1.05) translateZ(0); 
-    opacity: 1; 
-    box-shadow: 
-      0 0 40px color-mix(in srgb, var(--icon-color, var(--color-plasma-cyan)) 70%, transparent),
-      0 0 80px color-mix(in srgb, var(--icon-color, var(--color-plasma-cyan)) 50%, transparent),
-      0 0 120px color-mix(in srgb, var(--icon-color, var(--color-plasma-cyan)) 35%, transparent),
-      0 0 160px color-mix(in srgb, var(--brand-primary) 25%, transparent);
+  50% {
+    transform: scale(1.03) translateZ(0);
+    opacity: 0.95;
+    box-shadow:
+      0 0 30px color-mix(in srgb, var(--icon-color, var(--color-plasma-cyan)) 50%, transparent),
+      0 0 60px color-mix(in srgb, var(--icon-color, var(--color-plasma-cyan)) 35%, transparent);
   }
 }
 
@@ -194,29 +191,38 @@
    MOBILE OPTIMIZATIONS - HARMONIZED
    ========================================= */
 
-@media (max-width: 768px) {
-  /* CRITICAL: Disable icon animations on mobile */
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+  /* CRITICAL: Disable icon animations on mobile and touch devices */
   .spatial-icon,
   .icon-container,
   .breathing-icon,
   .icon-pulse-css,
-  .icon-breathing-css {
+  .icon-breathing-css,
+  .breathing-glow,
+  .particle-float,
+  .particle-css {
     animation: none !important;
-    transform: none !important;
+    transform: translateZ(0) !important;
     transition: none !important;
+    opacity: 0.9 !important;
   }
-  
-  .spatial-icon:hover {
+
+  /* Désactiver complètement hover sur mobile */
+  .spatial-icon:hover,
+  .icon-container:hover,
+  .hover-lift:hover {
     transform: none !important;
+    box-shadow: none !important;
   }
-  
+
   .spatial-icon:hover::after {
     opacity: 0 !important;
+    display: none !important;
   }
-  
-  /* Keep only essential loaders */
+
+  /* Keep only essential loaders - durée plus lente sur mobile */
   .icon-spin-css.loader-essential {
-    animation: icon-spin-css 2s linear infinite !important;
+    animation: icon-spin-css 2.5s linear infinite !important;
   }
 }
 

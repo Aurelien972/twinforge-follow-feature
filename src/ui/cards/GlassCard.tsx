@@ -79,40 +79,42 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
     onPointerDown?.(e);
   };
 
-  // CRITICAL: Désactiver les animations sur mobile
+  // CRITICAL: Désactiver les animations sur mobile et appareils tactiles
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-  const shouldAnimate = !reduceMotion && !isMobile;
+  const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  const shouldAnimate = !reduceMotion && !isMobile && !isTouchDevice;
 
   const handleMove = React.useCallback(
     (e: React.MouseEvent) => {
-      if (!interactive || !hasFinePointer() || disabled || !sheen || isMobile) return;
-      
+      // Désactiver complètement sur mobile et appareils tactiles
+      if (!interactive || !hasFinePointer() || disabled || !sheen || isMobile || isTouchDevice) return;
+
       const el = e.currentTarget as HTMLElement;
       const r = el.getBoundingClientRect();
       const px = (e.clientX - r.left) / r.width;
       const py = (e.clientY - r.top) / r.height;
 
-      // Mettre à jour les variables CSS pour le sheen
+      // Mettre à jour les variables CSS pour le sheen (desktop uniquement)
       el.style.setProperty('--mx', String(px));
       el.style.setProperty('--my', String(py));
       el.style.setProperty('--sheen-size', 'var(--glass-sheen-size)');
     },
-    [interactive, disabled, sheen, isMobile]
+    [interactive, disabled, sheen, isMobile, isTouchDevice]
   );
 
   const handleEnter = React.useCallback((e: React.MouseEvent) => {
-    if (!interactive || !hasFinePointer() || disabled || !sheen || isMobile) return;
+    if (!interactive || !hasFinePointer() || disabled || !sheen || isMobile || isTouchDevice) return;
     const el = e.currentTarget as HTMLElement;
     el.style.setProperty('--sheen-visible', '1');
-  }, [interactive, disabled, sheen, isMobile]);
+  }, [interactive, disabled, sheen, isMobile, isTouchDevice]);
 
   const handleLeave = React.useCallback((e: React.MouseEvent) => {
-    if (!interactive || disabled || !sheen || isMobile) return;
+    if (!interactive || disabled || !sheen || isMobile || isTouchDevice) return;
     const el = e.currentTarget as HTMLElement;
     el.style.removeProperty('--sheen-visible');
     el.style.removeProperty('--mx');
     el.style.removeProperty('--my');
-  }, [interactive, disabled, sheen, isMobile]);
+  }, [interactive, disabled, sheen, isMobile, isTouchDevice]);
 
   // Interactions desktop uniquement
   const interactiveDesktop = interactive && hasFinePointer() && !disabled && shouldAnimate;
@@ -137,12 +139,12 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
       onMouseLeave={handleLeave}
       onPointerDown={handlePointerDown}
       data-hover-effect={hoverEffectClass}
-      whileTap={!disabled && !reduceMotion ? {
-        scale: 'var(--interaction-scale-active)',
-        opacity: 'var(--interaction-opacity-active)',
-        transition: { 
-          duration: 0.15, 
-          ease: "easeOut" 
+      whileTap={!disabled && !reduceMotion && !isMobile && !isTouchDevice ? {
+        scale: 0.98,
+        opacity: 0.95,
+        transition: {
+          duration: 0.08,
+          ease: "easeOut"
         }
       } : {}}
       className={clsx(
@@ -157,8 +159,8 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
         className
       )}
       style={{
-        ['--spotlight-opacity' as any]: spotlight ? 0.6 : 0,
-        ['--glass-sheen-size' as any]: window.innerWidth < 768 ? '240px' : '420px',
+        ['--spotlight-opacity' as any]: (spotlight && !isMobile && !isTouchDevice) ? 0.6 : 0,
+        ['--glass-sheen-size' as any]: (isMobile || isTouchDevice) ? '0px' : '420px',
         position: 'relative',
         isolation: 'isolate',
         ...style,
@@ -167,8 +169,8 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
       {...(as === 'button' ? { disabled } : {})}
       {...rest}
     >
-      {/* sheen local (z au-dessus du verre, masqué en radial) - étendu jusqu'aux bords */}
-      {sheen && (
+      {/* sheen local (z au-dessus du verre, masqué en radial) - desktop uniquement */}
+      {sheen && !isMobile && !isTouchDevice && (
         <div
           aria-hidden
           className="glass-sheen pointer-events-none absolute rounded-[inherit] overflow-hidden"
