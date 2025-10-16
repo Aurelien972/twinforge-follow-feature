@@ -91,7 +91,7 @@ export function navFor(): NavSection[] {
           to: '/meals',
           icon: 'Utensils',
           label: 'Forge Nutritionnelle',
-          subtitle: 'Nutrition & Repas',
+          subtitle: 'Scanner de Repas',
           isForge: true,
           circuitColor: '#10B981', // Vert
           tabs: ['Scanner', 'Insights', 'Progression', 'Historique'],
@@ -123,7 +123,7 @@ export function navFor(): NavSection[] {
           to: '/fridge',
           icon: 'ChefHat',
           label: 'Forge Culinaire',
-          subtitle: 'Recettes & Plans',
+          subtitle: 'Scanner de Frigo',
           isForge: true,
           circuitColor: '#EC4899', // Rose
           tabs: ['Scanner', 'Inventaire', 'Recettes', 'Plan', 'Courses'],
@@ -168,7 +168,7 @@ export function navFor(): NavSection[] {
           to: '/activity',
           icon: 'Activity',
           label: 'Forge Énergétique',
-          subtitle: 'Activités & Dépenses',
+          subtitle: 'Tracker d\'Activités',
           isForge: true,
           circuitColor: '#3B82F6', // Bleu
           tabs: ['Tracker', 'Insights', 'Progression', 'Historique'],
@@ -200,7 +200,7 @@ export function navFor(): NavSection[] {
           to: '/training',
           icon: 'Dumbbell',
           label: 'Forge Corporelle',
-          subtitle: 'Training & Performance',
+          subtitle: 'Coaching live',
           isForge: true,
           circuitColor: '#18E3FF', // Cyan électrique
           tabs: ['Aujourd\'hui', 'Conseils', 'Progression', 'Records', 'Historique'],
