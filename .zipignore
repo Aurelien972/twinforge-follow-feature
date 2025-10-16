@@ -1,0 +1,11 @@
+dist/
+dist-ssr/
+dev-dist/
+node_modules/
+.env
+.DS_Store
+*.log
+coverage/
+.cache/
+.vscode/
+.idea/

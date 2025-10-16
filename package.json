@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "lock": "npm install --package-lock-only"
+    "lock": "npm install --package-lock-only",
+    "zip": "git archive -o project.zip HEAD"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
