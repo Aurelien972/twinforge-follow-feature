@@ -131,7 +131,7 @@ export function navFor(): NavSection[] {
             {
               to: '/fridge#scanner',
               icon: 'ScanLine',
-              label: 'Scanner',
+              label: 'Scanner de Frigo',
               isPrimarySubMenu: true
             },
             {
@@ -176,7 +176,7 @@ export function navFor(): NavSection[] {
             {
               to: '/activity#daily',
               icon: 'Activity',
-              label: 'Tracker',
+              label: 'Tracker d\'Activités',
               isPrimarySubMenu: true
             },
             {
@@ -203,12 +203,12 @@ export function navFor(): NavSection[] {
           subtitle: 'Coaching live',
           isForge: true,
           circuitColor: '#18E3FF', // Cyan électrique
-          tabs: ['Aujourd\'hui', 'Conseils', 'Progression', 'Records', 'Historique'],
+          tabs: ['Coaching', 'Conseils', 'Progression', 'Records', 'Historique'],
           subItems: [
             {
               to: '/training#aujourd hui',
               icon: 'Home',
-              label: 'Aujourd\'hui',
+              label: 'Coaching',
               isPrimarySubMenu: true
             },
             {
