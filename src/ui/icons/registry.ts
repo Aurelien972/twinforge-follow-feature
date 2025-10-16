@@ -12,6 +12,7 @@ export const ICONS = {
   Activity: L.Activity,
   Smile: L.Smile,
   Scan: L.Scan,
+  ScanLine: L.ScanLine,
   ScanFace: L.ScanFace,
   ScanBarcode: L.ScanBarcode,
   Barcode: L.Barcode,

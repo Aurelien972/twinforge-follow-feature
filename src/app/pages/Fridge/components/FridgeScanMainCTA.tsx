@@ -50,9 +50,11 @@ const FridgeScanMainCTA: React.FC = () => {
       ].map((position, index) => (
         <motion.div
           key={`corner-${index}`}
-          className="absolute w-8 h-8 rounded-lg pointer-events-none"
+          className="absolute rounded-lg pointer-events-none"
           style={{
             ...position,
+            width: '10px',
+            height: '10px',
             background: `
               linear-gradient(135deg,
                 color-mix(in srgb, #EC4899 60%, transparent),

@@ -6,7 +6,6 @@ import { useMealPlanStore } from '../../../../system/store/mealPlanStore';
 import { useToast } from '../../../../ui/components/ToastProvider';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
-import { useFeedback } from '../../../../hooks/useFeedback';
 import UserGuideCard from './FridgesTab/components/UserGuideCard';
 import SelectedInventoryActionsCard from './FridgesTab/components/SelectedInventoryActionsCard';
 import InventoryManagementHeader from './FridgesTab/components/InventoryManagementHeader';
@@ -25,9 +24,8 @@ import { formatDate, getInventoryPreview } from './FridgesTab/utils/inventoryUti
 const FridgesTab: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { click } = useFeedback();
   const { session } = useUserStore();
-  const { startRecipeGenerationFromInventory, startScan } = useFridgeScanPipeline();
+  const { startRecipeGenerationFromInventory } = useFridgeScanPipeline();
   const { generateMealPlan } = useMealPlanStore();
 
   const userId = session?.user?.id;
@@ -45,13 +43,6 @@ const FridgesTab: React.FC = () => {
 
   const selectedSession = sessions.find(session => session.id === selectedInventorySessionId);
 
-  // Handle starting new scan
-  const handleStartNewScan = () => {
-    click();
-    startScan();
-    navigate('/fridge/scan');
-  };
-
   return (
     <div className="space-y-6">
       {/* Guide utilisateur - affiché quand aucun inventaire */}
@@ -59,9 +50,8 @@ const FridgesTab: React.FC = () => {
 
       {/* Header de gestion - affiché quand il y a des inventaires */}
       {sessions.length > 0 && (
-        <InventoryManagementHeader 
+        <InventoryManagementHeader
           onDeleteAllInventories={handleDeleteAllInventories}
-          onStartNewScan={handleStartNewScan}
         />
       )}
 

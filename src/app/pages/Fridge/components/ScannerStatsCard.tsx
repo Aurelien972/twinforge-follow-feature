@@ -34,7 +34,7 @@ const ScannerStatsCard: React.FC = () => {
     {
       label: 'Scans Effectués',
       value: totalScans,
-      icon: 'ScanLine',
+      icon: 'Scan',
       color: '#EC4899',
       unit: ''
     },

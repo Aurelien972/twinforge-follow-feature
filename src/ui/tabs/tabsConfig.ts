@@ -20,6 +20,7 @@ export const TAB_COLORS: Record<string, string> = {
   'profile:avatar': '#A855F7',      // Violet pour avatar
 
   // Atelier de Recettes (Fridge)
+  'scanner': '#EC4899',     // Rose pour scanner
   'inventaire': '#06B6D4',  // Cyan pour inventaire
   'recipes': '#EC4899',     // Rose pour recettes
   'plan': '#8B5CF6',        // Violet pour plan
