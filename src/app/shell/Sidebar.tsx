@@ -221,14 +221,14 @@ const Section = ({
 }) => {
   // Pas d'espacement avant pour primary et twin (premières sections)
   const shouldHaveTopSpace = type === 'forge-category';
-  const isHealthCategory = title === 'Santé';
+  const needsSeparator = title === 'Alimentation' || title === 'Activité';
 
   return (
     <div className={`space-y-1 ${shouldHaveTopSpace ? 'mt-4' : ''}`}>
       {title && (
         <>
-          {/* Séparateur visuel avant Santé */}
-          {isHealthCategory && (
+          {/* Séparateur visuel avant Alimentation et Activité */}
+          {needsSeparator && (
             <div className="sidebar-category-separator" />
           )}
           <h3
