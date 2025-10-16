@@ -230,11 +230,12 @@ export function useFastingInsightsGenerator(periodDays: number = 7) {
       });
 
       if (!dataCheck.sufficient) {
-        logger.info('FASTING_INSIGHTS_AI', 'Insufficient data for AI insights generation', {
+        logger.warn('FASTING_INSIGHTS_AI', 'Insufficient data for AI insights generation - returning basic summary', {
           userId,
           periodDays,
           sessionsCount: completedSessionsCount,
           missingData: dataCheck.missingData,
+          willReturnBasicData: true,
           timestamp: new Date().toISOString()
         });
         

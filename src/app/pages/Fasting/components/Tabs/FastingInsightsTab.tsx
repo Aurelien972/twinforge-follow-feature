@@ -132,7 +132,7 @@ const FastingInsightsTab: React.FC = () => {
           {insightsData.insights.length > 0 && (
             <div className="space-y-4">
               <h3 className="text-white font-semibold text-lg flex items-center gap-2">
-                <SpatialIcon Icon={ICONS.Lightbulb} size={18} className="text-purple-400" />
+                <SpatialIcon Icon={ICONS.Lightbulb} size={18} className="text-green-400" />
                 Insights Détaillés ({insightsData.insights.length})
               </h3>
               
@@ -151,9 +151,9 @@ const FastingInsightsTab: React.FC = () => {
           {/* Data Quality Indicator */}
           <div className="text-center">
             <div className="flex items-center justify-center gap-4 flex-wrap">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-400/20">
-                <SpatialIcon Icon={ICONS.Shield} size={12} className="text-purple-400" />
-                <span className="text-purple-300 text-sm font-medium">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-400/20">
+                <SpatialIcon Icon={ICONS.Shield} size={12} className="text-green-400" />
+                <span className="text-green-300 text-sm font-medium">
                   Qualité : {
                     insightsData.dataQuality === 'excellent' ? 'Excellente' :
                     insightsData.dataQuality === 'good' ? 'Bonne' :

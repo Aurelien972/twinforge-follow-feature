@@ -1,8 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import GlassCard from '@/ui/cards/GlassCard';
-import SpatialIcon from '@/ui/icons/SpatialIcon';
-import { ICONS } from '@/ui/icons/registry';
+import { useFeedback } from '@/hooks/useFeedback';
+import logger from '@/lib/utils/logger';
 
 interface FastingPeriodSelectorProps {
   selectedPeriod: number;
@@ -11,30 +9,6 @@ interface FastingPeriodSelectorProps {
   getMinSessionsForPeriod?: (period: number) => number;
   className?: string;
 }
-
-interface PeriodOption {
-  value: number;
-  label: string;
-  description: string;
-}
-
-const PERIOD_OPTIONS: PeriodOption[] = [
-  {
-    value: 7,
-    label: '7 derniers jours',
-    description: 'Analyse hebdomadaire',
-  },
-  {
-    value: 30,
-    label: '30 derniers jours',
-    description: 'Tendances mensuelles',
-  },
-  {
-    value: 90,
-    label: '90 derniers jours',
-    description: 'Analyse trimestrielle',
-  }
-];
 
 /**
  * Default minimum sessions function (used by Insights tab)
@@ -49,8 +23,20 @@ const defaultGetMinSessions = (period: number): number => {
 };
 
 /**
- * Fasting Period Selector - Sélecteur de Période d'Analyse
- * Permet de choisir la période d'analyse pour les insights de jeûne
+ * Get period label for display
+ */
+function getPeriodLabel(period: number): string {
+  switch (period) {
+    case 7: return '7 jours';
+    case 30: return '30 jours';
+    case 90: return '90 jours';
+    default: return `${period} jours`;
+  }
+}
+
+/**
+ * Fasting Period Selector - Sélecteur de Période d'Analyse (Version Compacte)
+ * Harmonisé avec ProgressionPeriodSelector du tracker d'activité
  */
 const FastingPeriodSelector: React.FC<FastingPeriodSelectorProps> = ({
   selectedPeriod,
@@ -59,111 +45,82 @@ const FastingPeriodSelector: React.FC<FastingPeriodSelectorProps> = ({
   getMinSessionsForPeriod = defaultGetMinSessions,
   className = ''
 }) => {
+  const { click } = useFeedback();
+
+  const periods = [
+    { value: 7, label: getPeriodLabel(7) },
+    { value: 30, label: getPeriodLabel(30) },
+    { value: 90, label: getPeriodLabel(90) }
+  ];
+
+  // Check if a period is available (enough sessions)
+  const isPeriodAvailable = (periodValue: number) => {
+    const threshold = getMinSessionsForPeriod(periodValue);
+    const available = availableSessionsCount >= threshold;
+
+    logger.debug('FASTING_PERIOD_SELECTOR', 'Period availability check', {
+      periodValue,
+      availableSessionsCount,
+      threshold,
+      available,
+      calculation: `${availableSessionsCount} >= ${threshold} = ${available}`,
+      timestamp: new Date().toISOString()
+    });
+
+    return available;
+  };
+
   return (
-    <div className={`fasting-period-selector ${className}`}>
-      <div className="flex flex-col sm:flex-row gap-3">
-        {PERIOD_OPTIONS.map((option) => {
-          const isSelected = selectedPeriod === option.value;
-          const minSessions = getMinSessionsForPeriod(option.value);
-          const hasEnoughData = availableSessionsCount >= minSessions;
-          const isDisabled = !hasEnoughData;
-          
+    <div className={`flex justify-center ${className}`}>
+      <div className="inline-flex gap-2 p-1 rounded-lg" style={{
+        background: 'rgba(255, 255, 255, 0.05)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        backdropFilter: 'blur(10px)'
+      }}>
+        {periods.map((period) => {
+          const isAvailable = isPeriodAvailable(period.value);
+          const isSelected = selectedPeriod === period.value;
+          const accentColor = '#10B981'; // Vert pour la Forge Temporelle
+
           return (
-            <motion.button
-              key={option.value}
-              onClick={() => !isDisabled && onPeriodChange(option.value)}
-              disabled={isDisabled}
-              className={`
-                flex-1 p-4 rounded-xl transition-all duration-200 relative overflow-hidden
-                ${isSelected ? 'ring-2' : ''}
-                ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-              `}
-              style={{
-                background: isSelected 
-                  ? `
-                    radial-gradient(circle at 30% 20%, color-mix(in srgb, #8B5CF6 15%, transparent) 0%, transparent 60%),
-                    color-mix(in srgb, #8B5CF6 8%, transparent)
-                  `
-                  : 'rgba(255, 255, 255, 0.05)',
-                border: isSelected 
-                  ? '2px solid color-mix(in srgb, #8B5CF6 40%, transparent)'
-                  : '1px solid rgba(255, 255, 255, 0.1)',
-                ringColor: isSelected ? '#8B5CF6' : 'transparent',
-                backdropFilter: 'blur(12px) saturate(130%)'
+            <button
+              key={period.value}
+              onClick={() => {
+                if (isAvailable) {
+                  click();
+                  onPeriodChange(period.value);
+
+                  logger.info('FASTING_PERIOD_SELECTOR', 'Period changed', {
+                    newPeriod: period.value,
+                    availableSessionsCount,
+                    timestamp: new Date().toISOString()
+                  });
+                } else {
+                  const threshold = getMinSessionsForPeriod(period.value);
+                  logger.warn('FASTING_PERIOD_SELECTOR', 'Attempted to select unavailable period', {
+                    period: period.value,
+                    availableSessionsCount,
+                    requiredSessions: threshold,
+                    missingSessions: threshold - availableSessionsCount,
+                    timestamp: new Date().toISOString()
+                  });
+                }
               }}
-              whileHover={!isDisabled ? { 
-                scale: 1.02,
-                backgroundColor: isSelected 
-                  ? 'color-mix(in srgb, #8B5CF6 12%, transparent)'
-                  : 'rgba(255, 255, 255, 0.08)'
-              } : {}}
-              whileTap={!isDisabled ? { scale: 0.98 } : {}}
+              disabled={!isAvailable}
+              className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200"
+              style={{
+                background: isSelected ? `${accentColor}33` : 'transparent',
+                color: isSelected ? accentColor : isAvailable ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)',
+                border: isSelected ? `1px solid ${accentColor}66` : '1px solid transparent',
+                boxShadow: isSelected ? `0 0 20px ${accentColor}4D` : 'none',
+                opacity: isAvailable ? 1 : 0.5,
+                cursor: isAvailable ? 'pointer' : 'not-allowed'
+              }}
             >
-              <div className="text-left">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className={`font-semibold ${
-                    isSelected ? 'text-purple-300' : 'text-white/90'
-                  }`}>
-                    {option.label}
-                  </h4>
-                  {isSelected && (
-                    <div 
-                      className="w-6 h-6 rounded-full flex items-center justify-center"
-                      style={{
-                        background: 'color-mix(in srgb, #8B5CF6 20%, transparent)',
-                        border: '1px solid color-mix(in srgb, #8B5CF6 30%, transparent)'
-                      }}
-                    >
-                      <SpatialIcon Icon={ICONS.Check} size={12} style={{ color: '#8B5CF6' }} />
-                    </div>
-                  )}
-                </div>
-                
-                <p className={`text-sm mb-3 ${
-                  isSelected ? 'text-purple-200' : 'text-white/70'
-                }`}>
-                  {option.description}
-                </p>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <SpatialIcon 
-                      Icon={hasEnoughData ? ICONS.Check : ICONS.AlertCircle} 
-                      size={12} 
-                      className={hasEnoughData ? 'text-green-400' : 'text-orange-400'} 
-                    />
-                    <span className={`text-xs ${
-                      hasEnoughData ? 'text-green-300' : 'text-orange-300'
-                    }`}>
-                      {availableSessionsCount}/{minSessions} sessions
-                    </span>
-                  </div>
-                  
-                  {!hasEnoughData && (
-                    <span className="text-xs text-orange-300">
-                      {minSessions - availableSessionsCount} manquantes
-                    </span>
-                  )}
-                </div>
-              </div>
-            </motion.button>
+              {period.label}
+            </button>
           );
         })}
-      </div>
-      
-      {/* Information sur les données requises */}
-      <div className="mt-4 p-3 rounded-xl bg-purple-500/10 border border-purple-400/20">
-        <div className="flex items-start gap-2">
-          <SpatialIcon Icon={ICONS.Info} size={14} className="text-purple-400 mt-0.5" />
-          <div>
-            <p className="text-purple-200 text-sm leading-relaxed">
-              Plus vous avez de sessions de jeûne, plus les insights de la Forge sont précis et personnalisés.
-            </p>
-            <div className="text-purple-300 text-xs mt-2">
-              <strong>Recommandé :</strong> Au moins 3 sessions pour 7 jours, 8 pour 30 jours, 20 pour 90 jours
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

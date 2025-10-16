@@ -600,13 +600,15 @@ export function useFastingProgressionData(periodDays: number = 30) {
           // Continue without AI analysis
         }
       } else {
-        logger.info('FASTING_PROGRESSION_AI', 'Insufficient data for AI progression analysis', {
+        logger.warn('FASTING_PROGRESSION_AI', 'Insufficient data for AI progression analysis - showing local metrics only', {
           userId,
           periodDays,
           completedSessions: completedSessions.length,
           missingData: aiDataCheck.missingData,
           aiDataCheckSufficient: aiDataCheck.sufficient,
           reasonForSkipping: 'aiDataCheck.sufficient === false',
+          willShowLocalMetrics: true,
+          localMetricsAvailable: metrics.totalSessions > 0,
           timestamp: new Date().toISOString()
         });
       }
@@ -639,12 +641,18 @@ export function useFastingProgressionData(periodDays: number = 30) {
         cached
       };
 
-      // DEBUG: Log final progression data
-      logger.debug('FASTING_PROGRESSION_FINAL_DATA', 'Final progression data prepared', {
+      // CRITICAL LOG: Always return metrics even without AI
+      logger.info('FASTING_PROGRESSION_FINAL', 'Progression data ready - metrics available', {
         userId,
         periodDays,
-        dataQuality,
+        hasMetrics: !!metrics,
+        metricsSessionsCount: metrics.totalSessions,
+        metricsTotalHours: metrics.totalFastedHours,
+        metricsAvgDuration: metrics.averageDuration,
+        metricsConsistencyScore: metrics.consistencyScore,
         hasAiAnalysis: !!aiAnalysis,
+        dataQuality,
+        willDisplayLocalMetrics: metrics.totalSessions > 0,
         metricsKeys: Object.keys(metrics),
         consistencyDataLength: consistencyData.length,
         timestamp: new Date().toISOString()

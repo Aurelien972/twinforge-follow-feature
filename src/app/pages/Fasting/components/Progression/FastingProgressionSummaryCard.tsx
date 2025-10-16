@@ -42,7 +42,7 @@ function getPerformanceTheme(consistencyScore: number) {
     };
   } else {
     return {
-      color: '#8B5CF6',
+      color: '#10B981',
       icon: 'Timer' as const,
       badge: 'Débutant',
       description: 'Commencez votre forge'
@@ -256,22 +256,22 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
             <motion.div
               className="p-4 rounded-xl"
               style={{
-                background: 'color-mix(in srgb, #A855F7 10%, transparent)',
-                border: '1px solid color-mix(in srgb, #A855F7 20%, transparent)'
+                background: 'color-mix(in srgb, #10B981 10%, transparent)',
+                border: '1px solid color-mix(in srgb, #10B981 20%, transparent)'
               }}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
               <div className="flex items-center gap-3">
-                <div 
+                <div
                   className="w-10 h-10 rounded-full flex items-center justify-center"
                   style={{
-                    background: 'color-mix(in srgb, #A855F7 15%, transparent)',
-                    border: '1px solid color-mix(in srgb, #A855F7 25%, transparent)'
+                    background: 'color-mix(in srgb, #10B981 15%, transparent)',
+                    border: '1px solid color-mix(in srgb, #10B981 25%, transparent)'
                   }}
                 >
-                  <SpatialIcon Icon={ICONS.Star} size={16} style={{ color: '#A855F7' }} />
+                  <SpatialIcon Icon={ICONS.Star} size={16} style={{ color: '#10B981' }} />
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-white">
@@ -408,13 +408,13 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
               {aiAnalysis.strategicRecommendations.length > 0 && (
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                   <h5 className="text-white font-semibold mb-3 flex items-center gap-2">
-                    <SpatialIcon Icon={ICONS.Target} size={14} className="text-purple-400" />
+                    <SpatialIcon Icon={ICONS.Target} size={14} className="text-green-400" />
                     Recommandations Stratégiques IA
                   </h5>
                   <div className="space-y-2">
                     {aiAnalysis.strategicRecommendations.map((recommendation, index) => (
                       <div key={index} className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-2 flex-shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-2 flex-shrink-0" />
                         <span className="text-white/85 text-sm leading-relaxed">{recommendation}</span>
                       </div>
                     ))}

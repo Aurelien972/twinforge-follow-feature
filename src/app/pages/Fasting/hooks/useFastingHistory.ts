@@ -219,9 +219,11 @@ export function useFastingHistory(
       };
     },
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000, // 5 minutes (increased from 2)
+    staleTime: 10 * 60 * 1000, // 10 minutes - optimized cache duration
+    cacheTime: 15 * 60 * 1000, // 15 minutes - keep in cache longer
     retry: 1,
     refetchOnWindowFocus: false, // Don't refetch on window focus to reduce API calls
+    refetchOnMount: false, // Don't refetch on mount if data is fresh
   });
 }
 
