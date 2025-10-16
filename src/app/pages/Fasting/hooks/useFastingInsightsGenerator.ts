@@ -51,7 +51,7 @@ function hasMinimumDataForInsights(
   const missingData: string[] = [];
   
   // CRITICAL DEBUG: Log input parameters with detailed breakdown
-  logger.info('FASTING_INSIGHTS_MIN_DATA_CHECK', 'Checking minimum data requirements', {
+  logger.debug('FASTING_INSIGHTS_MIN_DATA_CHECK', 'Checking minimum data requirements', {
     profileExists: !!profile,
     sessionsCount,
     periodDays,
@@ -78,7 +78,7 @@ function hasMinimumDataForInsights(
   }
   
   // CRITICAL DEBUG: Log check result
-  logger.info('FASTING_INSIGHTS_MIN_DATA_RESULT', 'Minimum data check result', {
+  logger.debug('FASTING_INSIGHTS_MIN_DATA_RESULT', 'Minimum data check result', {
     sufficient: missingData.length === 0,
     missingDataCount: missingData.length,
     missingData,
@@ -133,7 +133,7 @@ export function useFastingInsightsGenerator(periodDays: number = 7) {
       const startDate = startOfDay(subDays(new Date(), periodDays)).toISOString();
       const endDate = new Date().toISOString();
 
-      logger.info('FASTING_INSIGHTS_AI', 'Starting AI insights generation', {
+      logger.debug('FASTING_INSIGHTS_AI', 'Starting AI insights generation', {
         userId,
         periodDays,
         startDate,
@@ -162,7 +162,7 @@ export function useFastingInsightsGenerator(periodDays: number = 7) {
       const completedSessionsCount = fastingSessions.filter(s => s.status === 'completed').length;
       
       // DEBUG: Log sessions data
-      logger.info('FASTING_INSIGHTS_SESSIONS_DATA', 'Sessions fetched for insights', {
+      logger.debug('FASTING_INSIGHTS_SESSIONS_DATA', 'Sessions fetched for insights', {
         userId,
         periodDays,
         totalSessions: fastingSessions.length,
@@ -181,7 +181,7 @@ export function useFastingInsightsGenerator(periodDays: number = 7) {
       const dataCheck = hasMinimumDataForInsights(profile, completedSessionsCount, periodDays);
       
       // CRITICAL DEBUG: Log data sufficiency check
-      logger.info('FASTING_INSIGHTS_DATA_CHECK', 'Data sufficiency check result', {
+      logger.debug('FASTING_INSIGHTS_DATA_CHECK', 'Data sufficiency check result', {
         userId,
         periodDays,
         completedSessionsCount,
@@ -199,7 +199,7 @@ export function useFastingInsightsGenerator(periodDays: number = 7) {
       });
 
       // DETAILED LOGGING: Profile and data check results
-      logger.info('FASTING_INSIGHTS_AI_DATA_CHECK', 'Data sufficiency check completed', {
+      logger.debug('FASTING_INSIGHTS_AI_DATA_CHECK', 'Data sufficiency check completed', {
         userId,
         periodDays,
         profileData: {
@@ -282,7 +282,7 @@ export function useFastingInsightsGenerator(periodDays: number = 7) {
       });
 
       // Call AI insights generator Edge Function
-      logger.info('FASTING_INSIGHTS_AI_EDGE_CALL', 'About to call AI insights generator Edge Function', {
+      logger.debug('FASTING_INSIGHTS_AI_EDGE_CALL', 'About to call AI insights generator Edge Function', {
         userId,
         periodDays,
         profileKeys: profile ? Object.keys(profile) : [],
@@ -291,7 +291,7 @@ export function useFastingInsightsGenerator(periodDays: number = 7) {
         timestamp: new Date().toISOString()
       });
 
-      logger.info('FASTING_INSIGHTS_AI', 'Calling AI insights generator Edge Function', {
+      logger.debug('FASTING_INSIGHTS_AI', 'Calling AI insights generator Edge Function', {
         userId,
         periodDays,
         profileKeys: profile ? Object.keys(profile) : [],
@@ -325,7 +325,7 @@ export function useFastingInsightsGenerator(periodDays: number = 7) {
 
       const insights: FastingInsightsData = aiResponse;
 
-      logger.info('FASTING_INSIGHTS_AI', 'AI insights generated successfully', {
+      logger.debug('FASTING_INSIGHTS_AI', 'AI insights generated successfully', {
         userId,
         periodDays,
         insightsCount: insights.insights.length,
@@ -340,16 +340,12 @@ export function useFastingInsightsGenerator(periodDays: number = 7) {
       return insights;
     },
     enabled: !!userId,
-    // DEBUG: Log enabled state
-    onMount: () => {
-      logger.debug('FASTING_INSIGHTS_QUERY_MOUNT', 'Query mounted', {
-        userId,
-        periodDays,
-        enabled: !!userId,
-        timestamp: new Date().toISOString()
-      });
-    },
-    staleTime: 10 * 60 * 1000, // 10 minutes - insights don't change frequently
+    staleTime: 15 * 60 * 1000, // 15 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes (replaces deprecated cacheTime)
     retry: 1,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    structuralSharing: false,
   });
 }

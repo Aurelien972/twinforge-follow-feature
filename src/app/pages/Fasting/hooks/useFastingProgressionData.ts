@@ -299,7 +299,7 @@ function hasMinimumDataForProgressionAI(
   const missingData: string[] = [];
 
   // CRITICAL DEBUG: Log all input parameters
-  logger.info('FASTING_PROGRESSION_AI_DATA_CHECK_DETAILED', 'Checking minimum data requirements with full details', {
+  logger.debug('FASTING_PROGRESSION_AI_DATA_CHECK_DETAILED', 'Checking minimum data requirements with full details', {
     profileExists: !!profile,
     sessionsCount,
     periodDays,
@@ -328,7 +328,7 @@ function hasMinimumDataForProgressionAI(
   }
   
   // CRITICAL DEBUG: Log check result
-  logger.info('FASTING_PROGRESSION_AI_DATA_CHECK_RESULT', 'Minimum data check result (NO BYPASS)', {
+  logger.debug('FASTING_PROGRESSION_AI_DATA_CHECK_RESULT', 'Minimum data check result (NO BYPASS)', {
     sufficient: missingData.length === 0,
     missingDataCount: missingData.length,
     missingData,
@@ -381,7 +381,7 @@ export function useFastingProgressionData(periodDays: number = 30) {
       const startDate = startOfDay(subDays(new Date(), periodDays)).toISOString();
       const endDate = new Date().toISOString();
 
-      logger.info('FASTING_PROGRESSION', 'Fetching progression data', {
+      logger.debug('FASTING_PROGRESSION', 'Fetching progression data', {
         userId,
         periodDays,
         startDate,
@@ -410,7 +410,7 @@ export function useFastingProgressionData(periodDays: number = 30) {
       const fastingSessions = sessions || [];
       
       // CRITICAL DEBUG: Log sessions data with full details
-      logger.info('FASTING_PROGRESSION_SESSIONS_DATA_DETAILED', 'Sessions fetched for progression with full details', {
+      logger.debug('FASTING_PROGRESSION_SESSIONS_DATA_DETAILED', 'Sessions fetched for progression with full details', {
         userId,
         periodDays,
         totalSessions: fastingSessions.length,
@@ -434,7 +434,7 @@ export function useFastingProgressionData(periodDays: number = 30) {
       const durationTrends = generateDurationTrends(fastingSessions, periodDays);
       
       // CRITICAL DEBUG: Log calculated metrics
-      logger.info('FASTING_PROGRESSION_METRICS_CALCULATED', 'Metrics calculated from sessions', {
+      logger.debug('FASTING_PROGRESSION_METRICS_CALCULATED', 'Metrics calculated from sessions', {
         userId,
         periodDays,
         metrics: {
@@ -459,7 +459,7 @@ export function useFastingProgressionData(periodDays: number = 30) {
       const aiDataCheck = hasMinimumDataForProgressionAI(profile, completedSessions.length, periodDays);
       
       // CRITICAL DEBUG: Log AI data check with bypass state
-      logger.info('FASTING_PROGRESSION_AI_DATA_CHECK_FINAL', 'AI data check result with bypass state', {
+      logger.debug('FASTING_PROGRESSION_AI_DATA_CHECK_FINAL', 'AI data check result with bypass state', {
         userId,
         periodDays,
         completedSessions: completedSessions.length,
@@ -498,7 +498,7 @@ export function useFastingProgressionData(periodDays: number = 30) {
             }
           };
           
-          logger.info('FASTING_PROGRESSION_EDGE_CALL_PAYLOAD_DETAILED', 'About to call Edge Function with full payload', {
+          logger.debug('FASTING_PROGRESSION_EDGE_CALL_PAYLOAD_DETAILED', 'About to call Edge Function with full payload', {
             userId,
             periodDays,
             profileComplete: {
@@ -517,7 +517,7 @@ export function useFastingProgressionData(periodDays: number = 30) {
             timestamp: new Date().toISOString()
           });
 
-          logger.info('FASTING_PROGRESSION_AI', 'Calling AI progression analyzer Edge Function', {
+          logger.debug('FASTING_PROGRESSION_AI', 'Calling AI progression analyzer Edge Function', {
             userId,
             periodDays,
             completedSessions: completedSessions.length,
@@ -531,7 +531,7 @@ export function useFastingProgressionData(periodDays: number = 30) {
           });
 
           // CRITICAL DEBUG: Log Edge Function response
-          logger.info('FASTING_PROGRESSION_EDGE_RESPONSE', 'Edge Function response received', {
+          logger.debug('FASTING_PROGRESSION_EDGE_RESPONSE', 'Edge Function response received', {
             userId,
             periodDays,
             hasResponse: !!aiResponse,
@@ -561,7 +561,7 @@ export function useFastingProgressionData(periodDays: number = 30) {
               tokensUsed = aiResponse.tokensUsed;
               cached = aiResponse.cached;
               
-              logger.info('FASTING_PROGRESSION_AI_SUCCESS', 'AI analysis extracted from response', {
+              logger.debug('FASTING_PROGRESSION_AI_SUCCESS', 'AI analysis extracted from response', {
                 userId,
                 periodDays,
                 hasAiAnalysis: !!aiAnalysis,
@@ -579,8 +579,8 @@ export function useFastingProgressionData(periodDays: number = 30) {
                 timestamp: new Date().toISOString()
               });
             }
-            
-            logger.info('FASTING_PROGRESSION_AI', 'AI progression analysis completed', {
+
+            logger.debug('FASTING_PROGRESSION_AI', 'AI progression analysis completed', {
               userId,
               periodDays,
               tokensUsed,
@@ -614,7 +614,7 @@ export function useFastingProgressionData(periodDays: number = 30) {
       }
       
       // DEBUG: Log calculated metrics
-      logger.info('FASTING_PROGRESSION_METRICS_CALCULATED', 'Metrics calculated', {
+      logger.debug('FASTING_PROGRESSION_METRICS_CALCULATED', 'Metrics calculated', {
         userId,
         periodDays,
         metrics: {
@@ -642,7 +642,7 @@ export function useFastingProgressionData(periodDays: number = 30) {
       };
 
       // CRITICAL LOG: Always return metrics even without AI
-      logger.info('FASTING_PROGRESSION_FINAL', 'Progression data ready - metrics available', {
+      logger.debug('FASTING_PROGRESSION_FINAL', 'Progression data ready - metrics available', {
         userId,
         periodDays,
         hasMetrics: !!metrics,
@@ -659,7 +659,7 @@ export function useFastingProgressionData(periodDays: number = 30) {
       });
 
       // CRITICAL DEBUG: Log AI data check with bypass state
-      logger.info('FASTING_PROGRESSION_AI_DATA_CHECK', 'AI data check result', {
+      logger.debug('FASTING_PROGRESSION_AI_DATA_CHECK', 'AI data check result', {
         periodDays,
         totalSessions: fastingSessions.length,
         completedSessions: completedSessions.length,
@@ -680,13 +680,12 @@ export function useFastingProgressionData(periodDays: number = 30) {
       return progressionData;
     },
     enabled: !!userId,
-    // DEBUG: Log enabled state
-    onMount: () => {
-      logger.debug('FASTING_PROGRESSION_QUERY_MOUNT', 'Query mounted', {
-        userId,
-        enabled: !!userId,
-        timestamp: new Date().toISOString()
-      });
-    }
+    staleTime: 15 * 60 * 1000, // 15 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes (replaces deprecated cacheTime)
+    retry: 1,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    structuralSharing: false,
   });
 }

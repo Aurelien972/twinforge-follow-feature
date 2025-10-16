@@ -166,7 +166,7 @@ export function useFastingHistory(
         throw new Error('User not authenticated');
       }
 
-      logger.info('FASTING_HISTORY', 'Fetching fasting history', {
+      logger.debug('FASTING_HISTORY', 'Fetching fasting history', {
         userId,
         limit,
         filters,
@@ -203,7 +203,7 @@ export function useFastingHistory(
       // Calculate statistics
       const stats = calculateHistoryStats(filteredSessions);
 
-      logger.info('FASTING_HISTORY', 'History fetched and processed', {
+      logger.debug('FASTING_HISTORY', 'History fetched and processed', {
         userId,
         totalSessions: allSessions.length,
         filteredSessions: filteredSessions.length,
@@ -219,11 +219,14 @@ export function useFastingHistory(
       };
     },
     enabled: !!userId,
-    staleTime: 10 * 60 * 1000, // 10 minutes - optimized cache duration
-    cacheTime: 15 * 60 * 1000, // 15 minutes - keep in cache longer
+    staleTime: 15 * 60 * 1000, // 15 minutes - aggressive cache
+    cacheTime: 30 * 60 * 1000, // 30 minutes - keep in cache very long
     retry: 1,
-    refetchOnWindowFocus: false, // Don't refetch on window focus to reduce API calls
-    refetchOnMount: false, // Don't refetch on mount if data is fresh
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    // Deduplicate requests that happen at the same time
+    structuralSharing: false, // Faster comparison
   });
 }
 
