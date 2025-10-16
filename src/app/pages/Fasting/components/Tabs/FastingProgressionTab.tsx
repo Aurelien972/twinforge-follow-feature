@@ -17,6 +17,8 @@ import FastingDataCompletenessAlert from '../Shared/FastingDataCompletenessAlert
 import FastingProgressionLoadingSkeleton from '../Progression/FastingProgressionLoadingSkeleton';
 import FastingProgressionSummaryCard from '../Progression/FastingProgressionSummaryCard';
 import FastingConsistencyChart from '../Progression/FastingConsistencyChart';
+import FastingStreakDiagram from '../Progression/FastingStreakDiagram';
+import FastingDurationTrendChart from '../Progression/FastingDurationTrendChart';
 
 /**
  * Get minimum sessions required for Progression AI analysis
@@ -167,12 +169,26 @@ const FastingProgressionTab: React.FC = () => {
             tokensUsed={progressionData.tokensUsed}
             cached={progressionData.cached}
           />
-          
-          {/* Consistency Chart */}
-          <FastingConsistencyChart
-            data={progressionData.consistencyData}
-            periodDays={selectedPeriod}
-          />
+
+          {/* Graphiques de Progression */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <FastingConsistencyChart
+              data={progressionData.consistencyData}
+              periodDays={selectedPeriod}
+            />
+            <FastingDurationTrendChart
+              data={progressionData.durationTrend || []}
+              periodDays={selectedPeriod}
+            />
+          </div>
+
+          {/* Streak Diagram */}
+          {progressionData.sessions && (
+            <FastingStreakDiagram
+              sessions={progressionData.sessions}
+              periodDays={selectedPeriod}
+            />
+          )}
         </div>
       )}
     </div>

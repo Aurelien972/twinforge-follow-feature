@@ -13,6 +13,8 @@ import { useExitModalStore } from '../../../system/store/exitModalStore';
 import ActivityAnalysisLoadingSkeleton from './components/Progression/ActivityAnalysisLoadingSkeleton';
 import ActivityDistributionChart from './components/Progression/ActivityDistributionChart';
 import ActivityHeatmap from './components/Progression/ActivityHeatmap';
+import ActivityCalorieEvolutionChart from './components/Progression/ActivityCalorieEvolutionChart';
+import ActivityWeeklyDistributionChart from './components/Progression/ActivityWeeklyDistributionChart';
 import VO2MaxEvolutionChart from './components/Progression/VO2MaxEvolutionChart';
 import HRZonesHeatmap from './components/Progression/HRZonesHeatmap';
 import FitnessFatigueChart from './components/Progression/FitnessFatigueChart';
@@ -560,6 +562,14 @@ const ActivityProgressTab: React.FC = () => {
               apiPeriod={apiPeriod}
             />
           </div>
+
+          {/* Nouveaux Graphiques d'Évolution */}
+          {profile?.id && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ActivityCalorieEvolutionChart userId={profile.id} period={selectedPeriod} />
+              <ActivityWeeklyDistributionChart userId={profile.id} period={selectedPeriod} />
+            </div>
+          )}
 
           {/* Objectifs Connectés */}
           {profile?.id && (
