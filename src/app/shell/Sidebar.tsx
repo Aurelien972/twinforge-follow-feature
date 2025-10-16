@@ -14,28 +14,53 @@ interface NavItemProps {
   icon: keyof typeof ICONS;
   label: string;
   subtitle: string;
+  actionLabel?: string;
   isPrimary?: boolean;
+  isTwin?: boolean;
+  isForge?: boolean;
   isActive?: boolean;
   circuitColor?: string;
+  tabs?: string[];
 }
 
-const NavItem = React.memo(({ to, icon, label, subtitle, isPrimary = false, isActive, circuitColor }: NavItemProps) => {
+const NavItem = React.memo(({
+  to,
+  icon,
+  label,
+  subtitle,
+  actionLabel,
+  isPrimary = false,
+  isTwin = false,
+  isForge = false,
+  isActive,
+  circuitColor,
+  tabs
+}: NavItemProps) => {
   const Icon = ICONS[icon];
   const itemColor = circuitColor || getCircuitColor(to);
   const { sidebarClick } = useFeedback();
 
   const handleNavItemClick = (e: React.MouseEvent) => {
     logger.trace('SIDEBAR', 'NavItem click captured', { to, label, isActive });
-
     logger.trace('SIDEBAR', 'NavItem click triggered', { to, label, currentPath: window.location.pathname });
   };
+
+  // Déterminer la classe CSS en fonction du type
+  let itemClass = 'sidebar-item';
+  if (isPrimary) {
+    itemClass = 'sidebar-item sidebar-item--primary';
+  } else if (isTwin) {
+    itemClass = 'sidebar-item sidebar-item--twin';
+  } else if (isForge) {
+    itemClass = 'sidebar-item sidebar-item--forge';
+  }
 
   return (
     <div className="relative">
       <Link
         to={to}
         className={`
-          sidebar-item ${isPrimary ? 'sidebar-item--primary' : ''}
+          ${itemClass}
           group focus-ring
           ${isActive
             ? 'text-white shadow-sm'
@@ -56,7 +81,7 @@ const NavItem = React.memo(({ to, icon, label, subtitle, isPrimary = false, isAc
         <div className={`sidebar-item-icon-container ${isActive ? 'sidebar-item-icon-container--active' : ''}`}>
           <SpatialIcon
             Icon={Icon}
-            size={isPrimary ? 20 : 16}
+            size={isPrimary ? 22 : isTwin ? 20 : 18}
             className={`sidebar-item-icon ${isActive ? '' : 'opacity-80 group-hover:opacity-100'}`}
             color={isActive ? itemColor : undefined}
             style={isActive ? {
@@ -68,7 +93,9 @@ const NavItem = React.memo(({ to, icon, label, subtitle, isPrimary = false, isAc
 
         {/* Text content */}
         <div className="flex-1 min-w-0">
-          <div className={`sidebar-item-label font-medium ${isPrimary ? 'text-sm' : 'text-xs'} truncate ${
+          <div className={`sidebar-item-label font-medium ${
+            isPrimary ? 'text-base' : isTwin ? 'text-sm' : 'text-xs'
+          } truncate ${
             isActive ? 'text-white' : 'text-white/82'
           }`}>
             {label}
@@ -79,29 +106,66 @@ const NavItem = React.memo(({ to, icon, label, subtitle, isPrimary = false, isAc
             {subtitle}
           </div>
         </div>
+
+        {/* Badge d'action pour les forges */}
+        {isForge && actionLabel && (
+          <div
+            className={`sidebar-item-action-badge ${isActive ? 'sidebar-item-action-badge--active' : ''}`}
+          >
+            {actionLabel}
+          </div>
+        )}
       </Link>
     </div>
   );
 });
 NavItem.displayName = 'NavItem';
 
-const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <div className="space-y-1">
-    {title && (
-      <h3 className={`sidebar-section-title ${getSectionClass(title)}`} role="heading" aria-level="3">
-        {title}
-      </h3>
-    )}
-    <div className="space-y-1">
-      {children}
+const Section = ({
+  title,
+  type,
+  children
+}: {
+  title: string;
+  type?: 'primary' | 'twin' | 'forge-category';
+  children: React.ReactNode
+}) => {
+  // Pas d'espacement avant pour primary et twin (premières sections)
+  const shouldHaveTopSpace = type === 'forge-category';
+
+  return (
+    <div className={`space-y-1 ${shouldHaveTopSpace ? 'mt-4' : ''}`}>
+      {title && (
+        <>
+          {/* Séparateur visuel pour les catégories de forges */}
+          {type === 'forge-category' && (
+            <div className="sidebar-category-separator" />
+          )}
+          <h3
+            className={`sidebar-section-title ${getSectionClass(title, type)}`}
+            role="heading"
+            aria-level="3"
+          >
+            {title}
+          </h3>
+        </>
+      )}
+      <div className="space-y-1">
+        {children}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 /**
  * Get section-specific CSS class for visual differentiation
  */
-function getSectionClass(title: string): string {
+function getSectionClass(title: string, type?: string): string {
+  if (type === 'forge-category') {
+    return 'sidebar-section--forge-category';
+  }
+
+  // Classes legacy pour compatibilité
   switch (title) {
     case 'Rituels du Forgeron':
       return 'sidebar-section--daily-tracking';
@@ -137,11 +201,11 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
       role="complementary"
       aria-label="Main navigation"
     >
-      <div className="sidebar-content space-y-3 flex-1 pt-2">
-        
-        {/* Dynamic Navigation Based on Role */}
+      <div className="sidebar-content space-y-2 flex-1 pt-2">
+
+        {/* Navigation Dynamique avec 3 Niveaux Hiérarchiques */}
         {navigation.map((section) => (
-          <Section key={section.title} title={section.title}>
+          <Section key={section.title || section.type} title={section.title} type={section.type}>
             {section.items.map((item) => (
               <NavItem
                 key={item.to}
@@ -149,9 +213,13 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
                 icon={item.icon}
                 label={item.label}
                 subtitle={item.subtitle}
+                actionLabel={item.actionLabel}
                 isPrimary={item.isPrimary}
+                isTwin={item.isTwin}
+                isForge={item.isForge}
                 isActive={isActive(item.to)}
                 circuitColor={item.circuitColor}
+                tabs={item.tabs}
               />
             ))}
           </Section>

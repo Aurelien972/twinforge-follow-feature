@@ -35,6 +35,7 @@ const FaceScanReviewWithHeader = lazy(() => import('./app/pages/FaceScan/FaceSca
 const ActivityInputPage = lazy(() => import('./app/pages/Activity/ActivityInputPage'));
 const FastingInputPage = lazy(() => import('./app/pages/Fasting/FastingInputPage'));
 const FridgeScanPage = lazy(() => import('./app/pages/FridgeScanPage'));
+const VitalPage = lazy(() => import('./app/pages/VitalPage'));
 const DevCachePage = lazy(() => import('./app/pages/DevCachePage'));
 const LogoGalleryPage = lazy(() => import('./app/pages/LogoGalleryPage'));
 
@@ -195,6 +196,10 @@ const router = createBrowserRouter([
       {
         path: "face-scan/review-face",
         element: <Suspense fallback={<LoadingFallback />}><FaceScanReviewWithHeader /></Suspense>
+      },
+      {
+        path: "vital",
+        element: <Suspense fallback={<LoadingFallback />}><VitalPage /></Suspense>
       },
       {
         path: "dev/cache",

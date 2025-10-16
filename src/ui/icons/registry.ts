@@ -78,6 +78,7 @@ export const ICONS = {
   ArrowUp: L.ArrowUp,
 
   Heart: L.Heart,
+  HeartPulse: L.HeartPulse,
   Moon: L.Moon,
   Zap: L.Zap,
   TrendingUp: L.TrendingUp,

@@ -48,11 +48,11 @@ const BOTTOM_BAR_BUTTONS = [
     color: '#F59E0B', // Orange jeûne
   },
   {
-    id: 'body',
-    label: 'Corps',
-    icon: 'Scan' as const,
+    id: 'twin',
+    label: 'Twin',
+    icon: 'User' as const,
     route: '/avatar',
-    color: '#A855F7', // Violet
+    color: '#8B5CF6', // Violet
   },
 ];
 
