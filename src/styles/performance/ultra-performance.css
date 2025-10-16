@@ -46,10 +46,10 @@ html.perf-ultra .glass-base,
   will-change: auto !important;
   contain: layout style !important;
 
-  /* Ensure visibility */
+  /* CRITICAL: Ensure all structural components remain fully visible */
   opacity: 1 !important;
   visibility: visible !important;
-  display: block !important;
+  /* DO NOT force display - let components manage their own display property */
 }
 
 /* Hover state - simple color change */
@@ -144,13 +144,25 @@ html.perf-ultra [class*="primary"] {
 
 /* =========================================
    DISABLE ALL EXPENSIVE EFFECTS
-   IMPORTANT: Only hide decorative pseudo-elements, not structural components
+   CRITICAL: ONLY hide decorative pseudo-elements, NEVER structural components
+   These selectors target specific decorative classes only
    ========================================= */
 
+/* Hide only decorative sheen overlay elements */
 .ultra-performance-mode .glass-sheen,
-html.perf-ultra .glass-sheen,
+html.perf-ultra .glass-sheen {
+  display: none !important;
+  content: none !important;
+}
+
+/* Hide only decorative ambient glow pseudo-elements */
 .ultra-performance-mode .ambient-glow::after,
-html.perf-ultra .ambient-glow::after,
+html.perf-ultra .ambient-glow::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Hide only elements explicitly marked as hover effects */
 .ultra-performance-mode [data-hover-effect],
 html.perf-ultra [data-hover-effect] {
   display: none !important;
@@ -469,16 +481,61 @@ html.perf-ultra .perf-indicator {
 
 /* =========================================
    PRESERVE COMPONENT VISIBILITY
-   Critical: All UI elements must remain visible
+   CRITICAL: All UI elements must remain visible
+   These rules protect structural components from being hidden
    ========================================= */
 
-/* DO NOT force display/opacity/visibility - components manage their own state */
-/* Only ensure critical icon containers remain visible */
+/* Ensure all form elements remain visible and functional */
+.ultra-performance-mode input,
+html.perf-ultra input,
+.ultra-performance-mode textarea,
+html.perf-ultra textarea,
+.ultra-performance-mode select,
+html.perf-ultra select,
+.ultra-performance-mode button,
+html.perf-ultra button {
+  opacity: 1 !important;
+  visibility: visible !important;
+  /* Let component manage its own display property */
+}
+
+/* Ensure all interactive elements remain visible */
+.ultra-performance-mode [role="button"],
+html.perf-ultra [role="button"],
+.ultra-performance-mode [role="tab"],
+html.perf-ultra [role="tab"],
+.ultra-performance-mode [role="tabpanel"],
+html.perf-ultra [role="tabpanel"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure all content cards remain visible */
+.ultra-performance-mode .glass-card > *,
+html.perf-ultra .glass-card > *,
+.ultra-performance-mode .glass-base > *,
+html.perf-ultra .glass-base > * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure critical icon containers remain visible */
 .ultra-performance-mode .sidebar-item-icon-container,
 html.perf-ultra .sidebar-item-icon-container,
 .ultra-performance-mode .new-bottom-bar-icon-container,
 html.perf-ultra .new-bottom-bar-icon-container {
   display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure all page content sections remain visible */
+.ultra-performance-mode section,
+html.perf-ultra section,
+.ultra-performance-mode article,
+html.perf-ultra article,
+.ultra-performance-mode main,
+html.perf-ultra main {
   opacity: 1 !important;
   visibility: visible !important;
 }
