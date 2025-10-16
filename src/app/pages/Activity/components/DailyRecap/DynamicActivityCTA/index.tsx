@@ -75,27 +75,27 @@ function getCTAMessage(urgencyConfig: UrgencyConfig, todayStats?: any): CTAMessa
   
   if (urgencyConfig.priority === 'high') {
     return {
-      title: 'Forgez votre énergie !',
-      subtitle: 'Commencez votre journée active en enregistrant votre première activité',
+      title: 'Forgez votre énergie aujourd\'hui !',
+      subtitle: 'Aucune activité enregistrée aujourd\'hui - Commencez dès maintenant',
       buttonText: 'Enregistrer une activité',
-      encouragement: 'Chaque mouvement compte pour votre bien-être'
+      encouragement: 'Chaque mouvement d\'aujourd\'hui compte pour votre bien-être'
     };
   }
-  
+
   if (urgencyConfig.priority === 'medium') {
     return {
-      title: 'Continuez sur votre lancée',
-      subtitle: `${activitiesCount} activité${activitiesCount > 1 ? 's' : ''} enregistrée${activitiesCount > 1 ? 's' : ''} - Ajoutez-en une autre !`,
+      title: 'Continuez votre journée active',
+      subtitle: `${activitiesCount} activité${activitiesCount > 1 ? 's' : ''} aujourd\'hui - Ajoutez-en une autre !`,
       buttonText: 'Ajouter une activité',
-      encouragement: 'Maintenez votre rythme énergétique'
+      encouragement: 'Maintenez votre rythme énergétique d\'aujourd\'hui'
     };
   }
-  
+
   return {
     title: 'Excellente journée active !',
     subtitle: 'Vous avez déjà bien forgé votre énergie aujourd\'hui',
     buttonText: 'Ajouter une activité',
-    encouragement: 'Continuez à cultiver votre vitalité'
+    encouragement: 'Continuez à cultiver votre vitalité aujourd\'hui'
   };
 }
 

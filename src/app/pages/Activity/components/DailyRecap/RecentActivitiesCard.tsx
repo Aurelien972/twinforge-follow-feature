@@ -83,8 +83,8 @@ const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({
           <SpatialIcon Icon={ICONS.History} size={20} style={{ color: 'var(--color-activity-primary)' }} />
         </div>
         <div>
-          <h3 className="activity-summary-title">Forge du Jour</h3>
-          <p className="activity-summary-subtitle">Vos activités enregistrées aujourd'hui</p>
+          <h3 className="activity-summary-title">Activités d'Aujourd'hui</h3>
+          <p className="activity-summary-subtitle">Liste de vos sessions forgées ce jour</p>
         </div>
       </div>
 

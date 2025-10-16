@@ -30,14 +30,14 @@ const DailyStatsGrid: React.FC<DailyStatsGridProps> = React.memo(({ todayStats }
           <div className="daily-stat-icon-container daily-stat-icon-primary">
             <SpatialIcon Icon={ICONS.Zap} size={28} style={{ color: '#3B82F6' }} />
           </div>
-          <h3 className="daily-stat-title">Énergie Quotidienne</h3>
-          <p className="daily-stat-subtitle">Calories brûlées aujourd'hui</p>
+          <h3 className="daily-stat-title">Énergie Brûlée Aujourd'hui</h3>
+          <p className="daily-stat-subtitle">Calories du jour</p>
         </div>
         <div className="daily-stat-value">
           {todayStats?.totalCalories || 0}
         </div>
         <div className="daily-stat-label">
-          Calories forgées
+          kcal forgées
         </div>
       </GlassCard>
 
@@ -47,14 +47,14 @@ const DailyStatsGrid: React.FC<DailyStatsGridProps> = React.memo(({ todayStats }
           <div className="daily-stat-icon-container daily-stat-icon-secondary">
             <SpatialIcon Icon={ICONS.Activity} size={28} className="text-cyan-400" />
           </div>
-          <h3 className="daily-stat-title">Activités Forgées</h3>
-          <p className="daily-stat-subtitle">Mouvements enregistrés</p>
+          <h3 className="daily-stat-title">Activités d'Aujourd'hui</h3>
+          <p className="daily-stat-subtitle">Mouvements forgés</p>
         </div>
         <div className="daily-stat-value">
           {todayStats?.activitiesCount || 0}
         </div>
         <div className="daily-stat-label">
-          Aujourd'hui
+          Sessions du jour
         </div>
       </GlassCard>
 
@@ -64,14 +64,14 @@ const DailyStatsGrid: React.FC<DailyStatsGridProps> = React.memo(({ todayStats }
           <div className="daily-stat-icon-container daily-stat-icon-accent">
             <SpatialIcon Icon={ICONS.Clock} size={28} className="text-purple-400" />
           </div>
-          <h3 className="daily-stat-title">Dernière Forge</h3>
-          <p className="daily-stat-subtitle">Timing de votre dernière activité</p>
+          <h3 className="daily-stat-title">Dernière Activité</h3>
+          <p className="daily-stat-subtitle">Heure de la dernière forge</p>
         </div>
         <div className="daily-stat-value">
           {todayStats?.lastActivityTime ? format(todayStats.lastActivityTime, 'HH:mm') : '--:--'}
         </div>
         <div className="daily-stat-label">
-          {todayStats?.lastActivityTime ? format(todayStats.lastActivityTime, 'dd/MM', { locale: fr }) : 'Aucune'}
+          {todayStats?.lastActivityTime ? format(todayStats.lastActivityTime, 'dd/MM', { locale: fr }) : 'Aucune aujourd\'hui'}
         </div>
       </GlassCard>
     </div>

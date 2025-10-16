@@ -53,8 +53,8 @@ const ActivitySummaryCard: React.FC<ActivitySummaryCardProps> = ({ todayStats, p
           <SpatialIcon Icon={ICONS.BarChart3} size={20} style={{ color: 'var(--color-activity-primary)' }} />
         </div>
         <div>
-          <h3 className="activity-summary-title">Forge Énergétique</h3>
-          <p className="activity-summary-subtitle">Résumé de vos mouvements et activités</p>
+          <h3 className="activity-summary-title">Résumé d'Aujourd'hui</h3>
+          <p className="activity-summary-subtitle">Aperçu de vos activités du jour</p>
         </div>
       </div>
 

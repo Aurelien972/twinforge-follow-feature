@@ -132,7 +132,7 @@ const FastingDailySummaryCard: React.FC<FastingDailySummaryCardProps> = ({ class
                 <SpatialIcon Icon={ICONS[theme.icon]} size={20} style={{ color: theme.color }} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Résumé du Jour</h3>
+                <h3 className="text-xl font-bold text-white">Dernière Session Forgée</h3>
                 <p className="text-white/80 text-sm mt-0.5">
                   {today} • {theme.description}
                 </p>

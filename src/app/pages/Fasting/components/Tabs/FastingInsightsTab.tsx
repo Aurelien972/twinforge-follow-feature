@@ -148,31 +148,6 @@ const FastingInsightsTab: React.FC = () => {
             </div>
           )}
           
-          {/* Data Quality Indicator */}
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-4 flex-wrap">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-400/20">
-                <SpatialIcon Icon={ICONS.Shield} size={12} className="text-green-400" />
-                <span className="text-green-300 text-sm font-medium">
-                  Qualité : {
-                    insightsData.dataQuality === 'excellent' ? 'Excellente' :
-                    insightsData.dataQuality === 'good' ? 'Bonne' :
-                    insightsData.dataQuality === 'limited' ? 'Limitée' : 'Insuffisante'
-                  }
-                </span>
-              </div>
-              
-              {insightsData.aiModel && (
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-400/20">
-                  <SpatialIcon Icon={ICONS.Zap} size={12} className="text-cyan-400" />
-                  <span className="text-cyan-300 text-sm font-medium">
-                    {insightsData.aiModel} • {insightsData.tokensUsed} tokens
-                    {insightsData.cached && ' • Mis en cache'}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       )}
       

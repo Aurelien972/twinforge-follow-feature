@@ -358,8 +358,8 @@ const CalorieProgressCard: React.FC<CalorieProgressCardProps> = ({
           />
         </div>
         <div className="calorie-progress-info">
-          <h3 className="calorie-progress-title">{activityProgress.mainMetricLabel}</h3>
-          <p className="calorie-progress-subtitle">Avancement vers votre objectif {activityProgress.subMetricLabel.toLowerCase()}</p>
+          <h3 className="calorie-progress-title">{activityProgress.mainMetricLabel} Aujourd'hui</h3>
+          <p className="calorie-progress-subtitle">Progression vers votre objectif {activityProgress.subMetricLabel.toLowerCase()} du jour</p>
         </div>
         <div className="calorie-progress-percentage">
           <div className="calorie-progress-percentage-value">{Math.round(activityProgress.progressPercentage)}%</div>
@@ -405,8 +405,8 @@ const CalorieProgressCard: React.FC<CalorieProgressCardProps> = ({
       </div>
 
       <div className="calorie-progress-objective">
-        Objectif quotidien {activityProgress.subMetricLabel.toLowerCase()}
-        {profile?.objective && ` • Objectif: ${
+        Objectif d'aujourd'hui : {activityProgress.subMetricLabel.toLowerCase()}
+        {profile?.objective && ` • Cible: ${
           profile.objective === 'fat_loss' ? 'Perte de graisse' :
           profile.objective === 'muscle_gain' ? 'Prise de muscle' :
           profile.objective === 'recomp' ? 'Recomposition' : 'Maintenance'
