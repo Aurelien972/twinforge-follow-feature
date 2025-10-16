@@ -19,48 +19,57 @@ html.perf-ultra {
 .ultra-performance-mode .glass-card,
 html.perf-ultra .glass-card,
 .ultra-performance-mode .glass-base,
-html.perf-ultra .glass-base {
+html.perf-ultra .glass-base,
+.perf-ultra .glass-card,
+.perf-ultra .glass-base {
   /* Remove glassmorphism completely */
   backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 
-  /* Flat gradient with forge colors */
+  /* Much more visible solid background with forge colors */
   background: linear-gradient(
     145deg,
-    color-mix(in srgb, var(--color-deep-forge-indigo) 8%, #0f172a) 0%,
-    color-mix(in srgb, var(--color-plasma-cyan) 3%, #0a0f1e) 100%
+    rgba(93, 63, 211, 0.35) 0%,
+    rgba(24, 227, 255, 0.25) 100%
   ) !important;
 
   /* Colored border with forge theme */
-  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent) !important;
+  border: 1px solid rgba(24, 227, 255, 0.45) !important;
 
-  /* Flat shadow - no blur */
+  /* Simple shadow for depth */
   box-shadow:
-    0 2px 0 color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent) !important;
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
 
   /* No expensive transforms */
   transform: none !important;
   will-change: auto !important;
   contain: layout style !important;
+
+  /* Ensure visibility */
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
 }
 
 /* Hover state - simple color change */
 .ultra-performance-mode .glass-card:hover,
-html.perf-ultra .glass-card:hover {
+html.perf-ultra .glass-card:hover,
+.perf-ultra .glass-card:hover {
   background: linear-gradient(
     145deg,
-    color-mix(in srgb, var(--color-deep-forge-indigo) 12%, #0f172a) 0%,
-    color-mix(in srgb, var(--color-plasma-cyan) 5%, #0a0f1e) 100%
+    rgba(93, 63, 211, 0.45) 0%,
+    rgba(24, 227, 255, 0.35) 100%
   ) !important;
 
-  border-color: color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent) !important;
+  border-color: rgba(24, 227, 255, 0.55) !important;
 
   box-shadow:
-    0 3px 0 color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent) !important;
+    0 6px 16px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 
   transform: none !important;
-  transition: background 80ms ease, border-color 80ms ease !important;
+  transition: background 80ms ease, border-color 80ms ease, box-shadow 80ms ease !important;
 }
 
 /* Active/pressed state */
