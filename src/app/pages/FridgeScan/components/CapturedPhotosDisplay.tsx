@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -9,10 +9,6 @@ interface CapturedPhotosDisplayProps {
   onRemovePhoto: (index: number) => void;
 }
 
-/**
- * Captured Photos Display - Affichage des Photos Capturées
- * Composant pour afficher et gérer les photos capturées
- */
 const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
   capturedPhotos,
   onRemovePhoto
@@ -20,66 +16,214 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
   if (capturedPhotos.length === 0) return null;
 
   return (
-    <GlassCard className="glass-fridge-photo-grid">
-      {/* Header de la Section */}
-      <div className="fridge-photos-header">
-        <div className="fridge-photos-icon-circle">
+    <GlassCard
+      className="p-6"
+      style={{
+        background: `
+          radial-gradient(circle at 30% 20%, color-mix(in srgb, #EC4899 12%, transparent) 0%, transparent 60%),
+          radial-gradient(circle at 70% 80%, color-mix(in srgb, #F472B6 10%, transparent) 0%, transparent 50%),
+          rgba(255, 255, 255, 0.06)
+        `,
+        borderColor: 'color-mix(in srgb, #EC4899 28%, transparent)',
+        boxShadow: `
+          0 12px 36px rgba(0, 0, 0, 0.25),
+          0 0 24px color-mix(in srgb, #EC4899 18%, transparent),
+          inset 0 2px 0 rgba(255, 255, 255, 0.12)
+        `,
+        backdropFilter: 'blur(24px) saturate(160%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(160%)'
+      }}
+    >
+      {/* Header de la Section - Amélioré */}
+      <div className="flex items-center gap-4 mb-6">
+        <motion.div
+          className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 relative"
+          style={{
+            background: `
+              radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.18) 0%, transparent 60%),
+              linear-gradient(135deg, color-mix(in srgb, #EC4899 35%, transparent), color-mix(in srgb, #F472B6 28%, transparent))
+            `,
+            border: '2.5px solid color-mix(in srgb, #EC4899 50%, transparent)',
+            boxShadow: `
+              0 0 24px color-mix(in srgb, #EC4899 35%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.25)
+            `
+          }}
+          animate={{
+            boxShadow: [
+              '0 0 24px color-mix(in srgb, #EC4899 35%, transparent)',
+              '0 0 32px color-mix(in srgb, #EC4899 45%, transparent)',
+              '0 0 24px color-mix(in srgb, #EC4899 35%, transparent)'
+            ]
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+        >
           <SpatialIcon
             Icon={ICONS.Image}
-            size={20}
-            color="rgba(255, 255, 255, 0.9)"
+            size={24}
+            color="rgba(255, 255, 255, 0.95)"
             variant="pure"
           />
+        </motion.div>
+
+        <div className="flex-1">
+          <h3 className="text-white font-bold text-xl mb-1"
+              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+            Photos Capturées
+          </h3>
+          <p className="text-pink-200/80 text-sm">
+            {capturedPhotos.length} / 6 photo{capturedPhotos.length > 1 ? 's' : ''}
+          </p>
         </div>
-        <h3 className="text-white font-semibold text-lg">
-          Photos Capturées ({capturedPhotos.length}/6)
-        </h3>
-      </div>
 
-      {/* Grille des Photos */}
-      <div className="fridge-photos-grid">
-        {capturedPhotos.map((photo, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
-          >
-            <div className="fridge-photo-item">
-              <img
-                src={photo}
-                alt={`Photo du frigo ${index + 1}`}
-                loading="lazy"
-              />
-
-              {/* Bouton de Suppression - Rond Lumineux en Haut à Droite */}
-              <button
-                onClick={() => onRemovePhoto(index)}
-                className="fridge-photo-delete-btn"
-                aria-label="Supprimer la photo"
-              >
-                <SpatialIcon Icon={ICONS.X} size={14} color="white" variant="pure" />
-              </button>
-
-              {/* Label Photo - Sur l'Image */}
-              <div className="fridge-photo-label">
-                <span>Photo {index + 1}</span>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Message d'Information - Bien Espacé */}
-      {capturedPhotos.length < 6 && (
-        <div className="glass-fridge-info-badge mt-6">
-          <div className="flex items-center gap-2">
-            <SpatialIcon Icon={ICONS.Info} size={14} color="#EC4899" variant="pure" />
-            <span className="text-pink-200 text-sm">
-              Vous pouvez ajouter jusqu'à {6 - capturedPhotos.length} photo{6 - capturedPhotos.length > 1 ? 's' : ''} supplémentaire{6 - capturedPhotos.length > 1 ? 's' : ''}
-            </span>
+        {/* Compteur Progressif */}
+        <div
+          className="px-4 py-2 rounded-xl text-center"
+          style={{
+            background: 'color-mix(in srgb, #EC4899 20%, transparent)',
+            border: '2px solid color-mix(in srgb, #EC4899 40%, transparent)',
+            backdropFilter: 'blur(12px)'
+          }}
+        >
+          <div className="text-2xl font-bold text-white">
+            {capturedPhotos.length}
+          </div>
+          <div className="text-xs text-pink-200/70 font-medium">
+            photo{capturedPhotos.length > 1 ? 's' : ''}
           </div>
         </div>
+      </div>
+
+      {/* Grille des Photos - Améliorée */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <AnimatePresence>
+          {capturedPhotos.map((photo, index) => (
+            <motion.div
+              key={`${photo}-${index}`}
+              initial={{ opacity: 0, scale: 0.85, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.85, y: -20 }}
+              transition={{
+                duration: 0.45,
+                delay: index * 0.08,
+                ease: [0.4, 0, 0.2, 1]
+              }}
+              className="group relative"
+            >
+              <div
+                className="relative aspect-square rounded-2xl overflow-hidden"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '2px solid color-mix(in srgb, #EC4899 25%, transparent)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (window.matchMedia('(hover: hover)').matches) {
+                    e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
+                    e.currentTarget.style.boxShadow = `
+                      0 8px 24px rgba(0, 0, 0, 0.3),
+                      0 0 24px color-mix(in srgb, #EC4899 35%, transparent)
+                    `;
+                    e.currentTarget.style.borderColor = 'color-mix(in srgb, #EC4899 45%, transparent)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (window.matchMedia('(hover: hover)').matches) {
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
+                    e.currentTarget.style.borderColor = 'color-mix(in srgb, #EC4899 25%, transparent)';
+                  }
+                }}
+              >
+                <img
+                  src={photo}
+                  alt={`Photo du frigo ${index + 1}`}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+
+                {/* Overlay au hover */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(180deg, transparent 0%, rgba(236, 72, 153, 0.15) 100%)'
+                  }}
+                />
+
+                {/* Bouton de Suppression - Ultra Stylisé */}
+                <motion.button
+                  onClick={() => onRemovePhoto(index)}
+                  className="absolute top-2 right-2 w-9 h-9 rounded-full flex items-center justify-center z-10"
+                  style={{
+                    background: 'radial-gradient(circle at center, rgba(239, 68, 68, 0.95) 0%, rgba(239, 68, 68, 0.85) 100%)',
+                    border: '2.5px solid rgba(255, 255, 255, 0.9)',
+                    boxShadow: '0 0 20px rgba(239, 68, 68, 0.7), 0 4px 12px rgba(0, 0, 0, 0.3)',
+                    backdropFilter: 'blur(8px)',
+                    cursor: 'pointer'
+                  }}
+                  whileHover={{
+                    scale: 1.15,
+                    boxShadow: '0 0 30px rgba(239, 68, 68, 0.9), 0 6px 16px rgba(0, 0, 0, 0.4)'
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label="Supprimer la photo"
+                >
+                  <SpatialIcon Icon={ICONS.X} size={16} color="white" variant="pure" />
+                </motion.button>
+
+                {/* Label Photo - Stylisé */}
+                <div
+                  className="absolute bottom-2 left-2 px-3 py-1.5 rounded-full"
+                  style={{
+                    background: 'rgba(0, 0, 0, 0.85)',
+                    border: '1.5px solid rgba(255, 255, 255, 0.35)',
+                    backdropFilter: 'blur(12px)',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+                  }}
+                >
+                  <span className="text-white text-xs font-semibold">
+                    Photo {index + 1}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* Message d'Information - Amélioré */}
+      {capturedPhotos.length < 6 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: capturedPhotos.length * 0.08 + 0.3 }}
+          className="mt-6 p-4 rounded-xl"
+          style={{
+            background: 'color-mix(in srgb, #EC4899 15%, transparent)',
+            border: '2px solid color-mix(in srgb, #EC4899 30%, transparent)',
+            backdropFilter: 'blur(16px)'
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{
+                background: 'color-mix(in srgb, #EC4899 25%, transparent)',
+                border: '1.5px solid color-mix(in srgb, #EC4899 45%, transparent)'
+              }}
+            >
+              <SpatialIcon Icon={ICONS.Info} size={16} color="#EC4899" variant="pure" />
+            </div>
+            <span className="text-pink-100 text-sm font-medium">
+              Vous pouvez ajouter encore {6 - capturedPhotos.length} photo{6 - capturedPhotos.length > 1 ? 's' : ''} supplémentaire{6 - capturedPhotos.length > 1 ? 's' : ''}
+            </span>
+          </div>
+        </motion.div>
       )}
     </GlassCard>
   );

@@ -80,58 +80,84 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
     <div className="glass-card p-6 space-y-6"
          style={{
            background: `
-             radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-fridge-primary, #EC4899) 15%, transparent) 0%, transparent 60%),
-             radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--color-plasma-cyan, #18E3FF) 12%, transparent) 0%, transparent 50%),
-             var(--glass-opacity)
+             radial-gradient(circle at 30% 20%, color-mix(in srgb, #EC4899 18%, transparent) 0%, transparent 60%),
+             radial-gradient(circle at 70% 80%, color-mix(in srgb, #18E3FF 15%, transparent) 0%, transparent 50%),
+             linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.08)),
+             rgba(11, 14, 23, 0.85)
            `,
-           borderColor: 'color-mix(in srgb, var(--color-fridge-primary, #EC4899) 30%, transparent)',
+           borderColor: 'color-mix(in srgb, #EC4899 35%, transparent)',
            boxShadow: `
-             0 12px 40px rgba(0, 0, 0, 0.25),
-             0 0 30px color-mix(in srgb, var(--color-fridge-primary, #EC4899) 20%, transparent),
-             inset 0 2px 0 rgba(255, 255, 255, 0.15)
-           `
+             0 16px 48px rgba(0, 0, 0, 0.3),
+             0 0 36px color-mix(in srgb, #EC4899 25%, transparent),
+             inset 0 2px 0 rgba(255, 255, 255, 0.18)
+           `,
+           backdropFilter: 'blur(28px) saturate(160%)',
+           WebkitBackdropFilter: 'blur(28px) saturate(160%)'
          }}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
         className="space-y-6"
       >
-        {/* Information Card */}
-        <div className="glass-card p-4"
-             style={{
-               background: `
-                 radial-gradient(circle at 30% 20%, color-mix(in srgb, #8B5CF6 15%, transparent) 0%, transparent 60%),
-                 var(--glass-opacity)
-               `,
-               borderColor: 'color-mix(in srgb, #8B5CF6 30%, transparent)'
-             }}>
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0">
-              <div className="w-10 h-10 rounded-full breathing-icon flex items-center justify-center"
+        {/* Information Card - Améliorée */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="glass-card p-5"
+          style={{
+            background: `
+              radial-gradient(circle at 30% 20%, color-mix(in srgb, #A78BFA 18%, transparent) 0%, transparent 60%),
+              radial-gradient(circle at 70% 80%, color-mix(in srgb, #8B5CF6 15%, transparent) 0%, transparent 50%),
+              rgba(255, 255, 255, 0.06)
+            `,
+            borderColor: 'color-mix(in srgb, #8B5CF6 35%, transparent)',
+            boxShadow: `
+              0 8px 24px rgba(0, 0, 0, 0.2),
+              0 0 24px color-mix(in srgb, #8B5CF6 20%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15)
+            `,
+            backdropFilter: 'blur(20px) saturate(150%)'
+          }}
+        >
+          <div className="flex items-start gap-4">
+            <motion.div
+              className="flex-shrink-0"
+              animate={{
+                scale: [1, 1.05, 1],
+                boxShadow: [
+                  '0 0 20px rgba(147, 51, 234, 0.3)',
+                  '0 0 28px rgba(147, 51, 234, 0.5)',
+                  '0 0 20px rgba(147, 51, 234, 0.3)'
+                ]
+              }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <div className="w-12 h-12 rounded-full flex items-center justify-center"
                    style={{
-                     background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.15) 0%, rgba(168, 85, 247, 0.25) 100%)',
-                     border: '1px solid rgba(147, 51, 234, 0.3)',
-                     boxShadow: '0 0 20px rgba(147, 51, 234, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                     backdropFilter: 'blur(10px)'
+                     background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.25) 0%, rgba(168, 85, 247, 0.35) 100%)',
+                     border: '2px solid rgba(147, 51, 234, 0.5)',
+                     boxShadow: '0 0 24px rgba(147, 51, 234, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)',
+                     backdropFilter: 'blur(12px)'
                    }}>
-                <SpatialIcon Icon={ICONS.AlertCircle} size={20} className="text-purple-400" glowColor="rgba(147, 51, 234, 0.6)" />
+                <SpatialIcon Icon={ICONS.AlertCircle} size={22} className="text-purple-300" />
               </div>
-            </div>
-            <div className="flex-1 space-y-1">
-              <h3 className="text-base font-semibold text-white mb-2">
+            </motion.div>
+            <div className="flex-1 space-y-2">
+              <h3 className="text-lg font-bold text-white">
                 Inventaire Insuffisant Détecté
               </h3>
-              <p className="text-sm text-gray-300">
-                Votre frigo contient seulement <span className="font-semibold text-purple-400">{userEditedInventory.length} ingrédients</span>.
+              <p className="text-sm text-gray-200 leading-relaxed">
+                Votre frigo contient seulement <span className="font-bold text-purple-300">{userEditedInventory.length} ingrédient{userEditedInventory.length > 1 ? 's' : ''}</span>.
+              </p>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                Pour optimiser vos possibilités culinaires, nous vous suggérons d'ajouter quelques ingrédients complémentaires.
               </p>
             </div>
           </div>
-          <p className="text-sm text-gray-300 mt-3 text-center">
-            Pour optimiser vos possibilités culinaires, nous vous suggérons d'ajouter quelques ingrédients complémentaires.
-          </p>
-        </div>
+        </motion.div>
 
         {/* Suggested Items Card */}
         {suggestedComplementaryItems.length > 0 && (
@@ -142,28 +168,89 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
           />
         )}
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        {/* Action Buttons - Améliorés */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          className="flex flex-col sm:flex-row gap-4"
+        >
           <button
             onClick={handleContinueToValidation}
-            className="flex-1 btn-glass--primary px-6 py-4"
+            className="flex-1 px-7 py-4 rounded-2xl font-semibold text-base transition-all duration-300 group"
+            style={{
+              background: `
+                linear-gradient(135deg,
+                  color-mix(in srgb, #EC4899 75%, transparent),
+                  color-mix(in srgb, #F472B6 60%, transparent)
+                )
+              `,
+              border: '2px solid color-mix(in srgb, #EC4899 60%, transparent)',
+              boxShadow: `
+                0 8px 24px color-mix(in srgb, #EC4899 40%, transparent),
+                0 0 32px color-mix(in srgb, #EC4899 25%, transparent),
+                inset 0 2px 0 rgba(255, 255, 255, 0.4)
+              `,
+              color: 'white'
+            }}
+            onMouseEnter={(e) => {
+              if (window.matchMedia('(hover: hover)').matches) {
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+                e.currentTarget.style.boxShadow = `
+                  0 12px 32px color-mix(in srgb, #EC4899 55%, transparent),
+                  0 0 40px color-mix(in srgb, #EC4899 35%, transparent),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.5)
+                `;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (window.matchMedia('(hover: hover)').matches) {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = `
+                  0 8px 24px color-mix(in srgb, #EC4899 40%, transparent),
+                  0 0 32px color-mix(in srgb, #EC4899 25%, transparent),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.4)
+                `;
+              }
+            }}
           >
             <div className="flex items-center justify-center gap-3">
-              <SpatialIcon Icon={ICONS.ArrowRight} size={20} />
-              <span className="font-medium">Continuer la Validation</span>
+              <SpatialIcon Icon={ICONS.ArrowRight} size={22} />
+              <span>Continuer la Validation</span>
             </div>
           </button>
-          
+
           <button
             onClick={handleBackToPhoto}
-            className="flex-1 btn-glass--secondary-nav px-6 py-4"
+            className="flex-1 px-7 py-4 rounded-2xl font-semibold text-base transition-all duration-300"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '2px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              backdropFilter: 'blur(16px)',
+              color: 'white'
+            }}
+            onMouseEnter={(e) => {
+              if (window.matchMedia('(hover: hover)').matches) {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (window.matchMedia('(hover: hover)').matches) {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+              }
+            }}
           >
             <div className="flex items-center justify-center gap-3">
-              <SpatialIcon Icon={ICONS.Camera} size={20} />
-              <span className="font-medium">Reprendre des Photos</span>
+              <SpatialIcon Icon={ICONS.Camera} size={22} />
+              <span>Reprendre des Photos</span>
             </div>
           </button>
-        </div>
+        </motion.div>
 
         {/* Dynamic guidance text */}
         {hasUnaddedSelections && (
@@ -175,26 +262,56 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
           </div>
         )}
 
-        {/* Stats Summary */}
-        <div className="glass-card p-4"
-             style={{
-               background: `
-                 radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-plasma-cyan, #18E3FF) 15%, transparent) 0%, transparent 60%),
-                 var(--glass-opacity)
-               `,
-               borderColor: 'color-mix(in srgb, var(--color-plasma-cyan, #18E3FF) 30%, transparent)'
-             }}>
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-purple-400">{userEditedInventory.length}</div>
-              <div className="text-sm text-gray-400">Ingrédients détectés</div>
+        {/* Stats Summary - Améliorée */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
+          className="glass-card p-5"
+          style={{
+            background: `
+              radial-gradient(circle at 30% 20%, color-mix(in srgb, #18E3FF 18%, transparent) 0%, transparent 60%),
+              radial-gradient(circle at 70% 80%, color-mix(in srgb, #06B6D4 15%, transparent) 0%, transparent 50%),
+              rgba(255, 255, 255, 0.06)
+            `,
+            borderColor: 'color-mix(in srgb, #18E3FF 35%, transparent)',
+            boxShadow: `
+              0 8px 24px rgba(0, 0, 0, 0.2),
+              0 0 24px color-mix(in srgb, #18E3FF 20%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15)
+            `,
+            backdropFilter: 'blur(20px) saturate(150%)'
+          }}
+        >
+          <div className="grid grid-cols-2 gap-6 text-center">
+            <div className="space-y-2">
+              <motion.div
+                className="text-4xl font-bold"
+                style={{ color: '#A78BFA', textShadow: '0 0 16px rgba(167, 139, 250, 0.5)' }}
+                animate={{
+                  scale: [1, 1.05, 1]
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                {userEditedInventory.length}
+              </motion.div>
+              <div className="text-sm font-medium text-gray-300">Ingrédients détectés</div>
             </div>
-            <div>
-              <div className="text-2xl font-bold text-blue-400">{suggestedComplementaryItems.length}</div>
-              <div className="text-sm text-gray-400">Suggestions disponibles</div>
+            <div className="space-y-2">
+              <motion.div
+                className="text-4xl font-bold"
+                style={{ color: '#18E3FF', textShadow: '0 0 16px rgba(24, 227, 255, 0.5)' }}
+                animate={{
+                  scale: [1, 1.05, 1]
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+              >
+                {suggestedComplementaryItems.length}
+              </motion.div>
+              <div className="text-sm font-medium text-gray-300">Suggestions disponibles</div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </motion.div>
     </div>
   );
