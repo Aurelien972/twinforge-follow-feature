@@ -5,14 +5,17 @@ export const createNavigationActions = (
   set: (partial: Partial<FridgeScanPipelineState>) => void,
   get: () => FridgeScanPipelineState
 ) => ({
-  goToStep: (step: FridgeScanPipelineState['currentStep']) => {
+  goToStep: async (step: FridgeScanPipelineState['currentStep']) => {
     const targetStep = FRIDGE_SCAN_STEPS.find(s => s.id === step);
-    const updates: Partial<FridgeScanPipelineState> = { 
+    const updates: Partial<FridgeScanPipelineState> = {
       currentStep: step,
       simulatedOverallProgress: targetStep?.startProgress || 0
     };
-    
+
     set(updates);
+
+    // Save session after navigation
+    await get().saveSessionToSupabase();
   },
 
   nextStep: () => {

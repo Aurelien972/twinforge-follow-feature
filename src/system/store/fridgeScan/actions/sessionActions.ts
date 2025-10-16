@@ -7,9 +7,75 @@ export const createSessionActions = (
   set: (partial: Partial<FridgeScanPipelineState>) => void,
   get: () => FridgeScanPipelineState
 ) => ({
-  startScan: () => {
+  // Action to save session to Supabase
+  saveSessionToSupabase: async () => {
+    const state = get();
+
+    if (!state.currentSessionId) {
+      logger.warn('FRIDGE_SCAN_PIPELINE', 'Cannot save session: no session ID');
+      return;
+    }
+
+    try {
+      const { useUserStore } = await import('../../userStore');
+      const userId = useUserStore.getState().session?.user?.id;
+
+      if (!userId) {
+        logger.warn('FRIDGE_SCAN_PIPELINE', 'Cannot save session: no user ID');
+        return;
+      }
+
+      const { supabase } = await import('../../../supabase/client');
+
+      const sessionData = {
+        session_id: state.currentSessionId,
+        user_id: userId,
+        stage: state.currentStep,
+        captured_photos: state.capturedPhotos,
+        raw_detected_items: state.rawDetectedItems,
+        user_edited_inventory: state.userEditedInventory,
+        suggested_complementary_items: state.suggestedComplementaryItems,
+        recipe_candidates: state.recipeCandidates,
+        selected_recipes: state.selectedRecipes,
+        meal_plan: state.mealPlan,
+        metadata: {
+          simulatedOverallProgress: state.simulatedOverallProgress,
+          loadingState: state.loadingState
+        },
+        completed: state.simulatedOverallProgress >= 100,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase
+        .from('fridge_scan_sessions')
+        .upsert(sessionData, {
+          onConflict: 'session_id'
+        });
+
+      if (error) {
+        // Si la table n'existe pas, on ignore silencieusement
+        if (error.code === 'PGRST205' || error.message?.includes('does not exist')) {
+          logger.debug('FRIDGE_SCAN_PIPELINE', 'fridge_scan_sessions table not found, skipping save');
+          return;
+        }
+        throw error;
+      }
+
+      logger.debug('FRIDGE_SCAN_PIPELINE', 'Session saved to Supabase', {
+        sessionId: state.currentSessionId,
+        stage: state.currentStep,
+        itemsCount: state.userEditedInventory.length
+      });
+    } catch (error) {
+      logger.warn('FRIDGE_SCAN_PIPELINE', 'Failed to save session to Supabase', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        sessionId: state.currentSessionId
+      });
+    }
+  },
+  startScan: async () => {
     const sessionId = crypto.randomUUID();
-    
+
     // CRITICAL: Force complete pipeline reset before starting new scan
     logger.info('FRIDGE_SCAN_PIPELINE', 'Force resetting pipeline before new scan', {
       previousStep: get().currentStep,
@@ -17,9 +83,9 @@ export const createSessionActions = (
       wasActive: get().isActive,
       timestamp: new Date().toISOString()
     });
-    
+
     const photoStep = FRIDGE_SCAN_STEPS.find(step => step.id === 'photo');
-    
+
     set({
       currentStep: 'photo',
       isActive: true,
@@ -39,6 +105,9 @@ export const createSessionActions = (
       resetComplete: true,
       timestamp: new Date().toISOString()
     });
+
+    // Save initial session to Supabase
+    await get().saveSessionToSupabase();
   },
 
   saveRecipeSession: async () => {

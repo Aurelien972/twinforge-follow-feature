@@ -44,7 +44,7 @@ export const createInventoryActions = (
     });
   },
 
-  updateInventory: (inventory: FridgeItem[]) => {
+  updateInventory: async (inventory: FridgeItem[]) => {
     set({
       userEditedInventory: inventory
     });
@@ -54,6 +54,9 @@ export const createInventoryActions = (
       inventoryCount: inventory.length,
       timestamp: new Date().toISOString()
     });
+
+    // Save session after inventory update
+    await get().saveSessionToSupabase();
   },
 
   setSuggestedComplementaryItems: (items: SuggestedFridgeItem[]) => {
@@ -68,10 +71,10 @@ export const createInventoryActions = (
     });
   },
 
-  addSelectedComplementaryItems: (selectedItems: FridgeItem[]) => {
+  addSelectedComplementaryItems: async (selectedItems: FridgeItem[]) => {
     const currentInventory = get().userEditedInventory;
     const updatedInventory = [...currentInventory, ...selectedItems];
-    
+
     set({
       userEditedInventory: updatedInventory
     });
@@ -82,5 +85,8 @@ export const createInventoryActions = (
       totalInventoryCount: updatedInventory.length,
       timestamp: new Date().toISOString()
     });
+
+    // Save session after adding items
+    await get().saveSessionToSupabase();
   }
 });

@@ -55,21 +55,33 @@ const ProgressionTab: React.FC = () => {
 
   // Préparer les données pour les graphiques
   const chartData = React.useMemo(() => {
-    if (!monthMeals) return { dailyCalories: [], macroDistribution: [] };
+    if (!monthMeals || monthMeals.length === 0) {
+      return { dailyCalories: [], macroDistribution: [] };
+    }
 
     // Données pour le graphique de tendance calorique (30 derniers jours)
     const dailyCaloriesMap = new Map<string, number>();
 
     monthMeals.forEach(meal => {
-      const date = format(new Date(meal.timestamp), 'yyyy-MM-dd');
-      const current = dailyCaloriesMap.get(date) || 0;
-      dailyCaloriesMap.set(date, current + (meal.total_kcal || 0));
+      try {
+        const date = format(new Date(meal.timestamp), 'yyyy-MM-dd');
+        const current = dailyCaloriesMap.get(date) || 0;
+        const mealCalories = meal.total_kcal || 0;
+        dailyCaloriesMap.set(date, current + mealCalories);
+      } catch (error) {
+        console.warn('Invalid meal timestamp:', meal.timestamp, error);
+      }
     });
+
+    // S'assurer qu'on a au moins quelques données avant de continuer
+    if (dailyCaloriesMap.size === 0) {
+      return { dailyCalories: [], macroDistribution: [] };
+    }
 
     const dailyCalories = Array.from(dailyCaloriesMap.entries())
       .map(([date, calories]) => ({
         date,
-        calories,
+        calories: calories || 0,
         formattedDate: format(new Date(date), 'dd/MM'),
       }))
       .sort((a, b) => a.date.localeCompare(b.date))

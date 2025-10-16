@@ -58,12 +58,15 @@ const CalorieTrendChart: React.FC<CalorieTrendChartProps> = ({
 }) => {
   const reduceMotion = useReducedMotion();
 
-  // Calculer les statistiques
-  const avgCalories = data.length > 0 ? 
-    Math.round(data.reduce((sum, day) => sum + day.calories, 0) / data.length) : 0;
-  
-  const maxCalories = data.length > 0 ? Math.max(...data.map(d => d.calories)) : 0;
-  const minCalories = data.length > 0 ? Math.min(...data.map(d => d.calories).filter(c => c > 0)) : 0;
+  // Calculer les statistiques de manière robuste
+  const avgCalories = data.length > 0 ?
+    Math.round(data.reduce((sum, day) => sum + (day.calories || 0), 0) / data.length) : 0;
+
+  const maxCalories = data.length > 0 ? Math.max(...data.map(d => d.calories || 0)) : 0;
+
+  // Pour minCalories, filtrer les zéros et gérer le cas où tous sont à zéro
+  const nonZeroCalories = data.map(d => d.calories || 0).filter(c => c > 0);
+  const minCalories = nonZeroCalories.length > 0 ? Math.min(...nonZeroCalories) : 0;
   
   const trend = data.length >= 2 ? 
     (data[data.length - 1].calories - data[0].calories) > 0 ? 'up' : 'down' : 'stable';

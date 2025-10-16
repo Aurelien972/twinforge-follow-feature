@@ -95,6 +95,7 @@ export const useFridgeScanPipeline = create<FridgeScanPipelineState>()(
 
           if (!user) {
             logger.warn('FRIDGE_SCAN_PIPELINE', 'No user found, cannot load recent sessions');
+            set({ recentSessions: [] });
             return;
           }
 
@@ -106,7 +107,22 @@ export const useFridgeScanPipeline = create<FridgeScanPipelineState>()(
             .limit(10);
 
           if (error) {
-            logger.error('FRIDGE_SCAN_PIPELINE', 'Failed to load recent sessions', { error });
+            // Si la table n'existe pas encore (404/PGRST205), c'est normal
+            if (error.code === 'PGRST205' || error.message?.includes('does not exist')) {
+              logger.warn('FRIDGE_SCAN_PIPELINE', 'fridge_scan_sessions table not found (migration pending)', {
+                code: error.code,
+                message: error.message
+              });
+              set({ recentSessions: [] });
+              return;
+            }
+
+            // Pour les autres erreurs, logger comme erreur
+            logger.error('FRIDGE_SCAN_PIPELINE', 'Failed to load recent sessions', {
+              error: error.message,
+              code: error.code
+            });
+            set({ recentSessions: [] });
             return;
           }
 
@@ -127,9 +143,12 @@ export const useFridgeScanPipeline = create<FridgeScanPipelineState>()(
             timestamp: new Date().toISOString()
           });
         } catch (error) {
-          logger.error('FRIDGE_SCAN_PIPELINE', 'Error loading recent sessions', {
-            error: error instanceof Error ? error.message : 'Unknown error'
+          // Gérer les erreurs réseau et autres exceptions
+          logger.warn('FRIDGE_SCAN_PIPELINE', 'Exception loading recent sessions', {
+            error: error instanceof Error ? error.message : 'Unknown error',
+            errorType: error instanceof Error ? error.constructor.name : typeof error
           });
+          set({ recentSessions: [] });
         }
       },
     }),
