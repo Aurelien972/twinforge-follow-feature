@@ -51,7 +51,7 @@ export function navFor(): NavSection[] {
           to: '/',
           icon: 'Home',
           label: 'Tableau de Bord',
-          subtitle: 'Vue d\'ensemble TwinForge',
+          subtitle: 'Vue d\'ensemble',
           isPrimary: true,
           circuitColor: '#F7931E', // Logo Orange - primary brand color
           actionLabel: undefined // No action badge for dashboard
