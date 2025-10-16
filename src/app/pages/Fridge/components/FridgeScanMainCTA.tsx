@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
 import { useFeedback } from '../../../../hooks/useFeedback';
+import { supabase } from '../../../../system/supabase/client';
+import logger from '../../../../lib/utils/logger';
 
 /**
  * FridgeScanMainCTA - Composant CTA Principal pour Scanner un Frigo
@@ -13,6 +15,41 @@ import { useFeedback } from '../../../../hooks/useFeedback';
 const FridgeScanMainCTA: React.FC = () => {
   const navigate = useNavigate();
   const { click } = useFeedback();
+  const [stats, setStats] = useState({ scans: 0, items: 0, recipes: 0 });
+
+  // Charger les vraies statistiques depuis Supabase
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: sessions } = await supabase
+          .from('recipe_sessions')
+          .select('inventory_final, selected_recipe_ids')
+          .eq('user_id', user.id)
+          .not('inventory_final', 'is', null);
+
+        if (sessions && sessions.length > 0) {
+          const totalScans = sessions.length;
+          const totalItems = sessions.reduce((sum, session) =>
+            sum + (Array.isArray(session.inventory_final) ? session.inventory_final.length : 0), 0
+          );
+          const totalRecipes = sessions.reduce((sum, session) =>
+            sum + (Array.isArray(session.selected_recipe_ids) ? session.selected_recipe_ids.length : 0), 0
+          );
+
+          setStats({ scans: totalScans, items: totalItems, recipes: totalRecipes });
+        }
+      } catch (error) {
+        logger.warn('FRIDGE_SCAN_MAIN_CTA', 'Failed to load stats', {
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    };
+
+    loadStats();
+  }, []);
 
   const handleScanClick = () => {
     click();
@@ -41,7 +78,7 @@ const FridgeScanMainCTA: React.FC = () => {
         WebkitBackdropFilter: 'blur(32px) saturate(170%)'
       }}
     >
-      {/* Carrés Animés aux 4 Coins */}
+      {/* Carrés Animés aux 4 Coins - Optimisés */}
       <div className="training-hero-corners" aria-hidden="true">
         {[0, 1, 2, 3].map((i) => (
           <motion.div
@@ -57,21 +94,22 @@ const FridgeScanMainCTA: React.FC = () => {
               top: i < 2 ? '12px' : 'auto',
               bottom: i >= 2 ? '12px' : 'auto',
               left: i % 2 === 0 ? '12px' : 'auto',
-              right: i % 2 === 1 ? '12px' : 'auto'
+              right: i % 2 === 1 ? '12px' : 'auto',
+              willChange: 'transform, opacity'
             }}
             initial={{
               rotate: i % 2 === 0 ? 45 : -45
             }}
             animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.6, 1, 0.6],
-              rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
+              scale: [1, 1.2, 1],
+              opacity: [0.6, 0.9, 0.6],
+              rotate: i % 2 === 0 ? [45, 55, 45] : [-45, -55, -45]
             }}
             transition={{
-              duration: 3,
+              duration: 3.5,
               repeat: Infinity,
-              delay: i * 0.2,
-              ease: [0.4, 0, 0.2, 1]
+              delay: i * 0.25,
+              ease: [0.45, 0.05, 0.55, 0.95]
             }}
           />
         ))}
@@ -80,7 +118,7 @@ const FridgeScanMainCTA: React.FC = () => {
       <div className="relative z-10 space-y-8">
         {/* Conteneur Icône Principale avec Bulles */}
         <div className="relative inline-block">
-          {/* Icône Principale avec Animation de Respiration */}
+          {/* Icône Principale avec Animation de Respiration - Optimisée */}
           <motion.div
             className="w-28 h-28 mx-auto rounded-full flex items-center justify-center relative"
             style={{
@@ -94,17 +132,18 @@ const FridgeScanMainCTA: React.FC = () => {
                 0 0 50px color-mix(in srgb, #EC4899 70%, transparent),
                 0 0 100px color-mix(in srgb, #F472B6 50%, transparent),
                 inset 0 4px 0 rgba(255,255,255,0.5)
-              `
+              `,
+              willChange: 'transform'
             }}
             animate={{
-              scale: [1, 1.08, 1],
+              scale: [1, 1.06, 1],
               boxShadow: [
                 '0 0 50px color-mix(in srgb, #EC4899 70%, transparent), 0 0 100px color-mix(in srgb, #F472B6 50%, transparent)',
-                '0 0 60px color-mix(in srgb, #EC4899 85%, transparent), 0 0 120px color-mix(in srgb, #F472B6 65%, transparent)',
+                '0 0 55px color-mix(in srgb, #EC4899 75%, transparent), 0 0 110px color-mix(in srgb, #F472B6 55%, transparent)',
                 '0 0 50px color-mix(in srgb, #EC4899 70%, transparent), 0 0 100px color-mix(in srgb, #F472B6 50%, transparent)'
               ]
             }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ duration: 3, repeat: Infinity, ease: [0.45, 0.05, 0.55, 0.95] }}
           >
             <SpatialIcon
               Icon={ICONS.Refrigerator}
@@ -113,29 +152,30 @@ const FridgeScanMainCTA: React.FC = () => {
               variant="pure"
             />
 
-            {/* Anneau de Pulsation */}
+            {/* Anneau de Pulsation - Optimisé */}
             <motion.div
               className="absolute inset-0 rounded-full border-3"
               style={{
-                borderColor: 'color-mix(in srgb, #EC4899 70%, transparent)'
+                borderColor: 'color-mix(in srgb, #EC4899 70%, transparent)',
+                willChange: 'transform, opacity'
               }}
               animate={{
-                scale: [1, 1.6, 1.6],
-                opacity: [0.8, 0, 0]
+                scale: [1, 1.5, 1.5],
+                opacity: [0.7, 0, 0]
               }}
               transition={{
-                duration: 2,
+                duration: 2.5,
                 repeat: Infinity,
                 ease: 'easeOut'
               }}
             />
 
-            {/* Bulles Animées jaillissant de l'Icône */}
+            {/* Bulles Animées jaillissant de l'Icône - Optimisées */}
             {[
-              { size: 16, distance: 80, angle: 45, delay: 0 },
-              { size: 20, distance: 90, angle: 135, delay: 0.3 },
-              { size: 14, distance: 85, angle: 225, delay: 0.6 },
-              { size: 18, distance: 95, angle: 315, delay: 0.9 }
+              { size: 16, distance: 70, angle: 45, delay: 0 },
+              { size: 20, distance: 80, angle: 135, delay: 0.4 },
+              { size: 14, distance: 75, angle: 225, delay: 0.8 },
+              { size: 18, distance: 85, angle: 315, delay: 1.2 }
             ].map((bubble, index) => (
               <motion.div
                 key={`bubble-${index}`}
@@ -158,7 +198,8 @@ const FridgeScanMainCTA: React.FC = () => {
                   boxShadow: `
                     0 0 20px color-mix(in srgb, #EC4899 60%, transparent),
                     inset 0 2px 4px rgba(255,255,255,0.4)
-                  `
+                  `,
+                  willChange: 'transform, opacity'
                 }}
                 animate={{
                   x: [
@@ -169,13 +210,13 @@ const FridgeScanMainCTA: React.FC = () => {
                     0,
                     Math.sin((bubble.angle * Math.PI) / 180) * bubble.distance
                   ],
-                  scale: [0.5, 1.2],
-                  opacity: [1, 0]
+                  scale: [0.6, 1],
+                  opacity: [0.9, 0]
                 }}
                 transition={{
-                  duration: 2,
+                  duration: 2.5,
                   repeat: Infinity,
-                  ease: 'easeOut',
+                  ease: [0.33, 1, 0.68, 1],
                   delay: bubble.delay
                 }}
               />
@@ -266,7 +307,7 @@ const FridgeScanMainCTA: React.FC = () => {
           </button>
         </motion.div>
 
-        {/* Statistiques Visuelles */}
+        {/* Statistiques Visuelles - Données Réelles */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -274,9 +315,9 @@ const FridgeScanMainCTA: React.FC = () => {
           className="flex flex-wrap items-center justify-center gap-6 pt-4"
         >
           {[
-            { icon: ICONS.ScanLine, label: '12 Scans', color: '#EC4899' },
-            { icon: ICONS.Package, label: '145 Items', color: '#F472B6' },
-            { icon: ICONS.ChefHat, label: '34 Recettes', color: '#DB2777' }
+            { icon: ICONS.ScanLine, label: `${stats.scans} Scan${stats.scans > 1 ? 's' : ''}`, color: '#EC4899' },
+            { icon: ICONS.Package, label: `${stats.items} Item${stats.items > 1 ? 's' : ''}`, color: '#F472B6' },
+            { icon: ICONS.ChefHat, label: `${stats.recipes} Recette${stats.recipes > 1 ? 's' : ''}`, color: '#DB2777' }
           ].map((stat, index) => (
             <motion.div
               key={index}

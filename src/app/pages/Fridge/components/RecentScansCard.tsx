@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
 import { useFeedback } from '../../../../hooks/useFeedback';
-import { useFridgeScanPipeline } from '../../../../system/store/fridgeScan';
+import { supabase } from '../../../../system/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import logger from '../../../../lib/utils/logger';
+
+interface RecipeSession {
+  id: string;
+  created_at: string;
+  inventory_final: any[];
+  status: string;
+}
 
 /**
  * RecentScansCard - Affiche l'historique des 3 derniers scans de frigo
@@ -16,14 +24,38 @@ import { fr } from 'date-fns/locale';
 const RecentScansCard: React.FC = () => {
   const navigate = useNavigate();
   const { click } = useFeedback();
-  const { recentSessions } = useFridgeScanPipeline();
+  const [displaySessions, setDisplaySessions] = useState<RecipeSession[]>([]);
 
-  // Limiter aux 3 dernières sessions
-  const displaySessions = recentSessions.slice(0, 3);
+  // Charger les sessions récentes depuis Supabase
+  useEffect(() => {
+    const loadSessions = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data } = await supabase
+          .from('recipe_sessions')
+          .select('id, created_at, inventory_final, status')
+          .eq('user_id', user.id)
+          .not('inventory_final', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (data) {
+          setDisplaySessions(data);
+        }
+      } catch (error) {
+        logger.warn('RECENT_SCANS_CARD', 'Failed to load recent sessions', {
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    };
+
+    loadSessions();
+  }, []);
 
   const handleSessionClick = (sessionId: string) => {
     click();
-    // Navigate to inventory tab with session selected
     navigate(`/fridge#inventaire`);
   };
 
@@ -134,8 +166,8 @@ const RecentScansCard: React.FC = () => {
         ) : (
           displaySessions.map((session, index) => (
             <motion.button
-              key={session.sessionId}
-              onClick={() => handleSessionClick(session.sessionId)}
+              key={session.id}
+              onClick={() => handleSessionClick(session.id)}
               className="w-full text-left rounded-xl p-4 transition-all duration-300"
               style={{
                 background: 'rgba(255, 255, 255, 0.03)',
@@ -165,24 +197,16 @@ const RecentScansCard: React.FC = () => {
                     boxShadow: '0 4px 12px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.2)'
                   }}
                 >
-                  {session.capturedPhotos && session.capturedPhotos.length > 0 ? (
-                    <img
-                      src={session.capturedPhotos[0]}
-                      alt="Scan preview"
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <SpatialIcon Icon={ICONS.Refrigerator} size={32} className="text-pink-300" />
-                  )}
+                  <SpatialIcon Icon={ICONS.Refrigerator} size={32} className="text-pink-300" />
                 </div>
 
                 {/* Métadonnées */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-white font-semibold text-base truncate">
-                      Scan du {format(new Date(session.createdAt), 'd MMM yyyy', { locale: fr })}
+                      Scan du {format(new Date(session.created_at), 'd MMM yyyy', { locale: fr })}
                     </span>
-                    {session.stage === 'completed' && (
+                    {session.status === 'completed' && (
                       <div
                         className="px-2 py-0.5 rounded-full text-xs font-medium"
                         style={{
@@ -199,16 +223,12 @@ const RecentScansCard: React.FC = () => {
                   <div className="flex items-center gap-4 text-sm text-white/70">
                     <div className="flex items-center gap-1.5">
                       <SpatialIcon Icon={ICONS.Package} size={14} />
-                      <span>{session.rawDetectedItems?.length || 0} items</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <SpatialIcon Icon={ICONS.Camera} size={14} />
-                      <span>{session.capturedPhotos?.length || 0} photos</span>
+                      <span>{Array.isArray(session.inventory_final) ? session.inventory_final.length : 0} items</span>
                     </div>
                   </div>
 
                   <p className="text-xs text-white/50 mt-1">
-                    {format(new Date(session.createdAt), 'HH:mm', { locale: fr })}
+                    {format(new Date(session.created_at), 'HH:mm', { locale: fr })}
                   </p>
                 </div>
 

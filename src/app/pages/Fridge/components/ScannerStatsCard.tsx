@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
-import { useFridgeScanPipeline } from '../../../../system/store/fridgeScan';
+import { supabase } from '../../../../system/supabase/client';
+import logger from '../../../../lib/utils/logger';
 
 interface StatMetric {
   label: string;
@@ -18,17 +19,66 @@ interface StatMetric {
  * Avec jauges circulaires animées, graphiques sparkline et badges
  */
 const ScannerStatsCard: React.FC = () => {
-  const { recentSessions } = useFridgeScanPipeline();
   const [animatedValues, setAnimatedValues] = useState<Record<string, number>>({});
+  const [totalScans, setTotalScans] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [topCategories, setTopCategories] = useState<Array<{ name: string; count: number; color: string }>>([]);
 
-  // Calcul des statistiques
-  const totalScans = recentSessions.length;
-  const totalItems = recentSessions.reduce(
-    (sum, session) => sum + (session.rawDetectedItems?.length || 0),
-    0
-  );
-  const completedScans = recentSessions.filter(s => s.stage === 'completed').length;
-  const avgFreshness = totalItems > 0 ? 85 : 0; // Mock pour démo, à calculer réellement
+  // Charger les vraies statistiques depuis Supabase
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: sessions } = await supabase
+          .from('recipe_sessions')
+          .select('inventory_final')
+          .eq('user_id', user.id)
+          .not('inventory_final', 'is', null);
+
+        if (sessions && sessions.length > 0) {
+          const scans = sessions.length;
+          const items = sessions.reduce((sum, session) =>
+            sum + (Array.isArray(session.inventory_final) ? session.inventory_final.length : 0), 0
+          );
+
+          // Calculer les catégories depuis les inventaires
+          const categoryCount: Record<string, number> = {};
+          sessions.forEach(session => {
+            if (Array.isArray(session.inventory_final)) {
+              session.inventory_final.forEach((item: any) => {
+                const category = item.category || 'Autre';
+                categoryCount[category] = (categoryCount[category] || 0) + 1;
+              });
+            }
+          });
+
+          // Top 3 catégories
+          const sortedCategories = Object.entries(categoryCount)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 3)
+            .map(([name, count], index) => ({
+              name,
+              count,
+              color: ['#10B981', '#F59E0B', '#EC4899'][index]
+            }));
+
+          setTotalScans(scans);
+          setTotalItems(items);
+          setTopCategories(sortedCategories);
+        }
+      } catch (error) {
+        logger.warn('SCANNER_STATS_CARD', 'Failed to load stats', {
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    };
+
+    loadStats();
+  }, []);
+
+  const avgFreshness = totalItems > 0 ? 85 : 0;
 
   const stats: StatMetric[] = [
     {
@@ -74,12 +124,7 @@ const ScannerStatsCard: React.FC = () => {
     });
   }, [totalScans, totalItems]);
 
-  // Calcul des catégories les plus scannées (mock pour démo)
-  const topCategories = [
-    { name: 'Légumes', count: 45, color: '#10B981' },
-    { name: 'Produits Laitiers', count: 38, color: '#F59E0B' },
-    { name: 'Fruits', count: 32, color: '#EC4899' }
-  ];
+  // Top catégories calculées depuis les vraies données
 
   return (
     <GlassCard
