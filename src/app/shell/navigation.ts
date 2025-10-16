@@ -70,10 +70,10 @@ export function navFor(): NavSection[] {
           to: '/avatar',
           icon: 'User',
           label: 'Mon Twin',
-          subtitle: 'Avatar 3D & Morphologie',
+          subtitle: 'Avatar 3D,
           isTwin: true,
           circuitColor: '#8B5CF6', // Violet
-          tabs: ['Scanner', 'Avatar', 'Projection', 'Insights', 'Historique']
+          tabs: ['Scanner Corporel', 'Avatar', 'Projection', 'Insights', 'Historique']
         },
       ],
     },
