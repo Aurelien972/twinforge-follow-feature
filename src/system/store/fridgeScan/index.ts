@@ -37,6 +37,7 @@ export const useFridgeScanPipeline = create<FridgeScanPipelineState>()(
       suggestedComplementaryItems: [],
       recipeCandidates: [],
       selectedRecipes: [],
+      recentSessions: [],
       externalGenerationTriggered: false,
       mealPlan: null,
       loadingState: 'idle',
@@ -79,11 +80,57 @@ export const useFridgeScanPipeline = create<FridgeScanPipelineState>()(
       // Action to clear recipe candidates
       clearRecipeCandidates: () => {
         set({ recipeCandidates: [] });
-        
+
         logger.info('FRIDGE_SCAN_PIPELINE', 'Recipe candidates cleared', {
           sessionId: get().currentSessionId,
           timestamp: new Date().toISOString()
         });
+      },
+
+      // Action to load recent sessions from Supabase
+      loadRecentSessions: async () => {
+        try {
+          const { supabase } = await import('../../supabase/client');
+          const { data: { user } } = await supabase.auth.getUser();
+
+          if (!user) {
+            logger.warn('FRIDGE_SCAN_PIPELINE', 'No user found, cannot load recent sessions');
+            return;
+          }
+
+          const { data, error } = await supabase
+            .from('fridge_scan_sessions')
+            .select('session_id, user_id, stage, created_at, updated_at, captured_photos, raw_detected_items')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+          if (error) {
+            logger.error('FRIDGE_SCAN_PIPELINE', 'Failed to load recent sessions', { error });
+            return;
+          }
+
+          const sessions = (data || []).map(session => ({
+            sessionId: session.session_id,
+            userId: session.user_id,
+            stage: session.stage,
+            createdAt: session.created_at,
+            updatedAt: session.updated_at,
+            capturedPhotos: session.captured_photos,
+            rawDetectedItems: session.raw_detected_items
+          }));
+
+          set({ recentSessions: sessions });
+
+          logger.info('FRIDGE_SCAN_PIPELINE', 'Recent sessions loaded', {
+            count: sessions.length,
+            timestamp: new Date().toISOString()
+          });
+        } catch (error) {
+          logger.error('FRIDGE_SCAN_PIPELINE', 'Error loading recent sessions', {
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
       },
     }),
     {

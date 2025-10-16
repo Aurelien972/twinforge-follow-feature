@@ -43,6 +43,7 @@ export function navFor(): NavSection[] {
       title: 'Rituels du Forgeron',
       items: [
         { to: '/meals', icon: 'Utensils', label: 'Forge Nutritionnelle', subtitle: 'Scanner de repas', circuitColor: '#10B981' },
+        { to: '/fridge', icon: 'ChefHat', label: 'Forge Culinaire', subtitle: 'Recettes & Plans', circuitColor: '#EC4899' },
         { to: '/activity', icon: 'Activity', label: 'Forge Énergétique', subtitle: 'Tracker d\'activités', circuitColor: '#3B82F6' },
         { to: '/fasting', icon: 'Timer', label: 'Forge du Temps', subtitle: 'Jeûne intermittent', circuitColor: '#F59E0B' },
         { to: '/avatar', icon: 'Scan', label: 'Forge Corporelle', subtitle: 'Avatar 3D & Scans', circuitColor: '#D946EF' },
@@ -52,12 +53,6 @@ export function navFor(): NavSection[] {
       title: 'Ateliers du Forgeron',
       items: [
         { to: '/training', icon: 'Target', label: 'Atelier de Training', subtitle: 'Générateur de Training', circuitColor: '#18E3FF' },
-      ],
-    },
-    {
-      title: 'Forge Culinaire',
-      items: [
-        { to: '/fridge', icon: 'ChefHat', label: 'Forge Culinaire', subtitle: 'Recettes & Plans', circuitColor: '#EC4899' },
       ],
     },
   ];

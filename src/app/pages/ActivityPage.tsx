@@ -95,7 +95,7 @@ const ActivityPage: React.FC = () => {
 
       <Tabs defaultValue="daily" className="w-full" onValueChange={handleTabChange} forgeContext="activity">
         <Tabs.List>
-          <Tabs.Trigger value="daily">Aujourd'hui</Tabs.Trigger>
+          <Tabs.Trigger value="daily">Tracker</Tabs.Trigger>
           <Tabs.Trigger value="insights">Insights</Tabs.Trigger>
           <Tabs.Trigger value="progression">Progression</Tabs.Trigger>
           <Tabs.Trigger value="history">Historique</Tabs.Trigger>

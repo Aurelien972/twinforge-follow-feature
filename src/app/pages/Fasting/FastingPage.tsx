@@ -188,7 +188,7 @@ const FastingPage: React.FC = () => {
       >
         <Tabs.List role="tablist" aria-label="Sections du jeûne" className="mb-6 w-full">
           <Tabs.Trigger value="daily" icon="Calendar">
-            <span className="tab-text">Aujourd'hui</span>
+            <span className="tab-text">Tracker</span>
           </Tabs.Trigger>
           <Tabs.Trigger value="insights" icon="TrendingUp">
             <span className="tab-text">Insights</span>

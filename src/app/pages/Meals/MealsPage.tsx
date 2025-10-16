@@ -191,7 +191,7 @@ const MealsPage: React.FC = () => {
       >
         <Tabs.List role="tablist" aria-label="Sections des repas" className="mb-6 w-full">
           <Tabs.Trigger value="daily" icon="Calendar">
-            <span className="tab-text">Aujourd'hui</span>
+            <span className="tab-text">Scanner</span>
           </Tabs.Trigger>
           <Tabs.Trigger value="insights" icon="TrendingUp">
             <span className="tab-text">Insights</span>

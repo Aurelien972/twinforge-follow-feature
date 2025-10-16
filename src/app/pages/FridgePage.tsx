@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import PageHeader from '../../ui/page/PageHeader';
 import Tabs from '../../ui/tabs/TabsComponent';
+import ScannerTab from './Fridge/tabs/ScannerTab';
 import FridgesTab from './Fridge/tabs/FridgesTab';
 import RecipesTab from './Fridge/tabs/RecipesTab';
 import PlanTab from './Fridge/tabs/PlanTab';
@@ -27,8 +28,11 @@ const FridgePage: React.FC = () => {
         iconColor="#EC4899"
       />
 
-      <Tabs defaultValue="inventaire" forgeContext="fridge">
+      <Tabs defaultValue="scanner" forgeContext="fridge">
         <Tabs.List role="tablist" aria-label="Forge Culinaire Navigation">
+          <Tabs.Trigger value="scanner" icon="ScanLine">
+            Scanner
+          </Tabs.Trigger>
           <Tabs.Trigger value="inventaire" icon="Refrigerator">
             Inventaire
           </Tabs.Trigger>
@@ -42,6 +46,10 @@ const FridgePage: React.FC = () => {
             Courses
           </Tabs.Trigger>
         </Tabs.List>
+
+        <Tabs.Panel value="scanner">
+          <ScannerTab />
+        </Tabs.Panel>
 
         <Tabs.Panel value="inventaire">
           <FridgesTab />

@@ -64,33 +64,44 @@ export interface RawDetectedItem {
   freshnessScore?: number;
 }
 
+export interface FridgeScanSession {
+  sessionId: string;
+  userId: string;
+  stage: string;
+  createdAt: string;
+  updatedAt: string;
+  capturedPhotos?: string[];
+  rawDetectedItems?: RawDetectedItem[];
+}
+
 export interface FridgeScanPipelineState {
   // Pipeline state
   currentStep: FridgeScanStep;
   isActive: boolean;
   currentSessionId: string | null;
-  
+
   // Progress simulation state
   simulatedLoadingStep: number;
   simulatedScanProgress: number;
   simulatedOverallProgress: number;
   progressIntervalId: number | null;
   progressTimeoutId: number | null;
-  
+
   // Data state
   capturedPhotos: string[]; // base64 or URLs
   rawDetectedItems: RawDetectedItem[];
   userEditedInventory: FridgeItem[];
   suggestedComplementaryItems: SuggestedFridgeItem[];
   recipeCandidates: Recipe[];
-  
+  recentSessions: FridgeScanSession[];
+
   // Meal plan data
   mealPlan: MealPlanData | null;
-  
+
   // Loading states
   loadingState: 'idle' | 'uploading' | 'analyzing' | 'generating' | 'saving';
   loadingMessage: string;
-  
+
   // Steps configuration
   steps: FridgeScanStepData[];
   
@@ -119,4 +130,5 @@ export interface FridgeScanPipelineState {
   
   // Session management
   resumePipeline: () => void;
+  loadRecentSessions: () => Promise<void>;
 }
