@@ -183,7 +183,22 @@ const MealPlanReviewAndGenerateCTA: React.FC<MealPlanReviewAndGenerateCTAProps> 
               <button
                 onClick={handleGenerateAllRecipes}
                 disabled={isProcessing}
-                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={!isProcessing ? {
+                  background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.9) 0%, rgba(147, 51, 234, 0.85) 100%)',
+                  backdropFilter: 'blur(20px) saturate(160%)',
+                  border: '2px solid color-mix(in srgb, #A855F7 60%, transparent)',
+                  boxShadow: `
+                    0 12px 40px color-mix(in srgb, #A855F7 40%, transparent),
+                    0 0 60px color-mix(in srgb, #A855F7 30%, transparent),
+                    inset 0 3px 0 rgba(255, 255, 255, 0.4),
+                    inset 0 -3px 0 rgba(0, 0, 0, 0.2),
+                    inset 2px 0 0 rgba(255, 255, 255, 0.1),
+                    inset -2px 0 0 rgba(0, 0, 0, 0.1)
+                  `,
+                  transform: 'translateZ(0)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(160%)'
+                } : undefined}
               >
                 {isProcessing ? (
                   <>

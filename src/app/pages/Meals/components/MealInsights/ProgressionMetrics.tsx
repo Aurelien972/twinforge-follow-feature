@@ -202,16 +202,16 @@ const ProgressionMetrics: React.FC<ProgressionMetricsProps> = ({
           className="p-6 relative"
           style={{
             background: `
-              radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
-              radial-gradient(circle at 75% 75%, rgba(34, 197, 94, 0.12) 0%, transparent 60%),
-              radial-gradient(circle at 50% 50%, rgba(52, 211, 153, 0.08) 0%, transparent 70%),
+              radial-gradient(circle at 25% 25%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 75% 75%, rgba(8, 145, 178, 0.12) 0%, transparent 60%),
+              radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.08) 0%, transparent 70%),
               var(--glass-opacity)
             `,
-            borderColor: 'rgba(16, 185, 129, 0.4)',
+            borderColor: 'rgba(6, 182, 212, 0.4)',
             boxShadow: `
               0 16px 48px rgba(0, 0, 0, 0.3),
-              0 0 40px rgba(16, 185, 129, 0.25),
-              0 0 80px rgba(34, 197, 94, 0.15),
+              0 0 40px rgba(6, 182, 212, 0.25),
+              0 0 80px rgba(8, 145, 178, 0.15),
               inset 0 2px 0 rgba(255, 255, 255, 0.2)
             `,
           }}
@@ -220,7 +220,7 @@ const ProgressionMetrics: React.FC<ProgressionMetricsProps> = ({
           <div
             className="absolute inset-0 rounded-inherit pointer-events-none progression-glow-css"
             style={{
-              background: 'radial-gradient(circle at center, rgba(16, 185, 129, 0.08) 0%, transparent 70%)',
+              background: 'radial-gradient(circle at center, rgba(6, 182, 212, 0.08) 0%, transparent 70%)',
               filter: 'blur(20px)',
               transform: 'scale(1.3)',
               zIndex: -1

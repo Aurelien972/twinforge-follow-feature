@@ -1,5 +1,5 @@
 import React from 'react';
-import { useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
@@ -59,6 +59,8 @@ const CustomTooltip = ({ active, payload }: any) => {
  * Custom Legend Component - VisionOS 26 Style
  */
 const CustomLegend = ({ payload }: any) => {
+  if (!payload || payload.length === 0) return null;
+
   return (
     <div className="flex justify-center gap-6 mt-4">
       {payload.map((entry: any, index: number) => (
@@ -105,6 +107,11 @@ const MacroDistributionChart: React.FC<MacroDistributionChartProps> = ({
   // Déterminer la couleur du score
   const scoreColor = balanceScore >= 80 ? '#22C55E' :
                     balanceScore >= 60 ? '#F59E0B' : '#EF4444';
+
+  // Don't render if no data
+  if (!data || data.length === 0 || data.every(d => d.value === 0)) {
+    return null;
+  }
 
   return (
     <div className="chart-enter-right">

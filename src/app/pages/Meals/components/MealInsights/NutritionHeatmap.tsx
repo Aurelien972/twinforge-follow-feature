@@ -30,6 +30,11 @@ const NutritionHeatmap: React.FC<NutritionHeatmapProps> = ({
 }) => {
   const reduceMotion = useReducedMotion();
 
+  // Don't render if not enough data
+  if (!meals || meals.length < 7) {
+    return null;
+  }
+
   // Préparer les données de la heatmap (4 dernières semaines)
   const heatmapData = React.useMemo(() => {
     const today = new Date();

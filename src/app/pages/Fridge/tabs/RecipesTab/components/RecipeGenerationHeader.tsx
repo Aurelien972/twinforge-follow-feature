@@ -147,15 +147,15 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
           className={`btn-glass btn-glass--primary w-full px-8 py-4 text-lg font-bold transition-all duration-200 flex items-center justify-center gap-2 ${!hasValidInventory || isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={hasValidInventory && !isGenerating ? {
             background: `
-              linear-gradient(135deg, 
-                color-mix(in srgb, var(--color-fridge-primary) 80%, transparent),
-                color-mix(in srgb, var(--color-fridge-secondary) 70%, transparent)
+              linear-gradient(135deg,
+                color-mix(in srgb, #10B981 80%, transparent),
+                color-mix(in srgb, #22C55E 70%, transparent)
               )
             `,
-            border: '2px solid color-mix(in srgb, var(--color-fridge-primary) 60%, transparent)',
+            border: '2px solid color-mix(in srgb, #10B981 60%, transparent)',
             boxShadow: `
-              0 8px 32px color-mix(in srgb, var(--color-fridge-primary) 40%, transparent),
-              0 0 40px color-mix(in srgb, var(--color-fridge-primary) 30%, transparent),
+              0 8px 32px color-mix(in srgb, #10B981 40%, transparent),
+              0 0 40px color-mix(in srgb, #10B981 30%, transparent),
               inset 0 2px 0 rgba(255, 255, 255, 0.4),
               inset 0 -2px 0 rgba(0, 0, 0, 0.2)
             `,
