@@ -54,7 +54,6 @@ const NavItem = React.memo(({
   const itemColor = circuitColor || getCircuitColor(to);
   const { sidebarClick } = useFeedback();
   const hasSubItems = subItems && subItems.length > 0;
-  const ChevronIcon = ICONS['ChevronDown'];
 
   const handleNavItemClick = (e: React.MouseEvent) => {
     logger.trace('SIDEBAR', 'NavItem click captured', { to, label, isActive });
@@ -67,15 +66,6 @@ const NavItem = React.memo(({
         onToggleExpand();
         sidebarClick();
       }
-    }
-  };
-
-  const handleToggleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onToggleExpand) {
-      onToggleExpand();
-      sidebarClick();
     }
   };
 
@@ -153,22 +143,6 @@ const NavItem = React.memo(({
             {subtitle}
           </div>
         </div>
-
-        {/* Expand/collapse button for items with submenus */}
-        {hasSubItems && (
-          <button
-            onClick={handleToggleClick}
-            className="sidebar-expand-button"
-            aria-label={isExpanded ? 'Réduire le menu' : 'Développer le menu'}
-            type="button"
-          >
-            <SpatialIcon
-              Icon={ChevronIcon}
-              size={16}
-              className={`sidebar-expand-icon ${isExpanded ? 'sidebar-expand-icon--expanded' : ''}`}
-            />
-          </button>
-        )}
 
         {/* Badge d'action uniquement pour les forges sans sous-menus */}
         {isForge && actionLabel && !hasSubItems && (

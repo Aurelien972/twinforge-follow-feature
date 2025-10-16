@@ -135,7 +135,7 @@ const MobileDrawer = React.memo(() => {
             role="navigation"
             aria-label="Navigation mobile"
           >
-            <div className="p-4 space-y-6">
+            <div className="py-4 pl-4 pr-2 space-y-6">
               {/* Header - Close button only */}
               <div className="flex items-center justify-end mb-2">
                 <motion.button
@@ -154,7 +154,6 @@ const MobileDrawer = React.memo(() => {
                 <Section key={index} title={section.title}>
                   {section.items.map((item) => {
                     const hasSubItems = item.subItems && item.subItems.length > 0;
-                    const ChevronIcon = ICONS['ChevronDown'];
 
                     // Check if any sub-item is active
                     const hasActiveSubItem = hasSubItems && item.subItems.some(subItem => {
@@ -172,12 +171,6 @@ const MobileDrawer = React.memo(() => {
                       } else {
                         setDrawer(false);
                       }
-                    };
-
-                    const handleToggleClick = (e: React.MouseEvent) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleToggleExpand(item.to);
                     };
 
                     return (
@@ -223,22 +216,6 @@ const MobileDrawer = React.memo(() => {
                               {item.subtitle}
                             </div>
                           </div>
-
-                          {/* Expand/collapse button for items with submenus */}
-                          {hasSubItems && (
-                            <button
-                              onClick={handleToggleClick}
-                              className="sidebar-expand-button"
-                              aria-label={expandedForges[item.to] ? 'Réduire le menu' : 'Développer le menu'}
-                              type="button"
-                            >
-                              <SpatialIcon
-                                Icon={ChevronIcon}
-                                size={16}
-                                className={`sidebar-expand-icon ${expandedForges[item.to] ? 'sidebar-expand-icon--expanded' : ''}`}
-                              />
-                            </button>
-                          )}
                         </Link>
 
                         {/* Sub-items menu */}
