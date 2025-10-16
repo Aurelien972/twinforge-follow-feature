@@ -73,7 +73,7 @@ export function navFor(): NavSection[] {
           subtitle: 'Avatar 3D',
           isTwin: true,
           circuitColor: '#8B5CF6', // Violet
-          tabs: ['Scanner Corporel', 'Avatar', 'Projection', 'Insights', 'Historique']
+          tabs: ['Scanner', 'Avatar', 'Projection', 'Insights', 'Historique']
         },
       ],
     },
