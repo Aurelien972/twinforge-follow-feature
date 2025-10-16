@@ -174,11 +174,27 @@
   backdrop-filter: blur(4px);
 }
 
-/* Category titles with subtle glass effect */
-.central-actions-panel h3 {
+/* Section titles with glass effect */
+.central-actions-panel h4 {
   position: relative;
-  padding-bottom: 2px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  padding-bottom: 4px;
+}
+
+.central-actions-panel h4::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.2) 80%,
+    transparent 100%
+  );
 }
 
 /* Enhanced tile glass cards */
@@ -315,35 +331,8 @@
 }
 
 /* Pill active state */
-.central-actions-panel button[class*="rounded-xl"]:active:not(:disabled) {
+.central-actions-panel button[class*="rounded-xl"]:active {
   transform: scale(0.96) translateZ(0);
-}
-
-/* Coming Soon pill styles */
-.central-actions-panel button[class*="rounded-xl"]:disabled {
-  pointer-events: none;
-  user-select: none;
-  filter: grayscale(0.2);
-}
-
-.central-actions-panel button[class*="rounded-xl"]:disabled:hover {
-  transform: none !important;
-}
-
-/* Coming Soon badge animation */
-@keyframes comingSoonPulse {
-  0%, 100% {
-    opacity: 0.8;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-}
-
-.central-actions-panel button[class*="rounded-xl"]:disabled > div[class*="absolute"] {
-  animation: comingSoonPulse 2s ease-in-out infinite;
 }
 
 /* Pill icon container enhancement - FIXED: no white overflow */
@@ -474,6 +463,12 @@
   /* Titres de catégories H3 compacts */
   .central-actions-panel h3 {
     font-size: 10px !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* Titres de sections H4 compacts */
+  .central-actions-panel h4 {
+    font-size: 8px !important;
     margin-bottom: 4px !important;
   }
 
