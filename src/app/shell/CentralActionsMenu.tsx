@@ -164,12 +164,14 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
         key={action.id}
         onClick={(e) => handleActionClick(action, false, e)}
         disabled={isComingSoon}
-        className="glass-card rounded-xl px-2 py-1.5 flex items-center gap-1.5 w-full relative"
+        className="glass-card rounded-xl px-2 py-1.5 flex items-center gap-1.5 w-full"
         style={{
           // Variable CSS pour la couleur de circuit dynamique
           '--pill-circuit-color': action.color || '#18E3FF',
           opacity: isComingSoon ? 0.5 : 1,
-          cursor: isComingSoon ? 'not-allowed' : 'pointer'
+          cursor: isComingSoon ? 'not-allowed' : 'pointer',
+          position: 'relative',
+          isolation: 'isolate'
         } as React.CSSProperties}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: isComingSoon ? 0.5 : 1, y: 0 }}
@@ -181,8 +183,33 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
         aria-disabled={isComingSoon}
       >
         {/* Icon container harmonisé - géré par CSS avec --pill-circuit-color */}
-        <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0" style={{ position: 'relative' }}>
           <SpatialIcon Icon={ICONS[action.icon]} size={13} />
+          {isComingSoon && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '-6px',
+                right: '-6px',
+                width: '16px',
+                height: '16px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, rgba(251, 146, 60, 0.95), rgba(251, 113, 133, 0.95))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '7px',
+                fontWeight: 'bold',
+                color: 'white',
+                boxShadow: '0 2px 8px rgba(251, 146, 60, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                zIndex: 20,
+                pointerEvents: 'none',
+                border: '1.5px solid rgba(255, 255, 255, 0.4)'
+              }}
+            >
+              S
+            </div>
+          )}
         </div>
         <div className="flex-1 min-w-0 text-left">
           <div className="text-[11px] font-semibold text-white leading-tight break-words">
@@ -194,19 +221,6 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
             </div>
           )}
         </div>
-        {isComingSoon && (
-          <div
-            className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold z-10"
-            style={{
-              background: 'linear-gradient(135deg, rgba(251, 146, 60, 0.9), rgba(251, 113, 133, 0.9))',
-              color: 'white',
-              boxShadow: '0 2px 8px rgba(251, 146, 60, 0.4)',
-              pointerEvents: 'none'
-            }}
-          >
-            SOON
-          </div>
-        )}
       </motion.button>
     );
   };
@@ -304,11 +318,12 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
             >
             {/* HEADER */}
             <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-3">
                 <div
-                  className="h-[2px] w-12 rounded-full"
+                  className="h-[3px] w-1 rounded-full"
                   style={{
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.5) 20%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.5) 80%, transparent 100%)',
+                    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
+                    boxShadow: '0 0 8px rgba(255, 255, 255, 0.5)'
                   }}
                   aria-hidden
                 />

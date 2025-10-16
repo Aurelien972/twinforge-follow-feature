@@ -268,15 +268,6 @@
     transform var(--liquid-transition-medium);
 }
 
-/* Badge SOON - Positionné correctement par rapport au bouton pill */
-.central-actions-panel .glass-card > .absolute.-top-1.-right-1 {
-  position: absolute !important;
-  top: -4px !important;
-  right: -4px !important;
-  z-index: 10 !important;
-  pointer-events: none !important;
-}
-
 /* Icon container dans les pills - système harmonisé */
 .central-actions-panel .glass-card .w-6.h-6 {
   width: 32px !important;
