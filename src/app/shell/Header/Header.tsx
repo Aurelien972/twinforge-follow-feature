@@ -6,11 +6,9 @@ import { ICONS } from '../../../ui/icons/registry';
 import { useShell } from '../../../ui/shell/useShell';
 import MobileDrawer from '../../../ui/shell/MobileDrawer';
 import { HeaderLogo } from './HeaderLogo';
-import { HeaderActions } from './HeaderActions';
 import { useFeedback } from '../../../hooks';
 import { BackButton } from '../../../ui/buttons';
 import { useOverlayStore } from '../../../system/store/overlayStore';
-import UserPanel from '../UserPanel';
 import CentralActionsMenu from '../CentralActionsMenu';
 
 export const Header = React.memo(() => {
@@ -18,7 +16,6 @@ export const Header = React.memo(() => {
   const { click } = useFeedback();
   const { isOpen, toggle } = useOverlayStore();
   const centralMenuOpen = isOpen('centralMenu');
-  const userPanelOpen = isOpen('userPanel');
 
   return (
     <>
@@ -143,11 +140,6 @@ export const Header = React.memo(() => {
               />
             </motion.button>
 
-            {/* Profil (desktop uniquement) */}
-            <div className="hidden lg:block">
-              <HeaderActions />
-            </div>
-
             {/* Bouton Hamburger - Menu de navigation */}
             <motion.button
               type="button"
@@ -240,7 +232,6 @@ export const Header = React.memo(() => {
 
       <MobileDrawer />
       <CentralActionsMenu isOpen={centralMenuOpen} onClose={() => {}} />
-      <UserPanel isOpen={userPanelOpen} />
     </>
   );
 });
