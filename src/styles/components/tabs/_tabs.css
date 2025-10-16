@@ -287,10 +287,7 @@
       var(--liquid-pill-bg);
     color:#fff;
     transform:scale(1.04) translateZ(0);
-    box-shadow:
-      var(--liquid-pill-shadow),
-      0 0 20px rgba(255,255,255,0.15),
-      0 4px 16px rgba(0,0,0,0.2);
+    box-shadow: var(--liquid-pill-shadow);
     border-color: rgba(255,255,255,0.3);
   }
 }
@@ -312,8 +309,6 @@
 
   box-shadow:
     var(--liquid-pill-shadow),
-    0 0 24px color-mix(in srgb, var(--button-color, var(--color-plasma-cyan)) 35%, transparent),
-    0 0 48px color-mix(in srgb, var(--button-color, var(--color-plasma-cyan)) 20%, transparent),
     inset 0 1px 0 rgba(255,255,255,0.3);
 
   transform: scale(1.04) translateZ(0);
@@ -324,15 +319,11 @@
   0%, 100% {
     box-shadow:
       var(--liquid-pill-shadow),
-      0 0 24px color-mix(in srgb, var(--button-color, var(--color-plasma-cyan)) 35%, transparent),
-      0 0 48px color-mix(in srgb, var(--button-color, var(--color-plasma-cyan)) 20%, transparent),
       inset 0 1px 0 rgba(255,255,255,0.3);
   }
   50% {
     box-shadow:
       var(--liquid-pill-shadow),
-      0 0 32px color-mix(in srgb, var(--button-color, var(--color-plasma-cyan)) 45%, transparent),
-      0 0 64px color-mix(in srgb, var(--button-color, var(--color-plasma-cyan)) 30%, transparent),
       inset 0 1px 0 rgba(255,255,255,0.35);
   }
 }
@@ -373,23 +364,7 @@
 .tabs-trigger:focus-visible{
   outline:3px solid rgba(24, 227, 255, 0.6);
   outline-offset:3px;
-  box-shadow:
-    var(--liquid-pill-shadow),
-    0 0 0 4px rgba(24, 227, 255, 0.3);
-  animation: focusGlow 1.5s ease-in-out infinite;
-}
-
-@keyframes focusGlow {
-  0%, 100% {
-    box-shadow:
-      var(--liquid-pill-shadow),
-      0 0 0 4px rgba(24, 227, 255, 0.3);
-  }
-  50% {
-    box-shadow:
-      var(--liquid-pill-shadow),
-      0 0 0 6px rgba(24, 227, 255, 0.5);
-  }
+  box-shadow: var(--liquid-pill-shadow);
 }
 
 /* High contrast mode support */
