@@ -50,8 +50,8 @@ export function navFor(): NavSection[] {
         {
           to: '/',
           icon: 'Home',
-          label: 'Tableau de Bord',
-          subtitle: 'Vue d\'ensemble',
+          label: 'Coeur de la Forge',
+          subtitle: 'Tableau de Bord',
           isPrimary: true,
           circuitColor: '#F7931E', // Logo Orange - primary brand color
           actionLabel: undefined // No action badge for dashboard
