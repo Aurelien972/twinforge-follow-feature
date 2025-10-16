@@ -94,7 +94,7 @@ export function navFor(): NavSection[] {
           subtitle: 'Scanner de Repas',
           isForge: true,
           circuitColor: '#10B981', // Vert
-          tabs: ['Scanner', 'Insights', 'Progression', 'Historique'],
+          tabs: ['Scanner de Repas', 'Insights', 'Progression', 'Historique'],
           subItems: [
             {
               to: '/meals#daily',
