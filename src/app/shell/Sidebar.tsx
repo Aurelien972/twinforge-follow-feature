@@ -170,7 +170,7 @@ const NavItem = React.memo(({
           </button>
         )}
 
-        {/* Badge d'action pour les forges sans sous-menus */}
+        {/* Badge d'action uniquement pour les forges sans sous-menus */}
         {isForge && actionLabel && !hasSubItems && (
           <div
             className={`sidebar-item-action-badge ${isActive ? 'sidebar-item-action-badge--active' : ''}`}
