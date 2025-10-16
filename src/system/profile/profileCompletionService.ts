@@ -306,7 +306,17 @@ export function getFeatureSpecificGuidance(
  */
 export function hasMinimumDataForRecipeWorkshop(profile: UserProfile | null): boolean {
   if (!profile) return false;
-  
+
   // Absolute minimum: at least basic identity info
   return !!(profile.sex && profile.weight_kg && profile.height_cm);
 }
+
+/**
+ * Profile Completion Service Object
+ * Convenient wrapper for all profile completion functions
+ */
+export const profileCompletionService = {
+  checkCompleteness: calculateRecipeWorkshopCompletion,
+  getFeatureGuidance: getFeatureSpecificGuidance,
+  hasMinimumData: hasMinimumDataForRecipeWorkshop
+};
