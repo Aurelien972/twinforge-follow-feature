@@ -9,18 +9,29 @@ import { useUserStore } from '../../system/store/userStore';
 import { getCircuitColor } from '../theme/circuits';
 import { navFor } from '../../app/shell/navigation';
 
-const Section = React.memo(({ title, children }: { title: string; children: React.ReactNode }) => (
-  <div>
-    {title && (
-      <h3 className="sidebar-section-title text-white/50 text-xs uppercase tracking-wider font-semibold mb-1 px-1">
-        {title}
-      </h3>
-    )}
-    <div className="space-y-0.5">
-      {children}
+const Section = React.memo(({ title, children, type }: { title: string; children: React.ReactNode; type?: 'primary' | 'twin' | 'forge-category' }) => {
+  const shouldHaveTopSpace = type === 'forge-category';
+  const isFoodCategory = title === 'Alimentation';
+
+  return (
+    <div className={shouldHaveTopSpace ? 'mt-4' : ''}>
+      {title && (
+        <>
+          {/* Séparateur visuel avant Alimentation */}
+          {isFoodCategory && (
+            <div className="sidebar-category-separator" />
+          )}
+          <h3 className="sidebar-section-title text-white/50 text-xs uppercase tracking-wider font-semibold mb-1 px-1">
+            {title}
+          </h3>
+        </>
+      )}
+      <div className="space-y-0.5">
+        {children}
+      </div>
     </div>
-  </div>
-));
+  );
+});
 Section.displayName = 'Section';
 
 const MobileDrawer = React.memo(() => {
@@ -145,7 +156,7 @@ const MobileDrawer = React.memo(() => {
               {/* Navigation Sections */}
               {navSections.map((section, index) => (
                 <React.Fragment key={index}>
-                  <Section title={section.title}>
+                  <Section title={section.title} type={section.type}>
                     {section.items.map((item) => {
                     const hasSubItems = item.subItems && item.subItems.length > 0;
 
@@ -274,11 +285,6 @@ const MobileDrawer = React.memo(() => {
                   {/* Séparateur après le Tableau de Bord (section primaire) */}
                   {section.type === 'primary' && (
                     <div className="sidebar-primary-separator" aria-hidden="true" />
-                  )}
-
-                  {/* Séparateur avant les catégories de forges (sauf la dernière) */}
-                  {section.type === 'forge-category' && index < navSections.length - 1 && (
-                    <div className="sidebar-category-separator" aria-hidden="true" />
                   )}
                 </React.Fragment>
               ))}
