@@ -29,9 +29,6 @@ const AvatarPage = lazy(() => import('./app/pages/Avatar/AvatarPage'));
 const BodyScan = lazy(() => import('./app/pages/BodyScan'));
 const BodyScanCelebrationWithHeader = lazy(() => import('./app/pages/BodyScan/BodyScanCelebrationWithHeader'));
 const BodyScanReviewWithHeader = lazy(() => import('./app/pages/BodyScan/BodyScanReviewWithHeader'));
-const FaceScanPage = lazy(() => import('./app/pages/FaceScanPage'));
-const FaceScanCelebrationWithHeader = lazy(() => import('./app/pages/FaceScan/FaceScanCelebrationWithHeader'));
-const FaceScanReviewWithHeader = lazy(() => import('./app/pages/FaceScan/FaceScanReviewWithHeader'));
 const ActivityInputPage = lazy(() => import('./app/pages/Activity/ActivityInputPage'));
 const FastingInputPage = lazy(() => import('./app/pages/Fasting/FastingInputPage'));
 const FridgeScanPage = lazy(() => import('./app/pages/FridgeScanPage'));
@@ -184,18 +181,6 @@ const router = createBrowserRouter([
       {
         path: "body-scan/review",
         element: <Suspense fallback={<LoadingFallback />}><BodyScanReviewWithHeader /></Suspense>
-      },
-      {
-        path: "face-scan",
-        element: <Suspense fallback={<LoadingFallback />}><FaceScanPage /></Suspense>
-      },
-      {
-        path: "face-scan/celebration",
-        element: <Suspense fallback={<LoadingFallback />}><FaceScanCelebrationWithHeader /></Suspense>
-      },
-      {
-        path: "face-scan/review-face",
-        element: <Suspense fallback={<LoadingFallback />}><FaceScanReviewWithHeader /></Suspense>
       },
       {
         path: "vital",

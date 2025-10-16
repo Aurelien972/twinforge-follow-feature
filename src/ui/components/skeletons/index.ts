@@ -56,7 +56,6 @@ export { default as CurrentGoalCardSkeleton } from './training/CurrentGoalCardSk
 export { default as QuickHistoryCardSkeleton } from './training/QuickHistoryCardSkeleton';
 export { default as HeroTrainingCTASkeleton } from './training/HeroTrainingCTASkeleton';
 
-export { default as FaceViewer3DSkeleton } from './FaceViewer3DSkeleton';
 export { default as ProfileTabSkeleton } from './ProfileTabSkeleton';
 export { default as AvatarTabSkeleton } from './AvatarTabSkeleton';
 export { default as ProjectionTabSkeleton } from './ProjectionTabSkeleton';
