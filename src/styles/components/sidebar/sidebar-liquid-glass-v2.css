@@ -319,6 +319,7 @@
 
 /* ==========================================
    NIVEAU 1: Primary Navigation (Tableau de Bord)
+   Premium glassmorphism avec gradient orange/copper
    Responsive et optimisé pour mobile et desktop
    ========================================== */
 .sidebar-item--primary {
@@ -329,30 +330,42 @@
   border: none;
   position: relative;
   overflow: visible;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-/* Gros bouton englobant tout le contenu - responsive */
+/* Premium glass container with orange/copper gradient - matches screenshot */
 .sidebar-item--primary::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 16px;
   padding: 1.5px;
+  /* Multi-layer gradient for depth - orange to copper */
   background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28) 0%, transparent 60%),
-    radial-gradient(circle at 70% 70%, rgba(247, 147, 30, 0.20) 0%, transparent 70%),
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.32) 0%, transparent 55%),
+    radial-gradient(circle at 70% 70%, rgba(247, 147, 30, 0.25) 0%, transparent 65%),
     linear-gradient(135deg,
-      rgba(255, 107, 53, 0.30),
-      rgba(253, 200, 48, 0.18));
-  border: 1.5px solid rgba(247, 147, 30, 0.50);
+      rgba(255, 107, 53, 0.35),
+      rgba(247, 147, 30, 0.25),
+      rgba(253, 200, 48, 0.20));
+  border: 1.5px solid rgba(247, 147, 30, 0.55);
+  /* Enhanced shadow with orange glow */
   box-shadow:
     var(--liquid-pill-shadow),
-    0 0 24px rgba(247, 147, 30, 0.30),
-    0 0 48px rgba(253, 200, 48, 0.18),
-    inset 0 1px 0 rgba(255,255,255,0.3);
-  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    0 0 28px rgba(247, 147, 30, 0.35),
+    0 0 56px rgba(253, 200, 48, 0.22),
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    inset 0 -1px 0 rgba(247, 147, 30, 0.15);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 0;
   pointer-events: none;
+  /* Hardware acceleration */
+  transform: translateZ(0);
+  will-change: transform, box-shadow, border-color;
+  backface-visibility: hidden;
 }
 
 .sidebar-item--primary > * {
@@ -364,32 +377,63 @@
 .sidebar-item--primary .sidebar-item-icon-container {
   width: 44px;
   height: 44px;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
+  border-radius: 12px;
+  /* Premium glass effect for icon container */
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255,255,255,0.35) 0%, transparent 50%),
+    radial-gradient(circle at 65% 65%, rgba(247, 147, 30, 0.22) 0%, transparent 60%),
+    linear-gradient(135deg,
+      rgba(255, 107, 53, 0.25),
+      rgba(247, 147, 30, 0.18));
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 2px 8px rgba(247, 147, 30, 0.25),
+    0 0 16px rgba(253, 200, 48, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
   flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
 }
 
+/* Enhanced hover interactions */
 @media (hover: hover) and (pointer: fine) {
   .sidebar-item--primary:hover::before {
-    transform: scale(1.02) translateY(-2px) translateZ(0);
-    border-color: rgba(247, 147, 30, 0.65);
+    transform: scale(1.025) translateY(-3px) translateZ(0);
+    border-color: rgba(247, 147, 30, 0.70);
     box-shadow:
       var(--liquid-pill-shadow),
-      0 0 30px rgba(247, 147, 30, 0.40),
-      0 0 60px rgba(253, 200, 48, 0.25),
-      0 6px 24px rgba(0,0,0,0.3),
-      inset 0 1px 0 rgba(255,255,255,0.35);
+      0 0 36px rgba(247, 147, 30, 0.45),
+      0 0 72px rgba(253, 200, 48, 0.30),
+      0 8px 32px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.40),
+      inset 0 -1px 0 rgba(247, 147, 30, 0.20);
   }
 
   .sidebar-item--primary:hover .sidebar-item-icon-container {
-    transform: scale(1.05) translateZ(0);
+    transform: scale(1.08) translateZ(0);
+    box-shadow:
+      0 3px 12px rgba(247, 147, 30, 0.35),
+      0 0 24px rgba(253, 200, 48, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.35);
   }
+
+  .sidebar-item--primary:hover .sidebar-item-icon {
+    filter: drop-shadow(0 0 12px rgba(253, 200, 48, 0.80)) !important;
+  }
+}
+
+/* Active/Tap state */
+.sidebar-item--primary:active::before {
+  transform: scale(0.98) translateZ(0);
+  transition-duration: 0.1s;
 }
 
 .sidebar-item--primary .sidebar-item-icon {
   color: #FDC830 !important;
-  filter: drop-shadow(0 0 8px rgba(253, 200, 48, 0.60)) !important;
+  filter: drop-shadow(0 0 10px rgba(253, 200, 48, 0.70)) drop-shadow(0 0 20px rgba(247, 147, 30, 0.40)) !important;
+  transition: filter 0.3s ease;
 }
 
 .sidebar-item--primary .sidebar-item-label {
@@ -397,11 +441,16 @@
   font-weight: 700 !important;
   font-size: 0.9375rem !important;
   line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .sidebar-item--primary .sidebar-item-subtitle {
   font-size: 0.6875rem !important;
   line-height: 1.3;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
 /* Séparateur sous le Tableau de Bord */
@@ -528,6 +577,12 @@
   box-shadow: 0 0 16px color-mix(in srgb, var(--item-circuit-color) 20%, transparent);
 }
 
+/* Touch target optimization for accessibility */
+.sidebar-item--primary {
+  /* Ensure minimum 44x44px touch target on mobile */
+  min-height: max(68px, 44px);
+}
+
 /* Responsive adjustments - CORRECTIONS MOBILES */
 @media (max-width: 1024px) {
   .sidebar-content {
@@ -556,7 +611,9 @@
   }
 
   .sidebar-item--primary {
-    min-height: 62px;
+    min-height: max(62px, 44px);
+    /* Increase touch target on mobile */
+    margin-bottom: 0.5rem;
   }
 
   .sidebar-item--primary > * {
@@ -566,14 +623,24 @@
   .sidebar-item--primary .sidebar-item-icon-container {
     width: 40px;
     height: 40px;
+    /* Maintain visual quality on mobile */
+    box-shadow:
+      0 2px 6px rgba(247, 147, 30, 0.22),
+      0 0 12px rgba(253, 200, 48, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
   }
 
   .sidebar-item--primary .sidebar-item-label {
     font-size: 0.875rem !important;
+    /* Maintain readability on mobile */
+    letter-spacing: -0.008em;
   }
 
   .sidebar-item--primary .sidebar-item-subtitle {
     font-size: 0.625rem !important;
+    /* Ensure subtitle remains visible on mobile */
+    letter-spacing: 0.012em;
+    opacity: 0.95;
   }
 
   .sidebar-item--twin {
@@ -908,6 +975,21 @@
   .sidebar-item[aria-current="page"] {
     background: rgba(24, 227, 255, 0.2) !important;
     border-width: 3px !important;
+  }
+
+  /* Dashboard button high contrast */
+  .sidebar-item--primary::before {
+    border: 3px solid rgba(247, 147, 30, 0.9) !important;
+    background: rgba(247, 147, 30, 0.25) !important;
+  }
+
+  .sidebar-item--primary .sidebar-item-icon-container {
+    border: 2px solid rgba(253, 200, 48, 0.8) !important;
+    background: rgba(247, 147, 30, 0.3) !important;
+  }
+
+  .sidebar-item--primary .sidebar-item-label {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
   }
 
   .sidebar-submenu-item {

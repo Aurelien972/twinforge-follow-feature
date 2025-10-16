@@ -120,6 +120,8 @@ const NavItem = React.memo(({
         }}
         aria-current={isActive ? 'page' : undefined}
         aria-expanded={hasSubItems ? isExpanded : undefined}
+        aria-label={`${label} - ${subtitle}`}
+        role={isPrimary ? 'link' : 'menuitem'}
         style={{ '--item-circuit-color': itemColor } as React.CSSProperties}
       >
         {/* Icon container with glass pill effect */}

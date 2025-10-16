@@ -33,13 +33,13 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
     actions: [
       {
         id: 'home',
-        label: 'Cœur de la Forge',
-        subtitle: 'Retour au tableau de bord principal',
+        label: 'Tableau de Bord',
+        subtitle: 'Vue d\'ensemble TwinForge',
         icon: 'Home',
         route: '/',
-        color: '#EF4444', // Rouge pour le home
+        color: '#F7931E', // Orange brand color matching sidebar
         available: true,
-        description: 'Retourner au tableau de bord'
+        description: 'Retourner au tableau de bord principal'
       }
     ]
   },

@@ -348,10 +348,33 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
               {homeAction && (
                 <button
                   onClick={(e) => handleActionClick(homeAction, false, e)}
-                  className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1.5 border border-cyan-300/25"
+                  className="glass-card rounded-full px-3 py-1.5 flex items-center gap-1.5"
+                  style={{
+                    background: `
+                      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18) 0%, transparent 60%),
+                      radial-gradient(circle at 70% 70%, rgba(247, 147, 30, 0.15) 0%, transparent 65%),
+                      var(--liquid-pill-bg)
+                    `,
+                    border: '1px solid rgba(247, 147, 30, 0.35)',
+                    boxShadow: `
+                      0 2px 8px rgba(247, 147, 30, 0.15),
+                      0 0 16px rgba(247, 147, 30, 0.08),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.15)
+                    `
+                  }}
                 >
-                  <SpatialIcon Icon={ICONS.Home} size={14} className="text-white/90" />
-                  <span className="text-[11px] text-white/85 font-medium">Accueil</span>
+                  <SpatialIcon
+                    Icon={ICONS.Home}
+                    size={14}
+                    style={{
+                      color: '#FDC830',
+                      filter: 'drop-shadow(0 0 4px rgba(253, 200, 48, 0.5))'
+                    }}
+                  />
+                  <span className="text-[11px] font-semibold" style={{
+                    color: 'rgba(255, 255, 255, 0.95)',
+                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+                  }}>Tableau de Bord</span>
                 </button>
               )}
             </div>

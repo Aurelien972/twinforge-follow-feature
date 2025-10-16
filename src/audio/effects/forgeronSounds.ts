@@ -143,26 +143,32 @@ export function panelClose() {
 }
 
 /**
- * Home Button - Return to home
- * Special red color with warm, central frequency
+ * Home Button - Return to dashboard
+ * Warm, welcoming orange/copper tones with rich harmonics
  */
 export function homeClick() {
   const soundDef: SoundDefinition = {
     layers: [
       {
-        frequency: addPitchVariance(261.63),
+        frequency: addPitchVariance(261.63), // C4 - warm fundamental
         waveform: 'sine',
-        adsr: { attack: 0.01, decay: 0.15, sustain: 0.3, release: 0.25 },
-        gain: 0.3
+        adsr: { attack: 0.008, decay: 0.15, sustain: 0.32, release: 0.28 },
+        gain: 0.35
       },
       {
-        frequency: addPitchVariance(523.25),
+        frequency: addPitchVariance(329.63), // E4 - harmonic warmth
         waveform: 'sine',
-        adsr: { attack: 0.015, decay: 0.18, sustain: 0.25, release: 0.3 },
-        gain: 0.2
+        adsr: { attack: 0.012, decay: 0.18, sustain: 0.28, release: 0.32 },
+        gain: 0.28
+      },
+      {
+        frequency: addPitchVariance(523.25), // C5 - bright overtone
+        waveform: 'sine',
+        adsr: { attack: 0.015, decay: 0.2, sustain: 0.25, release: 0.35 },
+        gain: 0.22
       }
     ],
-    masterGain: 1.1
+    masterGain: 1.15
   };
 
   playForgeronSound(soundDef, 'navigation', 'home-click');
@@ -280,7 +286,9 @@ function getFrequencyFromColor(color: string): number {
     '#EC4899': 466.16, // A#4
     // Violet
     '#8B5CF6': 493.88, // B4
-    // Red (home)
+    // Orange (home/dashboard)
+    '#F7931E': 329.63, // E4
+    // Red
     '#EF4444': 261.63, // C4
   };
 
