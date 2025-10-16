@@ -78,12 +78,11 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
       <div style={{
         position: 'relative',
         display: 'flex',
-        alignItems: 'center',
-        height: '42px'
+        alignItems: 'center'
       }}>
         <ForgeHammerIcon
-          width={36}
-          height={42}
+          width={42}
+          height={50}
           isHovered={isHovered}
         />
       </div>
