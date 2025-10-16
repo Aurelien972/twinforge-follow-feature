@@ -219,8 +219,9 @@ export function useFastingHistory(
       };
     },
     enabled: !!userId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes (increased from 2)
     retry: 1,
+    refetchOnWindowFocus: false, // Don't refetch on window focus to reduce API calls
   });
 }
 

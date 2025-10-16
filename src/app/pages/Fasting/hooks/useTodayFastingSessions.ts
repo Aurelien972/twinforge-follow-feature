@@ -141,7 +141,8 @@ export function useTodayFastingSessions() {
       };
     },
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchInterval: 60 * 1000, // Refetch every minute for real-time updates
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes (reduced from 1 minute)
+    refetchOnWindowFocus: true, // Refetch when window gains focus
   });
 }

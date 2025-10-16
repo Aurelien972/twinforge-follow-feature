@@ -1,19 +1,12 @@
-import React, { useState, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useBlocker, useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import { useFeedback } from '@/hooks/useFeedback';
-import { useToast } from '@/ui/components/ToastProvider';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '@/system/store/userStore';
-import { useExitModalStore } from '@/system/store/exitModalStore';
 import { useFastingProgressionData } from '../../hooks/useFastingProgressionData';
-import { getFastingFeatureFlags } from '@/config/featureFlags';
 import { useTodayFastingSessions } from '../../hooks/useTodayFastingSessions';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import FastingPeriodSelector from '../Shared/FastingPeriodSelector';
-import FastingDataCompletenessAlert from '../Shared/FastingDataCompletenessAlert';
 import FastingProgressionLoadingSkeleton from '../Progression/FastingProgressionLoadingSkeleton';
 import FastingProgressionSummaryCard from '../Progression/FastingProgressionSummaryCard';
 import FastingConsistencyChart from '../Progression/FastingConsistencyChart';
@@ -40,7 +33,6 @@ const FastingProgressionTab: React.FC = () => {
   const { profile, session } = useUserStore();
   const navigate = useNavigate();
   const [selectedPeriod, setSelectedPeriod] = useState(7);
-  const [showDataAlert, setShowDataAlert] = useState(true);
   
   // Get total sessions count for period selector
   const { data: todayData } = useTodayFastingSessions();
@@ -52,18 +44,6 @@ const FastingProgressionTab: React.FC = () => {
     error
   } = useFastingProgressionData(selectedPeriod);
   
-  // Check data completeness for AI analysis
-  const missingData = useMemo(() => {
-    const missing: string[] = [];
-    
-    if (!profile?.weight_kg) missing.push('Poids corporel');
-    if (!profile?.height_cm) missing.push('Taille');
-    if (!profile?.objective) missing.push('Objectif de santé');
-    
-    return missing;
-  }, [profile]);
-  
-  const shouldShowDataAlert = missingData.length > 0 && showDataAlert;
   
   // Calculate available sessions count for the selected period
   const availableSessionsCount = progressionData?.metrics?.totalSessions || 0;
@@ -77,17 +57,6 @@ const FastingProgressionTab: React.FC = () => {
         availableSessionsCount={availableSessionsCount}
         getMinSessionsForPeriod={getProgressionMinSessions}
       />
-      
-      {/* Data Completeness Alert */}
-      <AnimatePresence>
-        {shouldShowDataAlert && (
-          <FastingDataCompletenessAlert
-            missingData={missingData}
-            analysisType="analyse de progression IA"
-            onDismiss={() => setShowDataAlert(false)}
-          />
-        )}
-      </AnimatePresence>
       
       {/* Loading State */}
       {isLoading && (

@@ -181,7 +181,7 @@ const FastingPage: React.FC = () => {
       />
 
       <Tabs
-        defaultValue="daily"
+        defaultValue={activeTab}
         className="w-full min-w-0 fasting-tabs"
         onValueChange={handleTabChange}
         forgeContext="fasting"

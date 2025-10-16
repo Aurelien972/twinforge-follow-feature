@@ -1,7 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useBlocker, useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import { useQueryClient } from '@tanstack/react-query';
 import { useFastingInsightsGenerator } from '../../hooks/useFastingInsightsGenerator';
 import { useUserStore } from '@/system/store/userStore';
 import { useExitModalStore } from '@/system/store/exitModalStore';
@@ -11,7 +9,6 @@ import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import GlassCard from '@/ui/cards/GlassCard';
 import FastingPeriodSelector from '../Shared/FastingPeriodSelector';
-import FastingDataCompletenessAlert from '../Shared/FastingDataCompletenessAlert';
 import FastingInsightsLoadingSkeleton from '../Insights/FastingInsightsLoadingSkeleton';
 import FastingInsightsSummaryCard from '../Insights/FastingInsightsSummaryCard';
 import FastingInsightCard from '../Insights/FastingInsightCard';
@@ -38,7 +35,6 @@ const FastingInsightsTab: React.FC = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [selectedPeriod, setSelectedPeriod] = useState(7);
-  const [showDataAlert, setShowDataAlert] = useState(true);
   
   // Get available sessions count for the selected period
   const { data: historyData } = useFastingHistory(100, {
@@ -84,30 +80,6 @@ const FastingInsightsTab: React.FC = () => {
     }
   }, [blocker, showExitModal]);
 
-  // Check if we should show data completeness alert
-  const shouldShowDataAlert = showDataAlert && (
-    !profile?.weight_kg || 
-    !profile?.height_cm || 
-    !profile?.objective || 
-    !profile?.activity_level ||
-    (insightsData?.dataQuality === 'insufficient') ||
-    (insightsData?.missingData && insightsData.missingData.length > 0)
-  );
-  
-  const missingData = [];
-  if (!profile?.weight_kg) missingData.push('Poids corporel');
-  if (!profile?.height_cm) missingData.push('Taille');
-  if (!profile?.objective) missingData.push('Objectif fitness');
-  if (!profile?.activity_level) missingData.push('Niveau d\'activité');
-  if (!profile?.emotions?.chronotype) missingData.push('Chronotype (onglet Émotions)');
-  if (insightsData?.missingData) {
-    // Add unique missing data from AI response
-    insightsData.missingData.forEach(item => {
-      if (!missingData.includes(item)) {
-        missingData.push(item);
-      }
-    });
-  }
 
   return (
     <div className="space-y-6">
@@ -118,17 +90,6 @@ const FastingInsightsTab: React.FC = () => {
         availableSessionsCount={availableSessionsCount}
         getMinSessionsForPeriod={getInsightsMinSessions}
       />
-      
-      {/* Data Completeness Alert */}
-      <AnimatePresence>
-        {shouldShowDataAlert && (
-          <FastingDataCompletenessAlert
-            missingData={missingData}
-            analysisType="insights IA"
-            onDismiss={() => setShowDataAlert(false)}
-          />
-        )}
-      </AnimatePresence>
       
       {/* Loading State */}
       {isLoading && (

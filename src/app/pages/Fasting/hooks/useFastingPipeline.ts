@@ -184,22 +184,40 @@ export const useFastingPipeline = create<FastingPipelineState>()(
             timestamp: new Date().toISOString()
           });
 
-          // TODO: Implémenter la sauvegarde en base de données
-          // const { supabase } = await import('../../../system/supabase/client');
-          // await supabase.from('fasting_sessions').insert(sessionData);
+          // Import supabase client
+          const { supabase } = await import('../../../../system/supabase/client');
 
-          // Invalider les caches pour les données de jeûne
-          const queryClient = useQueryClient.getState ? useQueryClient.getState() : null;
-          if (queryClient) {
-            queryClient.invalidateQueries({
-              queryKey: ['fasting', 'daily', state.session.userId]
-            });
-            queryClient.invalidateQueries({
-              queryKey: ['fasting', 'history', state.session.userId]
-            });
+          // Prepare session data for database insertion
+          const sessionData = {
+            user_id: state.session.userId,
+            start_time: new Date(state.session.startTime).toISOString(),
+            end_time: state.session.endTime ? new Date(state.session.endTime).toISOString() : null,
+            target_hours: state.session.targetHours,
+            actual_duration_hours: state.session.actualDurationHours || null,
+            protocol_id: state.session.protocol || null,
+            status: state.session.status,
+            notes: state.session.notes || null
+          };
+
+          // Insert session into database
+          const { data, error } = await supabase
+            .from('fasting_sessions')
+            .insert([sessionData])
+            .select()
+            .single();
+
+          if (error) {
+            throw new Error(`Database insertion failed: ${error.message}`);
           }
 
-          // Reset pipeline state
+          logger.info('FASTING_PIPELINE', 'Session successfully saved to database', {
+            userId: state.session.userId,
+            sessionId: data?.id,
+            actualDurationHours: state.session.actualDurationHours,
+            timestamp: new Date().toISOString()
+          });
+
+          // Reset pipeline state AFTER successful save
           set({
             currentStep: 'setup',
             isActive: false,
