@@ -175,7 +175,7 @@
 /* Séparateur visuel pour les catégories */
 .sidebar-category-separator {
   height: 1px;
-  margin: 0.625rem 0.125rem 0.5rem 0.125rem;
+  margin: 0.75rem 0.125rem 0.625rem 0.125rem;
   background: linear-gradient(
     90deg,
     transparent 0%,
@@ -398,7 +398,7 @@
 /* Séparateur sous le Tableau de Bord */
 .sidebar-primary-separator {
   height: 1px;
-  margin: 0.25rem 0.125rem 0.5rem 0.125rem;
+  margin: 0.625rem 0.125rem 0.75rem 0.125rem;
   background: linear-gradient(
     90deg,
     transparent 0%,

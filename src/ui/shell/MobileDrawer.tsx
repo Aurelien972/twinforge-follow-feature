@@ -233,6 +233,9 @@ const MobileDrawer = React.memo(() => {
                                 const currentHash = location.hash.replace('#', '') || 'daily';
                                 const isSubActive = currentPath === subPath && (!subHash || currentHash === subHash);
 
+                                // Le bouton primaire (Scanner/Tracker) est toujours lumineux si on est sur cette page
+                                const isPrimaryAndPageActive = subItem.isPrimarySubMenu && currentPath === subPath;
+
                                 return (
                                   <Link
                                     key={subItem.to}
@@ -240,14 +243,14 @@ const MobileDrawer = React.memo(() => {
                                     className={`
                                       sidebar-submenu-item
                                       ${subItem.isPrimarySubMenu ? 'sidebar-submenu-item--primary' : 'sidebar-submenu-item--secondary'}
-                                      ${isSubActive ? 'sidebar-submenu-item--active' : ''}
+                                      ${isSubActive || isPrimaryAndPageActive ? 'sidebar-submenu-item--active' : ''}
                                       focus-ring
                                     `}
                                     onClick={() => setDrawer(false)}
                                     aria-current={isSubActive ? 'page' : undefined}
-                                    style={{ '--item-circuit-color': getCircuitColor(item.to) } as React.CSSProperties}
+                                    style={{ '--item-circuit-color': item.circuitColor || getCircuitColor(item.to) } as React.CSSProperties}
                                   >
-                                    <div className={`sidebar-submenu-item-icon-container ${isSubActive ? 'sidebar-submenu-item-icon-container--active' : ''}`}>
+                                    <div className={`sidebar-submenu-item-icon-container ${isSubActive || isPrimaryAndPageActive ? 'sidebar-submenu-item-icon-container--active' : ''}`}>
                                       <SpatialIcon
                                         Icon={SubIcon}
                                         size={subItem.isPrimarySubMenu ? 16 : 14}
@@ -273,8 +276,8 @@ const MobileDrawer = React.memo(() => {
                     <div className="sidebar-primary-separator" aria-hidden="true" />
                   )}
 
-                  {/* Séparateur avant les catégories de forges */}
-                  {section.type === 'forge-category' && (
+                  {/* Séparateur avant les catégories de forges (sauf la dernière) */}
+                  {section.type === 'forge-category' && index < navSections.length - 1 && (
                     <div className="sidebar-category-separator" aria-hidden="true" />
                   )}
                 </React.Fragment>

@@ -170,6 +170,9 @@ const NavItem = React.memo(({
               const currentHash = location.hash.replace('#', '') || 'daily';
               const isSubActive = currentPath === subPath && (!subHash || currentHash === subHash);
 
+              // Le bouton primaire (Scanner/Tracker) est toujours lumineux si on est sur cette page
+              const isPrimaryAndPageActive = subItem.isPrimarySubMenu && currentPath === subPath;
+
               return (
                 <Link
                   key={subItem.to}
@@ -177,14 +180,14 @@ const NavItem = React.memo(({
                   className={`
                     sidebar-submenu-item
                     ${subItem.isPrimarySubMenu ? 'sidebar-submenu-item--primary' : 'sidebar-submenu-item--secondary'}
-                    ${isSubActive ? 'sidebar-submenu-item--active' : ''}
+                    ${isSubActive || isPrimaryAndPageActive ? 'sidebar-submenu-item--active' : ''}
                     focus-ring
                   `}
                   onClick={() => sidebarClick()}
                   aria-current={isSubActive ? 'page' : undefined}
                   style={{ '--item-circuit-color': itemColor } as React.CSSProperties}
                 >
-                  <div className={`sidebar-submenu-item-icon-container ${isSubActive ? 'sidebar-submenu-item-icon-container--active' : ''}`}>
+                  <div className={`sidebar-submenu-item-icon-container ${isSubActive || isPrimaryAndPageActive ? 'sidebar-submenu-item-icon-container--active' : ''}`}>
                     <SpatialIcon
                       Icon={SubIcon}
                       size={subItem.isPrimarySubMenu ? 16 : 14}
@@ -208,11 +211,13 @@ NavItem.displayName = 'NavItem';
 const Section = ({
   title,
   type,
-  children
+  children,
+  isLastCategory
 }: {
   title: string;
   type?: 'primary' | 'twin' | 'forge-category';
-  children: React.ReactNode
+  children: React.ReactNode;
+  isLastCategory?: boolean;
 }) => {
   // Pas d'espacement avant pour primary et twin (premières sections)
   const shouldHaveTopSpace = type === 'forge-category';
@@ -221,8 +226,8 @@ const Section = ({
     <div className={`space-y-1 ${shouldHaveTopSpace ? 'mt-4' : ''}`}>
       {title && (
         <>
-          {/* Séparateur visuel pour les catégories de forges */}
-          {type === 'forge-category' && (
+          {/* Séparateur visuel pour les catégories de forges (sauf la dernière) */}
+          {type === 'forge-category' && !isLastCategory && (
             <div className="sidebar-category-separator" />
           )}
           <h3
@@ -352,7 +357,11 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
         {/* Navigation Dynamique avec 3 Niveaux Hiérarchiques + Sous-menus */}
         {navigation.map((section, sectionIndex) => (
           <React.Fragment key={section.title || section.type}>
-            <Section title={section.title} type={section.type}>
+            <Section
+              title={section.title}
+              type={section.type}
+              isLastCategory={sectionIndex === navigation.length - 1 && section.type === 'forge-category'}
+            >
               {section.items.map((item) => (
                 <NavItem
                   key={item.to}
