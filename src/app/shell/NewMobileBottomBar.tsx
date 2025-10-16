@@ -12,8 +12,8 @@ import CentralActionsMenu from './CentralActionsMenu';
 
 /**
  * Configuration des boutons de la nouvelle barre inférieure
- * 7 boutons : 3 à gauche - 1 central (éclair) - 3 à droite
- * Le bouton de chat est maintenant flottant au-dessus de la bottom bar
+ * 6 boutons : Repas - Frigo - Activité - Jeûne - Coaching - Twin
+ * Le bouton éclair (Outils du Forgeron) est maintenant dans le header
  */
 const BOTTOM_BAR_BUTTONS = [
   {
@@ -36,12 +36,6 @@ const BOTTOM_BAR_BUTTONS = [
     icon: 'Activity' as const,
     route: '/activity',
     color: '#3B82F6', // Bleu activité
-  },
-  {
-    id: 'central',
-    icon: 'Zap' as const,
-    color: '#F7931E', // Logo Orange (mid gradient)
-    isCentral: true,
   },
   {
     id: 'fasting',
@@ -83,23 +77,16 @@ function BarButton({
   unreadCount?: number;
 }) {
   const handleClick = () => {
-    if (button.isCentral) {
-      centralButtonClick(!active);
-    } else {
-      bottomBarClick(button.color, active);
-    }
+    bottomBarClick(button.color, active);
     onClick();
   };
 
-  const isBigButton = button.isCentral;
-  const iconSize = isBigButton ? 28 : 20;
+  const iconSize = 20;
 
   return (
     <motion.button
       onClick={handleClick}
-      className={`new-bottom-bar-button ${
-        button.isCentral ? 'new-bottom-bar-button--central central-action-button' : ''
-      }`}
+      className="new-bottom-bar-button"
       style={{
         '--button-color': button.color,
         '--button-active': active ? '1' : '0'
@@ -107,11 +94,7 @@ function BarButton({
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       aria-current={active ? 'page' : undefined}
-      aria-label={
-        button.isCentral
-          ? 'Ouvrir le menu d\'actions'
-          : `Aller à ${button.label}`
-      }
+      aria-label={`Aller à ${button.label}`}
     >
       <div className={`new-bottom-bar-icon-container ${active ? 'new-bottom-bar-icon-container--active' : ''}`}>
         <SpatialIcon
@@ -122,37 +105,31 @@ function BarButton({
           }}
         />
       </div>
-      {!isBigButton && (
-        <div className={`new-bottom-bar-label ${active ? 'new-bottom-bar-label--active' : ''}`}>
-          {button.label}
-        </div>
-      )}
+      <div className={`new-bottom-bar-label ${active ? 'new-bottom-bar-label--active' : ''}`}>
+        {button.label}
+      </div>
     </motion.button>
   );
 }
 
 /**
  * New Mobile Bottom Bar - Barre de navigation inférieure redesignée
- * 7 boutons : Scanner Repas - Scanner Frigo - Activité - ACTION (éclair) - Jeûne - Coaching - Twin 3D
- * Le bouton de chat est maintenant flottant au-dessus du coin droit de la bottom bar
+ * 6 boutons : Repas - Frigo - Activité - Jeûne - Coaching - Twin
+ * Le bouton éclair (Outils du Forgeron) a été déplacé dans le header
  */
 const NewMobileBottomBar: React.FC = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { isOpen, toggle, close } = useOverlayStore();
-  const centralMenuOpen = isOpen('centralMenu');
+  const { close } = useOverlayStore();
 
   const handleButtonClick = (button: typeof BOTTOM_BAR_BUTTONS[0]) => {
-    if (button.isCentral) {
-      toggle('centralMenu');
-    } else if (button.route) {
+    if (button.route) {
       navigate(button.route);
       close();
     }
   };
 
   const isButtonActive = (button: typeof BOTTOM_BAR_BUTTONS[0]) => {
-    if (button.isCentral) return centralMenuOpen;
     return button.route ? pathname.startsWith(button.route) : false;
   };
 

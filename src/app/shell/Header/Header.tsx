@@ -56,10 +56,10 @@ export const Header = React.memo(() => {
 
           {/* Right */}
           <div className="flex items-center gap-2 md:gap-3">
-            {/* Bouton Zap - Outils du Forgeron (desktop uniquement) */}
+            {/* Bouton Zap - Outils du Forgeron */}
             <motion.button
               type="button"
-              className="hidden lg:flex user-panel-toggle relative central-action-button"
+              className="user-panel-toggle relative central-action-button"
               style={{
                 width: '48px',
                 height: '48px',
@@ -143,13 +143,15 @@ export const Header = React.memo(() => {
               />
             </motion.button>
 
-            {/* Profil */}
-            <HeaderActions />
+            {/* Profil (desktop uniquement) */}
+            <div className="hidden lg:block">
+              <HeaderActions />
+            </div>
 
-            {/* Bouton Hamburger (mobile seulement) - Menu de navigation */}
+            {/* Bouton Hamburger - Menu de navigation */}
             <motion.button
               type="button"
-              className="lg:hidden user-panel-toggle relative"
+              className="user-panel-toggle relative"
               style={{
                 width: '48px',
                 height: '48px',

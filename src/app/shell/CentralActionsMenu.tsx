@@ -223,11 +223,12 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
   const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
   const isDesktop = window.innerWidth >= 1024;
 
+  // Animation variants: slide from top for all devices (menu opens from header)
   const animationVariants = {
     initial: {
       opacity: 0,
       scale: 0.88,
-      y: isMobile || isTablet ? 32 : -32
+      y: -32
     },
     animate: {
       opacity: 1,
@@ -237,7 +238,7 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
     exit: {
       opacity: 0,
       scale: 0.90,
-      y: isMobile || isTablet ? 24 : -24
+      y: -24
     }
   };
 
@@ -248,22 +249,22 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
           className="central-actions-menu fixed"
           style={{
             zIndex: Z_INDEX.CENTRAL_MENU,
-            transformOrigin: isDesktop ? 'top right' : 'bottom center',
+            transformOrigin: 'top center',
             overflow: 'visible',
-            // Dynamic positioning based on device
+            // Dynamic positioning based on device - all open from top (header)
             ...(isMobile ? {
-              bottom: 'calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 12px)',
+              top: '80px',
               left: '8px',
               right: '8px',
               width: 'auto',
-              maxHeight: 'calc(100vh - var(--new-bottom-bar-height) - var(--new-bottom-bar-bottom-offset) - 96px)'
+              maxHeight: 'calc(100vh - 96px - var(--new-bottom-bar-height) - var(--new-bottom-bar-bottom-offset))'
             } : isTablet ? {
-              bottom: 'calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 16px)',
+              top: '80px',
               left: '16px',
               right: '16px',
               width: 'auto',
               maxWidth: 'calc(100vw - 32px)',
-              maxHeight: 'calc(100vh - var(--new-bottom-bar-height) - var(--new-bottom-bar-bottom-offset) - 120px)'
+              maxHeight: 'calc(100vh - 120px - var(--new-bottom-bar-height) - var(--new-bottom-bar-bottom-offset))'
             } : {
               top: '80px',
               right: '24px',

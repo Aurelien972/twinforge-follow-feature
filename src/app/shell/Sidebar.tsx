@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Link } from '../nav/Link';
 import { ICONS } from '../../ui/icons/registry';
 import SpatialIcon from '../../ui/icons/SpatialIcon';
@@ -8,6 +8,7 @@ import { getCircuitColor } from '../../ui/theme/circuits';
 import { navFor } from './navigation';
 import { useFeedback } from '@/hooks';
 import logger from '../../lib/utils/logger';
+import { supabase } from '../../system/supabase/client';
 
 interface NavSubItem {
   to: string;
@@ -270,6 +271,7 @@ function getSectionClass(title: string, type?: string): string {
 
 const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isActive = useCallback((path: string) => location.pathname === path, [location.pathname]);
 
   // State for expanded forge menus
@@ -280,6 +282,16 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
 
   // Get navigation structure
   const navigation = navFor();
+
+  // Handle logout
+  const handleLogout = useCallback(async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  }, [navigate]);
 
   // Auto-expand menu if user is on a sub-page and close others
   React.useEffect(() => {
@@ -389,6 +401,102 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
             )}
           </React.Fragment>
         ))}
+
+        {/* ========== SECTION COMPTE ========== */}
+        <div className="mt-4 pt-2">
+          <div className="sidebar-category-separator mb-3" />
+          <h3 className="sidebar-section-title text-white/50 text-xs uppercase tracking-wider font-semibold mb-1 px-1">
+            Compte
+          </h3>
+          <div className="space-y-1">
+            {/* Bouton Profil */}
+            <Link
+              to="/profile"
+              className={`
+                sidebar-item group focus-ring
+                ${isActive('/profile') ? 'text-white shadow-sm' : 'text-white/70 hover:text-white'}
+              `}
+              style={{ '--item-circuit-color': '#18E3FF' } as React.CSSProperties}
+            >
+              <div className={`sidebar-item-icon-container ${isActive('/profile') ? 'sidebar-item-icon-container--active' : ''}`}>
+                <SpatialIcon
+                  Icon={ICONS.User}
+                  size={18}
+                  className={`sidebar-item-icon ${isActive('/profile') ? '' : 'opacity-80 group-hover:opacity-100'}`}
+                  style={isActive('/profile') ? {
+                    color: '#18E3FF',
+                    filter: 'drop-shadow(0 0 8px rgba(24, 227, 255, 0.6))'
+                  } : undefined}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className={`sidebar-item-label font-medium text-xs truncate ${isActive('/profile') ? 'text-white' : 'text-white/82'}`}>
+                  Mon Profil
+                </div>
+                <div className={`sidebar-item-subtitle text-xxs truncate mt-0 ${isActive('/profile') ? 'text-white/70' : 'text-white/50'}`}>
+                  Infos personnelles
+                </div>
+              </div>
+            </Link>
+
+            {/* Bouton Paramètres */}
+            <Link
+              to="/settings"
+              className={`
+                sidebar-item group focus-ring
+                ${isActive('/settings') ? 'text-white shadow-sm' : 'text-white/70 hover:text-white'}
+              `}
+              style={{ '--item-circuit-color': '#7A5AF8' } as React.CSSProperties}
+            >
+              <div className={`sidebar-item-icon-container ${isActive('/settings') ? 'sidebar-item-icon-container--active' : ''}`}>
+                <SpatialIcon
+                  Icon={ICONS.Settings}
+                  size={18}
+                  className={`sidebar-item-icon ${isActive('/settings') ? '' : 'opacity-80 group-hover:opacity-100'}`}
+                  style={isActive('/settings') ? {
+                    color: '#7A5AF8',
+                    filter: 'drop-shadow(0 0 8px rgba(122, 90, 248, 0.6))'
+                  } : undefined}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className={`sidebar-item-label font-medium text-xs truncate ${isActive('/settings') ? 'text-white' : 'text-white/82'}`}>
+                  Paramètres
+                </div>
+                <div className={`sidebar-item-subtitle text-xxs truncate mt-0 ${isActive('/settings') ? 'text-white/70' : 'text-white/50'}`}>
+                  Configuration
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          {/* Séparateur avant déconnexion */}
+          <div className="sidebar-category-separator my-2" />
+
+          {/* Bouton Déconnexion */}
+          <button
+            onClick={handleLogout}
+            className="sidebar-item group focus-ring text-white/70 hover:text-white w-full"
+            style={{ '--item-circuit-color': '#EF4444' } as React.CSSProperties}
+          >
+            <div className="sidebar-item-icon-container">
+              <SpatialIcon
+                Icon={ICONS.LogOut}
+                size={18}
+                className="sidebar-item-icon opacity-80 group-hover:opacity-100"
+                style={{ color: '#EF4444' }}
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="sidebar-item-label font-medium text-xs truncate text-white/82">
+                Déconnexion
+              </div>
+              <div className="sidebar-item-subtitle text-xxs truncate mt-0 text-white/50">
+                Se déconnecter
+              </div>
+            </div>
+          </button>
+        </div>
       </div>
     </aside>
   );
