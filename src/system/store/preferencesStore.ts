@@ -277,9 +277,11 @@ export const usePreferencesStore = create<PreferencesState>()(
 
         logger.info('[PREFERENCES] Applying preferences to DOM', preferences);
 
+        // Apply performance mode classes
         root.classList.remove('perf-auto', 'perf-optimized', 'perf-ultra');
         root.classList.add(`perf-${preferences.performanceMode}`);
 
+        // Apply theme mode classes
         root.classList.remove('theme-auto', 'theme-light', 'theme-dark');
         root.classList.add(`theme-${preferences.themeMode}`);
 
@@ -292,23 +294,38 @@ export const usePreferencesStore = create<PreferencesState>()(
           root.classList.toggle('theme-light-active', preferences.themeMode === 'light');
         }
 
+        // Apply effect toggles - only for decorative effects
         root.classList.toggle('disable-animations', !preferences.enableAnimations);
         root.classList.toggle('disable-glassmorphism', !preferences.enableGlassmorphism);
         root.classList.toggle('disable-3d-effects', !preferences.enable3DEffects);
 
+        // Apply performance-specific settings
         if (preferences.performanceMode === 'ultra') {
           root.classList.add('ultra-performance-mode');
+          // Ultra mode: no blur, minimal animations
           root.style.setProperty('--glass-blur-adaptive', '0px');
-          root.style.setProperty('--animation-duration-adaptive', '0ms');
+          root.style.setProperty('--animation-duration-adaptive', '80ms');
+
+          // Ensure structural components remain visible
+          logger.info('[PREFERENCES] Ultra mode applied - structural components preserved');
         } else if (preferences.performanceMode === 'optimized') {
           root.classList.remove('ultra-performance-mode');
-          root.style.setProperty('--glass-blur-adaptive', '4px');
+          // Optimized mode: light blur, fast animations
+          root.style.setProperty('--glass-blur-adaptive', '8px');
           root.style.setProperty('--animation-duration-adaptive', '150ms');
+
+          logger.info('[PREFERENCES] Optimized mode applied');
         } else {
+          // Auto mode: full effects
           root.classList.remove('ultra-performance-mode');
           root.style.setProperty('--glass-blur-adaptive', '16px');
           root.style.setProperty('--animation-duration-adaptive', '250ms');
+
+          logger.info('[PREFERENCES] Auto mode applied - all effects enabled');
         }
+
+        // Force a reflow to ensure styles are applied
+        void root.offsetHeight;
       },
 
       resetToDefaults: async () => {

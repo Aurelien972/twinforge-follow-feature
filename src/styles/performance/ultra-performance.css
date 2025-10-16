@@ -135,20 +135,26 @@ html.perf-ultra [class*="primary"] {
 
 /* =========================================
    DISABLE ALL EXPENSIVE EFFECTS
+   IMPORTANT: Only hide decorative pseudo-elements, not structural components
    ========================================= */
 
 .ultra-performance-mode .glass-sheen,
 html.perf-ultra .glass-sheen,
-.ultra-performance-mode .glass-card::before,
-html.perf-ultra .glass-card::before,
-.ultra-performance-mode .glass-card::after,
-html.perf-ultra .glass-card::after,
 .ultra-performance-mode .ambient-glow::after,
 html.perf-ultra .ambient-glow::after,
 .ultra-performance-mode [data-hover-effect],
 html.perf-ultra [data-hover-effect] {
   display: none !important;
   content: none !important;
+}
+
+/* Preserve structural pseudo-elements but remove effects */
+.ultra-performance-mode .glass-card::before,
+html.perf-ultra .glass-card::before,
+.ultra-performance-mode .glass-card::after,
+html.perf-ultra .glass-card::after {
+  animation: none !important;
+  opacity: 0 !important;
 }
 
 /* Disable all backdrop-filter usage */
@@ -170,10 +176,10 @@ html.perf-ultra * {
   transition-property: background, border-color, color !important;
 }
 
-/* Disable framer-motion animations */
-.ultra-performance-mode [style*="transform"],
-html.perf-ultra [style*="transform"] {
-  transform: none !important;
+/* Disable framer-motion animations but preserve essential transforms */
+.ultra-performance-mode [style*="transform"]:not(.sidebar-item-icon-container):not(.new-bottom-bar-icon-container):not([class*="icon-container"]),
+html.perf-ultra [style*="transform"]:not(.sidebar-item-icon-container):not(.new-bottom-bar-icon-container):not([class*="icon-container"]) {
+  transform: translateZ(0) !important;
 }
 
 /* =========================================
@@ -214,18 +220,50 @@ html.perf-ultra [data-scroll-reveal] {
 
 /* =========================================
    SIDEBAR & NAVIGATION - Flat Design
+   IMPORTANT: Preserve border-radius and component visibility
    ========================================= */
 
 .ultra-performance-mode .sidebar-liquid-glass,
-html.perf-ultra .sidebar-liquid-glass {
+html.perf-ultra .sidebar-liquid-glass,
+.ultra-performance-mode .sidebar-glass-enhanced,
+html.perf-ultra .sidebar-glass-enhanced {
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--color-deep-forge-indigo) 10%, #0a0f1e) 0%,
     #0a0f1e 100%
   ) !important;
 
-  border-right: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent) !important;
+  border-radius: 24px !important;
   backdrop-filter: none !important;
+}
+
+/* Preserve sidebar icon containers */
+.ultra-performance-mode .sidebar-item-icon-container,
+html.perf-ultra .sidebar-item-icon-container {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-plasma-cyan) 15%, #0f172a) 0%,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 10%, #0a0f1e) 100%
+  ) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent) !important;
+  border-radius: 50% !important;
+  backdrop-filter: none !important;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Active state for sidebar icons */
+.ultra-performance-mode .sidebar-item-icon-container--active,
+html.perf-ultra .sidebar-item-icon-container--active {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 25%, #0f172a) 0%,
+    color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 15%, #0a0f1e) 100%
+  ) !important;
+  border-color: color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 40%, transparent) !important;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 20%, transparent) !important;
 }
 
 .ultra-performance-mode .header-liquid-glass,
@@ -243,19 +281,67 @@ html.perf-ultra .header-liquid-glass {
 
 /* =========================================
    BOTTOM BAR - Flat Mobile Design
+   IMPORTANT: Preserve border-radius and all icon containers
    ========================================= */
 
 .ultra-performance-mode .new-mobile-bottom-bar,
 html.perf-ultra .new-mobile-bottom-bar {
+  border-radius: 24px !important;
+}
+
+.ultra-performance-mode .new-mobile-bottom-bar-container,
+html.perf-ultra .new-mobile-bottom-bar-container {
   background: linear-gradient(
     0deg,
     color-mix(in srgb, var(--color-deep-forge-indigo) 12%, #0a0f1e) 0%,
     color-mix(in srgb, var(--color-plasma-cyan) 4%, #0f172a) 100%
   ) !important;
 
-  border-top: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent) !important;
+  border-radius: 24px !important;
   backdrop-filter: none !important;
-  box-shadow: 0 -1px 0 color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Preserve bottom bar icon containers with rounded borders */
+.ultra-performance-mode .new-bottom-bar-icon-container,
+html.perf-ultra .new-bottom-bar-icon-container {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-plasma-cyan) 15%, #0f172a) 0%,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 10%, #0a0f1e) 100%
+  ) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent) !important;
+  border-radius: 50% !important;
+  backdrop-filter: none !important;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Active state for bottom bar icons */
+.ultra-performance-mode .new-bottom-bar-icon-container--active,
+html.perf-ultra .new-bottom-bar-icon-container--active {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--button-color) 25%, #0f172a) 0%,
+    color-mix(in srgb, var(--button-color) 15%, #0a0f1e) 100%
+  ) !important;
+  border-color: color-mix(in srgb, var(--button-color) 40%, transparent) !important;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--button-color) 20%, transparent) !important;
+  transform: scale(1.05) translateZ(0) !important;
+}
+
+/* Central button with larger icon container */
+.ultra-performance-mode .new-bottom-bar-button--central .new-bottom-bar-icon-container,
+html.perf-ultra .new-bottom-bar-button--central .new-bottom-bar-icon-container {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-ember-copper) 20%, #1e1b4b) 0%,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 15%, #0f0a2e) 100%
+  ) !important;
+  border-color: color-mix(in srgb, var(--color-ember-copper) 35%, transparent) !important;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--color-ember-copper) 20%, transparent) !important;
 }
 
 /* =========================================
@@ -346,4 +432,97 @@ html.perf-ultra .perf-indicator {
   font-weight: 600;
   z-index: 9000;
   pointer-events: none;
+}
+
+/* =========================================
+   PRESERVE ROUNDED BORDERS GLOBALLY
+   Critical: All components must maintain rounded borders
+   ========================================= */
+
+/* Preserve all border-radius properties */
+.ultra-performance-mode *[class*="rounded"],
+html.perf-ultra *[class*="rounded"],
+.ultra-performance-mode *[style*="border-radius"],
+html.perf-ultra *[style*="border-radius"] {
+  border-radius: inherit !important;
+}
+
+/* Ensure specific components keep their rounded borders */
+.ultra-performance-mode .sidebar-glass-enhanced,
+html.perf-ultra .sidebar-glass-enhanced {
+  border-radius: 24px !important;
+}
+
+.ultra-performance-mode .new-mobile-bottom-bar-container,
+html.perf-ultra .new-mobile-bottom-bar-container {
+  border-radius: 24px !important;
+}
+
+.ultra-performance-mode .sidebar-item,
+html.perf-ultra .sidebar-item {
+  border-radius: 16px !important;
+}
+
+.ultra-performance-mode .sidebar-submenu-item,
+html.perf-ultra .sidebar-submenu-item {
+  border-radius: 12px !important;
+}
+
+/* Preserve glass orb buttons and pills */
+.ultra-performance-mode .glass-orb-button,
+html.perf-ultra .glass-orb-button,
+.ultra-performance-mode [class*="icon-container"],
+html.perf-ultra [class*="icon-container"] {
+  border-radius: 50% !important;
+}
+
+/* =========================================
+   PRESERVE COMPONENT VISIBILITY
+   Critical: All UI elements must remain visible
+   ========================================= */
+
+/* Ensure all buttons remain visible */
+.ultra-performance-mode button,
+html.perf-ultra button,
+.ultra-performance-mode .btn,
+html.perf-ultra .btn {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure all navigation items remain visible */
+.ultra-performance-mode .sidebar-item,
+html.perf-ultra .sidebar-item,
+.ultra-performance-mode .new-bottom-bar-button,
+html.perf-ultra .new-bottom-bar-button {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure all icon containers remain visible */
+.ultra-performance-mode [class*="icon-container"],
+html.perf-ultra [class*="icon-container"] {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure sidebar pseudo-elements for borders are subtle */
+.ultra-performance-mode .sidebar-glass-enhanced::before,
+html.perf-ultra .sidebar-glass-enhanced::before,
+.ultra-performance-mode .sidebar-glass-enhanced::after,
+html.perf-ultra .sidebar-glass-enhanced::after {
+  opacity: 0.3 !important;
+  animation: none !important;
+}
+
+/* Ensure bottom bar pseudo-elements for borders are subtle */
+.ultra-performance-mode .new-mobile-bottom-bar-container::before,
+html.perf-ultra .new-mobile-bottom-bar-container::before,
+.ultra-performance-mode .new-mobile-bottom-bar-container::after,
+html.perf-ultra .new-mobile-bottom-bar-container::after {
+  opacity: 0.3 !important;
+  animation: none !important;
 }

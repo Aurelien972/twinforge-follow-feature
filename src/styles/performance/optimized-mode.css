@@ -120,16 +120,35 @@ html.perf-optimized [class*="glow"]::after {
    NAVIGATION ELEMENTS
    ========================================= */
 
-html.perf-optimized .sidebar-liquid-glass {
-  backdrop-filter: blur(6px) saturate(115%) !important;
+html.perf-optimized .sidebar-liquid-glass,
+html.perf-optimized .sidebar-glass-enhanced {
+  backdrop-filter: blur(8px) saturate(115%) !important;
 
   background: color-mix(in srgb, var(--color-deep-forge-indigo) 5%, rgba(15, 23, 42, 0.85)) !important;
 
-  border-right: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 12%, rgba(255, 255, 255, 0.12)) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 12%, rgba(255, 255, 255, 0.12)) !important;
+  border-radius: 24px !important;
+}
+
+/* Preserve sidebar icon containers */
+html.perf-optimized .sidebar-item-icon-container {
+  backdrop-filter: blur(6px) saturate(115%) !important;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 8%, rgba(255, 255, 255, 0.05)) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 18%, rgba(255, 255, 255, 0.15)) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html.perf-optimized .sidebar-item-icon-container--active {
+  background: color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 15%, rgba(255, 255, 255, 0.08)) !important;
+  border-color: color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 30%, rgba(255, 255, 255, 0.2)) !important;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 15%, transparent) !important;
 }
 
 html.perf-optimized .header-liquid-glass {
-  backdrop-filter: blur(6px) saturate(115%) !important;
+  backdrop-filter: blur(8px) saturate(115%) !important;
 
   background: color-mix(in srgb, var(--color-deep-forge-indigo) 4%, rgba(15, 23, 42, 0.8)) !important;
 
@@ -139,11 +158,39 @@ html.perf-optimized .header-liquid-glass {
 }
 
 html.perf-optimized .new-mobile-bottom-bar {
-  backdrop-filter: blur(6px) saturate(115%) !important;
+  border-radius: 24px !important;
+}
+
+html.perf-optimized .new-mobile-bottom-bar-container {
+  backdrop-filter: blur(8px) saturate(115%) !important;
 
   background: color-mix(in srgb, var(--color-deep-forge-indigo) 6%, rgba(10, 15, 30, 0.88)) !important;
 
-  border-top: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 15%, rgba(255, 255, 255, 0.12)) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 15%, rgba(255, 255, 255, 0.12)) !important;
+  border-radius: 24px !important;
+}
+
+/* Preserve bottom bar icon containers */
+html.perf-optimized .new-bottom-bar-icon-container {
+  backdrop-filter: blur(6px) saturate(115%) !important;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 8%, rgba(255, 255, 255, 0.05)) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 18%, rgba(255, 255, 255, 0.15)) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html.perf-optimized .new-bottom-bar-icon-container--active {
+  background: color-mix(in srgb, var(--button-color) 15%, rgba(255, 255, 255, 0.08)) !important;
+  border-color: color-mix(in srgb, var(--button-color) 30%, rgba(255, 255, 255, 0.2)) !important;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--button-color) 15%, transparent) !important;
+}
+
+html.perf-optimized .new-bottom-bar-button--central .new-bottom-bar-icon-container {
+  background: color-mix(in srgb, var(--color-ember-copper) 12%, rgba(30, 27, 75, 0.15)) !important;
+  border-color: color-mix(in srgb, var(--color-ember-copper) 25%, rgba(255, 255, 255, 0.2)) !important;
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-ember-copper) 15%, transparent) !important;
 }
 
 /* =========================================
