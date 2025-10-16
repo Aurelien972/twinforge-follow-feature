@@ -21,40 +21,40 @@ function getTabHeaderContent(activeTab: string) {
     case 'daily':
       return {
         icon: 'Calendar' as const,
-        title: 'Forge Nutritionnelle du Jour',
-        subtitle: 'Votre carburant quotidien analysé et optimisé',
+        title: 'Scanner',
+        subtitle: 'Scannez et analysez vos repas quotidiens',
         circuit: 'meals' as const,
         color: '#10B981',
       };
     case 'insights':
       return {
         icon: 'TrendingUp' as const,
-        title: 'Insights Nutritionnels',
-        subtitle: 'Analyses et conseils personnalisés avancés',
+        title: 'Insights',
+        subtitle: 'Analyses nutritionnelles personnalisées',
         circuit: 'meals' as const,
-        color: '#F59E0B', // Orange pour insights nutritionnels
+        color: '#F59E0B',
       };
     case 'progression':
       return {
         icon: 'BarChart3' as const,
-        title: 'Progression Nutritionnelle',
-        subtitle: 'Métriques et tendances de votre évolution',
+        title: 'Progression',
+        subtitle: 'Évolution de votre alimentation',
         circuit: 'meals' as const,
-        color: '#06B6D4', // Cyan pour progression
+        color: '#06B6D4',
       };
     case 'history':
       return {
         icon: 'History' as const,
-        title: 'Historique des Repas',
-        subtitle: 'Tous vos repas scannés et analysés',
+        title: 'Historique',
+        subtitle: 'Tous vos repas enregistrés',
         circuit: 'meals' as const,
         color: '#8B5CF6',
       };
     default:
       return {
         icon: 'Utensils' as const,
-        title: 'Forge Nutritionnelle',
-        subtitle: 'Scannez et analysez vos repas pour optimiser votre énergie',
+        title: 'Nutrition',
+        subtitle: 'Scannez et analysez vos repas',
         circuit: 'meals' as const,
         color: '#10B981',
       };

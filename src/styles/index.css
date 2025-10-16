@@ -80,6 +80,7 @@
 @import './components/face-shape-controls.css';
 @import './components/fasting-cta-3d.css';
 @import './components/meal-scan-results.css';
+@import './components/page-header-responsive.css';
 @import '../ui/components/skeletons/skeletons.css';
 
 /* =========================================

@@ -19,40 +19,40 @@ function getTabHeaderContent(activeTab: string) {
     case 'daily':
       return {
         icon: 'Timer' as const,
-        title: 'Forge Temporelle du Jour',
-        subtitle: 'Votre discipline du jeûne au quotidien',
+        title: 'Tracker',
+        subtitle: 'Suivez vos sessions de jeûne quotidiennes',
         circuit: 'fasting' as const,
         color: '#F59E0B',
       };
     case 'insights':
       return {
         icon: 'TrendingUp' as const,
-        title: 'Insights de Jeûne',
-        subtitle: 'Analyses et patterns de votre discipline temporelle',
+        title: 'Insights',
+        subtitle: 'Analyses de vos patterns de jeûne',
         circuit: 'fasting' as const,
         color: '#10B981',
       };
     case 'progression':
       return {
         icon: 'BarChart3' as const,
-        title: 'Progression Temporelle',
-        subtitle: 'Métriques et tendances de votre évolution',
+        title: 'Progression',
+        subtitle: 'Évolution de votre pratique du jeûne',
         circuit: 'fasting' as const,
         color: '#06B6D4',
       };
     case 'history':
       return {
         icon: 'History' as const,
-        title: 'Historique des Sessions',
-        subtitle: 'Toutes vos sessions de jeûne enregistrées',
+        title: 'Historique',
+        subtitle: 'Toutes vos sessions enregistrées',
         circuit: 'fasting' as const,
         color: '#8B5CF6',
       };
     default:
       return {
         icon: 'Timer' as const,
-        title: 'Forge Temporelle',
-        subtitle: 'Maîtrisez le temps avec le jeûne intermittent',
+        title: 'Jeûne Intermittent',
+        subtitle: 'Suivez et optimisez vos sessions de jeûne',
         circuit: 'fasting' as const,
         color: '#F59E0B',
       };

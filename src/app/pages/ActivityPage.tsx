@@ -21,40 +21,40 @@ function getTabHeaderContent(activeTab: string) {
     case 'daily':
       return {
         icon: 'Activity' as const,
-        title: 'Forge Énergétique',
-        subtitle: 'Votre énergie forgée aujourd\'hui et vos séances actives',
+        title: 'Tracker',
+        subtitle: 'Suivez votre activité physique quotidienne',
         circuit: 'activity' as const,
         color: '#3B82F6',
       };
     case 'insights':
       return {
         icon: 'BarChart3' as const,
-        title: 'Insights Énergétiques',
-        subtitle: 'Analyses avancées et recommandations personnalisées',
+        title: 'Insights',
+        subtitle: 'Analyses avancées de vos performances',
         circuit: 'activity' as const,
         color: '#F59E0B',
       };
     case 'progression':
       return {
         icon: 'TrendingUp' as const,
-        title: 'Progression de la Forge',
-        subtitle: 'Évolution de vos performances et tendances énergétiques',
+        title: 'Progression',
+        subtitle: 'Évolution de vos performances physiques',
         circuit: 'activity' as const,
         color: '#10B981',
       };
     case 'history':
       return {
         icon: 'History' as const,
-        title: 'Historique Énergétique',
-        subtitle: 'Toutes vos séances et activités forgées',
+        title: 'Historique',
+        subtitle: 'Toutes vos séances et activités enregistrées',
         circuit: 'activity' as const,
         color: '#8B5CF6',
       };
     default:
       return {
         icon: 'Activity' as const,
-        title: 'Forge Énergétique',
-        subtitle: 'Votre centre de suivi d\'activité physique',
+        title: 'Activité Physique',
+        subtitle: 'Suivez et analysez vos performances',
         circuit: 'activity' as const,
         color: '#3B82F6',
       };

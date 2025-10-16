@@ -30,8 +30,8 @@ function getTabHeaderContent(activeTab: string) {
     case 'nutrition':
       return {
         icon: 'Utensils' as const,
-        title: 'Forge Nutritionnelle',
-        subtitle: 'Régime, allergies et préférences alimentaires',
+        title: 'Préférences Nutritionnelles',
+        subtitle: 'Régime alimentaire et restrictions',
         circuit: 'meals' as const,
         color: '#10B981',
       };
@@ -46,8 +46,8 @@ function getTabHeaderContent(activeTab: string) {
     case 'fasting':
       return {
         icon: 'Timer' as const,
-        title: 'Jeûne Intermittent',
-        subtitle: 'Protocoles de jeûne et objectifs nutritionnels',
+        title: 'Préférences de Jeûne',
+        subtitle: 'Protocoles et objectifs de jeûne',
         circuit: 'fasting' as const,
         color: '#F59E0B',
       };
@@ -55,16 +55,16 @@ function getTabHeaderContent(activeTab: string) {
     case 'training':
       return {
         icon: 'Dumbbell' as const,
-        title: 'Atelier de Training',
-        subtitle: 'Vos programmes d\'entraînement personnalisés',
+        title: 'Préférences de Training',
+        subtitle: 'Objectifs et préférences d\'entraînement',
         circuit: 'training' as const,
         color: '#18E3FF',
       };
     case 'geo':
       return {
         icon: 'MapPin' as const,
-        title: 'Geo & Environnement',
-        subtitle: 'Données géographiques et contexte sanitaire local',
+        title: 'Géolocalisation',
+        subtitle: 'Pays et données environnementales',
         circuit: 'home' as const,
         color: '#EC4899',
       };
@@ -72,7 +72,7 @@ function getTabHeaderContent(activeTab: string) {
       return {
         icon: 'Camera' as const,
         title: 'Avatar 3D',
-        subtitle: 'Votre reflet numérique et données morphologiques',
+        subtitle: 'Données morphologiques et scans',
         circuit: 'avatar' as const,
         color: '#A855F7',
       };

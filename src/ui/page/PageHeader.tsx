@@ -91,10 +91,10 @@ export default function PageHeader({
         </div>
 
         {/* Titre et sous-titre alignés à gauche */}
-        <div className="space-y-2 text-left flex-1">
-          <h1 
+        <div className="space-y-2 text-left flex-1 min-w-0">
+          <h1
             id="page-title"
-            className="text-2xl md:text-3xl lg:text-4xl font-bold text-white"
+            className="text-2xl md:text-3xl lg:text-4xl font-bold text-white page-header-title"
             style={{
               color: 'var(--text-primary)',
               fontWeight: 700,
@@ -106,9 +106,9 @@ export default function PageHeader({
             {title}
           </h1>
           {subtitle && (
-            <p 
-              className="text-gray-300 text-lg md:text-xl max-w-2xl leading-relaxed"
-              style={{ 
+            <p
+              className="text-gray-300 text-lg md:text-xl max-w-2xl leading-relaxed page-header-subtitle"
+              style={{
                 color: `color-mix(in srgb, #E5E7EB 90%, ${finalCircuitColor} 10%)`,
                 textShadow: '0 0 20px rgba(0, 0, 0, 0.5)',
                 lineHeight: '1.4'

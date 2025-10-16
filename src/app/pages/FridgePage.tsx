@@ -24,27 +24,27 @@ const FridgePage: React.FC = () => {
     const configs: Record<string, { title: string; subtitle: string; iconColor: string }> = {
       scanner: {
         title: 'Scanner',
-        subtitle: 'Capturez votre inventaire',
+        subtitle: 'Scannez le contenu de votre frigo',
         iconColor: '#EC4899'
       },
       inventaire: {
         title: 'Inventaire',
-        subtitle: 'Gérez vos ingrédients',
+        subtitle: 'Gérez vos ingrédients disponibles',
         iconColor: '#06B6D4'
       },
       recipes: {
         title: 'Recettes',
-        subtitle: 'Créations culinaires personnalisées',
+        subtitle: 'Recettes adaptées à votre inventaire',
         iconColor: '#10B981'
       },
       plan: {
         title: 'Plan',
-        subtitle: 'Planification hebdomadaire',
+        subtitle: 'Planifiez vos repas de la semaine',
         iconColor: '#8B5CF6'
       },
       courses: {
         title: 'Courses',
-        subtitle: 'Liste de courses optimisée',
+        subtitle: 'Générez votre liste de courses',
         iconColor: '#F59E0B'
       }
     };

@@ -119,7 +119,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         pageHeader: {
           icon: 'Home',
           title: 'Aujourd\'hui',
-          subtitle: 'Votre hub d\'entraînement quotidien',
+          subtitle: 'Votre entraînement du jour',
           color: '#18E3FF'
         }
       },
@@ -132,7 +132,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         pageHeader: {
           icon: 'Lightbulb',
           title: 'Conseils',
-          subtitle: 'Recommandations personnalisées de votre coach IA',
+          subtitle: 'Recommandations personnalisées',
           color: '#10B981'
         }
       },
@@ -150,7 +150,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         pageHeader: {
           icon: 'TrendingUp',
           title: 'Progression',
-          subtitle: 'Visualisez votre évolution détaillée',
+          subtitle: 'Évolution de vos performances',
           color: '#F59E0B'
         }
       },
@@ -168,7 +168,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         pageHeader: {
           icon: 'Trophy',
           title: 'Records',
-          subtitle: 'Vos records personnels et meilleurs performances',
+          subtitle: 'Vos records et meilleures performances',
           color: '#EF4444'
         }
       },
@@ -195,7 +195,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
 
   settings: {
     title: 'Réglages',
-    subtitle: 'Configuration et personnalisation de l\'application',
+    subtitle: 'Paramètres de l\'application',
     icon: 'Settings',
     color: '#8B5CF6',
     circuit: 'settings',
@@ -204,7 +204,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         value: 'general',
         label: 'Général',
         icon: 'Settings',
-        description: 'Personnalisez les paramètres généraux de l\'application selon vos préférences.',
+        description: 'Thème, langue et unités',
         features: [
           'Préférences utilisateur',
           'Thème et apparence',
@@ -216,7 +216,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         value: 'notifications',
         label: 'Notifications',
         icon: 'Bell',
-        description: 'Gérez vos préférences de notifications et alertes personnalisées.',
+        description: 'Alertes et rappels personnalisés',
         features: [
           'Notifications personnalisées',
           'Horaires de rappel',
@@ -228,7 +228,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         value: 'confidentialite',
         label: 'Confidentialité',
         icon: 'Shield',
-        description: 'Contrôlez vos données personnelles et paramètres de confidentialité.',
+        description: 'Données et confidentialité',
         features: [
           'Synchronisation des données',
           'Paramètres de confidentialité',
@@ -240,7 +240,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         value: 'appareils',
         label: 'Appareils Connectés',
         icon: 'Watch',
-        description: 'Connectez vos montres et trackers fitness pour synchroniser automatiquement vos données.',
+        description: 'Synchronisez vos trackers fitness',
         features: [
           'Strava, Garmin, Fitbit, Apple Health',
           'Polar, Wahoo, WHOOP, Oura',
