@@ -166,21 +166,34 @@ html.perf-ultra [style*="backdrop-filter"] {
 
 /* =========================================
    DISABLE ANIMATIONS & TRANSITIONS
+   Only target decorative animations, preserve structural ones
    ========================================= */
 
-.ultra-performance-mode *,
-html.perf-ultra * {
-  animation-duration: 0ms !important;
-  animation-delay: 0ms !important;
-  transition-duration: 80ms !important;
-  transition-property: background, border-color, color !important;
+/* Disable only decorative animations */
+.ultra-performance-mode *[class*="breathing"],
+html.perf-ultra *[class*="breathing"],
+.ultra-performance-mode *[class*="pulse"],
+html.perf-ultra *[class*="pulse"],
+.ultra-performance-mode *[class*="shimmer"],
+html.perf-ultra *[class*="shimmer"],
+.ultra-performance-mode *[class*="glow"],
+html.perf-ultra *[class*="glow"] {
+  animation: none !important;
 }
 
-/* Disable framer-motion animations but preserve essential transforms */
-.ultra-performance-mode [style*="transform"]:not(.sidebar-item-icon-container):not(.new-bottom-bar-icon-container):not([class*="icon-container"]),
-html.perf-ultra [style*="transform"]:not(.sidebar-item-icon-container):not(.new-bottom-bar-icon-container):not([class*="icon-container"]) {
-  transform: translateZ(0) !important;
+/* Fast transitions for interactive elements only */
+.ultra-performance-mode .glass-card,
+html.perf-ultra .glass-card,
+.ultra-performance-mode button,
+html.perf-ultra button,
+.ultra-performance-mode .tabs-trigger,
+html.perf-ultra .tabs-trigger {
+  transition-duration: 80ms !important;
+  transition-property: background, border-color, color, opacity !important;
 }
+
+/* DO NOT disable transforms globally - components need them for layout */
+/* Framer-motion transforms are preserved for proper component positioning */
 
 /* =========================================
    SIMPLIFY 3D ELEMENTS
@@ -439,71 +452,23 @@ html.perf-ultra .perf-indicator {
    Critical: All components must maintain rounded borders
    ========================================= */
 
-/* Preserve all border-radius properties */
-.ultra-performance-mode *[class*="rounded"],
-html.perf-ultra *[class*="rounded"],
-.ultra-performance-mode *[style*="border-radius"],
-html.perf-ultra *[style*="border-radius"] {
-  border-radius: inherit !important;
-}
+/* All border-radius values are naturally preserved from component stylesheets */
+/* No overrides needed - components keep their rounded corners */
 
-/* Ensure specific components keep their rounded borders */
-.ultra-performance-mode .sidebar-glass-enhanced,
-html.perf-ultra .sidebar-glass-enhanced {
-  border-radius: 24px !important;
-}
-
-.ultra-performance-mode .new-mobile-bottom-bar-container,
-html.perf-ultra .new-mobile-bottom-bar-container {
-  border-radius: 24px !important;
-}
-
-.ultra-performance-mode .sidebar-item,
-html.perf-ultra .sidebar-item {
-  border-radius: 16px !important;
-}
-
-.ultra-performance-mode .sidebar-submenu-item,
-html.perf-ultra .sidebar-submenu-item {
-  border-radius: 12px !important;
-}
-
-/* Preserve glass orb buttons and pills */
-.ultra-performance-mode .glass-orb-button,
-html.perf-ultra .glass-orb-button,
-.ultra-performance-mode [class*="icon-container"],
-html.perf-ultra [class*="icon-container"] {
-  border-radius: 50% !important;
-}
+/* Border-radius is naturally preserved from component stylesheets */
+/* No need to force border-radius values - components maintain their natural rounded corners */
 
 /* =========================================
    PRESERVE COMPONENT VISIBILITY
    Critical: All UI elements must remain visible
    ========================================= */
 
-/* Ensure all buttons remain visible */
-.ultra-performance-mode button,
-html.perf-ultra button,
-.ultra-performance-mode .btn,
-html.perf-ultra .btn {
-  display: flex !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-/* Ensure all navigation items remain visible */
-.ultra-performance-mode .sidebar-item,
-html.perf-ultra .sidebar-item,
-.ultra-performance-mode .new-bottom-bar-button,
-html.perf-ultra .new-bottom-bar-button {
-  display: flex !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-/* Ensure all icon containers remain visible */
-.ultra-performance-mode [class*="icon-container"],
-html.perf-ultra [class*="icon-container"] {
+/* DO NOT force display/opacity/visibility - components manage their own state */
+/* Only ensure critical icon containers remain visible */
+.ultra-performance-mode .sidebar-item-icon-container,
+html.perf-ultra .sidebar-item-icon-container,
+.ultra-performance-mode .new-bottom-bar-icon-container,
+html.perf-ultra .new-bottom-bar-icon-container {
   display: flex !important;
   opacity: 1 !important;
   visibility: visible !important;
@@ -524,5 +489,86 @@ html.perf-ultra .new-mobile-bottom-bar-container::before,
 .ultra-performance-mode .new-mobile-bottom-bar-container::after,
 html.perf-ultra .new-mobile-bottom-bar-container::after {
   opacity: 0.3 !important;
+  animation: none !important;
+}
+
+/* =========================================
+   TABS - Flat Design with Preserved Structure
+   ========================================= */
+
+/* Tabs container - flat design with natural rounded borders */
+.ultra-performance-mode .tabs-list-container,
+html.perf-ultra .tabs-list-container {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 10%, #0f172a) 0%,
+    color-mix(in srgb, var(--color-plasma-cyan) 4%, #0a0f1e) 100%
+  ) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent) !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Disable decorative pseudo-elements on tabs container */
+.ultra-performance-mode .tabs-list-container::before,
+html.perf-ultra .tabs-list-container::before,
+.ultra-performance-mode .tabs-list-container::after,
+html.perf-ultra .tabs-list-container::after {
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+/* Individual tab triggers - flat with natural rounded borders */
+.ultra-performance-mode .tabs-trigger,
+html.perf-ultra .tabs-trigger {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-plasma-cyan) 12%, #0f172a) 0%,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 8%, #0a0f1e) 100%
+  ) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent) !important;
+  backdrop-filter: none !important;
+  transform: none !important;
+}
+
+/* Disable decorative pseudo-elements on tabs */
+.ultra-performance-mode .tabs-trigger::before,
+html.perf-ultra .tabs-trigger::before {
+  opacity: 0 !important;
+}
+
+/* Active/selected tab state */
+.ultra-performance-mode .tabs-trigger--active,
+html.perf-ultra .tabs-trigger--active,
+.ultra-performance-mode .tabs-trigger[aria-selected="true"],
+html.perf-ultra .tabs-trigger[aria-selected="true"] {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--button-color, var(--color-plasma-cyan)) 25%, #0f172a) 0%,
+    color-mix(in srgb, var(--button-color, var(--color-plasma-cyan)) 15%, #0a0f1e) 100%
+  ) !important;
+  border-color: color-mix(in srgb, var(--button-color, var(--color-plasma-cyan)) 45%, transparent) !important;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--button-color, var(--color-plasma-cyan)) 20%, transparent) !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+/* Tab hover states */
+.ultra-performance-mode .tabs-trigger:hover,
+html.perf-ultra .tabs-trigger:hover {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-plasma-cyan) 18%, #0f172a) 0%,
+    color-mix(in srgb, var(--color-deep-forge-indigo) 12%, #0a0f1e) 100%
+  ) !important;
+  border-color: color-mix(in srgb, var(--color-plasma-cyan) 35%, transparent) !important;
+  transform: none !important;
+}
+
+/* Disable tab scroll indicators animations */
+.ultra-performance-mode .tabs-scroll-dot,
+html.perf-ultra .tabs-scroll-dot,
+.ultra-performance-mode .tabs-scroll-dot--active,
+html.perf-ultra .tabs-scroll-dot--active {
   animation: none !important;
 }
