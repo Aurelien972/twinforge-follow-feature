@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useFastingHistory, type FastingHistoryFilters } from '../../hooks/useFastingHistory';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
@@ -30,7 +30,12 @@ const FastingHistoryTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6"
+    >
       {/* Filters Toggle */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -211,7 +216,7 @@ const FastingHistoryTab: React.FC = () => {
           )}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

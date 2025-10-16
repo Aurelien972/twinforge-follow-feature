@@ -240,7 +240,12 @@ const AvatarTab: React.FC = () => {
     // Removed 'profile-section-container' class from here.
     // The padding will now be handled by the parent of AvatarTab (Tabs.Panel),
     // allowing GlassCard to expand to the full width of the Tabs.Panel.
-    <div className="space-y-8">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-8"
+    >
       {/* 3D Avatar Viewer */}
       <GlassCard className="bodyscan-card p-6">
         <div className="flex items-center mb-4">
@@ -367,7 +372,7 @@ const AvatarTab: React.FC = () => {
           </div>
         </motion.button>
       </GlassCard>
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useBlocker, useNavigate } from 'react-router-dom';
 import { useFastingInsightsGenerator } from '../../hooks/useFastingInsightsGenerator';
 import { useUserStore } from '@/system/store/userStore';
@@ -82,7 +83,12 @@ const FastingInsightsTab: React.FC = () => {
 
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6"
+    >
       {/* Period Selector */}
       <FastingPeriodSelector
         selectedPeriod={selectedPeriod}
@@ -213,7 +219,7 @@ const FastingInsightsTab: React.FC = () => {
           </div>
         </GlassCard>
       )}
-    </div>
+    </motion.div>
   );
 };
 

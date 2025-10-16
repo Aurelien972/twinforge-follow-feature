@@ -181,7 +181,12 @@ const HistoryTab: React.FC = () => {
   const canLoadMore = scans && scans.length > 0 && scans.length === displayLimit;
 
   return (
-    <div className="space-y-6 w-full">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6 w-full"
+    >
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         <AnimatePresence>
           {validScans.map((scan: any) => {
@@ -325,7 +330,7 @@ const HistoryTab: React.FC = () => {
           <HistoricalScanModal scanId={selectedScanId} onClose={handleCloseModal} />
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };
 

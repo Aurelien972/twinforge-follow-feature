@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { useFastingPipeline } from '../../hooks/useFastingPipeline';
 import { useUserStore } from '@/system/store/userStore';
 import DynamicFastingCTA from '../Cards/DynamicFastingCTA';
@@ -21,7 +22,12 @@ const FastingDailyTab: React.FC<FastingDailyTabProps> = ({ onLoadingChange }) =>
   const { isActive, session: fastingSession } = useFastingPipeline();
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6"
+    >
       {/*
         CTA Dynamique Enrichi pour le Jeûne
         Affiche toutes les informations de la session active:
@@ -43,7 +49,7 @@ const FastingDailyTab: React.FC<FastingDailyTabProps> = ({ onLoadingChange }) =>
 
       {/* Conseils de Jeûne */}
       <FastingTipsCard />
-    </div>
+    </motion.div>
   );
 };
 

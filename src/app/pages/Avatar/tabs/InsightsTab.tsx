@@ -113,6 +113,11 @@ const InsightsTab: React.FC = () => {
   
   return (
     <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      >
       {/* Modale d'exit */}
       <InsightsGenerationExitModal
         isOpen={showExitModal}
@@ -287,6 +292,7 @@ const InsightsTab: React.FC = () => {
         </div>
       )}
     </div>
+      </motion.div>
     </>
   );
 };

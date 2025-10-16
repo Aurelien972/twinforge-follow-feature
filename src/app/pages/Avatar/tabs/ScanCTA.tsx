@@ -198,7 +198,12 @@ const ScanCTA: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 w-full">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6 w-full"
+    >
       {/* Main CTA Card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -704,7 +709,7 @@ const ScanCTA: React.FC = () => {
           </div>
         </GlassCard>
       </motion.div>
-    </div>
+    </motion.div>
   );
 };
 

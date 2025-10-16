@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '@/system/store/userStore';
 import { useFastingProgressionData } from '../../hooks/useFastingProgressionData';
@@ -49,7 +50,12 @@ const FastingProgressionTab: React.FC = () => {
   const availableSessionsCount = progressionData?.metrics?.totalSessions || 0;
   
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6"
+    >
       {/* Period Selector with Cyan Color for Progression Tab */}
       <div className="flex justify-center">
         <div className="inline-flex gap-2 p-1 rounded-lg" style={{
@@ -211,7 +217,7 @@ const FastingProgressionTab: React.FC = () => {
           )}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
