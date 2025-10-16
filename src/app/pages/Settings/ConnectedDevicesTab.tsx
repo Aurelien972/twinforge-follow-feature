@@ -135,7 +135,11 @@ const ConnectedDevicesTab: React.FC = () => {
   };
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
       <div className="devices-header" style={{ marginBottom: '2rem' }}>
         <button
           onClick={handleToggleSimulator}
@@ -371,7 +375,7 @@ const ConnectedDevicesTab: React.FC = () => {
           </div>
         </>
       )}
-    </div>
+    </motion.div>
   );
 };
 
