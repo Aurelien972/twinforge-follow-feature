@@ -59,6 +59,15 @@ const NavItem = React.memo(({
   const handleNavItemClick = (e: React.MouseEvent) => {
     logger.trace('SIDEBAR', 'NavItem click captured', { to, label, isActive });
     logger.trace('SIDEBAR', 'NavItem click triggered', { to, label, currentPath: window.location.pathname });
+
+    // Si l'item a des sous-menus, toggle l'expansion au lieu de naviguer
+    if (hasSubItems) {
+      e.preventDefault();
+      if (onToggleExpand) {
+        onToggleExpand();
+        sidebarClick();
+      }
+    }
   };
 
   const handleToggleClick = (e: React.MouseEvent) => {
@@ -284,12 +293,18 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
   // State for expanded forge menus
   const [expandedForges, setExpandedForges] = useState<Record<string, boolean>>({});
 
+  // Track the currently active forge to auto-close others
+  const [activeForge, setActiveForge] = useState<string | null>(null);
+
   // Get navigation structure
   const navigation = navFor();
 
-  // Auto-expand menu if user is on a sub-page
+  // Auto-expand menu if user is on a sub-page and close others
   React.useEffect(() => {
     const currentPath = location.pathname;
+    let newActiveForge: string | null = null;
+    const newExpandedState: Record<string, boolean> = {};
+
     navigation.forEach(section => {
       section.items.forEach(item => {
         if (item.subItems && item.subItems.length > 0) {
@@ -297,12 +312,22 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
             const subPath = subItem.to.split('#')[0];
             return currentPath === subPath;
           });
-          if (hasActiveSubItem && !expandedForges[item.to]) {
-            setExpandedForges(prev => ({ ...prev, [item.to]: true }));
+
+          // If this item has an active sub-item, expand it and mark as active
+          if (hasActiveSubItem) {
+            newExpandedState[item.to] = true;
+            newActiveForge = item.to;
+          } else {
+            // Close all other items
+            newExpandedState[item.to] = false;
           }
         }
       });
     });
+
+    // Update states
+    setExpandedForges(newExpandedState);
+    setActiveForge(newActiveForge);
   }, [location.pathname]);
 
   // Log sidebar render
@@ -310,12 +335,29 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
     logger.trace('SIDEBAR', 'Component rendered', { currentPath: location.pathname });
   }, [location.pathname]);
 
-  // Handle toggle expand for forge items
+  // Handle toggle expand for forge items with auto-close others
   const handleToggleExpand = useCallback((itemTo: string) => {
-    setExpandedForges(prev => ({
-      ...prev,
-      [itemTo]: !prev[itemTo]
-    }));
+    setExpandedForges(prev => {
+      const isCurrentlyExpanded = prev[itemTo];
+
+      // If closing the current item, just toggle it
+      if (isCurrentlyExpanded) {
+        return {
+          ...prev,
+          [itemTo]: false
+        };
+      }
+
+      // If opening, close all others and open this one
+      const newState: Record<string, boolean> = {};
+      Object.keys(prev).forEach(key => {
+        newState[key] = false;
+      });
+      newState[itemTo] = true;
+
+      setActiveForge(itemTo);
+      return newState;
+    });
   }, []);
 
   return (
@@ -332,28 +374,34 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
       <div className="sidebar-content space-y-2 flex-1 pt-2">
 
         {/* Navigation Dynamique avec 3 Niveaux Hiérarchiques + Sous-menus */}
-        {navigation.map((section) => (
-          <Section key={section.title || section.type} title={section.title} type={section.type}>
-            {section.items.map((item) => (
-              <NavItem
-                key={item.to}
-                to={item.to}
-                icon={item.icon}
-                label={item.label}
-                subtitle={item.subtitle}
-                actionLabel={item.actionLabel}
-                isPrimary={item.isPrimary}
-                isTwin={item.isTwin}
-                isForge={item.isForge}
-                isActive={isActive(item.to)}
-                circuitColor={item.circuitColor}
-                tabs={item.tabs}
-                subItems={item.subItems}
-                isExpanded={expandedForges[item.to]}
-                onToggleExpand={() => handleToggleExpand(item.to)}
-              />
-            ))}
-          </Section>
+        {navigation.map((section, sectionIndex) => (
+          <React.Fragment key={section.title || section.type}>
+            <Section title={section.title} type={section.type}>
+              {section.items.map((item) => (
+                <NavItem
+                  key={item.to}
+                  to={item.to}
+                  icon={item.icon}
+                  label={item.label}
+                  subtitle={item.subtitle}
+                  actionLabel={item.actionLabel}
+                  isPrimary={item.isPrimary}
+                  isTwin={item.isTwin}
+                  isForge={item.isForge}
+                  isActive={isActive(item.to)}
+                  circuitColor={item.circuitColor}
+                  tabs={item.tabs}
+                  subItems={item.subItems}
+                  isExpanded={expandedForges[item.to]}
+                  onToggleExpand={() => handleToggleExpand(item.to)}
+                />
+              ))}
+            </Section>
+            {/* Séparateur après le Tableau de Bord (section primaire) */}
+            {section.type === 'primary' && (
+              <div className="sidebar-primary-separator" aria-hidden="true" />
+            )}
+          </React.Fragment>
         ))}
       </div>
     </aside>
