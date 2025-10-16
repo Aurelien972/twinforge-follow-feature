@@ -209,7 +209,12 @@ const MealInsightsTab: React.FC<MealInsightsTabProps> = ({ onLoadingChange }) =>
   }
 
   return (
-    <div className="space-y-6 w-full">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6 w-full"
+    >
       {/* Conformité Alimentaire - Insight IA */}
       {trendAnalysis?.diet_compliance && (
         <GlassCard 
@@ -300,7 +305,7 @@ const MealInsightsTab: React.FC<MealInsightsTabProps> = ({ onLoadingChange }) =>
         weekMeals={weekMeals}
         monthMeals={monthMeals}
       />
-    </div>
+    </motion.div>
   );
 };
 

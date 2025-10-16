@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { mealsRepo } from '../../../system/data/repositories/mealsRepo';
 import { useUserStore } from '../../../system/store/userStore';
@@ -204,7 +204,12 @@ const MealHistoryTab: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6 w-full">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="space-y-6 w-full"
+      >
         {Object.entries(groupedMeals).map(([date, dayMeals]) => (
           <div
             key={date}
@@ -365,7 +370,7 @@ const MealHistoryTab: React.FC = () => {
             </GlassCard>
           </div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Modal de Détail */}
       <AnimatePresence>
