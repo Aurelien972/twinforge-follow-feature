@@ -141,11 +141,12 @@ const MobileDrawer = React.memo(() => {
               msOverflowStyle: 'none'
             }}
           >
-            <div className="py-2 pl-4 pr-3 space-y-2">
+            <div className="py-3 pl-3 pr-2.5 space-y-2">
               {/* Navigation Sections */}
               {navSections.map((section, index) => (
-                <Section key={index} title={section.title}>
-                  {section.items.map((item) => {
+                <React.Fragment key={index}>
+                  <Section title={section.title}>
+                    {section.items.map((item) => {
                     const hasSubItems = item.subItems && item.subItems.length > 0;
 
                     // Check if any sub-item is active
@@ -170,15 +171,20 @@ const MobileDrawer = React.memo(() => {
                       <div key={item.to} className="relative sidebar-nav-item-container">
                         <Link
                           to={item.to}
-                          className={`sidebar-item ${
-                            hasSubItems ? 'sidebar-item--with-submenu' : ''
-                          } group focus-ring ${
-                            isActive(item.to) || hasActiveSubItem
+                          className={`
+                            sidebar-item
+                            ${item.isPrimary ? 'sidebar-item--primary' : ''}
+                            ${item.isTwin ? 'sidebar-item--twin' : ''}
+                            ${item.isForge ? 'sidebar-item--forge' : ''}
+                            ${hasSubItems ? 'sidebar-item--with-submenu' : ''}
+                            group focus-ring
+                            ${isActive(item.to) || hasActiveSubItem
                               ? 'text-white shadow-sm'
                               : 'text-white/70 hover:text-white'
-                          }`}
+                            }
+                          `}
                           onClick={handleNavItemClick}
-                          style={{ '--item-circuit-color': getCircuitColor(item.to) } as React.CSSProperties}
+                          style={{ '--item-circuit-color': item.circuitColor || getCircuitColor(item.to) } as React.CSSProperties}
                         >
                           {/* Icon container with glass pill effect */}
                           <div className={`sidebar-item-icon-container ${
@@ -260,7 +266,18 @@ const MobileDrawer = React.memo(() => {
                       </div>
                     );
                   })}
-                </Section>
+                  </Section>
+
+                  {/* Séparateur après le Tableau de Bord (section primaire) */}
+                  {section.type === 'primary' && (
+                    <div className="sidebar-primary-separator" aria-hidden="true" />
+                  )}
+
+                  {/* Séparateur avant les catégories de forges */}
+                  {section.type === 'forge-category' && (
+                    <div className="sidebar-category-separator" aria-hidden="true" />
+                  )}
+                </React.Fragment>
               ))}
             </div>
           </motion.nav>
