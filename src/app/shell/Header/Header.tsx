@@ -168,10 +168,10 @@ export const Header = React.memo(() => {
               />
             </motion.button>
 
-            {/* Bouton Hamburger - Menu de navigation */}
+            {/* Bouton Hamburger - Menu de navigation - MASQUÉ sur desktop */}
             <motion.button
               type="button"
-              className="user-panel-toggle relative"
+              className="user-panel-toggle relative lg:hidden"
               style={{
                 width: '48px',
                 height: '48px',

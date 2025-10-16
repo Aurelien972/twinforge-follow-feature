@@ -129,11 +129,23 @@ const MobileDrawer = React.memo(() => {
   // Handle logout
   const handleLogout = useCallback(async () => {
     try {
+      // Sign out from Supabase
       await supabase.auth.signOut();
+
+      // Clear local session state
+      useUserStore.getState().setSession(null);
+      useUserStore.getState().setProfile(null);
+
+      // Close drawer
       setDrawer(false);
-      navigate('/');
+
+      // Navigate to login page
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
+      // Even on error, close drawer and navigate
+      setDrawer(false);
+      navigate('/', { replace: true });
     }
   }, [navigate, setDrawer]);
 
@@ -378,25 +390,38 @@ const MobileDrawer = React.memo(() => {
                 {/* Séparateur avant déconnexion */}
                 <div className="sidebar-category-separator my-2" />
 
-                {/* Bouton Déconnexion */}
+                {/* Bouton Déconnexion avec gradient orange - HARMONISÉ avec sidebar */}
                 <button
                   onClick={handleLogout}
                   className="sidebar-item group focus-ring text-white/70 hover:text-white w-full"
-                  style={{ '--item-circuit-color': '#EF4444' } as React.CSSProperties}
+                  style={{
+                    '--item-circuit-color': '#FF6B35',
+                    textAlign: 'left'
+                  } as React.CSSProperties}
                 >
-                  <div className="sidebar-item-icon-container">
+                  <div
+                    className="sidebar-item-icon-container"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(247, 147, 30, 0.15))',
+                      border: '1.5px solid rgba(255, 107, 53, 0.35)',
+                      boxShadow: '0 0 16px rgba(255, 107, 53, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                    }}
+                  >
                     <SpatialIcon
                       Icon={ICONS.LogOut}
                       size={16}
                       className="sidebar-item-icon opacity-80 group-hover:opacity-100"
-                      style={{ color: '#EF4444' }}
+                      style={{
+                        color: '#FF6B35',
+                        filter: 'drop-shadow(0 0 6px rgba(255, 107, 53, 0.4))'
+                      }}
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="sidebar-item-label font-medium text-xs truncate text-white/82">
+                  <div className="flex-1 min-w-0 text-left">
+                    <div className="sidebar-item-label font-medium text-xs truncate text-white/82 text-left">
                       Déconnexion
                     </div>
-                    <div className="sidebar-item-subtitle text-xxs truncate mt-0 text-white/50">
+                    <div className="sidebar-item-subtitle text-xxs truncate mt-0 text-white/50 text-left">
                       Se déconnecter
                     </div>
                   </div>

@@ -292,21 +292,22 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
     try {
       logger.info('AUTH', 'Logout initiated');
 
-      // Clear session first for immediate UI feedback
-      useUserStore.getState().setSession(null);
-
-      // Then sign out from Supabase
+      // Sign out from Supabase
       await supabase.auth.signOut();
 
-      logger.info('AUTH', 'Logout successful');
+      // Clear local session state
+      useUserStore.getState().setSession(null);
+      useUserStore.getState().setProfile(null);
 
-      // Navigate with smooth transition
-      setTimeout(() => {
-        navigate('/', { replace: true });
-      }, 300);
+      logger.info('AUTH', 'Logout successful, navigating to login');
+
+      // Navigate immediately to login page
+      navigate('/', { replace: true });
     } catch (error) {
       logger.error('AUTH', 'Logout error', { error });
       console.error('Logout error:', error);
+      // Even on error, try to navigate to login
+      navigate('/', { replace: true });
     }
   }, [navigate]);
 
