@@ -57,7 +57,8 @@ const MobileDrawer = React.memo(() => {
     }
   }, [drawerOpen]);
 
-  const navSections = navFor();
+  // Memoize navSections to prevent re-renders
+  const navSections = useMemo(() => navFor(), []);
 
   // Auto-expand menu if user is on a sub-page and close others
   React.useEffect(() => {
