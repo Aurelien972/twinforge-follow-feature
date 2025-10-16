@@ -11,9 +11,11 @@ import { navFor } from '../../app/shell/navigation';
 
 const Section = React.memo(({ title, children }: { title: string; children: React.ReactNode }) => (
   <div>
-    <h3 className="text-white/60 text-xs uppercase tracking-wider font-medium mb-2 px-3" style={{ color: 'var(--brand-accent)' }}>
-      {title}
-    </h3>
+    {title && (
+      <h3 className="sidebar-section-title text-white/50 text-xs uppercase tracking-wider font-semibold mb-1 px-1">
+        {title}
+      </h3>
+    )}
     <div className="space-y-0.5">
       {children}
     </div>
@@ -134,21 +136,12 @@ const MobileDrawer = React.memo(() => {
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             role="navigation"
             aria-label="Navigation mobile"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
           >
-            <div className="py-4 pl-4 pr-2 space-y-6">
-              {/* Header - Close button only */}
-              <div className="flex items-center justify-end mb-2">
-                <motion.button
-                  onClick={() => setDrawer(false)}
-                  className="mobile-drawer-close-btn"
-                  aria-label="Fermer le menu"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <SpatialIcon Icon={ICONS.X} size={20} className="text-white/90" />
-                </motion.button>
-              </div>
-
+            <div className="py-2 pl-4 pr-3 space-y-2">
               {/* Navigation Sections */}
               {navSections.map((section, index) => (
                 <Section key={index} title={section.title}>
