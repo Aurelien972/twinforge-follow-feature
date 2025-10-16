@@ -20,16 +20,12 @@ function hexToRgbArray(hex: string): [number, number, number] {
   return [r, g, b];
 }
 
-/** Sélection de section tolérante (clé ou titre) */
-function pickSection(
+/** Sélection de section par clé */
+function getSection(
   sections: { key?: string; title: string; actions: QuickAction[] }[],
-  keys: string[],
-  titleIncludes: string[]
+  key: string
 ) {
-  const byKey = sections.find((s) => s.key && keys.includes(s.key));
-  if (byKey) return byKey;
-  const lowerInc = titleIncludes.map((t) => t.toLowerCase());
-  return sections.find((s) => lowerInc.some((inc) => s.title?.toLowerCase?.().includes(inc)));
+  return sections.find((s) => s.key === key) || { title: '', actions: [] };
 }
 
 interface CentralActionsMenuProps {
@@ -49,32 +45,11 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
   const { click, success } = useFeedback();
   const { close: closeOverlay } = useOverlayStore();
 
-  // Catégorie Alimentation
-  const foodTrackingSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['tracking-food'], ['outils de suivi']) ??
-    { title: 'Outils de Suivi', actions: [] };
-
-  const foodGeneratorsSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['generators-food'], ['générateurs']) ??
-    { title: 'Générateurs', actions: [] };
-
-  // Catégorie Activité
-  const activityTrackingSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['tracking-activity'], ['outils de suivi']) ??
-    { title: 'Outils de Suivi', actions: [] };
-
-  const activityGeneratorsSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['generators-activity'], ['générateurs']) ??
-    { title: 'Générateurs', actions: [] };
-
-  // Catégorie Santé
-  const healthTrackingSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['tracking-health'], ['outils de suivi']) ??
-    { title: 'Outils de Suivi', actions: [] };
-
-  const homeSection =
-    pickSection(QUICK_ACTION_SECTIONS, ['navigation', 'home', 'main'], ['navigation', 'accueil']) ??
-    { title: 'Navigation', actions: [] };
+  // Récupération des sections par catégorie
+  const alimentationSection = getSection(QUICK_ACTION_SECTIONS, 'alimentation');
+  const activiteSection = getSection(QUICK_ACTION_SECTIONS, 'activite');
+  const santeSection = getSection(QUICK_ACTION_SECTIONS, 'sante');
+  const homeSection = getSection(QUICK_ACTION_SECTIONS, 'navigation');
 
   const homeAction =
     homeSection.actions.find(
@@ -86,6 +61,7 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
   const handleActionClick = (action: QuickAction, isTile: boolean = false, event?: React.MouseEvent) => {
     if (!action?.available) {
       logger.warn('CENTRAL_ACTIONS', 'Action not available', { actionId: action?.id });
+      click();
       return;
     }
 
@@ -234,29 +210,36 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
   /** Petits boutons (pills) — style identique Workout */
   const SecondaryPill: React.FC<{ action: QuickAction; index: number }> = ({ action, index }) => {
     const [r, g, b] = hexToRgbArray(action.color || '#18E3FF');
+    const isComingSoon = !action.available;
+    const isComingSoonLabel = action.subtitle === 'COMING SOON';
+
     return (
       <motion.button
         key={action.id}
         onClick={(e) => handleActionClick(action, false, e)}
-        className="glass-card rounded-xl px-2 py-1.5 flex items-center gap-1.5 w-full"
+        disabled={isComingSoon}
+        className="glass-card rounded-xl px-2 py-1.5 flex items-center gap-1.5 w-full relative"
         style={{
           background: 'var(--glass-opacity-base)',
-          border: `1px solid rgba(${r}, ${g}, ${b}, 0.24)`,
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 14px rgba(0,0,0,0.18)'
+          border: `1px solid rgba(${r}, ${g}, ${b}, ${isComingSoon ? '0.15' : '0.24'})`,
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 14px rgba(0,0,0,0.18)',
+          opacity: isComingSoon ? 0.5 : 1,
+          cursor: isComingSoon ? 'not-allowed' : 'pointer'
         }}
         initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+        animate={{ opacity: isComingSoon ? 0.5 : 1, y: 0 }}
         transition={{ ...springy, delay: reduceMotion ? 0 : index * 0.05 }}
-        whileHover={reduceMotion ? {} : { y: -1, scale: 1.02 }}
-        whileTap={reduceMotion ? {} : { scale: 0.98 }}
+        whileHover={reduceMotion || isComingSoon ? {} : { y: -1, scale: 1.02 }}
+        whileTap={reduceMotion || isComingSoon ? {} : { scale: 0.98 }}
         role="menuitem"
         aria-label={action.description || action.label}
+        aria-disabled={isComingSoon}
       >
         <div
           className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
           style={{
-            background: `linear-gradient(135deg, rgba(${r}, ${g}, ${b}, 0.3), rgba(${r}, ${g}, ${b}, 0.18))`,
-            border: `1px solid rgba(${r}, ${g}, ${b}, 0.4)`,
+            background: `linear-gradient(135deg, rgba(${r}, ${g}, ${b}, ${isComingSoon ? '0.2' : '0.3'}), rgba(${r}, ${g}, ${b}, ${isComingSoon ? '0.12' : '0.18'}))`,
+            border: `1px solid rgba(${r}, ${g}, ${b}, ${isComingSoon ? '0.25' : '0.4'})`,
             borderRadius: '0.5rem',
             overflow: 'hidden'
           }}
@@ -268,11 +251,29 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
             {action.label}
           </div>
           {action.subtitle && (
-            <div className="text-[9px] text-white/65 leading-tight mt-0.5 break-words">
+            <div
+              className="text-[9px] leading-tight mt-0.5 break-words"
+              style={{
+                color: isComingSoonLabel ? '#F59E0B' : 'rgba(255, 255, 255, 0.65)',
+                fontWeight: isComingSoonLabel ? 600 : 400
+              }}
+            >
               {action.subtitle}
             </div>
           )}
         </div>
+        {isComingSoon && (
+          <div
+            className="absolute top-0.5 right-0.5 text-[7px] font-bold px-1.5 py-0.5 rounded"
+            style={{
+              background: 'rgba(245, 158, 11, 0.2)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              color: '#F59E0B'
+            }}
+          >
+            SOON
+          </div>
+        )}
       </motion.button>
     );
   };
@@ -398,111 +399,52 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
             </div>
 
             {/* ========== CATÉGORIE: ALIMENTATION ========== */}
-            <div className="mb-3">
-              <div className="px-1.5 mb-1.5">
-                <h3 className="text-[#10B981] text-[11px] uppercase tracking-wider font-bold">
-                  Alimentation
-                </h3>
+            {alimentationSection.actions.length > 0 && (
+              <div className="mb-3">
+                <div className="px-1.5 mb-1.5">
+                  <h3 className="text-white/75 text-[11px] uppercase tracking-wider font-bold">
+                    Alimentation
+                  </h3>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {alimentationSection.actions.map((a, i) => (
+                    <SecondaryPill key={a.id} action={a} index={i} />
+                  ))}
+                </div>
               </div>
-
-              {/* Outils de Suivi */}
-              {foodTrackingSection.actions.length > 0 && (
-                <div className="mb-2.5">
-                  <div className="px-1.5 mb-1.5">
-                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
-                      Outils de suivi
-                    </h4>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {foodTrackingSection.actions.map((a, i) => (
-                      <SecondaryPill key={a.id} action={a} index={i} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Générateurs */}
-              {foodGeneratorsSection.actions.length > 0 && (
-                <div>
-                  <div className="px-1.5 mb-1.5">
-                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
-                      Générateurs
-                    </h4>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {foodGeneratorsSection.actions.map((a, i) => (
-                      <SecondaryPill key={a.id} action={a} index={i} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* ========== CATÉGORIE: ACTIVITÉ ========== */}
-            <div className="mb-3">
-              <div className="px-1.5 mb-1.5">
-                <h3 className="text-[#3B82F6] text-[11px] uppercase tracking-wider font-bold">
-                  Activité
-                </h3>
+            {activiteSection.actions.length > 0 && (
+              <div className="mb-3">
+                <div className="px-1.5 mb-1.5">
+                  <h3 className="text-white/75 text-[11px] uppercase tracking-wider font-bold">
+                    Activité
+                  </h3>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {activiteSection.actions.map((a, i) => (
+                    <SecondaryPill key={a.id} action={a} index={i} />
+                  ))}
+                </div>
               </div>
-
-              {/* Outils de Suivi */}
-              {activityTrackingSection.actions.length > 0 && (
-                <div className="mb-2.5">
-                  <div className="px-1.5 mb-1.5">
-                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
-                      Outils de suivi
-                    </h4>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {activityTrackingSection.actions.map((a, i) => (
-                      <SecondaryPill key={a.id} action={a} index={i} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Générateurs */}
-              {activityGeneratorsSection.actions.length > 0 && (
-                <div>
-                  <div className="px-1.5 mb-1.5">
-                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
-                      Générateurs
-                    </h4>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {activityGeneratorsSection.actions.map((a, i) => (
-                      <SecondaryPill key={a.id} action={a} index={i} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* ========== CATÉGORIE: SANTÉ ========== */}
-            <div>
-              <div className="px-1.5 mb-1.5">
-                <h3 className="text-[#EF4444] text-[11px] uppercase tracking-wider font-bold">
-                  Santé
-                </h3>
-              </div>
-
-              {/* Outils de Suivi */}
-              {healthTrackingSection.actions.length > 0 && (
-                <div>
-                  <div className="px-1.5 mb-1.5">
-                    <h4 className="text-white/65 text-[9px] uppercase tracking-wider font-semibold">
-                      Outils de suivi
-                    </h4>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {healthTrackingSection.actions.map((a, i) => (
-                      <SecondaryPill key={a.id} action={a} index={i} />
-                    ))}
-                  </div>
+            {santeSection.actions.length > 0 && (
+              <div>
+                <div className="px-1.5 mb-1.5">
+                  <h3 className="text-white/75 text-[11px] uppercase tracking-wider font-bold">
+                    Santé
+                  </h3>
                 </div>
-              )}
-            </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {santeSection.actions.map((a, i) => (
+                    <SecondaryPill key={a.id} action={a} index={i} />
+                  ))}
+                </div>
+              </div>
+            )}
             </div>
           </div>
         </motion.div>
