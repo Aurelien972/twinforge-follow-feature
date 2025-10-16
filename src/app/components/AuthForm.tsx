@@ -8,6 +8,7 @@ import GlassCard from '../../ui/cards/GlassCard';
 import SpatialIcon from '../../ui/icons/SpatialIcon';
 import { ICONS } from '../../ui/icons/registry';
 import TwinForgeLogo from '../../ui/components/branding/TwinForgeLogo';
+import ForgeHammerIcon from '../../ui/icons/ForgeHammerIcon';
 import logger from '../../lib/utils/logger';
 
 interface AuthFormProps {
@@ -234,9 +235,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
               backdropFilter: 'blur(32px) saturate(180%)'
             }}
           >
-            {/* Logo TwinForge */}
+            {/* Logo TwinForge avec T stylisé */}
             <motion.div
-              className="flex justify-center mb-6"
+              className="flex flex-col items-center justify-center mb-6 gap-3"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -246,14 +247,33 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                 pointerEvents: 'auto'
               }}
             >
-              <div
-                className="transform scale-110"
+              {/* T stylisé (ForgeHammerIcon) */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
+                style={{
+                  filter: 'drop-shadow(0 0 20px rgba(253, 200, 48, 0.4)) drop-shadow(0 0 12px rgba(247, 147, 30, 0.3))'
+                }}
+              >
+                <ForgeHammerIcon
+                  width={55}
+                  height={45}
+                  isHovered={false}
+                />
+              </motion.div>
+
+              {/* Texte TWINFORGE */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
                 style={{
                   filter: 'drop-shadow(0 0 16px color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.1))'
                 }}
               >
                 <TwinForgeLogo variant="desktop" isHovered={false} />
-              </div>
+              </motion.div>
             </motion.div>
 
             <div style={{ position: 'relative', zIndex: 103, pointerEvents: 'auto' }}>

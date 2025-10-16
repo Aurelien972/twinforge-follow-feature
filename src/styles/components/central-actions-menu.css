@@ -3,7 +3,7 @@
    VisionOS 26 Outils du Forgeron Panel
    ========================================= */
 
-/* Main panel container with ultra-transparent glass */
+/* Main panel container with ultra-transparent glass - UNIFIED ANIMATION */
 .central-actions-panel {
   /* Ultra-transparent Liquid Glass with multi-layer reflections */
   background:
@@ -21,8 +21,12 @@
   overflow: hidden !important;
 
   transform: translateZ(0);
-  will-change: transform, filter;
+  will-change: transform, filter, opacity;
   backface-visibility: hidden;
+
+  /* CRITICAL: Unified opacity transition to prevent two-step appearance */
+  opacity: 1;
+  transition: opacity 0.15s ease-out;
 
   /* Safari rounded corners fix */
   -webkit-mask-image: -webkit-radial-gradient(white, black);
@@ -158,7 +162,7 @@
   z-index: 10;
 }
 
-/* Header drag indicator - glass strip */
+/* Header drag indicator - glass strip - NO WHITE BANDS */
 .central-actions-panel .h-1\.5 {
   background: linear-gradient(
     90deg,
@@ -168,25 +172,42 @@
     rgba(255, 255, 255, 0.5) 80%,
     transparent 100%
   );
-  /* Removed box-shadow to prevent rectangular shadows */
   backdrop-filter: blur(4px);
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
-/* Section titles - clean without shadows */
+/* Section titles - TOTALLY CLEAN NO WHITE BANDS */
 .central-actions-panel h3,
 .central-actions-panel h4 {
   position: relative;
-  text-shadow: none;
-  box-shadow: none;
-  background: none;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  background: none !important;
+  border: none !important;
+  outline: none !important;
+  text-decoration: none !important;
 }
 
-/* Remove any pseudo-elements that could create shadows */
+/* CRITICAL: Remove all pseudo-elements that could create white bands */
 .central-actions-panel h3::before,
 .central-actions-panel h3::after,
 .central-actions-panel h4::before,
 .central-actions-panel h4::after {
-  display: none;
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure parent containers don't add white bands */
+.central-actions-panel .px-1\.5,
+.central-actions-panel .mb-1\.5 {
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 /* Enhanced tile glass cards - clean with proper border radius */
@@ -371,7 +392,7 @@
   }
 }
 
-/* Avatar Twin Button - Premium Principal Button */
+/* Avatar Twin Button - Premium Principal Button - REDUCED GLOW */
 .central-actions-panel .avatar-twin-button {
   position: relative;
   overflow: hidden;
@@ -380,21 +401,28 @@
   min-height: 64px;
   isolation: isolate;
   transform: translateZ(0);
+  border-radius: 16px !important;
 }
 
-/* Avatar Twin Button - Animated gradient border */
+/* CRITICAL: Remove excessive glow underneath button */
+.central-actions-panel .avatar-twin-button,
+.central-actions-panel .avatar-twin-button * {
+  box-shadow: none !important;
+}
+
+/* Avatar Twin Button - Animated gradient border - SUBTLE */
 .central-actions-panel .avatar-twin-button::before {
   content: '';
   position: absolute;
   inset: -1px;
-  border-radius: inherit;
+  border-radius: 16px;
   padding: 1px;
   background: linear-gradient(
     135deg,
-    rgba(217, 70, 239, 0.6) 0%,
-    rgba(139, 92, 246, 0.5) 25%,
-    rgba(236, 72, 153, 0.5) 50%,
-    rgba(217, 70, 239, 0.6) 100%
+    rgba(217, 70, 239, 0.4) 0%,
+    rgba(139, 92, 246, 0.35) 25%,
+    rgba(236, 72, 153, 0.35) 50%,
+    rgba(217, 70, 239, 0.4) 100%
   );
   background-size: 200% 200%;
   -webkit-mask:
@@ -403,9 +431,11 @@
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
-  opacity: 0.8;
+  opacity: 0.6;
   z-index: 1;
   animation: avatarBorderFlow 4s ease-in-out infinite;
+  filter: none;
+  box-shadow: none !important;
 }
 
 /* Avatar Twin Button - Inner glow effect */
@@ -427,15 +457,15 @@
   z-index: 0;
 }
 
-/* Avatar Twin Button hover enhancement */
+/* Avatar Twin Button hover enhancement - SUBTLE GLOW ONLY */
 @media (hover: hover) and (pointer: fine) {
   .central-actions-panel .avatar-twin-button:hover {
     transform: scale(1.03) translateY(-3px) translateZ(0);
-    /* Removed box-shadow to prevent rectangular shadows */
+    box-shadow: 0 8px 24px rgba(217, 70, 239, 0.2) !important;
   }
 
   .central-actions-panel .avatar-twin-button:hover::before {
-    opacity: 1;
+    opacity: 0.8;
     animation-duration: 3s;
   }
 }
@@ -455,20 +485,34 @@
   }
 }
 
-/* Performance optimizations for mobile */
+/* Performance optimizations for mobile - GPU ACCELERATED */
 @media (max-width: 768px) {
   .central-actions-panel {
     padding: 8px !important;
+    /* GPU acceleration for smooth animations */
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
   }
 
   .central-actions-panel::after {
     filter: blur(8px);
+    /* Disable glow animation on mobile for better performance */
+    animation: none !important;
+  }
+
+  .central-actions-panel::before {
+    /* Reduce border animation complexity on mobile */
+    animation-duration: 8s !important;
   }
 
   .central-actions-panel .glass-card,
   .central-actions-panel button {
     backdrop-filter: blur(14px) saturate(140%);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
+    /* GPU acceleration */
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    will-change: transform;
   }
 
   /* Optimiser l'espace vertical sur mobile - tout doit être visible sans scroll */
@@ -562,10 +606,23 @@
     height: 12px !important;
   }
 
-  /* Avatar Twin Button - Mobile compact */
+  /* Avatar Twin Button - Mobile compact - OPTIMIZED */
   .central-actions-panel .avatar-twin-button {
     min-height: 56px !important;
     padding: 10px 12px !important;
+    /* Reduce animation complexity on mobile */
+    animation: none !important;
+  }
+
+  .central-actions-panel .avatar-twin-button::before {
+    /* Simplify border animation on mobile */
+    animation-duration: 6s !important;
+    opacity: 0.5 !important;
+  }
+
+  .central-actions-panel .avatar-twin-button::after {
+    /* Disable inner glow on mobile for performance */
+    display: none !important;
   }
 
   .central-actions-panel .avatar-twin-button > div:first-child {

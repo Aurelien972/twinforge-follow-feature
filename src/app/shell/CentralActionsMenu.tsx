@@ -223,22 +223,34 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
   const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
   const isDesktop = window.innerWidth >= 1024;
 
-  // Animation variants: slide from top for all devices (menu opens from header)
+  // Animation variants: UNIFIED single-step appearance (no two-phase)
   const animationVariants = {
     initial: {
       opacity: 0,
-      scale: 0.88,
-      y: -32
+      scale: 0.92,
+      y: -20
     },
     animate: {
       opacity: 1,
       scale: 1,
-      y: 0
+      y: 0,
+      transition: {
+        duration: 0.25,
+        ease: [0.25, 0.1, 0.25, 1],
+        // All properties animate together
+        opacity: { duration: 0.25 },
+        scale: { duration: 0.25 },
+        y: { duration: 0.25 }
+      }
     },
     exit: {
       opacity: 0,
-      scale: 0.90,
-      y: -24
+      scale: 0.94,
+      y: -16,
+      transition: {
+        duration: 0.2,
+        ease: [0.25, 0.1, 0.25, 1]
+      }
     }
   };
 
@@ -276,17 +288,18 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
           initial={animationVariants.initial}
           animate={animationVariants.animate}
           exit={animationVariants.exit}
-          transition={springy}
           role="dialog"
           aria-label="Actions rapides"
           aria-modal="true"
         >
-          {/* PANEL - Ultra-transparent Liquid Glass */}
+          {/* PANEL - Ultra-transparent Liquid Glass - UNIFIED APPEARANCE */}
           <div
             className="rounded-3xl overflow-hidden relative central-actions-panel liquid-glass-premium max-h-[inherit]"
             style={{
               padding: 12,
-              isolation: 'isolate'
+              isolation: 'isolate',
+              opacity: 1,
+              willChange: 'transform, opacity'
             }}
           >
             {/* Inner scroll container */}
