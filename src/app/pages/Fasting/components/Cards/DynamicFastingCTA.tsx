@@ -8,7 +8,12 @@ import { useFeedback } from '../../../../../hooks/useFeedback';
 import { usePreferredMotion } from '../../../../../system/device/DeviceProvider';
 import { useUserStore } from '@/system/store/userStore';
 import { useFastingPipeline, useFastingElapsedSeconds, useFastingProgressPercentage, useFastingTimerTick } from '../../hooks/useFastingPipeline';
-import { getCurrentFastingPhase, getMotivationalMessage } from '../../../../../lib/nutrition/fastingPhases';
+import {
+  getCurrentFastingPhase,
+  getMotivationalMessage,
+  getPhaseProgress,
+  estimateCaloriesBurnedInPhase
+} from '../../../../../lib/nutrition/fastingPhases';
 import { formatElapsedTime } from '../../utils/fastingUtils';
 import { getProtocolById } from '../../../../../lib/nutrition/fastingProtocols';
 
@@ -383,23 +388,103 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
             </button>
           </div>
 
-          {/* Message motivationnel pour session active */}
-          {isActive && currentPhase && (
-            <div 
-              className="px-3 py-1.5 rounded-full"
-              style={{
-                backdropFilter: 'blur(8px) saturate(120%)'
-              }}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <SpatialIcon Icon={ICONS[currentPhase.icon]} size={14} style={{ color: currentPhase.color }} />
-                <span className="text-sm font-semibold" style={{ color: currentPhase.color }}>
-                  {currentPhase.name}
-                </span>
+          {/* Métriques principales de la session active */}
+          {isActive && currentPhase && session && (
+            <div className="space-y-4 mt-6">
+              {/* 4 Métriques Principales */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {/* Phase Progress */}
+                <div className="text-center p-3 rounded-xl" style={{
+                  background: `color-mix(in srgb, ${currentPhase.color} 12%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${currentPhase.color} 25%, transparent)`
+                }}>
+                  <div className="text-xl font-bold text-white mb-1">
+                    {Math.round(getPhaseProgress(elapsedHours, currentPhase))}%
+                  </div>
+                  <div className="text-xs font-medium" style={{ color: currentPhase.color }}>
+                    Phase {currentPhase.name}
+                  </div>
+                  <div className="text-white/50 text-xs mt-0.5">Progression</div>
+                </div>
+
+                {/* Calories Burned */}
+                <div className="text-center p-3 rounded-xl" style={{
+                  background: 'color-mix(in srgb, #EF4444 12%, transparent)',
+                  border: '1px solid color-mix(in srgb, #EF4444 25%, transparent)'
+                }}>
+                  <div className="text-xl font-bold text-red-400 mb-1">
+                    {estimateCaloriesBurnedInPhase(currentPhase, elapsedHours, profile?.weight_kg || 70)}
+                  </div>
+                  <div className="text-red-300 text-xs font-medium">Calories</div>
+                  <div className="text-white/50 text-xs mt-0.5">Brûlées</div>
+                </div>
+
+                {/* Metabolic State */}
+                <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div className="text-sm font-bold text-white mb-1 truncate">
+                    {currentPhase.metabolicState}
+                  </div>
+                  <div className="text-white/70 text-xs font-medium">État</div>
+                  <div className="text-white/50 text-xs mt-0.5">Métabolique</div>
+                </div>
+
+                {/* Protocol */}
+                <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div className="text-sm font-bold text-white mb-1 truncate">
+                    {session.protocol}
+                  </div>
+                  <div className="text-white/70 text-xs font-medium">Protocole</div>
+                  <div className="text-white/50 text-xs mt-0.5">Actif</div>
+                </div>
               </div>
-              <p className="text-white/80 text-sm leading-relaxed">
-                {getMotivationalMessage(currentPhase, elapsedHours)}
-              </p>
+
+              {/* Message Motivationnel */}
+              <div
+                className="p-4 rounded-xl"
+                style={{
+                  background: `color-mix(in srgb, ${currentPhase.color} 8%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${currentPhase.color} 20%, transparent)`
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <SpatialIcon Icon={ICONS.Heart} size={14} style={{ color: currentPhase.color }} />
+                  <span className="text-sm font-semibold" style={{ color: currentPhase.color }}>
+                    Message de la Forge
+                  </span>
+                </div>
+                <p className="text-white/85 text-sm leading-relaxed">
+                  {getMotivationalMessage(currentPhase, elapsedHours)}
+                </p>
+              </div>
+
+              {/* Bénéfices Actuels */}
+              <div>
+                <h4 className="text-white font-semibold mb-3 flex items-center gap-2 text-sm">
+                  <SpatialIcon Icon={ICONS.Check} size={16} style={{ color: currentPhase.color }} />
+                  Bénéfices Actuels
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {currentPhase.benefits.slice(0, 4).map((benefit: string, index: number) => (
+                    <motion.div
+                      key={index}
+                      className="flex items-center gap-2 p-2 rounded-lg"
+                      style={{
+                        background: `color-mix(in srgb, ${currentPhase.color} 6%, transparent)`,
+                        border: `1px solid color-mix(in srgb, ${currentPhase.color} 15%, transparent)`
+                      }}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                    >
+                      <div
+                        className="w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ background: currentPhase.color }}
+                      />
+                      <span className="text-white/80 text-xs">{benefit}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>

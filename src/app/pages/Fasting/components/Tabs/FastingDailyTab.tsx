@@ -1,40 +1,45 @@
 import React from 'react';
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useFastingPipeline, useFastingElapsedSeconds, useFastingProgressPercentage } from '../../hooks/useFastingPipeline';
+import { useFastingPipeline } from '../../hooks/useFastingPipeline';
 import { useUserStore } from '@/system/store/userStore';
-import { useToast } from '@/ui/components/ToastProvider';
-import { useFeedback } from '@/hooks/useFeedback';
-import GlassCard from '@/ui/cards/GlassCard';
-import SpatialIcon from '@/ui/icons/SpatialIcon';
-import { ICONS } from '@/ui/icons/registry';
 import DynamicFastingCTA from '../Cards/DynamicFastingCTA';
-import FastingCurrentSessionCard from '../Cards/FastingCurrentSessionCard';
 import FastingDailySummaryCard from '../Cards/FastingDailySummaryCard';
 import FastingTipsCard from '../Cards/FastingTipsCard';
 
+interface FastingDailyTabProps {
+  onLoadingChange?: (isLoading: boolean) => void;
+}
+
 /**
- * Fasting Daily Tab - Onglet Aujourd'hui de la Forge du Temps
- * Affiche le statut actuel du jeûne et les sessions de la journée
+ * Fasting Daily Tab - Onglet Tracker de la Forge du Temps
+ * Affiche le statut actuel du jeûne avec toutes les métriques détaillées
+ *
+ * RÔLE: Vue d'information complète pour le suivi du jeûne (lecture seule)
+ * Pour les actions (démarrer/arrêter), l'utilisateur est redirigé vers /fasting/input
  */
-const FastingDailyTab: React.FC = () => {
-  const { profile, session } = useUserStore();
+const FastingDailyTab: React.FC<FastingDailyTabProps> = ({ onLoadingChange }) => {
+  const { profile } = useUserStore();
   const { isActive, session: fastingSession } = useFastingPipeline();
 
   return (
     <div className="space-y-6">
-      {/* CTA Dynamique pour le Jeûne */}
+      {/*
+        CTA Dynamique Enrichi pour le Jeûne
+        Affiche toutes les informations de la session active:
+        - Timer en temps réel
+        - Progression globale
+        - 4 métriques principales (Phase, Calories, État métabolique, Protocole)
+        - Message motivationnel
+        - Bénéfices actuels de la phase
+
+        Si aucune session active: affiche un CTA pour démarrer un jeûne
+      */}
       <DynamicFastingCTA />
 
-      {/* Session Active ou Résumé Quotidien */}
-      {isActive && fastingSession ? (
-        <FastingCurrentSessionCard
-          session={fastingSession}
-          userWeight={profile?.weight_kg}
-        />
-      ) : (
-        <FastingDailySummaryCard />
-      )}
+      {/*
+        Résumé Quotidien - Affiché uniquement si aucune session active
+        Affiche les statistiques des sessions complétées aujourd'hui
+      */}
+      {!isActive && <FastingDailySummaryCard />}
 
       {/* Conseils de Jeûne */}
       <FastingTipsCard />

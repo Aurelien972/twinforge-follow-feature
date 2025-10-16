@@ -16,6 +16,7 @@ export { default as FastingCompletionStage } from './Stages/FastingCompletionSta
 
 // Cards Components
 export { default as DynamicFastingCTA } from './Cards/DynamicFastingCTA';
+/** @deprecated Remplacé par DynamicFastingCTA qui inclut toutes ces fonctionnalités */
 export { default as FastingCurrentSessionCard } from './Cards/FastingCurrentSessionCard';
 export { default as FastingDailySummaryCard } from './Cards/FastingDailySummaryCard';
 export { default as FastingMetabolicPhasesCard } from './Cards/FastingMetabolicPhasesCard';

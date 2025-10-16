@@ -30,8 +30,18 @@ interface FastingCurrentSessionCardProps {
 }
 
 /**
+ * @deprecated Ce composant n'est plus utilisé.
+ * Toutes ses fonctionnalités ont été intégrées dans DynamicFastingCTA.
+ *
  * Fasting Current Session Card - Session Active en Temps Réel
  * Affiche les détails de la session de jeûne active avec phase métabolique
+ *
+ * REMPLACEMENT: Voir DynamicFastingCTA qui inclut maintenant:
+ * - Timer en temps réel
+ * - Progression globale
+ * - 4 métriques principales (Phase, Calories, État métabolique, Protocole)
+ * - Message motivationnel
+ * - Bénéfices actuels de la phase
  */
 const FastingCurrentSessionCard: React.FC<FastingCurrentSessionCardProps> = ({
   session,

@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { format } from 'date-fns';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
@@ -29,8 +28,11 @@ interface FastingActiveStageProps {
 }
 
 /**
- * Fasting Active Stage - Session de Jeûne Active
- * Interface de suivi en temps réel d'une session de jeûne
+ * Fasting Active Stage - Contrôles de Session Active (Pipeline)
+ * Interface de contrôle simplifiée pour gérer une session de jeûne en cours
+ *
+ * RÔLE: Contrôles d'action uniquement (arrêter le jeûne)
+ * Pour la visualisation détaillée, voir l'onglet Tracker
  */
 const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
   session,
@@ -64,8 +66,8 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
   };
 
   return (
-    <GlassCard 
-      className="p-8 text-center"
+    <GlassCard
+      className="p-6 md:p-8"
       style={{
         background: `
           radial-gradient(circle at 30% 20%, color-mix(in srgb, #EF4444 15%, transparent) 0%, transparent 60%),
@@ -83,72 +85,53 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
       }}
     >
       <div className="space-y-6">
-        {/* Icône Centrale Active */}
-        <div className="flex items-center justify-center w-full">
-          <div
-            className="w-32 h-32 rounded-full flex items-center justify-center relative breathing-icon"
-            style={{
-              background: `
-                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
-                radial-gradient(circle at 70% 70%, color-mix(in srgb, #EF4444 20%, transparent) 0%, transparent 50%),
-                linear-gradient(135deg, color-mix(in srgb, #EF4444 45%, transparent), color-mix(in srgb, #F59E0B 35%, transparent))
-              `,
-              border: `4px solid color-mix(in srgb, #EF4444 70%, transparent)`,
-              boxShadow: `
-                0 0 60px color-mix(in srgb, #EF4444 70%, transparent),
-                0 0 100px color-mix(in srgb, #EF4444 50%, transparent),
-                0 0 140px color-mix(in srgb, #F59E0B 40%, transparent),
-                inset 0 4px 0 rgba(255,255,255,0.5),
-                inset 0 -3px 0 rgba(0,0,0,0.2)
-              `,
-              backdropFilter: 'blur(20px) saturate(170%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(170%)',
-              margin: '0 auto'
-            }}
-          >
-            <SpatialIcon
-              Icon={ICONS.Timer}
-              size={64}
+        {/* Header avec indicateur de session active */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center breathing-icon"
               style={{
-                color: '#EF4444',
-                filter: `
-                  drop-shadow(0 0 16px color-mix(in srgb, #EF4444 90%, transparent))
-                  drop-shadow(0 0 32px color-mix(in srgb, #EF4444 70%, transparent))
-                  drop-shadow(0 0 48px color-mix(in srgb, #F59E0B 50%, transparent))
-                `
+                background: `linear-gradient(135deg, color-mix(in srgb, #EF4444 40%, transparent), color-mix(in srgb, #F59E0B 30%, transparent))`,
+                border: `2px solid color-mix(in srgb, #EF4444 60%, transparent)`,
+                boxShadow: `0 0 25px color-mix(in srgb, #EF4444 50%, transparent)`
               }}
-              variant="pure"
-            />
+            >
+              <SpatialIcon
+                Icon={ICONS.Timer}
+                size={24}
+                style={{ color: '#EF4444' }}
+                variant="pure"
+              />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">Session Active</h3>
+              <p className="text-white/80 text-sm mt-0.5">
+                Contrôles de la session en cours
+              </p>
+            </div>
+          </div>
 
-            {/* Anneaux de Pulsation pour Session Active */}
+          <div className="flex items-center gap-2">
             <div
-              className="absolute inset-0 rounded-full border-2 animate-ping"
+              className="w-3 h-3 rounded-full animate-pulse"
               style={{
-                borderColor: 'color-mix(in srgb, #EF4444 50%, transparent)',
-                animationDuration: '2s'
+                background: '#EF4444',
+                boxShadow: '0 0 8px #EF444460'
               }}
             />
-            <div
-              className="absolute inset-0 rounded-full border-2 animate-ping"
-              style={{
-                borderColor: 'color-mix(in srgb, #F59E0B 40%, transparent)',
-                animationDuration: '2.5s',
-                animationDelay: '0.5s'
-              }}
-            />
+            <span className="text-red-300 text-sm font-medium">En cours</span>
           </div>
         </div>
 
-        {/* Temps Écoulé */}
-        <div className="space-y-3">
-          <h2 className="text-3xl font-bold text-white">Session Active</h2>
-          <div className="text-6xl font-black text-red-400">
+        {/* Temps Écoulé et Progression - Version simplifiée */}
+        <div className="text-center space-y-3">
+          <div className="text-5xl md:text-6xl font-black text-red-400">
             {formatElapsedTime(elapsedSeconds)}
           </div>
-          <p className="text-white/80 text-lg">
-            Objectif : {session?.targetHours}h • Progression : {progressPercentage?.toFixed(2) || '0.00'}%
+          <p className="text-white/70 text-base">
+            Objectif : {session?.targetHours}h • {progressPercentage?.toFixed(1) || '0.0'}% accompli
           </p>
-          
+
           {/* Barre de Progression */}
           <div className="max-w-md mx-auto">
             <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
@@ -166,9 +149,9 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
                 <div
                   className="absolute inset-0 rounded-full"
                   style={{
-                    background: `linear-gradient(90deg, 
-                      transparent 0%, 
-                      rgba(255,255,255,0.4) 50%, 
+                    background: `linear-gradient(90deg,
+                      transparent 0%,
+                      rgba(255,255,255,0.4) 50%,
                       transparent 100%
                     )`,
                     animation: 'progressShimmer 2s ease-in-out infinite'
@@ -179,14 +162,34 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
           </div>
         </div>
 
-        {/* Bouton d'Arrêt */}
+        {/* Message d'information */}
+        <div
+          className="p-4 rounded-xl text-center"
+          style={{
+            background: 'color-mix(in srgb, #06B6D4 8%, transparent)',
+            border: '1px solid color-mix(in srgb, #06B6D4 20%, transparent)'
+          }}
+        >
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <SpatialIcon Icon={ICONS.Info} size={16} className="text-cyan-400" />
+            <span className="text-sm font-semibold text-cyan-300">
+              Suivi Détaillé
+            </span>
+          </div>
+          <p className="text-white/75 text-sm leading-relaxed">
+            Pour voir les métriques détaillées de votre session (phases métaboliques, calories, bénéfices),
+            consultez l'onglet <strong className="text-white">Tracker</strong>.
+          </p>
+        </div>
+
+        {/* Bouton d'Arrêt Principal */}
         <div className="flex justify-center">
           <button
             onClick={handleStopFasting}
-            className="px-8 py-4 text-xl font-bold rounded-full relative overflow-hidden"
+            className="px-8 py-4 text-xl font-bold rounded-full relative overflow-hidden w-full md:w-auto"
             style={{
-              background: `linear-gradient(135deg, 
-                color-mix(in srgb, #EF4444 80%, transparent), 
+              background: `linear-gradient(135deg,
+                color-mix(in srgb, #EF4444 80%, transparent),
                 color-mix(in srgb, #F59E0B 60%, transparent)
               )`,
               border: '3px solid color-mix(in srgb, #EF4444 60%, transparent)',
@@ -200,8 +203,8 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
               transition: 'all 0.2s ease'
             }}
           >
-            <div className="flex items-center gap-3">
-              <SpatialIcon Icon={ICONS.Square} size={28} className="text-white" />
+            <div className="flex items-center justify-center gap-3">
+              <SpatialIcon Icon={ICONS.Square} size={24} className="text-white" />
               <span>Terminer le Jeûne</span>
             </div>
           </button>
