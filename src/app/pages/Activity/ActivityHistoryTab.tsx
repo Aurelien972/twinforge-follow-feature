@@ -183,7 +183,12 @@ const ActivityHistoryTab: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6 w-full">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="space-y-6 w-full"
+      >
         {Object.entries(groupedActivities).map(([date, dayActivities]) => {
           // Calculer les totaux du jour
           const dayTotalCalories = dayActivities.reduce((sum, activity) => sum + activity.calories_est, 0);
@@ -332,7 +337,7 @@ const ActivityHistoryTab: React.FC = () => {
             </div>
           );
         })}
-      </div>
+      </motion.div>
 
       {/* Modal de Détail */}
       <AnimatePresence>

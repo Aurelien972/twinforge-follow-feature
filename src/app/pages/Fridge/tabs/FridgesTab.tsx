@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useUserStore } from '../../../../system/store/userStore';
 import { useFridgeScanPipeline } from '../../../../system/store/fridgeScan';
 import { useMealPlanStore } from '../../../../system/store/mealPlanStore';
@@ -44,7 +45,12 @@ const FridgesTab: React.FC = () => {
   const selectedSession = sessions.find(session => session.id === selectedInventorySessionId);
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6"
+    >
       {/* Guide utilisateur - affiché quand aucun inventaire */}
       {!loading && sessions.length === 0 && <UserGuideCard />}
 
@@ -101,7 +107,7 @@ const FridgesTab: React.FC = () => {
           </button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

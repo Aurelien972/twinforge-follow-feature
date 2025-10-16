@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { usePlanTabLogic } from './PlanTab/hooks/usePlanTabLogic';
 import PlanHeaderSection from './PlanTab/components/PlanHeaderSection';
 import PlanContentSection from './PlanTab/components/PlanContentSection';
@@ -58,7 +59,12 @@ const PlanTab: React.FC = () => {
   } = usePlanTabLogic();
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="space-y-6"
+    >
       {/* Header Section */}
       {(currentPlan || isGenerating) && (
         <PlanHeaderSection
@@ -125,7 +131,7 @@ const PlanTab: React.FC = () => {
         }}
         recipe={selectedRecipeForDetail}
       />
-    </div>
+    </motion.div>
   );
 };
 
