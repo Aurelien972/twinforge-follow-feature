@@ -16,49 +16,40 @@ html.perf-ultra {
    FLAT CARD DESIGN - Colored with Forge Theme
    ========================================= */
 
-/* Target ALL glass cards with maximum specificity */
 .ultra-performance-mode .glass-card,
 html.perf-ultra .glass-card,
 .ultra-performance-mode .glass-base,
 html.perf-ultra .glass-base,
 .perf-ultra .glass-card,
-.perf-ultra .glass-base,
-.ultra-performance-mode div[class*="glass"],
-html.perf-ultra div[class*="glass"],
-.ultra-performance-mode a > div[class*="glass"],
-html.perf-ultra a > div[class*="glass"] {
+.perf-ultra .glass-base {
   /* Remove glassmorphism completely */
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 
-  /* Much more visible solid background - OVERRIDE INLINE STYLES */
+  /* Much more visible solid background with forge colors */
   background: linear-gradient(
     145deg,
-    rgba(93, 63, 211, 0.5) 0%,
-    rgba(24, 227, 255, 0.4) 100%
+    rgba(93, 63, 211, 0.35) 0%,
+    rgba(24, 227, 255, 0.25) 100%
   ) !important;
 
   /* Colored border with forge theme */
-  border: 1px solid rgba(24, 227, 255, 0.6) !important;
+  border: 1px solid rgba(24, 227, 255, 0.45) !important;
 
-  /* Strong shadow for high visibility */
+  /* Simple shadow for depth */
   box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.6),
-    0 0 40px rgba(24, 227, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
 
   /* No expensive transforms */
   transform: none !important;
   will-change: auto !important;
   contain: layout style !important;
 
-  /* CRITICAL: Force full visibility - override inline opacity */
+  /* Ensure visibility */
   opacity: 1 !important;
   visibility: visible !important;
-  /* Don't force display - let components use their natural display type */
-  min-height: 100px !important;
-  min-width: 100px !important;
-  pointer-events: auto !important;
+  display: block !important;
 }
 
 /* Hover state - simple color change */
@@ -212,15 +203,6 @@ html.perf-ultra .tabs-trigger {
 
 /* DO NOT disable transforms globally - components need them for layout */
 /* Framer-motion transforms are preserved for proper component positioning */
-
-/* CRITICAL: Force visibility for motion.div wrappers containing glass cards */
-.ultra-performance-mode motion-div,
-html.perf-ultra motion-div,
-.ultra-performance-mode [class*="motion"],
-html.perf-ultra [class*="motion"] {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
 
 /* =========================================
    SIMPLIFY 3D ELEMENTS
@@ -489,38 +471,6 @@ html.perf-ultra .perf-indicator {
    PRESERVE COMPONENT VISIBILITY
    Critical: All UI elements must remain visible
    ========================================= */
-
-/* CRITICAL: Ensure ALL containers and wrappers are visible */
-.ultra-performance-mode *,
-html.perf-ultra * {
-  /* DO NOT hide anything - performance mode should simplify, not hide */
-}
-
-/* Force visibility on common containers */
-.ultra-performance-mode .grid,
-html.perf-ultra .grid,
-.ultra-performance-mode div[class*="grid"],
-html.perf-ultra div[class*="grid"] {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-/* Ensure all link wrappers are visible */
-.ultra-performance-mode a,
-html.perf-ultra a {
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-/* Ensure flex containers remain visible */
-.ultra-performance-mode .flex,
-html.perf-ultra .flex,
-.ultra-performance-mode div[class*="flex"],
-html.perf-ultra div[class*="flex"] {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
 
 /* DO NOT force display/opacity/visibility - components manage their own state */
 /* Only ensure critical icon containers remain visible */
