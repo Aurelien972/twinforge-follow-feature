@@ -194,6 +194,7 @@ const TabsTrigger: React.FC<{
   const isActive = activeTab === value;
   const IconComponent = icon ? ICONS[icon] : null;
   const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const previousActiveRef = React.useRef<boolean>(isActive);
 
   // Récupération de la couleur depuis la configuration centralisée avec contexte de forge
   const getTabIconColor = (tabValue: string, isActive: boolean, forgeCtx?: string) => {
@@ -210,10 +211,35 @@ const TabsTrigger: React.FC<{
     return getTabColor(tabValue);
   };
 
+  // Auto-scroll when tab becomes active via external navigation (URL hash change)
+  React.useEffect(() => {
+    const wasInactive = !previousActiveRef.current;
+    const isNowActive = isActive;
+
+    // Only scroll if tab became active from inactive state (external navigation)
+    if (wasInactive && isNowActive && hasOverflow && triggerRef.current) {
+      // Small delay to ensure page is loaded and ready
+      const timeoutId = setTimeout(() => {
+        if (triggerRef.current) {
+          triggerRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center'
+          });
+        }
+      }, 150);
+
+      return () => clearTimeout(timeoutId);
+    }
+
+    // Update previous active state
+    previousActiveRef.current = isActive;
+  }, [isActive, hasOverflow]);
+
   const handleClick = () => {
     setActiveTab(value);
 
-    // Auto-scroll functionality for mobile when there's overflow
+    // Auto-scroll functionality for direct click when there's overflow
     if (hasOverflow && listRef?.current && triggerRef.current) {
       triggerRef.current.scrollIntoView({
         behavior: 'smooth',
