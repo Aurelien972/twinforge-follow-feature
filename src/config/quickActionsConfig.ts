@@ -109,6 +109,16 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
     title: 'Activité',
     actions: [
       {
+        id: 'coach-training',
+        label: 'Coach Training',
+        subtitle: 'Live Training',
+        icon: 'Dumbbell',
+        route: '/training',
+        color: '#F97316',
+        available: true,
+        description: 'Accéder à la pipeline de training avec coaching en direct'
+      },
+      {
         id: 'track-activity',
         label: "Tracker d'Activité",
         subtitle: "Enregistrez vos séances",
@@ -117,16 +127,6 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
         color: '#3B82F6',
         available: true,
         description: "Enregistrer une nouvelle séance d'activité"
-      },
-      {
-        id: 'body-scan',
-        label: 'Scanner Corporel',
-        subtitle: 'Morphologie 3D',
-        icon: 'Scan',
-        route: '/body-scan',
-        color: '#D946EF',
-        available: true,
-        description: 'Scanner et analyser votre corps en 3D'
       }
     ]
   },
@@ -155,6 +155,24 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
         available: false,
         comingSoon: true,
         description: 'Suivi de santé complet (bientôt disponible)'
+      }
+    ]
+  },
+
+  // ==================== BOUTON PRINCIPAL: AVATAR TWIN ====================
+  {
+    key: 'avatar-twin',
+    title: 'TwinForge Avatar',
+    actions: [
+      {
+        id: 'avatar-scan',
+        label: 'Mon Avatar en 3D',
+        subtitle: 'Créez votre jumeau numérique',
+        icon: 'Scan',
+        route: '/body-scan',
+        color: '#D946EF',
+        available: true,
+        description: 'Scanner et créer votre avatar 3D personnalisé'
       }
     ]
   }

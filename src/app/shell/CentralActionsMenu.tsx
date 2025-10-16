@@ -49,6 +49,7 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
   const activiteSection = getSection(QUICK_ACTION_SECTIONS, 'activite');
   const santeSection = getSection(QUICK_ACTION_SECTIONS, 'sante');
   const homeSection = getSection(QUICK_ACTION_SECTIONS, 'navigation');
+  const avatarTwinSection = getSection(QUICK_ACTION_SECTIONS, 'avatar-twin');
 
   const homeAction =
     homeSection.actions.find(
@@ -372,7 +373,7 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
 
             {/* ========== CATÉGORIE: SANTÉ ========== */}
             {santeSection.actions.length > 0 && (
-              <div>
+              <div className="mb-3">
                 <div className="px-1.5 mb-1.5">
                   <h3 className="text-white/70 text-[11px] uppercase tracking-wider font-bold">
                     Santé
@@ -383,6 +384,81 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
                     <SecondaryPill key={a.id} action={a} index={i} />
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* ========== BOUTON PRINCIPAL: MON AVATAR EN 3D ========== */}
+            {avatarTwinSection.actions.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-white/10">
+                {avatarTwinSection.actions.map((action, index) => {
+                  const [r, g, b] = hexToRgbArray(action.color || '#D946EF');
+                  return (
+                    <motion.button
+                      key={action.id}
+                      onClick={(e) => handleActionClick(action, true, e)}
+                      className="glass-card rounded-2xl px-4 py-3 flex items-center gap-3 w-full relative avatar-twin-button"
+                      style={{
+                        background: `
+                          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.18) 0%, transparent 60%),
+                          radial-gradient(circle at 70% 70%, rgba(${r}, ${g}, ${b}, 0.2) 0%, transparent 65%),
+                          var(--liquid-pill-bg)
+                        `,
+                        border: `1px solid rgba(${r}, ${g}, ${b}, 0.4)`,
+                        boxShadow: `
+                          0 4px 16px rgba(${r}, ${g}, ${b}, 0.25),
+                          0 0 24px rgba(${r}, ${g}, ${b}, 0.15),
+                          inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                        `
+                      }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ ...springy, delay: reduceMotion ? 0 : 0.3 }}
+                      whileHover={reduceMotion ? {} : { y: -2, scale: 1.02 }}
+                      whileTap={reduceMotion ? {} : { scale: 0.98 }}
+                      role="menuitem"
+                      aria-label={action.description || action.label}
+                    >
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{
+                          background: `linear-gradient(135deg, rgba(${r}, ${g}, ${b}, 0.4), rgba(${r}, ${g}, ${b}, 0.25))`,
+                          border: `1px solid rgba(${r}, ${g}, ${b}, 0.5)`,
+                          boxShadow: `0 0 12px rgba(${r}, ${g}, ${b}, 0.3)`
+                        }}
+                      >
+                        <SpatialIcon
+                          Icon={ICONS[action.icon]}
+                          size={20}
+                          style={{
+                            color: action.color,
+                            filter: `drop-shadow(0 0 6px rgba(${r}, ${g}, ${b}, 0.6))`
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0 text-left">
+                        <div className="text-[13px] font-bold text-white leading-tight">
+                          {action.label}
+                        </div>
+                        <div className="text-[10px] text-white/75 leading-tight mt-0.5">
+                          {action.subtitle}
+                        </div>
+                      </div>
+                      <div
+                        className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{
+                          background: `rgba(${r}, ${g}, ${b}, 0.2)`,
+                          border: `1px solid rgba(${r}, ${g}, ${b}, 0.4)`
+                        }}
+                      >
+                        <SpatialIcon
+                          Icon={ICONS.ChevronRight}
+                          size={12}
+                          style={{ color: action.color }}
+                        />
+                      </div>
+                    </motion.button>
+                  );
+                })}
               </div>
             )}
             </div>
