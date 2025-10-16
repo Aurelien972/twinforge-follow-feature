@@ -10,7 +10,7 @@ import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import { useUserStore } from '../../../system/store/userStore';
 import { useWearableSync } from '../../../hooks/useWearableSync';
-import { PROVIDER_CONFIGS } from '../../../domain/connectedDevices';
+import { PROVIDER_CONFIGS, MVP_PROVIDERS } from '../../../domain/connectedDevices';
 import type { ConnectedDevice, Provider } from '../../../domain/connectedDevices';
 import logger from '../../../lib/utils/logger';
 import '../../../styles/components/connected-devices.css';
@@ -308,7 +308,9 @@ const ConnectedDevicesTab: React.FC = () => {
             </h3>
 
             <div className="providers-grid">
-              {Object.values(PROVIDER_CONFIGS).map((config, index) => {
+              {Object.values(PROVIDER_CONFIGS)
+                .filter((config) => MVP_PROVIDERS.includes(config.id as any))
+                .map((config, index) => {
                 const isConnected = devices.some((d) => d.provider === config.id);
 
                 return (
@@ -352,6 +354,19 @@ const ConnectedDevicesTab: React.FC = () => {
                   </motion.div>
                 );
               })}
+            </div>
+
+            {/* Coming Soon Section */}
+            <div style={{ marginTop: '2rem', padding: '1.5rem', borderRadius: '16px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                <SpatialIcon Icon={ICONS.Clock} size={20} style={{ color: '#06B6D4' }} />
+                <h4 style={{ fontSize: '1rem', fontWeight: '600', color: 'white', margin: 0 }}>
+                  Prochainement
+                </h4>
+              </div>
+              <p style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)', margin: 0, lineHeight: '1.5' }}>
+                Garmin, Polar, Fitbit, Whoop, Oura, Suunto, Coros, et Wahoo seront bientôt disponibles.
+              </p>
             </div>
           </div>
         </>

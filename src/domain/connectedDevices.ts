@@ -16,6 +16,11 @@ export type Provider =
   | 'coros'
   | 'google_fit';
 
+// MVP Providers - Essential devices for initial launch
+export type MVPProvider = 'apple_health' | 'google_fit' | 'strava';
+
+export const MVP_PROVIDERS: MVPProvider[] = ['apple_health', 'google_fit', 'strava'];
+
 export type DeviceType =
   | 'smartwatch'
   | 'fitness_tracker'

@@ -40,7 +40,7 @@ const REVERSE_PERIOD_MAPPING = {
  * Calculer la période par défaut basée sur l'historique d'activité
  */
 function calculateDefaultPeriod(hasActivityHistory: boolean, currentActivities: number): 'week' | 'month' | 'quarter' {
-  logger.info('ACTIVITY_PROGRESS_TAB_DIAGNOSTIC', 'Calculating default period', {
+  logger.debug('ACTIVITY_PROGRESS_TAB_DIAGNOSTIC', 'Calculating default period', {
     hasActivityHistory,
     currentActivities,
     weekThreshold: getMinimumActivitiesForPeriod('last7Days'),
@@ -84,7 +84,7 @@ function calculateDefaultPeriod(hasActivityHistory: boolean, currentActivities: 
     });
   }
   
-  logger.info('ACTIVITY_PROGRESS_TAB_DIAGNOSTIC', 'Default period calculated', {
+  logger.debug('ACTIVITY_PROGRESS_TAB_DIAGNOSTIC', 'Default period calculated', {
     defaultPeriod,
     reasoning: 'always_week_to_prevent_auto_expensive_calls',
     finalDecision: defaultPeriod,
@@ -140,7 +140,7 @@ const ActivityProgressTab: React.FC = () => {
       const shouldBlock = isLoading && currentLocation.pathname !== nextLocation.pathname;
       
       if (shouldBlock) {
-        logger.info('ACTIVITY_PROGRESS_TAB', 'Navigation blocked during analysis loading', {
+        logger.debug('ACTIVITY_PROGRESS_TAB', 'Navigation blocked during analysis loading', {
           currentPath: currentLocation.pathname,
           nextPath: nextLocation.pathname,
           isLoading,
@@ -182,7 +182,7 @@ const ActivityProgressTab: React.FC = () => {
   // Mettre à jour le nombre d'activités et gérer la période intelligemment
   React.useEffect(() => {
     if (insightsData?.current_activities !== undefined) {
-      logger.info('ACTIVITY_PROGRESS_TAB', 'Activities count updated from insights data', {
+      logger.debug('ACTIVITY_PROGRESS_TAB', 'Activities count updated from insights data', {
         previousCount: currentActivitiesCount,
         newCount: insightsData.current_activities,
         selectedPeriod,
@@ -208,7 +208,7 @@ const ActivityProgressTab: React.FC = () => {
         
         // Seulement changer si différent ET que l'utilisateur n'a pas sélectionné
         if (newDefaultPeriod !== selectedPeriod && !userHasSelectedPeriod) {
-          logger.info('ACTIVITY_PROGRESS_TAB', 'Auto-switching to calculated period', {
+          logger.debug('ACTIVITY_PROGRESS_TAB', 'Auto-switching to calculated period', {
             from: selectedPeriod,
             to: newDefaultPeriod,
             reason: 'automatic_calculation_respecting_no_user_selection',
@@ -286,7 +286,7 @@ const ActivityProgressTab: React.FC = () => {
     setUserHasSelectedPeriod(true);
     setGlobalPeriod(period);
     
-    logger.info('ACTIVITY_PROGRESS_TAB_DIAGNOSTIC', 'Period changed by user', {
+    logger.debug('ACTIVITY_PROGRESS_TAB_DIAGNOSTIC', 'Period changed by user', {
       newPeriod: period,
       apiPeriod: PERIOD_MAPPING[period],
       userAction: true,

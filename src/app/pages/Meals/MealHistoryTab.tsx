@@ -271,7 +271,9 @@ const MealHistoryTab: React.FC = () => {
                         border: '1px solid color-mix(in srgb, #8B5CF6 15%, transparent)',
                         backdropFilter: 'blur(8px) saturate(120%)',
                         animationDelay: `${index * 0.1}s`,
-                        boxShadow: '0 2px 8px rgba(139, 92, 246, 0.1)'
+                        boxShadow: '0 2px 8px rgba(139, 92, 246, 0.1)',
+                        position: 'relative',
+                        zIndex: 1
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background = `color-mix(in srgb, #8B5CF6 12%, transparent)`;
@@ -283,8 +285,12 @@ const MealHistoryTab: React.FC = () => {
                         e.currentTarget.style.borderColor = `color-mix(in srgb, #8B5CF6 15%, transparent)`;
                         e.currentTarget.style.boxShadow = '0 2px 8px rgba(139, 92, 246, 0.1)';
                       }}
-                      onClick={() => {
-                        click(); // Enhanced glass click for meal details
+                      onClick={(e) => {
+                        if ((e.target as HTMLElement).closest('button')) {
+                          return;
+                        }
+                        console.log('🔍 MEAL_HISTORY [MEAL_CARD_CLICK]', { mealId: meal.id, mealName: meal.meal_name });
+                        click();
                         setSelectedMeal(meal);
                       }}
                     >
@@ -331,13 +337,16 @@ const MealHistoryTab: React.FC = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
+                              console.log('🔍 MEAL_HISTORY [DELETE_BUTTON_CLICK]', { mealId: meal.id });
                               handleDeleteMeal(meal.id);
                             }}
                             disabled={deletingMealId === meal.id}
                             className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2 rounded-full"
                             style={{
                               background: 'rgba(239, 68, 68, 0.15)',
-                              border: '1px solid rgba(239, 68, 68, 0.3)'
+                              border: '1px solid rgba(239, 68, 68, 0.3)',
+                              position: 'relative',
+                              zIndex: 2
                             }}
                             title="Supprimer ce repas"
                           >

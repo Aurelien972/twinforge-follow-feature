@@ -52,7 +52,7 @@ const ActivityWeeklyDistributionChart: React.FC<ActivityWeeklyDistributionChartP
 
         const { data: activities, error } = await supabase
           .from('activities')
-          .select('timestamp, calories_burned, duration_minutes')
+          .select('timestamp, calories_est, duration_min')
           .eq('user_id', userId)
           .gte('timestamp', since.toISOString())
           .order('timestamp', { ascending: true });
@@ -79,8 +79,8 @@ const ActivityWeeklyDistributionChart: React.FC<ActivityWeeklyDistributionChartP
             const entry = aggregatedByDay.get(dayNumber)!;
 
             entry.activitiesCount += 1;
-            entry.totalCalories += activity.calories_burned || 0;
-            entry.totalDuration += activity.duration_minutes || 0;
+            entry.totalCalories += activity.calories_est || 0;
+            entry.totalDuration += activity.duration_min || 0;
           });
 
           const sortedData = Array.from(aggregatedByDay.values()).sort((a, b) => {
@@ -93,7 +93,7 @@ const ActivityWeeklyDistributionChart: React.FC<ActivityWeeklyDistributionChartP
           setData(sortedData);
         }
 
-        logger.info('WEEKLY_DISTRIBUTION_CHART', 'Data fetched successfully', {
+        logger.debug('WEEKLY_DISTRIBUTION_CHART', 'Data fetched successfully', {
           count: activities?.length
         });
       } catch (error) {

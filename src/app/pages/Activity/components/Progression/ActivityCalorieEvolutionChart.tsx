@@ -41,10 +41,10 @@ const ActivityCalorieEvolutionChart: React.FC<ActivityCalorieEvolutionChartProps
 
         const { data: activities, error } = await supabase
           .from('activities')
-          .select('timestamp, calories_burned')
+          .select('timestamp, calories_est')
           .eq('user_id', userId)
           .gte('timestamp', since.toISOString())
-          .not('calories_burned', 'is', null)
+          .not('calories_est', 'is', null)
           .order('timestamp', { ascending: true });
 
         if (error) throw error;
@@ -65,7 +65,7 @@ const ActivityCalorieEvolutionChart: React.FC<ActivityCalorieEvolutionChartProps
             }
 
             const entry = aggregatedByDate.get(dateKey)!;
-            entry.calories += activity.calories_burned || 0;
+            entry.calories += activity.calories_est || 0;
             entry.activitiesCount += 1;
           });
 
@@ -75,7 +75,7 @@ const ActivityCalorieEvolutionChart: React.FC<ActivityCalorieEvolutionChartProps
           setData(sortedData);
         }
 
-        logger.info('CALORIE_EVOLUTION_CHART', 'Data fetched successfully', {
+        logger.debug('CALORIE_EVOLUTION_CHART', 'Data fetched successfully', {
           count: activities?.length
         });
       } catch (error) {
