@@ -92,7 +92,6 @@ export function navFor(): NavSection[] {
           icon: 'Utensils',
           label: 'Forge Nutritionnelle',
           subtitle: 'Nutrition & Repas',
-          actionLabel: 'Scanner',
           isForge: true,
           circuitColor: '#10B981', // Vert
           tabs: ['Scanner', 'Insights', 'Progression', 'Historique'],
@@ -125,10 +124,37 @@ export function navFor(): NavSection[] {
           icon: 'ChefHat',
           label: 'Forge Culinaire',
           subtitle: 'Recettes & Plans',
-          actionLabel: 'Scanner',
           isForge: true,
           circuitColor: '#EC4899', // Rose
-          tabs: ['Scanner', 'Inventaire', 'Recettes', 'Plan', 'Courses']
+          tabs: ['Scanner', 'Inventaire', 'Recettes', 'Plan', 'Courses'],
+          subItems: [
+            {
+              to: '/fridge#scanner',
+              icon: 'ScanLine',
+              label: 'Scanner',
+              isPrimarySubMenu: true
+            },
+            {
+              to: '/fridge#inventaire',
+              icon: 'Refrigerator',
+              label: 'Inventaire'
+            },
+            {
+              to: '/fridge#recipes',
+              icon: 'ChefHat',
+              label: 'Recettes'
+            },
+            {
+              to: '/fridge#plan',
+              icon: 'Calendar',
+              label: 'Plan'
+            },
+            {
+              to: '/fridge#courses',
+              icon: 'ShoppingCart',
+              label: 'Courses'
+            }
+          ]
         },
       ],
     },
@@ -143,20 +169,69 @@ export function navFor(): NavSection[] {
           icon: 'Activity',
           label: 'Forge Énergétique',
           subtitle: 'Activités & Dépenses',
-          actionLabel: 'Tracker',
           isForge: true,
           circuitColor: '#3B82F6', // Bleu
-          tabs: ['Tracker', 'Insights', 'Progression', 'Historique']
+          tabs: ['Tracker', 'Insights', 'Progression', 'Historique'],
+          subItems: [
+            {
+              to: '/activity#daily',
+              icon: 'Activity',
+              label: 'Tracker',
+              isPrimarySubMenu: true
+            },
+            {
+              to: '/activity#insights',
+              icon: 'BarChart3',
+              label: 'Insights'
+            },
+            {
+              to: '/activity#progression',
+              icon: 'TrendingUp',
+              label: 'Progression'
+            },
+            {
+              to: '/activity#history',
+              icon: 'History',
+              label: 'Historique'
+            }
+          ]
         },
         {
           to: '/training',
           icon: 'Dumbbell',
           label: 'Forge Corporelle',
           subtitle: 'Training & Performance',
-          actionLabel: 'Générer',
           isForge: true,
           circuitColor: '#18E3FF', // Cyan électrique
-          tabs: ['Aujourd\'hui', 'Programmes', 'Progression', 'Historique']
+          tabs: ['Aujourd\'hui', 'Conseils', 'Progression', 'Records', 'Historique'],
+          subItems: [
+            {
+              to: '/training#aujourd hui',
+              icon: 'Home',
+              label: 'Aujourd\'hui',
+              isPrimarySubMenu: true
+            },
+            {
+              to: '/training#conseils',
+              icon: 'Lightbulb',
+              label: 'Conseils'
+            },
+            {
+              to: '/training#progression',
+              icon: 'TrendingUp',
+              label: 'Progression'
+            },
+            {
+              to: '/training#records',
+              icon: 'Trophy',
+              label: 'Records'
+            },
+            {
+              to: '/training#historique',
+              icon: 'History',
+              label: 'Historique'
+            }
+          ]
         },
       ],
     },
@@ -171,20 +246,64 @@ export function navFor(): NavSection[] {
           icon: 'Timer',
           label: 'Forge du Temps',
           subtitle: 'Jeûne Intermittent',
-          actionLabel: 'Tracker',
           isForge: true,
           circuitColor: '#F59E0B', // Orange
-          tabs: ['Tracker', 'Insights', 'Progression', 'Historique']
+          tabs: ['Tracker', 'Insights', 'Progression', 'Historique'],
+          subItems: [
+            {
+              to: '/fasting#daily',
+              icon: 'Timer',
+              label: 'Tracker',
+              isPrimarySubMenu: true
+            },
+            {
+              to: '/fasting#insights',
+              icon: 'TrendingUp',
+              label: 'Insights'
+            },
+            {
+              to: '/fasting#progression',
+              icon: 'BarChart3',
+              label: 'Progression'
+            },
+            {
+              to: '/fasting#history',
+              icon: 'History',
+              label: 'Historique'
+            }
+          ]
         },
         {
           to: '/vital',
           icon: 'HeartPulse',
           label: 'Forge Vitale',
           subtitle: 'Santé & Prévention',
-          actionLabel: 'Analyser',
           isForge: true,
           circuitColor: '#EF4444', // Rouge santé
-          tabs: ['Dossier', 'Analyses', 'Suivi', 'Prévention']
+          tabs: ['Dossier', 'Analyses', 'Suivi', 'Prévention'],
+          subItems: [
+            {
+              to: '/vital#dossier',
+              icon: 'FileText',
+              label: 'Dossier',
+              isPrimarySubMenu: true
+            },
+            {
+              to: '/vital#analyses',
+              icon: 'Activity',
+              label: 'Analyses'
+            },
+            {
+              to: '/vital#suivi',
+              icon: 'TrendingUp',
+              label: 'Suivi'
+            },
+            {
+              to: '/vital#prevention',
+              icon: 'Shield',
+              label: 'Prévention'
+            }
+          ]
         },
       ],
     },
