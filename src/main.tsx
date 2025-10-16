@@ -79,7 +79,17 @@ function AuthWrapper({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       logger.debug('AUTH', 'Auth state changed', { event, hasSession: !!session });
-      
+
+      if (event === 'SIGNED_OUT') {
+        logger.info('AUTH', 'User signed out, redirecting to auth form');
+        setUser(null);
+        setShowAuthForm(true);
+        setSession(null);
+        setAuthReady(false);
+        setIsLoading(false);
+        return;
+      }
+
       if (session?.user) {
         setUser(session.user);
         setShowAuthForm(false);

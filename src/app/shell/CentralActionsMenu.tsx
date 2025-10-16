@@ -196,11 +196,12 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
         </div>
         {isComingSoon && (
           <div
-            className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold"
+            className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold z-10"
             style={{
               background: 'linear-gradient(135deg, rgba(251, 146, 60, 0.9), rgba(251, 113, 133, 0.9))',
               color: 'white',
-              boxShadow: '0 2px 8px rgba(251, 146, 60, 0.4)'
+              boxShadow: '0 2px 8px rgba(251, 146, 60, 0.4)',
+              pointerEvents: 'none'
             }}
           >
             SOON
@@ -302,10 +303,16 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
               }}
             >
             {/* HEADER */}
-            <div className="flex items-center justify-between mb-2.5 px-1.5">
-              <div className="flex items-center gap-2">
-                <div aria-hidden className="h-1.5 w-10 rounded-full bg-white/40" />
-                <span className="text-white/80 text-xs font-semibold tracking-wider uppercase">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="h-[2px] w-12 rounded-full"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.5) 20%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.5) 80%, transparent 100%)',
+                  }}
+                  aria-hidden
+                />
+                <span className="text-white text-sm font-bold tracking-wider uppercase">
                   Outils du Forgeron
                 </span>
               </div>
