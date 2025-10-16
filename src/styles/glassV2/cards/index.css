@@ -8,6 +8,7 @@
 @import './hover.css';
 @import './interactions.css';
 @import './variants.css';
+@import './scroll-reveal.css';
 
 /* Main glass card classes - now fully harmonized */
 .glass-card {

@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import clsx from 'clsx';
 import { HoverEffectManager, supportsAdvancedHover } from './cardUtils';
 import { useFeedback } from '../../hooks/useFeedback';
+import { useScrollReveal } from '../../hooks/useScrollReveal';
 
 type GlassCardProps = React.PropsWithChildren<{
   className?: string;
@@ -31,6 +32,10 @@ type GlassCardProps = React.PropsWithChildren<{
   spotlight?: boolean;
   /** Active/Désactive le petit sheen local sur la carte */
   sheen?: boolean;
+  /** Active/Désactive l'animation progressive au scroll */
+  scrollReveal?: boolean;
+  /** Intensité de l'effet scroll reveal */
+  scrollRevealIntensity?: 'subtle' | 'medium' | 'intense';
 }>;
 
 const hasFinePointer = () =>
@@ -46,6 +51,8 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
   size = 'base',
   spotlight = false,
   sheen = true,
+  scrollReveal = true,
+  scrollRevealIntensity = 'medium',
   onPointerDown,
   style,
   ...rest
@@ -54,15 +61,33 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
   const reduceMotion = useReducedMotion();
   const { glassClick } = useFeedback();
 
-  // Get performance-optimized hover effect class
-  const [hoverEffectClass, setHoverEffectClass] = React.useState<string | null>(null);
-  
+  const scrollRevealHook = useScrollReveal({
+    enabled: scrollReveal && !reduceMotion,
+    intensity: scrollRevealIntensity,
+  });
+
+  const internalRef = React.useRef<HTMLElement>(null);
+  const scrollRevealRef = scrollRevealHook.ref;
+
   React.useEffect(() => {
-    if (ref && 'current' in ref && ref.current && supportsAdvancedHover()) {
-      const effectClass = HoverEffectManager.getInstance().getEffectClass(ref.current);
+    if (ref && typeof ref === 'function') {
+      ref(internalRef.current);
+    } else if (ref && 'current' in ref) {
+      (ref as React.MutableRefObject<HTMLElement | null>).current = internalRef.current;
+    }
+    if (scrollRevealRef) {
+      scrollRevealRef.current = internalRef.current;
+    }
+  }, [ref, scrollRevealRef]);
+
+  const [hoverEffectClass, setHoverEffectClass] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (internalRef.current && supportsAdvancedHover()) {
+      const effectClass = HoverEffectManager.getInstance().getEffectClass(internalRef.current);
       setHoverEffectClass(effectClass);
     }
-  }, [ref]);
+  }, []);
 
   // ACIER SUR VERRE - Enhanced pointer down handler with forge-specific audio
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -133,12 +158,16 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
 
   return (
     <Comp
-      ref={ref}
+      ref={internalRef}
       onMouseMove={handleMove}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onPointerDown={handlePointerDown}
       data-hover-effect={hoverEffectClass}
+      data-scroll-visible={scrollReveal ? scrollRevealHook.state.isVisible : undefined}
+      data-scroll-active={scrollReveal ? scrollRevealHook.state.isVisible : undefined}
+      data-intensity={scrollReveal ? scrollRevealIntensity : undefined}
+      data-low-end={scrollReveal ? scrollRevealHook.isLowEnd : undefined}
       whileTap={!disabled && !reduceMotion && !isMobile && !isTouchDevice ? {
         scale: 0.98,
         opacity: 0.95,
@@ -149,13 +178,14 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
       } : {}}
       className={clsx(
         'glass-base glass-card relative will-transform group',
-        'rounded-3xl', // CRITICAL: Default border-radius class
+        'rounded-3xl',
+        scrollReveal && 'glass-card-scroll-reveal',
         sizeClasses[size],
         elevationClasses[elevation],
         interactive && 'transform-gpu preserve-3d',
         interactive && !disabled && 'cursor-pointer glass-focus',
         disabled && 'opacity-50 cursor-not-allowed',
-        'z-0', // z-index handled by CSS class
+        'z-0',
         className
       )}
       style={{
@@ -165,7 +195,6 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
         isolation: 'isolate',
         ...style,
       }}
-      // sécurité : éviter de propager disabled sur un div
       {...(as === 'button' ? { disabled } : {})}
       {...rest}
     >
