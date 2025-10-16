@@ -20,17 +20,10 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
         className={`flex items-center ${className}`}
         style={{
           transition: 'all 300ms ease-out',
-          gap: '12px',
           height: '100%'
         }}
       >
-        <ForgeHammerIcon
-          width={52}
-          height={43}
-          isHovered={isHovered}
-        />
-
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0', marginLeft: '-2px' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: '0' }}>
           <span
             style={{
               fontFamily: "'Montserrat', sans-serif",
@@ -60,8 +53,6 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               backgroundClip: 'text',
               lineHeight: 1,
               textTransform: 'uppercase',
-              position: 'relative',
-              top: '2.5px',
               filter: isHovered
                 ? 'drop-shadow(0 0 12px rgba(253, 200, 48, 0.5))'
                 : 'drop-shadow(0 0 6px rgba(247, 147, 30, 0.3))',
@@ -77,19 +68,31 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
 
   return (
     <div
-      className={`flex items-center ${className}`}
+      className={`flex items-start ${className}`}
       style={{
         transition: 'all 300ms ease-out',
-        gap: '10px'
+        gap: '8px',
+        position: 'relative'
       }}
     >
-      <ForgeHammerIcon
-        width={40}
-        height={33}
-        isHovered={isHovered}
-      />
+      <div style={{
+        position: 'relative',
+        marginTop: '-2px'
+      }}>
+        <ForgeHammerIcon
+          width={30}
+          height={36}
+          isHovered={isHovered}
+        />
+      </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', alignItems: 'flex-start', marginLeft: '-1px' }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2px',
+        alignItems: 'flex-start',
+        marginTop: '0px'
+      }}>
         <span
           style={{
             fontFamily: "'Montserrat', sans-serif",
@@ -119,8 +122,6 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
             backgroundClip: 'text',
             lineHeight: 1,
             textTransform: 'uppercase',
-            position: 'relative',
-            top: '1.5px',
             filter: isHovered
               ? 'drop-shadow(0 0 10px rgba(253, 200, 48, 0.4))'
               : 'drop-shadow(0 0 5px rgba(247, 147, 30, 0.25))',
