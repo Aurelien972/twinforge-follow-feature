@@ -11,13 +11,13 @@ import { navFor } from '../../app/shell/navigation';
 
 const Section = React.memo(({ title, children, type }: { title: string; children: React.ReactNode; type?: 'primary' | 'twin' | 'forge-category' }) => {
   const shouldHaveTopSpace = type === 'forge-category';
-  const needsSeparator = title === 'Activité' || title === 'Santé';
+  const needsSeparator = title === 'Alimentation' || title === 'Activité' || title === 'Santé';
 
   return (
     <div className={shouldHaveTopSpace ? 'mt-4' : ''}>
       {title && (
         <>
-          {/* Séparateur visuel avant Activité et Santé */}
+          {/* Séparateur visuel avant Alimentation, Activité et Santé */}
           {needsSeparator && (
             <div className="sidebar-category-separator" />
           )}
