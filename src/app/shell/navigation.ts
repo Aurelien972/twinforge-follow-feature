@@ -208,7 +208,7 @@ export function navFor(): NavSection[] {
             {
               to: '/training#aujourd hui',
               icon: 'Home',
-              label: 'Coaching',
+              label: 'Coaching Live',
               isPrimarySubMenu: true
             },
             {
@@ -253,7 +253,7 @@ export function navFor(): NavSection[] {
             {
               to: '/fasting#daily',
               icon: 'Timer',
-              label: 'Tracker',
+              label: 'Tracker de Jeûne',
               isPrimarySubMenu: true
             },
             {
@@ -277,7 +277,7 @@ export function navFor(): NavSection[] {
           to: '/vital',
           icon: 'HeartPulse',
           label: 'Forge Vitale',
-          subtitle: 'Santé & Prévention',
+          subtitle: 'Médecine Préventive',
           isForge: true,
           circuitColor: '#EF4444', // Rouge santé
           tabs: ['Dossier', 'Analyses', 'Suivi', 'Prévention'],
