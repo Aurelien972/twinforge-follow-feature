@@ -8,6 +8,13 @@
 
 import { ICONS } from '../../ui/icons/registry';
 
+interface NavSubItem {
+  to: string;
+  icon: keyof typeof ICONS;
+  label: string;
+  isPrimarySubMenu?: boolean; // Le sous-menu principal mis en avant
+}
+
 interface NavItem {
   to: string;
   icon: keyof typeof ICONS;
@@ -19,6 +26,7 @@ interface NavItem {
   isForge?: boolean;
   circuitColor?: string;
   tabs?: string[]; // Onglets disponibles pour cette page
+  subItems?: NavSubItem[]; // Sous-menus pour les forges
 }
 
 interface NavSection {
@@ -86,7 +94,30 @@ export function navFor(): NavSection[] {
           actionLabel: 'Scanner',
           isForge: true,
           circuitColor: '#10B981', // Vert
-          tabs: ['Scanner', 'Insights', 'Progression', 'Historique']
+          tabs: ['Scanner', 'Insights', 'Progression', 'Historique'],
+          subItems: [
+            {
+              to: '/meals#daily',
+              icon: 'ScanLine',
+              label: 'Scanner',
+              isPrimarySubMenu: true
+            },
+            {
+              to: '/meals#insights',
+              icon: 'TrendingUp',
+              label: 'Insights'
+            },
+            {
+              to: '/meals#progression',
+              icon: 'BarChart3',
+              label: 'Progression'
+            },
+            {
+              to: '/meals#history',
+              icon: 'History',
+              label: 'Historique'
+            }
+          ]
         },
         {
           to: '/fridge',
