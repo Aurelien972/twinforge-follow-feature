@@ -28,7 +28,7 @@ const BOTTOM_BAR_BUTTONS = [
     label: 'Frigo',
     icon: 'Refrigerator' as const,
     route: '/fridge',
-    color: '#14B8A6', // Turquoise
+    color: '#EC4899', // Rose
   },
   {
     id: 'activity',
@@ -49,7 +49,7 @@ const BOTTOM_BAR_BUTTONS = [
     label: 'Coaching',
     icon: 'Dumbbell' as const,
     route: '/training',
-    color: '#EC4899', // Rose coaching
+    color: '#06B6D4', // Cyan
   },
   {
     id: 'twin',

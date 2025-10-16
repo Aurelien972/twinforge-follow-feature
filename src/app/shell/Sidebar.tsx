@@ -15,6 +15,7 @@ interface NavSubItem {
   icon: keyof typeof ICONS;
   label: string;
   isPrimarySubMenu?: boolean;
+  color?: string; // Couleur personnalisée pour ce sous-item
 }
 
 interface NavItemProps {
@@ -186,7 +187,7 @@ const NavItem = React.memo(({
                   `}
                   onClick={() => sidebarClick()}
                   aria-current={isSubActive ? 'page' : undefined}
-                  style={{ '--item-circuit-color': itemColor } as React.CSSProperties}
+                  style={{ '--item-circuit-color': subItem.color || itemColor } as React.CSSProperties}
                 >
                   <div className={`sidebar-submenu-item-icon-container ${isSubActive || isPrimaryAndPageActive ? 'sidebar-submenu-item-icon-container--active' : ''}`}>
                     <SpatialIcon

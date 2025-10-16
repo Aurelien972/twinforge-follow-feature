@@ -13,6 +13,7 @@ interface NavSubItem {
   icon: keyof typeof ICONS;
   label: string;
   isPrimarySubMenu?: boolean; // Le sous-menu principal mis en avant
+  color?: string; // Couleur personnalisée pour ce sous-item
 }
 
 interface NavItem {
@@ -187,7 +188,8 @@ export function navFor(): NavSection[] {
             {
               to: '/activity#progression',
               icon: 'TrendingUp',
-              label: 'Progression'
+              label: 'Progression',
+              color: '#10B981' // Vert
             },
             {
               to: '/activity#history',
@@ -259,7 +261,8 @@ export function navFor(): NavSection[] {
             {
               to: '/fasting#insights',
               icon: 'TrendingUp',
-              label: 'Insights'
+              label: 'Insights',
+              color: '#10B981' // Vert
             },
             {
               to: '/fasting#progression',

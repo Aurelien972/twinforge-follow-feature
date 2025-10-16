@@ -273,7 +273,7 @@ const MobileDrawer = React.memo(() => {
                                     `}
                                     onClick={() => setDrawer(false)}
                                     aria-current={isSubActive ? 'page' : undefined}
-                                    style={{ '--item-circuit-color': item.circuitColor || getCircuitColor(item.to) } as React.CSSProperties}
+                                    style={{ '--item-circuit-color': subItem.color || item.circuitColor || getCircuitColor(item.to) } as React.CSSProperties}
                                   >
                                     <div className={`sidebar-submenu-item-icon-container ${isSubActive || isPrimaryAndPageActive ? 'sidebar-submenu-item-icon-container--active' : ''}`}>
                                       <SpatialIcon

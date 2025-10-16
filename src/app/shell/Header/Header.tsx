@@ -66,51 +66,22 @@ export const Header = React.memo(() => {
                 padding: 0,
                 alignItems: 'center',
                 justifyContent: 'center',
+                display: 'flex',
                 background: centralMenuOpen
-                  ? `radial-gradient(circle at 30% 30%, rgba(255, 107, 53, 0.35) 0%, transparent 60%), linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(253, 200, 48, 0.15))`
-                  : `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18) 0%, transparent 50%), rgba(255, 255, 255, 0.10)`,
+                  ? `radial-gradient(circle at 30% 30%, rgba(247, 147, 30, 0.45) 0%, transparent 60%), linear-gradient(135deg, rgba(247, 147, 30, 0.35), rgba(255, 107, 53, 0.3))`
+                  : `radial-gradient(circle at 30% 30%, rgba(247, 147, 30, 0.25) 0%, transparent 60%), linear-gradient(135deg, rgba(247, 147, 30, 0.2), rgba(255, 107, 53, 0.15))`,
                 border: centralMenuOpen
-                  ? '1px solid rgba(247, 147, 30, 0.4)'
-                  : '1px solid rgba(255,255,255,0.2)',
-                backdropFilter: 'blur(16px) saturate(140%)',
-                WebkitBackdropFilter: 'blur(16px) saturate(140%)',
+                  ? '2px solid rgba(247, 147, 30, 0.6)'
+                  : '2px solid rgba(247, 147, 30, 0.35)',
+                backdropFilter: 'blur(16px) saturate(150%)',
+                WebkitBackdropFilter: 'blur(16px) saturate(150%)',
                 boxShadow: centralMenuOpen
-                  ? `0 8px 24px rgba(0, 0, 0, 0.25), 0 2px 12px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 28px rgba(247, 147, 30, 0.4), 0 0 40px rgba(253, 200, 48, 0.2)`
-                  : `0 8px 24px rgba(0, 0, 0, 0.25), 0 2px 12px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.12)`,
+                  ? `0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 4px 32px rgba(247, 147, 30, 0.5), 0 2px 16px rgba(0, 0, 0, 0.25)`
+                  : `0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 4px 24px rgba(247, 147, 30, 0.25), 0 2px 12px rgba(0, 0, 0, 0.2)`,
                 transition: 'transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1)',
                 transform: 'translateZ(0)',
                 willChange: 'transform, filter',
                 cursor: 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                if (window.matchMedia('(hover: hover)').matches && !centralMenuOpen) {
-                  e.currentTarget.style.background = `
-                    radial-gradient(circle at 30% 30%, rgba(255, 107, 53, 0.25) 0%, transparent 60%),
-                    linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(253, 200, 48, 0.1))
-                  `;
-                  e.currentTarget.style.borderColor = 'rgba(247, 147, 30, 0.3)';
-                  e.currentTarget.style.boxShadow = `
-                    0 8px 24px rgba(0, 0, 0, 0.25),
-                    0 2px 12px rgba(0, 0, 0, 0.18),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-                    0 0 20px rgba(247, 147, 30, 0.3),
-                    0 4px 16px rgba(0,0,0,0.2)
-                  `;
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (window.matchMedia('(hover: hover)').matches && !centralMenuOpen) {
-                  e.currentTarget.style.background = `
-                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18) 0%, transparent 50%),
-                    rgba(255, 255, 255, 0.10)
-                  `;
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
-                  e.currentTarget.style.boxShadow = `
-                    0 8px 24px rgba(0, 0, 0, 0.25),
-                    0 2px 12px rgba(0, 0, 0, 0.18),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.12)
-                  `;
-                }
               }}
               aria-label="Ouvrir les outils du forgeron"
               aria-expanded={centralMenuOpen}
@@ -127,14 +98,71 @@ export const Header = React.memo(() => {
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
             >
+              {/* Carrés tournants aux 4 coins */}
+              {[0, 1, 2, 3].map((i) => (
+                <motion.div
+                  key={i}
+                  style={{
+                    position: 'absolute',
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '1.5px',
+                    background: 'linear-gradient(135deg, #F7931E, rgba(255, 255, 255, 0.9))',
+                    boxShadow: '0 0 16px #F7931E',
+                    top: i < 2 ? '2px' : 'auto',
+                    bottom: i >= 2 ? '2px' : 'auto',
+                    left: i % 2 === 0 ? '2px' : 'auto',
+                    right: i % 2 === 1 ? '2px' : 'auto',
+                    zIndex: 2
+                  }}
+                  initial={{
+                    rotate: i % 2 === 0 ? 45 : -45
+                  }}
+                  animate={{
+                    scale: centralMenuOpen ? [1, 1.4, 1] : [1, 1.2, 1],
+                    opacity: centralMenuOpen ? [0.7, 1, 0.7] : [0.5, 0.8, 0.5],
+                    rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                    ease: [0.4, 0, 0.2, 1]
+                  }}
+                />
+              ))}
+
               <SpatialIcon
                 Icon={ICONS.Zap}
-                size={20}
+                size={22}
                 style={{
-                  color: centralMenuOpen ? '#FDC830' : 'rgba(255,255,255,0.9)',
+                  color: centralMenuOpen ? '#F7931E' : '#FF9F40',
                   filter: centralMenuOpen
-                    ? 'drop-shadow(0 0 12px rgba(253, 200, 48, 0.6))'
-                    : 'drop-shadow(0 0 8px rgba(247, 147, 30, 0.3))'
+                    ? 'drop-shadow(0 0 14px rgba(247, 147, 30, 0.9))'
+                    : 'drop-shadow(0 0 10px rgba(255, 159, 64, 0.6))'
+                }}
+                aria-hidden="true"
+              />
+
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: 'radial-gradient(circle at center, rgba(247, 147, 30, 0.25) 0%, transparent 70%)',
+                  filter: 'blur(10px)',
+                  zIndex: -1,
+                  pointerEvents: 'none'
+                }}
+                animate={centralMenuOpen ? {
+                  scale: [1, 1.4, 1.3],
+                  opacity: [0.7, 1, 0.8]
+                } : {
+                  scale: [1, 1.15, 1],
+                  opacity: [0.4, 0.6, 0.4]
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
                 }}
                 aria-hidden="true"
               />
