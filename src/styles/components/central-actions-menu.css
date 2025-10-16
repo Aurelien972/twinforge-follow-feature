@@ -178,16 +178,22 @@
   outline: none !important;
 }
 
-/* Section titles - TOTALLY CLEAN NO WHITE BANDS */
+/* Section titles - TOTALLY CLEAN NO GREY/WHITE BANDS */
 .central-actions-panel h3,
-.central-actions-panel h4 {
+.central-actions-panel h4,
+.central-actions-panel h3.text-white\/70,
+.central-actions-panel h3[class*="text-"],
+.central-actions-panel h4[class*="text-"] {
   position: relative;
   text-shadow: none !important;
   box-shadow: none !important;
-  background: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
   border: none !important;
   outline: none !important;
   text-decoration: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* CRITICAL: Remove all pseudo-elements that could create white bands */
@@ -202,12 +208,40 @@
   box-shadow: none !important;
 }
 
-/* Ensure parent containers don't add white bands */
+/* CRITICAL: Ensure parent containers are COMPLETELY transparent */
 .central-actions-panel .px-1\.5,
-.central-actions-panel .mb-1\.5 {
-  background: none !important;
+.central-actions-panel .mb-1\.5,
+.central-actions-panel div.px-1\.5,
+.central-actions-panel div.mb-1\.5,
+.central-actions-panel > div > div > div.mb-3 > div.px-1\.5,
+.central-actions-panel > div > div > div.mb-3 > div.mb-1\.5 {
+  background: transparent !important;
+  background-color: transparent !important;
   box-shadow: none !important;
   border: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* CRITICAL: NUCLEAR OPTION - Remove ALL backgrounds from ALL divs except buttons */
+.central-actions-panel div:not(button):not(.glass-card):not(.avatar-twin-button) {
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* CRITICAL: Remove all backgrounds from divs that could create grey bands */
+.central-actions-panel div[class*="mb-"],
+.central-actions-panel div[class*="px-"],
+.central-actions-panel div[class*="mt-"],
+.central-actions-panel div[class*="pt-"],
+.central-actions-panel div[class*="gap-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* Enhanced tile glass cards - clean with proper border radius */

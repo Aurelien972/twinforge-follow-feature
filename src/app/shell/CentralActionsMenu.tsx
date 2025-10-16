@@ -410,13 +410,15 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
                     <motion.button
                       key={action.id}
                       onClick={(e) => handleActionClick(action, true, e)}
-                      className="glass-card rounded-2xl px-4 py-3 flex items-center gap-3 w-full relative avatar-twin-button"
+                      className="rounded-2xl px-4 py-3 flex items-center gap-3 w-full relative avatar-twin-button"
                       style={{
                         background: `
-                          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.18) 0%, transparent 60%),
-                          radial-gradient(circle at 70% 70%, rgba(${r}, ${g}, ${b}, 0.2) 0%, transparent 65%),
-                          var(--liquid-pill-bg)
+                          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 60%),
+                          radial-gradient(circle at 70% 70%, rgba(${r}, ${g}, ${b}, 0.15) 0%, transparent 65%),
+                          rgba(255, 255, 255, 0.03)
                         `,
+                        backdropFilter: 'blur(20px) saturate(150%)',
+                        WebkitBackdropFilter: 'blur(20px) saturate(150%)',
                         border: `1px solid rgba(${r}, ${g}, ${b}, 0.4)`,
                         boxShadow: `
                           0 4px 16px rgba(${r}, ${g}, ${b}, 0.25),
