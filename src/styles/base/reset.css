@@ -9,6 +9,7 @@
     overscroll-behavior: auto;
     font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     touch-action: manipulation;
+    background: transparent;
   }
 
   body {
@@ -24,6 +25,20 @@
     min-height: 100dvh;
     overscroll-behavior: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* Root and App containers need opaque background for content visibility */
+  #root {
+    background: transparent;
+    position: relative;
+    z-index: 5;
+  }
+
+  /* Main app container gets the dark background */
+  #root > div {
+    background: rgba(11, 14, 23, 0.95) !important;
+    position: relative;
+    z-index: 10;
   }
 
   /* Touch optimization for interactive elements */
