@@ -1,0 +1,318 @@
+/* =========================================
+   GLASSMORPHISM CONTROL SYSTEM
+   Désactivation des effets glass pour performances
+   ========================================= */
+
+/*
+  Ce fichier gère la désactivation complète du glassmorphisme pour les utilisateurs
+  avec des appareils peu performants. Quand .glassmorphism-disabled est appliqué,
+  tous les effets coûteux sont désactivés :
+  - backdrop-filter (blur, saturate)
+  - box-shadow complexes
+  - animations de border gradient
+  - pseudo-éléments décoratifs
+  - effets de glow et reflets
+
+  Les couleurs, la structure et la fonctionnalité restent intacts.
+*/
+
+/* =========================================
+   GLOBAL GLASSMORPHISM DISABLE
+   ========================================= */
+
+.glassmorphism-disabled {
+  /* Variables simplifiées pour mode performance */
+  --glass-blur-disabled: 0px;
+  --glass-saturate-disabled: 100%;
+  --shadow-simple: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================================
+   HEADER SIMPLIFICATIONS
+   ========================================= */
+
+.glassmorphism-disabled .header-liquid-glass {
+  /* Remplacer le glass par un fond solide */
+  background: rgba(11, 14, 23, 0.95) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--shadow-elevated) !important;
+}
+
+.glassmorphism-disabled .header-liquid-glass::before,
+.glassmorphism-disabled .header-liquid-glass::after {
+  /* Désactiver les pseudo-éléments décoratifs */
+  display: none !important;
+}
+
+.glassmorphism-disabled .header-liquid-glass .glass-orb-button {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--shadow-simple) !important;
+}
+
+.glassmorphism-disabled .header-liquid-glass .glass-orb-button::before {
+  display: none !important;
+}
+
+.glassmorphism-disabled .header-liquid-glass .glass-orb-button:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: var(--shadow-simple) !important;
+  transform: scale(1.05) translateZ(0) !important;
+}
+
+/* =========================================
+   SIDEBAR SIMPLIFICATIONS
+   ========================================= */
+
+.glassmorphism-disabled .sidebar-glass-container {
+  background: rgba(11, 14, 23, 0.95) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--shadow-elevated) !important;
+}
+
+.glassmorphism-disabled .sidebar-glass-container::before,
+.glassmorphism-disabled .sidebar-glass-container::after {
+  display: none !important;
+}
+
+.glassmorphism-disabled .sidebar-nav-item {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.glassmorphism-disabled .sidebar-nav-item:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  transform: translateX(4px) translateZ(0) !important;
+}
+
+.glassmorphism-disabled .sidebar-nav-item.active {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* =========================================
+   MOBILE BOTTOM BAR SIMPLIFICATIONS
+   ========================================= */
+
+.glassmorphism-disabled .new-mobile-bottom-bar-container {
+  background: rgba(11, 14, 23, 0.95) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--shadow-elevated) !important;
+}
+
+.glassmorphism-disabled .new-mobile-bottom-bar-container::before,
+.glassmorphism-disabled .new-mobile-bottom-bar-container::after {
+  display: none !important;
+}
+
+.glassmorphism-disabled .new-bottom-bar-icon-container {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--shadow-simple) !important;
+}
+
+.glassmorphism-disabled .new-bottom-bar-icon-container::before {
+  display: none !important;
+}
+
+.glassmorphism-disabled .new-bottom-bar-icon-container--active {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--button-color) 25%, rgba(255, 255, 255, 0.15)),
+    color-mix(in srgb, var(--button-color) 15%, rgba(255, 255, 255, 0.08))) !important;
+  box-shadow: var(--shadow-simple) !important;
+  border: 1.5px solid color-mix(in srgb, var(--button-color) 50%, transparent) !important;
+}
+
+.glassmorphism-disabled .new-bottom-bar-button--central .new-bottom-bar-icon-container {
+  background: rgba(247, 147, 30, 0.15) !important;
+  box-shadow: var(--shadow-simple) !important;
+  border: 1.5px solid rgba(247, 147, 30, 0.4) !important;
+}
+
+.glassmorphism-disabled .new-bottom-bar-button--central .new-bottom-bar-icon-container--active {
+  background: linear-gradient(135deg,
+    rgba(255, 107, 53, 0.25),
+    rgba(253, 200, 48, 0.15)) !important;
+  box-shadow: var(--shadow-elevated) !important;
+  border: 2px solid rgba(247, 147, 30, 0.6) !important;
+}
+
+/* =========================================
+   USER PANEL SIMPLIFICATIONS
+   ========================================= */
+
+.glassmorphism-disabled .user-panel-container {
+  background: rgba(11, 14, 23, 0.95) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--shadow-elevated) !important;
+}
+
+.glassmorphism-disabled .user-panel-container::before,
+.glassmorphism-disabled .user-panel-container::after {
+  display: none !important;
+}
+
+/* =========================================
+   GENERIC GLASS CARDS SIMPLIFICATIONS
+   ========================================= */
+
+.glassmorphism-disabled .glass-card,
+.glassmorphism-disabled .glass-card-base,
+.glassmorphism-disabled [class*="glass-"] {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--shadow-simple) !important;
+}
+
+.glassmorphism-disabled .glass-card::before,
+.glassmorphism-disabled .glass-card::after,
+.glassmorphism-disabled .glass-card-base::before,
+.glassmorphism-disabled .glass-card-base::after {
+  display: none !important;
+}
+
+.glassmorphism-disabled .glass-card:hover,
+.glassmorphism-disabled .glass-card-base:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: var(--shadow-simple) !important;
+  transform: translateY(-2px) translateZ(0) !important;
+}
+
+/* =========================================
+   BUTTONS & INTERACTIVE ELEMENTS
+   ========================================= */
+
+.glassmorphism-disabled .btn-glass,
+.glassmorphism-disabled button[class*="glass"] {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--shadow-simple) !important;
+}
+
+.glassmorphism-disabled .btn-glass::before,
+.glassmorphism-disabled .btn-glass::after {
+  display: none !important;
+}
+
+.glassmorphism-disabled .btn-glass:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: var(--shadow-simple) !important;
+}
+
+/* =========================================
+   DRAWERS & MODALS
+   ========================================= */
+
+.glassmorphism-disabled .mobile-drawer-glass,
+.glassmorphism-disabled .generic-drawer,
+.glassmorphism-disabled [class*="drawer-glass"] {
+  background: rgba(11, 14, 23, 0.98) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--shadow-elevated) !important;
+}
+
+.glassmorphism-disabled .mobile-drawer-glass::before,
+.glassmorphism-disabled .mobile-drawer-glass::after,
+.glassmorphism-disabled .generic-drawer::before,
+.glassmorphism-disabled .generic-drawer::after {
+  display: none !important;
+}
+
+/* =========================================
+   CENTRAL ACTIONS MENU
+   ========================================= */
+
+.glassmorphism-disabled .central-actions-menu {
+  background: rgba(11, 14, 23, 0.95) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--shadow-elevated) !important;
+}
+
+.glassmorphism-disabled .central-actions-menu::before,
+.glassmorphism-disabled .central-actions-menu::after {
+  display: none !important;
+}
+
+/* =========================================
+   FLOATING BUTTONS
+   ========================================= */
+
+.glassmorphism-disabled .floating-chat-button,
+.glassmorphism-disabled .floating-generate-button,
+.glassmorphism-disabled [class*="floating-"][class*="button"] {
+  background: rgba(255, 255, 255, 0.10) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--shadow-elevated) !important;
+}
+
+.glassmorphism-disabled .floating-chat-button::before,
+.glassmorphism-disabled .floating-chat-button::after {
+  display: none !important;
+}
+
+/* =========================================
+   ANIMATIONS DÉSACTIVATION
+   ========================================= */
+
+.glassmorphism-disabled *[class*="borderPulse"],
+.glassmorphism-disabled *[class*="glowPulse"],
+.glassmorphism-disabled *[class*="activePulse"] {
+  animation: none !important;
+}
+
+/* Conserver uniquement les transitions de couleur essentielles */
+.glassmorphism-disabled * {
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease !important;
+}
+
+/* =========================================
+   PRESERVE ESSENTIAL FUNCTIONALITY
+   ========================================= */
+
+/* Les couleurs de circuits doivent rester visibles */
+.glassmorphism-disabled [data-circuit] {
+  /* Conserver les couleurs de circuits */
+}
+
+/* Les focus states pour l'accessibilité */
+.glassmorphism-disabled *:focus-visible {
+  outline: 3px solid rgba(24, 227, 255, 0.6) !important;
+  outline-offset: 3px !important;
+}
+
+/* Les états de chargement essentiels */
+.glassmorphism-disabled .loader-essential {
+  animation: icon-spin-css 2s linear infinite !important;
+}
+
+/* =========================================
+   PERFORMANCE NOTES
+   ========================================= */
+
+/*
+  Mode performance activé:
+  ✓ Pas de backdrop-filter (économie GPU considérable)
+  ✓ Shadows simplifiées (réduction des repaints)
+  ✓ Animations désactivées (économie CPU/GPU)
+  ✓ Pseudo-éléments décoratifs cachés (réduction DOM)
+  ✓ Transitions réduites au minimum (fluidité préservée)
+
+  Préservé:
+  ✓ Toutes les couleurs et identité visuelle
+  ✓ Structure et layout complets
+  ✓ Toutes les fonctionnalités
+  ✓ États interactifs (hover, active, focus)
+  ✓ Accessibilité complète
+*/

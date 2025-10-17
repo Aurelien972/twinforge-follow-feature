@@ -22,8 +22,11 @@ import CentralActionsMenu from './shell/CentralActionsMenu';
 import FloatingChatButton from '../ui/components/chat/FloatingChatButton';
 import GlobalChatDrawer from '../ui/components/chat/GlobalChatDrawer';
 import { ChatButtonProvider, useChatButtonRef } from '../system/context/ChatButtonContext';
+import { useGlassmorphismPreference } from '../hooks/useGlassmorphismPreference';
 
 function AppContent() {
+  // Apply glassmorphism preference to root element
+  useGlassmorphismPreference();
   const { isInstallable, isInstalled } = usePWAInstall();
   const { isUpdateAvailable, updateInfo, applyUpdate, dismissUpdate } = usePWAUpdate();
   const { showToast } = useToast();

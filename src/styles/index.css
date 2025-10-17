@@ -126,6 +126,12 @@
 @import './utilities/debug.css';
 
 /* =========================================
+   PHASE 11: GLASSMORPHISM CONTROL SYSTEM
+   Doit être chargé après tous les styles glass
+   ========================================= */
+@import './optimizations/glassmorphism-control.css';
+
+/* =========================================
    ENFORCEMENT GLOBAL - ÉLÉMENTS CRITIQUES
    Positionnement fixe pour les éléments flottants
    ========================================= */
