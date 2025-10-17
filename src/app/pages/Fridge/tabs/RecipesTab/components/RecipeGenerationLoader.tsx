@@ -21,15 +21,15 @@ const RecipeGenerationLoader: React.FC = () => {
         className="p-8 text-center"
         style={{
           background: `
-            radial-gradient(circle at 30% 20%, color-mix(in srgb, #10B981 12%, transparent) 0%, transparent 60%),
-            radial-gradient(circle at 70% 80%, color-mix(in srgb, #34D399 8%, transparent) 0%, transparent 50%),
+            radial-gradient(circle at 30% 20%, color-mix(in srgb, #F97316 12%, transparent) 0%, transparent 60%),
+            radial-gradient(circle at 70% 80%, color-mix(in srgb, #FB923C 8%, transparent) 0%, transparent 50%),
             rgba(255, 255, 255, 0.05)
           `,
-          borderColor: 'color-mix(in srgb, #10B981 25%, transparent)',
+          borderColor: 'color-mix(in srgb, #F97316 25%, transparent)',
           boxShadow: `
             0 12px 40px rgba(0, 0, 0, 0.25),
-            0 0 30px color-mix(in srgb, #10B981 15%, transparent),
-            0 0 60px color-mix(in srgb, #34D399 10%, transparent),
+            0 0 30px color-mix(in srgb, #F97316 15%, transparent),
+            0 0 60px color-mix(in srgb, #FB923C 10%, transparent),
             inset 0 2px 0 rgba(255, 255, 255, 0.15)
           `
         }}
@@ -42,10 +42,10 @@ const RecipeGenerationLoader: React.FC = () => {
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                  linear-gradient(135deg, color-mix(in srgb, #10B981 35%, transparent), color-mix(in srgb, #10B981 25%, transparent))
+                  linear-gradient(135deg, color-mix(in srgb, #F97316 35%, transparent), color-mix(in srgb, #F97316 25%, transparent))
                 `,
-                border: '2px solid color-mix(in srgb, #10B981 50%, transparent)',
-                boxShadow: '0 0 30px color-mix(in srgb, #10B981 40%, transparent)'
+                border: '2px solid color-mix(in srgb, #F97316 50%, transparent)',
+                boxShadow: '0 0 30px color-mix(in srgb, #F97316 40%, transparent)'
               }}
             >
               <SpatialIcon 
@@ -67,7 +67,7 @@ const RecipeGenerationLoader: React.FC = () => {
             <h3
               className="text-2xl font-bold text-white"
               style={{
-                textShadow: '0 0 20px rgba(16, 185, 129, 0.5), 0 0 40px rgba(16, 185, 129, 0.3)'
+                textShadow: '0 0 20px rgba(249, 115, 22, 0.5), 0 0 40px rgba(249, 115, 22, 0.3)'
               }}
             >
               Création de recettes en cours...
@@ -75,7 +75,7 @@ const RecipeGenerationLoader: React.FC = () => {
             <p
               className="text-white/80 text-lg"
               style={{
-                textShadow: '0 0 10px rgba(52, 211, 153, 0.3)'
+                textShadow: '0 0 10px rgba(251, 146, 60, 0.3)'
               }}
             >
               La Forge Spatiale travaille...
@@ -105,10 +105,10 @@ const RecipeGenerationLoader: React.FC = () => {
           {/* Progress Indicator */}
           <div className="space-y-3">
             <div className="flex items-center justify-center gap-2 text-sm text-white/70">
-              <SpatialIcon 
-                Icon={ICONS.Clock} 
-                size={16} 
-                className="text-pink-400" 
+              <SpatialIcon
+                Icon={ICONS.Clock}
+                size={16}
+                className="text-orange-400"
               />
               <span>Analyse des ingrédients et création des recettes...</span>
             </div>
@@ -116,7 +116,7 @@ const RecipeGenerationLoader: React.FC = () => {
             {/* Animated Progress Bar */}
             <div className="w-full max-w-xs mx-auto h-2 bg-white/10 rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"
+                className="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full"
                 animate={{
                   x: ['-100%', '100%']
                 }}
