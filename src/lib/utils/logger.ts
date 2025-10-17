@@ -15,10 +15,10 @@ const LOG_LEVEL_CONFIG = {
     level: 'info' as LogLevel, // Suppress trace and debug logs by default
   },
   staging: {
-    level: 'info' as LogLevel,
+    level: 'warn' as LogLevel,
   },
   production: {
-    level: 'warn' as LogLevel,
+    level: 'silent' as LogLevel, // PRODUCTION: Disable ALL logs for performance
   },
 } as const;
 
@@ -58,17 +58,24 @@ function getCurrentContext(): { clientScanId?: string; serverScanId?: string } {
  */
 function shouldLog(level: LogLevel): boolean {
   const config = getCurrentLogConfig();
+
+  // PRODUCTION: Disable ALL logs for performance (silent mode)
+  if (config.level === 'silent') {
+    return false;
+  }
+
   const levelOrder = {
     'trace': 0,
     'debug': 1,
     'info': 2,
     'warn': 3,
-    'error': 4
+    'error': 4,
+    'silent': 5
   };
-  
+
   const currentLevelValue = levelOrder[config.level as LogLevel];
   const messageLevelValue = levelOrder[level];
-  
+
   // More restrictive logging - only show important logs
   if (import.meta.env.DEV) {
     // Only show debug logs for critical components
@@ -80,7 +87,7 @@ function shouldLog(level: LogLevel): boolean {
       return false; // Disable trace logs in dev unless explicitly needed
     }
   }
-  
+
   return messageLevelValue >= currentLevelValue;
 }
 

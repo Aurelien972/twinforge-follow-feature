@@ -137,6 +137,12 @@
 @import './optimizations/mobile-performance-strict.css';
 
 /* =========================================
+   PHASE 12: MOBILE RADICAL OPTIMIZATIONS (ULTRA-CRITICAL - ABSOLUTE LAST)
+   Applied after all other styles to ensure mobile stability
+   ========================================= */
+@import './optimizations/mobile-radical.css';
+
+/* =========================================
    ENFORCEMENT GLOBAL - ÉLÉMENTS CRITIQUES
    Positionnement fixe pour les éléments flottants
    ========================================= */
