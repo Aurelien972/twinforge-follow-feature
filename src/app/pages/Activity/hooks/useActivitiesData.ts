@@ -236,6 +236,45 @@ export function useRecentActivities(limit: number = 10) {
 }
 
 /**
+ * Hook pour récupérer la dernière activité enregistrée (globale, pas uniquement aujourd'hui)
+ */
+export function useLastActivity() {
+  const { session } = useUserStore();
+
+  return useQuery({
+    queryKey: ['activities', 'last', session?.user?.id],
+    queryFn: async () => {
+      if (!session?.user?.id) {
+        throw new Error('User not authenticated');
+      }
+
+      const { data, error } = await supabase
+        .from('activities')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('timestamp', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+        logger.error('ACTIVITIES_REPO', 'Failed to fetch last activity', {
+          error: error.message,
+          userId: session.user.id,
+          timestamp: new Date().toISOString()
+        });
+        throw error;
+      }
+
+      return data || null;
+    },
+    enabled: !!session?.user?.id,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2,
+  });
+}
+
+/**
  * Hook pour récupérer les statistiques globales
  */
 export function useGlobalActivityStats() {

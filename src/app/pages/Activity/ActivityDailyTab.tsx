@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { format, startOfDay, endOfDay } from 'date-fns';
 import { useUserStore } from '../../../system/store/userStore';
-import { useTodayActivities, useTodayActivityStats, useDeleteActivity } from './hooks/useActivitiesData';
+import { useTodayActivities, useTodayActivityStats, useDeleteActivity, useRecentActivities } from './hooks/useActivitiesData';
 import { useToast } from '../../../ui/components/ToastProvider';
 import { useFeedback } from '../../../hooks/useFeedback';
 import logger from '../../../lib/utils/logger';
@@ -27,13 +27,16 @@ const ActivityDailyTab: React.FC = () => {
   const { success, error: errorSound } = useFeedback();
   
   // Récupération des données réelles d'activité
-  const { 
-    data: todayStats, 
-    isLoading: statsLoading, 
+  const {
+    data: todayStats,
+    isLoading: statsLoading,
     error: statsError,
-    activities: todayActivities 
+    activities: todayActivities
   } = useTodayActivityStats();
-  
+
+  // Récupérer les dernières activités (pas uniquement aujourd'hui)
+  const { data: recentActivities = [], isLoading: recentLoading } = useRecentActivities(10);
+
   // Hook pour la suppression d'activités
   const deleteActivityMutation = useDeleteActivity();
 
@@ -166,7 +169,7 @@ const ActivityDailyTab: React.FC = () => {
       />
 
       <RecentActivitiesCard
-        todayActivities={todayActivities}
+        todayActivities={recentActivities}
         todayStats={todayStats}
         hasAnyActivityHistory={hasAnyActivityHistory}
         deletingActivityId={deleteActivityMutation.isPending ? 'deleting' : undefined}

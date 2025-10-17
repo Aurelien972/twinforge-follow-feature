@@ -5,6 +5,10 @@ import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
 import { useFeedback } from '../../../../../../hooks/useFeedback';
 import { usePreferredMotion } from '../../../../../../system/device/DeviceProvider';
+import { useLastActivity } from '../../../hooks/useActivitiesData';
+import { analyzeActivityContext } from './contextAnalysis';
+import { generateCTAMessage } from './messageGenerator';
+import { calculateUrgencyConfig, shouldShowParticles, getParticleCount } from './urgencyCalculator';
 import React from 'react';
 
 interface ActivityCTAProps {
@@ -17,137 +21,55 @@ interface ActivityCTAProps {
   profile?: any;
 }
 
-interface UrgencyConfig {
-  priority: 'low' | 'medium' | 'high';
-  color: string;
-  icon: keyof typeof ICONS;
-  animation: 'none' | 'breathing' | 'pulse';
-}
-
-interface CTAMessage {
-  title: string;
-  subtitle: string;
-  buttonText: string;
-  encouragement?: string;
-}
-
 /**
- * Déterminer l'urgence basée sur les statistiques du jour
+ * Obtenir les métriques contextuelles pour affichage
  */
-function getUrgencyConfig(todayStats?: any): UrgencyConfig {
-  const activitiesCount = todayStats?.activitiesCount || 0;
-  const totalCalories = todayStats?.totalCalories || 0;
-  
-  // Haute urgence : aucune activité aujourd'hui
-  if (activitiesCount === 0) {
-    return {
-      priority: 'high',
-      color: '#3B82F6',
-      icon: 'Zap',
-      animation: 'pulse'
-    };
-  }
-  
-  // Urgence moyenne : peu d'activités
-  if (activitiesCount < 2 || totalCalories < 200) {
-    return {
-      priority: 'medium',
-      color: '#06B6D4',
-      icon: 'Activity',
-      animation: 'breathing'
-    };
-  }
-  
-  // Faible urgence : objectifs atteints
-  return {
-    priority: 'low',
-    color: '#22C55E',
-    icon: 'Target',
-    animation: 'none'
-  };
-}
-
-/**
- * Obtenir le message CTA basé sur l'urgence
- */
-function getCTAMessage(urgencyConfig: UrgencyConfig, todayStats?: any): CTAMessage {
-  const activitiesCount = todayStats?.activitiesCount || 0;
-  
-  if (urgencyConfig.priority === 'high') {
-    return {
-      title: 'Forgez votre énergie aujourd\'hui !',
-      subtitle: 'Aucune activité enregistrée aujourd\'hui - Commencez dès maintenant',
-      buttonText: 'Enregistrer une activité',
-      encouragement: 'Chaque mouvement d\'aujourd\'hui compte pour votre bien-être'
-    };
-  }
-
-  if (urgencyConfig.priority === 'medium') {
-    return {
-      title: 'Continuez votre journée active',
-      subtitle: `${activitiesCount} activité${activitiesCount > 1 ? 's' : ''} aujourd\'hui - Ajoutez-en une autre !`,
-      buttonText: 'Ajouter une activité',
-      encouragement: 'Maintenez votre rythme énergétique d\'aujourd\'hui'
-    };
-  }
-
-  return {
-    title: 'Excellente journée active !',
-    subtitle: 'Vous avez déjà bien forgé votre énergie aujourd\'hui',
-    buttonText: 'Ajouter une activité',
-    encouragement: 'Continuez à cultiver votre vitalité aujourd\'hui'
-  };
-}
-
-/**
- * Obtenir les métriques contextuelles
- */
-function getContextualMetrics(todayStats?: any, urgencyConfig?: UrgencyConfig): string[] {
+function getContextualMetrics(todayStats?: any): string[] {
   const metrics: string[] = [];
-  
+
   if (todayStats?.totalCalories > 0) {
     metrics.push(`${todayStats.totalCalories} kcal brûlées`);
   }
-  
+
   if (todayStats?.totalDuration > 0) {
     metrics.push(`${todayStats.totalDuration} min actives`);
   }
-  
+
   if (todayStats?.activitiesCount > 0) {
     metrics.push(`${todayStats.activitiesCount} activité${todayStats.activitiesCount > 1 ? 's' : ''}`);
   }
-  
+
   return metrics;
 }
 
 /**
- * Vérifier si les particules doivent être affichées
- */
-function shouldShowParticles(urgencyConfig: UrgencyConfig): boolean {
-  return urgencyConfig.priority === 'high' || urgencyConfig.priority === 'medium';
-}
-
-/**
- * Obtenir le nombre de particules
- */
-function getParticleCount(urgencyConfig: UrgencyConfig): number {
-  if (urgencyConfig.priority === 'high') return 6;
-  if (urgencyConfig.priority === 'medium') return 4;
-  return 0;
-}
-
-/**
  * Dynamic Activity CTA - Call to Action dynamique pour les activités
- * Incite l'utilisateur à enregistrer des activités selon son état actuel
+ * Incite l'utilisateur à enregistrer des activités selon son état actuel ET son historique global
  */
 const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile }) => {
   const navigate = useNavigate();
   const { click } = useFeedback();
   const reduceMotion = usePreferredMotion() === 'reduced';
 
-  const urgencyConfig = getUrgencyConfig(todayStats);
-  const message = getCTAMessage(urgencyConfig, todayStats);
-  const contextualMetrics = getContextualMetrics(todayStats, urgencyConfig);
+  // Récupérer la dernière activité globale (pas uniquement aujourd'hui)
+  const { data: lastActivity } = useLastActivity();
+
+  // Analyser le contexte d'activité complet
+  const activityContext = React.useMemo(() => {
+    return analyzeActivityContext(todayStats || null, lastActivity);
+  }, [todayStats, lastActivity]);
+
+  // Générer le message CTA basé sur le contexte
+  const message = React.useMemo(() => {
+    return generateCTAMessage(activityContext);
+  }, [activityContext]);
+
+  // Calculer la configuration d'urgence
+  const urgencyConfig = React.useMemo(() => {
+    return calculateUrgencyConfig(activityContext);
+  }, [activityContext]);
+
+  const contextualMetrics = getContextualMetrics(todayStats);
   const hasActivities = (todayStats?.activitiesCount || 0) > 0;
 
   const handleActivityInput = () => {
@@ -224,7 +146,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
           ))}
         </div>
 
-        {urgencyConfig.priority === 'high' && !reduceMotion && (
+        {(urgencyConfig.priority === 'high' || urgencyConfig.priority === 'critical') && !reduceMotion && (
           <div
             className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
             style={{
@@ -245,8 +167,8 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
             style={iconStyles}
           >
             <SpatialIcon
-              Icon={ICONS[urgencyConfig.icon]}
-              size={urgencyConfig.priority === 'high' ? 64 : 56}
+              Icon={ICONS[urgencyConfig.icon as keyof typeof ICONS]}
+              size={(urgencyConfig.priority === 'high' || urgencyConfig.priority === 'critical') ? 64 : 56}
               style={{ color: urgencyConfig.color }}
             />
 
@@ -358,7 +280,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
 
               <div className="relative z-10 flex items-center justify-center gap-3">
                 <SpatialIcon
-                  Icon={ICONS[urgencyConfig.icon]}
+                  Icon={ICONS[urgencyConfig.icon as keyof typeof ICONS]}
                   size={24}
                   style={{
                     color: 'white',

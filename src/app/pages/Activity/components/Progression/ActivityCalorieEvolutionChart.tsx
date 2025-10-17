@@ -133,10 +133,10 @@ const ActivityCalorieEvolutionChart: React.FC<ActivityCalorieEvolutionChartProps
 
   // Préparation pour le graphique
   const rangeCalories = maxCalories - minCalories;
-  const paddingCalories = rangeCalories * 0.2;
+  const paddingCalories = Math.max(rangeCalories * 0.2, 10); // Minimum padding de 10 calories
   const chartMin = Math.max(0, minCalories - paddingCalories);
   const chartMax = maxCalories + paddingCalories;
-  const chartRange = chartMax - chartMin;
+  const chartRange = Math.max(chartMax - chartMin, 1); // Éviter la division par zéro
 
   return (
     <motion.div
@@ -248,7 +248,9 @@ const ActivityCalorieEvolutionChart: React.FC<ActivityCalorieEvolutionChartProps
           <div className="relative h-48 bg-white/5 rounded-xl p-4 overflow-hidden">
             <div className="relative h-full flex items-end justify-between gap-1">
               {data.map((point, index) => {
-                const height = chartRange > 0 ? ((point.calories - chartMin) / chartRange) * 100 : 0;
+                // Calcul de la hauteur avec un minimum visible
+                const heightPercent = chartRange > 0 ? ((point.calories - chartMin) / chartRange) * 100 : 0;
+                const height = Math.max(heightPercent, 5); // Minimum 5% de hauteur pour la visibilité
                 const isMax = point.calories === maxCalories;
 
                 return (
@@ -262,7 +264,8 @@ const ActivityCalorieEvolutionChart: React.FC<ActivityCalorieEvolutionChartProps
                     <div
                       className="w-full rounded-t-md transition-all duration-200 group-hover:opacity-100"
                       style={{
-                        height: `${Math.max(height, 2)}%`,
+                        height: `${height}%`,
+                        minHeight: '8px', // Hauteur minimum absolue pour la visibilité
                         background: isMax
                           ? 'linear-gradient(to top, #EF4444, #F59E0B)'
                           : 'linear-gradient(to top, #F59E0B, #FBBF24)',

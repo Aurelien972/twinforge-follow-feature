@@ -59,8 +59,8 @@ function getIntensityColor(intensity: string): string {
 }
 
 /**
- * Recent Activities Card - Activités récentes de la journée
- * Affiche la liste des activités enregistrées aujourd'hui
+ * Recent Activities Card - Dernières activités enregistrées
+ * Affiche la liste des dernières activités (pas uniquement aujourd'hui)
  */
 const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({
   todayActivities = [],
@@ -83,8 +83,8 @@ const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({
           <SpatialIcon Icon={ICONS.History} size={20} style={{ color: 'var(--color-activity-primary)' }} />
         </div>
         <div>
-          <h3 className="activity-summary-title">Activités d'Aujourd'hui</h3>
-          <p className="activity-summary-subtitle">Liste de vos sessions forgées ce jour</p>
+          <h3 className="activity-summary-title">Dernières Activités</h3>
+          <p className="activity-summary-subtitle">Historique de vos dernières sessions</p>
         </div>
       </div>
 
@@ -94,10 +94,10 @@ const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({
             <SpatialIcon Icon={ICONS.Activity} size={32} className="text-blue-400" />
           </div>
           <p className="text-white/70 text-sm mb-2">
-            Aucune activité enregistrée aujourd'hui.
+            Aucune activité enregistrée.
           </p>
           <p className="text-white/50 text-xs">
-            Commencez à forger votre énergie en enregistrant votre première activité !
+            Commencez votre voyage énergétique en enregistrant votre première activité !
           </p>
         </div>
       ) : (
@@ -133,7 +133,7 @@ const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({
                         {activity.type}
                       </div>
                       <div className="recent-activity-item-time">
-                        {activity.duration_min} min • {format(new Date(activity.timestamp), 'HH:mm')}
+                        {activity.duration_min} min • {format(new Date(activity.timestamp), 'dd MMM HH:mm', { locale: fr })}
                       </div>
                     </div>
                   </div>
