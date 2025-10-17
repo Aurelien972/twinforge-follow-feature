@@ -131,43 +131,42 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
         });
 
         // Utiliser setState directement pour garantir l'immutabilité
-        useUnifiedCoachStore.setState((state) => {
-          const lastMessage = state.messages[state.messages.length - 1];
+        const newState = useUnifiedCoachStore.getState().messages;
+        const lastMessage = newState[newState.length - 1];
 
-          if (lastMessage && lastMessage.role === 'coach') {
-            // Créer un nouveau tableau avec le message mis à jour
-            const updatedMessages = [...state.messages];
-            updatedMessages[updatedMessages.length - 1] = {
-              ...lastMessage,
-              content: lastMessage.content + chunk
-            };
+        if (lastMessage && lastMessage.role === 'coach') {
+          // Créer un nouveau tableau avec le message mis à jour
+          const updatedMessages = [...newState];
+          updatedMessages[updatedMessages.length - 1] = {
+            ...lastMessage,
+            content: lastMessage.content + chunk
+          };
 
-            logger.info('UNIFIED_COACH_DRAWER', '✅ Appending to existing coach message', {
-              messageId: lastMessage.id,
-              chunkLength: chunk.length,
-              previousLength: lastMessage.content.length,
-              newContentLength: updatedMessages[updatedMessages.length - 1].content.length
-            });
+          logger.info('UNIFIED_COACH_DRAWER', '✅ Appending to existing coach message', {
+            messageId: lastMessage.id,
+            chunkLength: chunk.length,
+            previousLength: lastMessage.content.length,
+            newContentLength: updatedMessages[updatedMessages.length - 1].content.length
+          });
 
-            return { messages: updatedMessages };
-          } else {
-            // Créer un nouveau message coach
-            const newMessage = {
-              id: crypto.randomUUID(),
-              role: 'coach' as const,
-              content: chunk,
-              timestamp: new Date()
-            };
+          useUnifiedCoachStore.setState({ messages: updatedMessages });
+        } else {
+          // Créer un nouveau message coach
+          const newMessage = {
+            id: crypto.randomUUID(),
+            role: 'coach' as const,
+            content: chunk,
+            timestamp: new Date()
+          };
 
-            logger.info('UNIFIED_COACH_DRAWER', '🆕 Creating new coach message', {
-              messageId: newMessage.id,
-              contentLength: chunk.length,
-              lastMessageRole: lastMessage?.role || 'none'
-            });
+          logger.info('UNIFIED_COACH_DRAWER', '🆕 Creating new coach message', {
+            messageId: newMessage.id,
+            contentLength: chunk.length,
+            lastMessageRole: lastMessage?.role || 'none'
+          });
 
-            return { messages: [...state.messages, newMessage] };
-          }
-        });
+          useUnifiedCoachStore.setState({ messages: [...newState, newMessage] });
+        }
       } else if (!isDelta) {
         logger.info('UNIFIED_COACH_DRAWER', 'Stream completed, clearing processing state');
         setProcessing(false);
