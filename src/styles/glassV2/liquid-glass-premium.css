@@ -61,10 +61,9 @@
 
   --liquid-border-gradient-tricolor: linear-gradient(
     135deg,
-    var(--liquid-border-indigo) 0%,
-    var(--liquid-border-cyan) 33%,
-    var(--liquid-border-orange) 66%,
-    var(--liquid-border-violet) 100%
+    var(--liquid-border-cyan) 0%,
+    var(--liquid-border-orange) 50%,
+    var(--liquid-border-cyan) 100%
   );
 
   /* =========================================

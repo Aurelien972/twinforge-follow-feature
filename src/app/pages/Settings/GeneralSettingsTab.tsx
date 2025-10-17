@@ -95,7 +95,7 @@ const GeneralSettingsTab: React.FC = () => {
       id: 'auto',
       label: 'Automatique',
       description: 'Suit les préférences système de votre appareil',
-      icon: 'MonitorSmartphone',
+      icon: 'Monitor',
       color: '#18E3FF',
     },
     {
