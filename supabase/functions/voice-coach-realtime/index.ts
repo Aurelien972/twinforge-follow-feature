@@ -9,6 +9,104 @@ import { corsHeaders } from '../_shared/cors.ts';
 
 const OPENAI_REALTIME_URL = 'wss://api.openai.com/v1/realtime';
 
+function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
+  let openaiConnected = false;
+
+  openaiSocket.onopen = () => {
+    console.log('[VOICE-PROXY] OpenAI connection established');
+    openaiConnected = true;
+
+    if (clientSocket.readyState === WebSocket.OPEN) {
+      clientSocket.send(JSON.stringify({
+        type: 'proxy.connected',
+        timestamp: new Date().toISOString()
+      }));
+    }
+  };
+
+  openaiSocket.onerror = (error) => {
+    console.error('[VOICE-PROXY] OpenAI WebSocket error', error);
+
+    if (clientSocket.readyState === WebSocket.OPEN) {
+      clientSocket.send(JSON.stringify({
+        type: 'error',
+        error: {
+          message: 'Failed to connect to OpenAI Realtime API',
+          details: 'Check server logs for more information'
+        },
+      }));
+      clientSocket.close(1011, 'OpenAI connection failed');
+    }
+  };
+
+  openaiSocket.onclose = (event) => {
+    console.log('[VOICE-PROXY] OpenAI connection closed', {
+      code: event.code,
+      reason: event.reason,
+      wasClean: event.wasClean
+    });
+    openaiConnected = false;
+
+    if (clientSocket.readyState === WebSocket.OPEN) {
+      clientSocket.close(event.code, event.reason || 'OpenAI disconnected');
+    }
+  };
+
+  openaiSocket.onmessage = (event) => {
+    try {
+      if (clientSocket.readyState === WebSocket.OPEN) {
+        clientSocket.send(event.data);
+      } else {
+        console.warn('[VOICE-PROXY] Client socket not ready, dropping message');
+      }
+    } catch (error) {
+      console.error('[VOICE-PROXY] Error forwarding to client', error);
+    }
+  };
+
+  // Client handlers
+  clientSocket.onmessage = (event) => {
+    try {
+      if (openaiSocket.readyState === WebSocket.OPEN) {
+        openaiSocket.send(event.data);
+      } else {
+        console.warn('[VOICE-PROXY] OpenAI socket not ready', {
+          state: openaiSocket.readyState,
+          connected: openaiConnected
+        });
+
+        if (clientSocket.readyState === WebSocket.OPEN) {
+          clientSocket.send(JSON.stringify({
+            type: 'error',
+            error: { message: 'OpenAI connection not ready' }
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('[VOICE-PROXY] Error forwarding to OpenAI', error);
+    }
+  };
+
+  clientSocket.onclose = (event) => {
+    console.log('[VOICE-PROXY] Client connection closed', {
+      code: event.code,
+      reason: event.reason
+    });
+
+    if (openaiSocket.readyState === WebSocket.OPEN) {
+      openaiSocket.close(1000, 'Client disconnected');
+    }
+  };
+
+  clientSocket.onerror = (error) => {
+    console.error('[VOICE-PROXY] Client WebSocket error', error);
+
+    if (openaiSocket.readyState === WebSocket.OPEN) {
+      openaiSocket.close(1011, 'Client error');
+    }
+  };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, {
@@ -18,11 +116,18 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      console.error('Missing authorization header');
+    // Vérifier l'authentification (header ou sous-protocole WebSocket)
+    const authHeader = req.headers.get('Authorization') ||
+                       req.headers.get('authorization') ||
+                       req.headers.get('apikey');
+
+    // Pour les WebSockets, Supabase passe aussi l'auth via sec-websocket-protocol
+    const wsProtocol = req.headers.get('sec-websocket-protocol');
+
+    if (!authHeader && !wsProtocol) {
+      console.error('[VOICE-PROXY] Missing authorization');
       return new Response(
-        JSON.stringify({ error: 'Missing authorization header' }),
+        JSON.stringify({ error: 'Missing authorization' }),
         {
           status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -66,114 +171,32 @@ Deno.serve(async (req: Request) => {
 
     console.log('[VOICE-PROXY] Connecting to OpenAI', { url: openaiWsUrl });
 
-    const openaiSocket = new WebSocket(openaiWsUrl, {
-      headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
-        'OpenAI-Beta': 'realtime=v1',
-      },
-    });
-
+    // Upgrade the request to WebSocket
     const { socket: clientSocket, response } = Deno.upgradeWebSocket(req);
 
-    let openaiConnected = false;
-    let clientConnected = false;
-
-    openaiSocket.onopen = () => {
-      console.log('[VOICE-PROXY] OpenAI connection established');
-      openaiConnected = true;
-
-      if (clientSocket.readyState === WebSocket.OPEN) {
-        clientSocket.send(JSON.stringify({
-          type: 'proxy.connected',
-          timestamp: new Date().toISOString()
-        }));
-      }
-    };
-
-    openaiSocket.onerror = (error) => {
-      console.error('[VOICE-PROXY] OpenAI WebSocket error', error);
-
-      if (clientSocket.readyState === WebSocket.OPEN) {
-        clientSocket.send(JSON.stringify({
-          type: 'error',
-          error: {
-            message: 'Failed to connect to OpenAI Realtime API',
-            details: 'Check server logs for more information'
-          },
-        }));
-        clientSocket.close(1011, 'OpenAI connection failed');
-      }
-    };
-
-    openaiSocket.onclose = (event) => {
-      console.log('[VOICE-PROXY] OpenAI connection closed', {
-        code: event.code,
-        reason: event.reason,
-        wasClean: event.wasClean
-      });
-      openaiConnected = false;
-
-      if (clientSocket.readyState === WebSocket.OPEN) {
-        clientSocket.close(event.code, event.reason || 'OpenAI disconnected');
-      }
-    };
-
-    openaiSocket.onmessage = (event) => {
-      try {
-        if (clientSocket.readyState === WebSocket.OPEN) {
-          clientSocket.send(event.data);
-        } else {
-          console.warn('[VOICE-PROXY] Client socket not ready, dropping message');
-        }
-      } catch (error) {
-        console.error('[VOICE-PROXY] Error forwarding to client', error);
-      }
-    };
-
+    // Attendre que le client soit connecté avant de créer la connexion OpenAI
     clientSocket.onopen = () => {
       console.log('[VOICE-PROXY] Client connection established');
-      clientConnected = true;
-    };
 
-    clientSocket.onmessage = (event) => {
+      // Maintenant créer la connexion OpenAI
       try {
-        if (openaiSocket.readyState === WebSocket.OPEN) {
-          openaiSocket.send(event.data);
-        } else {
-          console.warn('[VOICE-PROXY] OpenAI socket not ready', {
-            state: openaiSocket.readyState,
-            connected: openaiConnected
-          });
+        const openaiSocket = new WebSocket(openaiWsUrl, {
+          headers: {
+            'Authorization': `Bearer ${openaiApiKey}`,
+            'OpenAI-Beta': 'realtime=v1',
+          },
+        });
 
-          if (clientSocket.readyState === WebSocket.OPEN) {
-            clientSocket.send(JSON.stringify({
-              type: 'error',
-              error: { message: 'OpenAI connection not ready' }
-            }));
-          }
-        }
+        setupOpenAIHandlers(openaiSocket, clientSocket);
       } catch (error) {
-        console.error('[VOICE-PROXY] Error forwarding to OpenAI', error);
-      }
-    };
-
-    clientSocket.onclose = (event) => {
-      console.log('[VOICE-PROXY] Client connection closed', {
-        code: event.code,
-        reason: event.reason
-      });
-      clientConnected = false;
-
-      if (openaiSocket.readyState === WebSocket.OPEN) {
-        openaiSocket.close(1000, 'Client disconnected');
-      }
-    };
-
-    clientSocket.onerror = (error) => {
-      console.error('[VOICE-PROXY] Client WebSocket error', error);
-
-      if (openaiSocket.readyState === WebSocket.OPEN) {
-        openaiSocket.close(1011, 'Client error');
+        console.error('[VOICE-PROXY] Failed to create OpenAI WebSocket', error);
+        if (clientSocket.readyState === WebSocket.OPEN) {
+          clientSocket.send(JSON.stringify({
+            type: 'error',
+            error: { message: 'Failed to connect to OpenAI' }
+          }));
+          clientSocket.close(1011, 'OpenAI connection failed');
+        }
       }
     };
 

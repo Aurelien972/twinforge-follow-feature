@@ -71,7 +71,11 @@ class OpenAIRealtimeService {
       logger.debug('REALTIME_API', 'Connecting to edge function', { url: edgeFunctionUrl });
 
       // Créer la connexion WebSocket via notre edge function
-      this.ws = new WebSocket(edgeFunctionUrl);
+      // Pour l'authentification avec Supabase, on doit passer le token dans les sous-protocoles
+      this.ws = new WebSocket(edgeFunctionUrl, [
+        'apikey.' + supabaseAnonKey,
+        'authorization.' + supabaseAnonKey
+      ]);
 
       this.ws.binaryType = 'arraybuffer';
 
