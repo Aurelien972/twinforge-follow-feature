@@ -39,17 +39,31 @@
 }
 
 /* =========================================
-   HEADER - SOLID (no blur)
+   HEADER - SOLID METALLIC GRAY (no blur)
    ========================================= */
 
 .mobile-device .header-liquid-glass {
-  /* Solid background - no blur for performance */
-  background: rgba(15, 25, 39, 0.98) !important;
+  /* CRITICAL: Preserve fixed positioning */
+  position: fixed !important;
+  z-index: var(--z-mobile-header, 9999) !important;
+
+  /* SOLID METALLIC GRAY - no blur for performance */
+  background: var(--mobile-metallic-gray, rgba(45, 52, 64, 0.98)) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 
-  /* Simple single-layer shadow */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+  /* Simple shadow */
+  box-shadow: var(--mobile-metallic-shadow, 0 2px 8px rgba(0, 0, 0, 0.3)) !important;
+  border: 1px solid var(--mobile-metallic-border, rgba(255, 255, 255, 0.12)) !important;
+
+  /* GPU acceleration for sticky positioning */
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  contain: layout style paint !important;
+  isolation: isolate !important;
 }
 
 .mobile-device .header-liquid-glass::before,
@@ -58,16 +72,32 @@
 }
 
 /* =========================================
-   BOTTOM BAR - SOLID (no blur)
+   BOTTOM BAR - SOLID METALLIC GRAY (no blur)
    ========================================= */
 
+.mobile-device .new-mobile-bottom-bar {
+  /* CRITICAL: Preserve fixed positioning */
+  position: fixed !important;
+  z-index: var(--z-mobile-bottom-bar, 9996) !important;
+
+  /* GPU acceleration for sticky positioning */
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  contain: layout style paint !important;
+  isolation: isolate !important;
+}
+
 .mobile-device .new-mobile-bottom-bar-container {
-  /* Solid background - no blur for performance */
-  background: rgba(15, 25, 39, 0.98) !important;
+  /* SOLID METALLIC GRAY - no blur for performance */
+  background: var(--mobile-metallic-gray, rgba(45, 52, 64, 0.98)) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.25) !important;
+  box-shadow: var(--mobile-metallic-shadow-bottom, 0 -2px 8px rgba(0, 0, 0, 0.3)) !important;
+  border: 1px solid var(--mobile-metallic-border, rgba(255, 255, 255, 0.12)) !important;
 }
 
 .mobile-device .new-mobile-bottom-bar-container::before,
@@ -189,29 +219,61 @@
 }
 
 /* =========================================
-   FLOATING ELEMENTS - LIGHT BLUR (preserve identity)
+   FLOATING ELEMENTS - PRESERVE POSITIONING
    ========================================= */
 
 .mobile-device .floating-chat-button,
 .mobile-device .floating-voice-coach-button,
+.mobile-device .unified-floating-button,
 .mobile-device [class*="floating"]:not([class*="floating-generate"]) {
-  /* Semi-transparent with light blur */
-  background: rgba(247, 147, 30, 0.88) !important;
-  backdrop-filter: blur(6px) saturate(120%) !important;
-  -webkit-backdrop-filter: blur(6px) saturate(120%) !important;
+  /* CRITICAL: Preserve fixed positioning */
+  position: fixed !important;
+  z-index: var(--z-mobile-fab, 9997) !important;
+
+  /* GPU acceleration for sticky positioning */
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+
+  /* Solid metallic for FAB buttons */
+  background: var(--mobile-metallic-gray, rgba(45, 52, 64, 0.98)) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* =========================================
-   CHAT/VOICE COMPONENTS - LIGHT BLUR
+   CHAT/VOICE COMPONENTS - SOLID METALLIC
    ========================================= */
+
+.mobile-device .chat-notification-bubble {
+  /* CRITICAL: Preserve fixed positioning */
+  position: fixed !important;
+  z-index: var(--z-mobile-chat-bubble, 9998) !important;
+
+  /* GPU acceleration for sticky positioning */
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+
+  /* SOLID METALLIC GRAY */
+  background: var(--mobile-metallic-gray, rgba(45, 52, 64, 0.98)) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--mobile-metallic-shadow, 0 2px 8px rgba(0, 0, 0, 0.3)) !important;
+  border: 1px solid var(--mobile-metallic-border, rgba(255, 255, 255, 0.12)) !important;
+}
 
 .mobile-device .voice-coach-panel,
 .mobile-device .global-chat-drawer,
 .mobile-device .unified-coach-drawer,
-.mobile-device [class*="chat-"]:not(.glass-card) {
-  background: rgba(15, 25, 39, 0.92) !important;
-  backdrop-filter: blur(8px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+.mobile-device [class*="chat-"]:not(.glass-card):not(.chat-notification-bubble) {
+  background: var(--mobile-metallic-gray-dark, rgba(38, 44, 54, 0.98)) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* =========================================

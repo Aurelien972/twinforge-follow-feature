@@ -114,94 +114,93 @@
     0 0 16px color-mix(in srgb, var(--color-plasma-cyan) 40%, transparent) !important;
 }
 
-/* Mobile adaptations - USE EXACT BOTTOMBAR CSS VARIABLES */
+/* Mobile adaptations - SOLID METALLIC GRAY WITHOUT BLUR */
 @media (max-width: 1024px) {
   body .header-liquid-glass,
   .header-liquid-glass {
+    /* CRITICAL: Fixed positioning with explicit values */
+    position: fixed !important;
     left: 8px !important;
     right: 8px !important;
     top: 6px !important;
+    z-index: var(--z-mobile-header) !important;
 
-    /* USE EXACT SAME BACKGROUND AS BOTTOMBAR */
-    background:
-      var(--liquid-reflections-multi),
-      var(--liquid-highlight-ambient),
-      var(--liquid-glass-bg-base) !important;
+    /* SOLID METALLIC GRAY - No blur, no transparency */
+    background: var(--mobile-metallic-gray) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 
-    /* USE EXACT SAME BLUR AS BOTTOMBAR */
-    backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
-    -webkit-backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
+    /* Simple shadow without blur effects */
+    box-shadow: var(--mobile-metallic-shadow) !important;
+    border: 1px solid var(--mobile-metallic-border) !important;
 
-    /* USE EXACT SAME SHADOWS AS BOTTOMBAR */
-    box-shadow: var(--liquid-bottombar-shadow), var(--liquid-bottombar-glow) !important;
+    /* GPU acceleration for sticky positioning */
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+
+    /* Force compositing layer */
+    contain: layout style paint !important;
+    isolation: isolate !important;
+    pointer-events: auto !important;
 
     /* Disable animations */
     transition: none !important;
   }
 
-  /* Disable animated border on mobile */
+  /* Remove all pseudo-element effects on mobile */
   body .header-liquid-glass::before,
   .header-liquid-glass::before {
-    animation: none !important;
-    opacity: 0.6 !important;
-    /* FORCE SAME BORDER AS BOTTOMBAR */
-    background: var(--liquid-border-gradient-tricolor) !important;
+    display: none !important;
+    opacity: 0 !important;
   }
 
-  /* Disable glow animation on mobile but keep same glow as bottombar */
+  /* Remove all glow effects on mobile */
   body .header-liquid-glass::after,
   .header-liquid-glass::after {
-    animation: none !important;
-    opacity: 0.5 !important;
-    filter: blur(8px);
-    /* FORCE SAME AMBIENT GLOW AS BOTTOMBAR */
-    background: radial-gradient(
-      ellipse at 50% 50%,
-      rgba(24, 227, 255, 0.15) 0%,
-      rgba(61, 19, 179, 0.1) 40%,
-      transparent 70%
-    ) !important;
+    display: none !important;
+    opacity: 0 !important;
   }
 }
 
-/* Mobile device class enforcement - USE BOTTOMBAR CSS VARIABLES */
+/* Mobile device class enforcement - SOLID METALLIC GRAY */
 body.mobile-device .header-liquid-glass,
 .mobile-device .header-liquid-glass {
-  /* USE EXACT SAME BACKGROUND AS BOTTOMBAR */
-  background:
-    var(--liquid-reflections-multi),
-    var(--liquid-highlight-ambient),
-    var(--liquid-glass-bg-base) !important;
+  /* CRITICAL: Fixed positioning */
+  position: fixed !important;
+  z-index: var(--z-mobile-header) !important;
 
-  /* USE EXACT SAME BLUR AS BOTTOMBAR */
-  backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
-  -webkit-backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
+  /* SOLID METALLIC GRAY - No blur, no transparency */
+  background: var(--mobile-metallic-gray) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 
-  /* USE EXACT SAME SHADOWS AS BOTTOMBAR */
-  box-shadow: var(--liquid-bottombar-shadow), var(--liquid-bottombar-glow) !important;
+  /* Simple shadow */
+  box-shadow: var(--mobile-metallic-shadow) !important;
+  border: 1px solid var(--mobile-metallic-border) !important;
+
+  /* GPU acceleration */
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  contain: layout style paint !important;
+  isolation: isolate !important;
 
   transition: none !important;
 }
 
 body.mobile-device .header-liquid-glass::before,
 .mobile-device .header-liquid-glass::before {
-  animation: none !important;
-  opacity: 0.6 !important;
-  /* FORCE SAME BORDER AS BOTTOMBAR */
-  background: var(--liquid-border-gradient-tricolor) !important;
+  display: none !important;
 }
 
 body.mobile-device .header-liquid-glass::after,
 .mobile-device .header-liquid-glass::after {
-  animation: none !important;
-  opacity: 0.5 !important;
-  /* FORCE SAME AMBIENT GLOW AS BOTTOMBAR */
-  background: radial-gradient(
-    ellipse at 50% 50%,
-    rgba(24, 227, 255, 0.15) 0%,
-    rgba(61, 19, 179, 0.1) 40%,
-    transparent 70%
-  ) !important;
+  display: none !important;
 }
 
 /* Tablet optimizations */
@@ -286,10 +285,20 @@ body.mobile-device .header-liquid-glass::after,
   will-change: transform, filter;
 }
 
-/* Mobile: Disable transitions on header buttons */
+/* Mobile: Disable transitions on header buttons and ensure solid backgrounds */
 @media (max-width: 768px) {
   .header-liquid-glass button {
     transition: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .header-liquid-glass .glass-orb-button,
+  .header-liquid-glass button.user-panel-toggle,
+  .header-liquid-glass button.central-action-button {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }
 

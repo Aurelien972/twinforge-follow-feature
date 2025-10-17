@@ -20,6 +20,16 @@
   /* Position par défaut (mobile/tablette) : au-dessus du coin droit de la bottom bar */
   right: 8px !important;
   bottom: calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px) !important;
+  z-index: var(--z-mobile-fab, 9997) !important;
+
+  /* GPU acceleration for sticky positioning */
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  contain: layout style paint !important;
+  isolation: isolate !important;
 }
 
 /* ============================================================
@@ -81,12 +91,18 @@
     display: flex !important;
     width: 56px !important;
     height: 56px !important;
+    position: fixed !important;
     right: 8px !important;
     bottom: calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px) !important;
+    z-index: var(--z-mobile-fab, 9997) !important;
 
-    /* Optimisation GPU pour mobile */
-    transform: translateZ(0) !important;
-    backface-visibility: hidden;
+    /* Optimisation GPU pour mobile - CRITICAL for sticky positioning */
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    contain: layout style paint !important;
     -webkit-font-smoothing: antialiased;
   }
 }
