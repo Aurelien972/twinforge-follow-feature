@@ -103,9 +103,6 @@
 @import './optimizations/mobile-animations-only.css';
 @import './optimizations/mobile-blur-selective.css';
 
-/* CRITICAL: TOTAL EFFECTS ELIMINATION ON MOBILE - MUST BE IMPORTED HERE */
-@import './optimizations/mobile-zero-effects-global.css';
-
 /* =========================================
    PHASE 8: FORGE PIPELINE STYLES
    ========================================= */

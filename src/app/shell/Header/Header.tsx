@@ -11,7 +11,6 @@ import { BackButton } from '../../../ui/buttons';
 import { useOverlayStore } from '../../../system/store/overlayStore';
 import CentralActionsMenu from '../CentralActionsMenu';
 import { useIsMobile } from '../../../system/device/DeviceProvider';
-import { safeMotionProps } from '../../../lib/motion/mobileMotionConfig';
 
 export const Header = React.memo(() => {
   const { setDrawer } = useShell();
@@ -98,10 +97,8 @@ export const Header = React.memo(() => {
                   toggle('centralMenu');
                 }
               }}
-              {...safeMotionProps(isMobile, {
-                whileHover: { scale: 1.05 },
-                whileTap: { scale: 0.98 }
-              })}
+              whileHover={isMobile ? {} : { scale: 1.05 }}
+              whileTap={isMobile ? {} : { scale: 0.98 }}
             >
               {/* Carrés tournants aux 4 coins - Désactivés sur mobile */}
               {!isMobile && [0, 1, 2, 3].map((i) => (
