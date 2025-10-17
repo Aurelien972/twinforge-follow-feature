@@ -91,8 +91,8 @@ function BarButton({
         '--button-color': button.color,
         '--button-active': active ? '1' : '0'
       } as React.CSSProperties}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.98 }}
       aria-current={active ? 'page' : undefined}
       aria-label={`Aller à ${button.label}`}
     >

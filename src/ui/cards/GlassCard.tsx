@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import { HoverEffectManager, supportsAdvancedHover } from './cardUtils';
 import { useFeedback } from '../../hooks/useFeedback';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
-import { usePerformanceMode } from '../../system/context/PerformanceModeContext';
+import { useIsMobile } from '../../system/device/DeviceProvider';
 
 type GlassCardProps = React.PropsWithChildren<{
   className?: string;
@@ -61,7 +61,7 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
   const Comp: any = (motion as any)[as] ?? motion.div;
   const reduceMotion = useReducedMotion();
   const { glassClick } = useFeedback();
-  const { isPerformanceMode } = usePerformanceMode();
+  const isMobileDevice = useIsMobile();
 
   const scrollRevealHook = useScrollReveal({
     enabled: scrollReveal && !reduceMotion,
@@ -106,15 +106,13 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
     onPointerDown?.(e);
   };
 
-  // CRITICAL: Désactiver les animations sur mobile et appareils tactiles
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-  const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-  const shouldAnimate = !reduceMotion && !isMobile && !isTouchDevice && !isPerformanceMode;
+  // CRITICAL: Désactiver les animations sur mobile (détection automatique via DeviceProvider)
+  const shouldAnimate = !reduceMotion && !isMobileDevice;
 
   const handleMove = React.useCallback(
     (e: React.MouseEvent) => {
-      // Désactiver complètement sur mobile et appareils tactiles
-      if (!interactive || !hasFinePointer() || disabled || !sheen || isMobile || isTouchDevice || isPerformanceMode) return;
+      // Désactiver complètement sur mobile (détection automatique)
+      if (!interactive || !hasFinePointer() || disabled || !sheen || isMobileDevice) return;
 
       const el = e.currentTarget as HTMLElement;
       const r = el.getBoundingClientRect();
@@ -126,22 +124,22 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
       el.style.setProperty('--my', String(py));
       el.style.setProperty('--sheen-size', 'var(--glass-sheen-size)');
     },
-    [interactive, disabled, sheen, isMobile, isTouchDevice, isPerformanceMode]
+    [interactive, disabled, sheen, isMobileDevice]
   );
 
   const handleEnter = React.useCallback((e: React.MouseEvent) => {
-    if (!interactive || !hasFinePointer() || disabled || !sheen || isMobile || isTouchDevice || isPerformanceMode) return;
+    if (!interactive || !hasFinePointer() || disabled || !sheen || isMobileDevice) return;
     const el = e.currentTarget as HTMLElement;
     el.style.setProperty('--sheen-visible', '1');
-  }, [interactive, disabled, sheen, isMobile, isTouchDevice, isPerformanceMode]);
+  }, [interactive, disabled, sheen, isMobileDevice]);
 
   const handleLeave = React.useCallback((e: React.MouseEvent) => {
-    if (!interactive || disabled || !sheen || isMobile || isTouchDevice || isPerformanceMode) return;
+    if (!interactive || disabled || !sheen || isMobileDevice) return;
     const el = e.currentTarget as HTMLElement;
     el.style.removeProperty('--sheen-visible');
     el.style.removeProperty('--mx');
     el.style.removeProperty('--my');
-  }, [interactive, disabled, sheen, isMobile, isTouchDevice, isPerformanceMode]);
+  }, [interactive, disabled, sheen, isMobileDevice]);
 
   // Interactions desktop uniquement
   const interactiveDesktop = interactive && hasFinePointer() && !disabled && shouldAnimate;
@@ -170,9 +168,9 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
       data-scroll-active={scrollReveal ? scrollRevealHook.state.isVisible : undefined}
       data-intensity={scrollReveal ? scrollRevealIntensity : undefined}
       data-low-end={scrollReveal ? scrollRevealHook.isLowEnd : undefined}
-      whileTap={!disabled && !reduceMotion && !isMobile && !isTouchDevice && !isPerformanceMode ? {
-        scale: 0.98,
-        opacity: 0.95,
+      whileTap={!disabled && !reduceMotion && !isMobileDevice ? {
+        scale: 0.99,
+        opacity: 0.97,
         transition: {
           duration: 0.08,
           ease: "easeOut"
@@ -191,8 +189,8 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
         className
       )}
       style={{
-        ['--spotlight-opacity' as any]: (spotlight && !isMobile && !isTouchDevice) ? 0.6 : 0,
-        ['--glass-sheen-size' as any]: (isMobile || isTouchDevice) ? '0px' : '420px',
+        ['--spotlight-opacity' as any]: (spotlight && !isMobileDevice) ? 0.6 : 0,
+        ['--glass-sheen-size' as any]: isMobileDevice ? '0px' : '420px',
         position: 'relative',
         isolation: 'isolate',
         ...style,
@@ -201,7 +199,7 @@ const GlassCard = React.forwardRef<HTMLElement, GlassCardProps>(({
       {...rest}
     >
       {/* sheen local (z au-dessus du verre, masqué en radial) - desktop uniquement */}
-      {sheen && !isMobile && !isTouchDevice && !isPerformanceMode && (
+      {sheen && !isMobileDevice && (
         <div
           aria-hidden
           className="glass-sheen pointer-events-none absolute rounded-[inherit] overflow-hidden"

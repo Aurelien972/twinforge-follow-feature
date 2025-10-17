@@ -95,13 +95,14 @@ export const Header = React.memo(() => {
                   toggle('centralMenu');
                 }
               }}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
             >
-              {/* Carrés tournants aux 4 coins */}
+              {/* Carrés tournants aux 4 coins - Désactivés sur mobile via CSS */}
               {[0, 1, 2, 3].map((i) => (
                 <motion.div
                   key={i}
+                  className="header-corner-square"
                   style={{
                     position: 'absolute',
                     width: '6px',
@@ -241,8 +242,8 @@ export const Header = React.memo(() => {
                   setDrawer(true);
                 }
               }}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
             >
               <SpatialIcon
                 Icon={ICONS.Menu}

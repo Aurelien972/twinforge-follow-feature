@@ -201,16 +201,17 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
     circuit: 'settings',
     tabs: [
       {
-        value: 'general',
-        label: 'Général',
-        icon: 'Settings',
-        description: 'Thème, langue, unités et mode performance',
+        value: 'appareils',
+        label: 'Appareils Connectés',
+        icon: 'Watch',
+        description: 'Synchronisez vos trackers fitness',
         features: [
-          'Mode Performance pour iPhone 10',
-          'Préférences utilisateur',
-          'Thème et apparence',
-          'Langue et région',
-          'Unités de mesure'
+          'Strava, Garmin, Fitbit, Apple Health',
+          'Polar, Wahoo, WHOOP, Oura',
+          'Synchronisation automatique',
+          'Données de santé et fitness',
+          'Historique de synchronisation',
+          'Mode simulation pour développement'
         ]
       },
       {
@@ -235,20 +236,6 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
           'Paramètres de confidentialité',
           'Export de données',
           'Suppression de compte'
-        ]
-      },
-      {
-        value: 'appareils',
-        label: 'Appareils Connectés',
-        icon: 'Watch',
-        description: 'Synchronisez vos trackers fitness',
-        features: [
-          'Strava, Garmin, Fitbit, Apple Health',
-          'Polar, Wahoo, WHOOP, Oura',
-          'Synchronisation automatique',
-          'Données de santé et fitness',
-          'Historique de synchronisation',
-          'Mode simulation pour développement'
         ]
       }
     ]

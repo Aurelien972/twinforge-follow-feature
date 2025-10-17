@@ -442,8 +442,8 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ ...springy, delay: reduceMotion ? 0 : 0.3 }}
-                      whileHover={reduceMotion ? {} : { y: -2, scale: 1.02 }}
-                      whileTap={reduceMotion ? {} : { scale: 0.98 }}
+                      whileHover={reduceMotion ? {} : { scale: 1.02 }}
+                      whileTap={reduceMotion ? {} : { scale: 0.99 }}
                       role="menuitem"
                       aria-label={action.description || action.label}
                     >

@@ -90,23 +90,33 @@ export const DeviceProvider: React.FC<DeviceProviderProps> = ({ children }) => {
   };
 
   // CRITICAL: Add mobile-device class to body for CSS targeting
+  // This automatically applies mobile optimizations without user intervention
   useEffect(() => {
     if (isMobile) {
+      // Add mobile-device class for CSS targeting (mobile-no-blur.css, mobile-zero-animations.css)
       document.body.classList.add('mobile-device');
       document.documentElement.classList.add('mobile-device');
 
       // Log for debugging
-      console.log('🔍 Mobile device detected:', {
+      console.log('🔍 Mobile device detected - Auto-optimizations applied:', {
         isMobile,
         isIOS,
         isAndroid,
         hasTouch,
         screenWidth: window.innerWidth,
-        userAgent: navigator.userAgent
+        userAgent: navigator.userAgent,
+        optimizations: [
+          'Backdrop-blur disabled',
+          'Animations reduced',
+          'Solid backgrounds',
+          'Touch-optimized interactions'
+        ]
       });
     } else {
       document.body.classList.remove('mobile-device');
       document.documentElement.classList.remove('mobile-device');
+
+      console.log('🖥️ Desktop device detected - Full visual effects enabled');
     }
   }, [isMobile, isIOS, isAndroid, hasTouch]);
 
