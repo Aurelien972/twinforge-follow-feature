@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGlobalChatStore } from '../../../system/store/globalChatStore';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
+import { unifiedNotificationService, type NotificationId } from '../../../system/services/unifiedNotificationService';
 import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
 import '../../../styles/components/chat-notification-bubble.css';
@@ -26,7 +27,9 @@ const ChatNotificationBubble: React.FC<ChatNotificationBubbleProps> = ({ buttonR
     click();
     Haptics.press();
 
-    hideNotification();
+    if (currentNotification) {
+      unifiedNotificationService.hideNotification(currentNotification.id as NotificationId);
+    }
 
     open(currentNotification?.mode);
   };
@@ -38,10 +41,10 @@ const ChatNotificationBubble: React.FC<ChatNotificationBubbleProps> = ({ buttonR
       const target = event.target as Node;
 
       const isNotificationClick = notificationRef.current?.contains(target);
-      const isButtonClick = buttonRef.current?.contains(target);
+      const isButtonClick = buttonRef?.current?.contains(target);
 
-      if (!isNotificationClick && !isButtonClick) {
-        hideNotification();
+      if (!isNotificationClick && !isButtonClick && currentNotification) {
+        unifiedNotificationService.hideNotification(currentNotification.id as NotificationId);
       }
     };
 

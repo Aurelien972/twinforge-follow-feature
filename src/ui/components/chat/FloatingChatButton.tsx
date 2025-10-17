@@ -14,7 +14,7 @@ import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
 import ContextualTooltip from '../ContextualTooltip';
 import ChatNotificationBubble from './ChatNotificationBubble';
-import { chatNotificationService } from '../../../system/services/chatNotificationService';
+import { unifiedNotificationService } from '../../../system/services/unifiedNotificationService';
 import '../../../styles/components/floating-chat-button.css';
 import '../../../styles/components/floating-chat-button-step2.css';
 
@@ -45,19 +45,19 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
     if (isOpen) return;
 
     if (location.pathname.includes('/pipeline/step-2')) {
-      chatNotificationService.scheduleNotification(currentMode, 'step2');
+      unifiedNotificationService.scheduleNotification('step2-adjust');
     } else if (location.pathname.includes('/training')) {
-      chatNotificationService.scheduleNotification('training', 'step1');
+      unifiedNotificationService.scheduleNotification('training-intro');
     } else if (location.pathname.includes('/meals') || location.pathname.includes('/fridge')) {
-      chatNotificationService.scheduleNotification('nutrition');
+      unifiedNotificationService.scheduleNotification('nutrition-intro');
     } else if (location.pathname.includes('/fasting')) {
-      chatNotificationService.scheduleNotification('fasting');
+      unifiedNotificationService.scheduleNotification('fasting-intro');
     } else {
-      chatNotificationService.scheduleNotification('general', 'step1');
+      unifiedNotificationService.scheduleNotification('step1-welcome');
     }
 
     return () => {
-      chatNotificationService.clearScheduledNotification();
+      unifiedNotificationService.cancelScheduled();
     };
   }, [location.pathname, isOpen, currentMode]);
 
@@ -186,17 +186,18 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
         />
       </motion.div>
 
-      {/* Badge Count for unread messages or Step 2 notification */}
+      {/* Badge for unread messages - Only shown when NO contextual notification is active */}
       <AnimatePresence>
-        {!isOpen && (hasUnreadMessages && unreadCount > 0 || isStep2Active) && (
+        {!isOpen && hasUnreadMessages && unreadCount > 0 && !isStep2Active && (
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            className={isStep2Active && !hasUnreadMessages ? 'floating-chat-button--step2-notification' : 'floating-chat-badge'}
-            title={isStep2Active && !hasUnreadMessages ? 'Ton coach t\'attend pour ajuster ta séance !' : undefined}
-            style={isStep2Active && !hasUnreadMessages ? {} : {
+            className="floating-chat-badge"
+            style={{
               position: 'absolute',
+              top: '-4px',
+              right: '-4px',
               minWidth: '20px',
               height: '20px',
               padding: '0 6px',
@@ -217,7 +218,22 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
               `
             }}
           >
-            {isStep2Active ? '!' : (unreadCount > 9 ? '9+' : unreadCount)}
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Step 2 Alert Badge - Higher priority, shown separately */}
+      <AnimatePresence>
+        {!isOpen && isStep2Active && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            className="floating-chat-button--step2-notification"
+            title="Ton coach t'attend pour ajuster ta séance !"
+          >
+            !
           </motion.div>
         )}
       </AnimatePresence>

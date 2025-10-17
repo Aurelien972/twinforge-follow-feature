@@ -10,7 +10,7 @@ import logger from '../../lib/utils/logger';
 import type { ChatMessage } from '../../domain/coachChat';
 import type { ChatState } from './chatStateMachine';
 import { initialChatState } from './chatStateMachine';
-import type { NotificationId } from '../../utils/notificationTracker';
+import type { NotificationId } from '../services/unifiedNotificationService';
 
 export type ChatMode = 'training' | 'nutrition' | 'fasting' | 'general' | 'body-scan';
 
