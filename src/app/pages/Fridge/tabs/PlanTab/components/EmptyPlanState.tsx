@@ -389,16 +389,16 @@ const EmptyPlanState: React.FC<EmptyPlanStateProps> = ({
         </div>
       </GlassCard>
 
-      <style jsx>{`
+      <style>{`
         @keyframes shine {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
         }
-        
+
         .breathing-icon {
           animation: breathe 3s ease-in-out infinite;
         }
-        
+
         @keyframes breathe {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.05); }

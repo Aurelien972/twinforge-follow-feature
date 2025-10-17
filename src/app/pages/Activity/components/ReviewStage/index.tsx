@@ -242,6 +242,46 @@ const ReviewStage: React.FC<ReviewStageProps> = ({ analysisResult, onComplete, o
         timestamp: new Date().toISOString()
       });
 
+      // Appeler sync-wearable-goals pour chaque activité créée
+      if (data && data.length > 0) {
+        logger.info('ACTIVITY_REVIEW', 'Syncing wearable goals', {
+          userId: session.user.id,
+          activitiesCount: data.length,
+          timestamp: new Date().toISOString()
+        });
+
+        for (const activity of data) {
+          try {
+            const { data: syncResult, error: syncError } = await supabase.functions.invoke('sync-wearable-goals', {
+              body: {
+                activity_id: activity.id,
+                user_id: session.user.id
+              }
+            });
+
+            if (syncError) {
+              logger.error('ACTIVITY_REVIEW', 'Failed to sync wearable goals', {
+                activityId: activity.id,
+                error: syncError.message,
+                timestamp: new Date().toISOString()
+              });
+            } else {
+              logger.info('ACTIVITY_REVIEW', 'Wearable goals synced successfully', {
+                activityId: activity.id,
+                goalsUpdated: syncResult?.goals_updated || 0,
+                timestamp: new Date().toISOString()
+              });
+            }
+          } catch (syncErr) {
+            logger.error('ACTIVITY_REVIEW', 'Exception during wearable goal sync', {
+              activityId: activity.id,
+              error: syncErr instanceof Error ? syncErr.message : 'Unknown error',
+              timestamp: new Date().toISOString()
+            });
+          }
+        }
+      }
+
       // Invalider les caches React Query pour forcer le rechargement des données
       await queryClient.invalidateQueries({
         queryKey: ['activities', 'daily', session.user.id]
@@ -251,6 +291,9 @@ const ReviewStage: React.FC<ReviewStageProps> = ({ analysisResult, onComplete, o
       });
       await queryClient.invalidateQueries({
         queryKey: ['activities', 'recent', session.user.id]
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ['training-goals', session.user.id]
       });
       success();
       showToast({

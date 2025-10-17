@@ -62,16 +62,6 @@ const PlanContentSection: React.FC<PlanContentSectionProps> = ({
   isWeekAvailable,
   setCurrentWeek
 }) => {
-  // Add logging for debugging CTA visibility
-  console.log('PlanContentSection render conditions:', {
-    hasInventory,
-    isGenerating,
-    currentPlan: !!currentPlan,
-    currentPlanWeek: currentPlan?.weekNumber,
-    currentWeek,
-    selectedInventory: !!selectedInventory
-  });
-
   return (
     <>
       {/* Progression de Génération */}
@@ -85,9 +75,8 @@ const PlanContentSection: React.FC<PlanContentSectionProps> = ({
       )}
 
       {/* Plan de Repas - Affichage Progressif */}
-      {currentPlan && (
+      {!isGenerating && currentPlan && (
         <>
-          {console.log('Rendering MealPlanReviewAndGenerateCTA with currentPlan:', currentPlan.weekNumber)}
           {/* Meal Plan Review and Generate CTA - Hidden during generation */}
           <MealPlanReviewAndGenerateCTA
             currentPlan={currentPlan}
@@ -122,17 +111,15 @@ const PlanContentSection: React.FC<PlanContentSectionProps> = ({
 
       {/* AI Explanation Card */}
       {(isGenerating || currentPlan?.aiExplanation) && (
-        <AIExplanationCard 
+        <AIExplanationCard
           aiExplanation={currentPlan?.aiExplanation}
           weekNumber={currentWeek}
           isLoading={isGenerating}
         />
       )}
 
-      {/* État Vide */}
+      {/* État Vide - Only show when not generating and no plan */}
       {!isGenerating && !currentPlan && (
-        <>
-          {console.log('Rendering EmptyPlanState - no current plan')}
         <EmptyPlanState
           hasContext={hasInventory}
           onGenerate={handleGenerateMealPlan}
@@ -146,7 +133,6 @@ const PlanContentSection: React.FC<PlanContentSectionProps> = ({
           weekDateRange={weekDateRange}
           setCurrentWeek={setCurrentWeek}
         />
-        </>
       )}
     </>
   );
