@@ -143,6 +143,18 @@
 @import './optimizations/mobile-radical.css';
 
 /* =========================================
+   PHASE 13: MOBILE ICON VISIBILITY FIX (CRITICAL - MUST BE ABSOLUTE LAST)
+   Forces icon visibility after all other optimizations
+   ========================================= */
+@import './optimizations/mobile-icon-visibility-fix.css';
+
+/* =========================================
+   PHASE 14: MOBILE SCROLL FIX (ULTRA-CRITICAL - FINAL OVERRIDE)
+   Restores scroll functionality on mobile after all optimizations
+   ========================================= */
+@import './optimizations/mobile-scroll-fix.css';
+
+/* =========================================
    ENFORCEMENT GLOBAL - ÉLÉMENTS CRITIQUES
    Positionnement fixe pour les éléments flottants
    ========================================= */

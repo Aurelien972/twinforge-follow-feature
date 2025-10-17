@@ -41,15 +41,11 @@ function AppContent() {
   React.useEffect(() => {
     const anyOverlayOpen = isAnyOpen();
     if (anyOverlayOpen) {
+      // CRITICAL FIX: Don't use position:fixed on body - it breaks position:fixed children on mobile
+      // Instead, use a simpler overflow:hidden approach
       const originalOverflow = document.body.style.overflow;
-      const originalPosition = document.body.style.position;
-      const originalWidth = document.body.style.width;
-      const originalHeight = document.body.style.height;
 
       document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      document.body.style.height = '100%';
 
       logger.debug('OVERLAY_BODY_LOCK', 'Body scroll locked', {
         anyOverlayOpen,
@@ -58,9 +54,6 @@ function AppContent() {
 
       return () => {
         document.body.style.overflow = originalOverflow;
-        document.body.style.position = originalPosition;
-        document.body.style.width = originalWidth;
-        document.body.style.height = originalHeight;
         logger.debug('OVERLAY_BODY_UNLOCK', 'Body scroll unlocked', {
           timestamp: new Date().toISOString(),
         });

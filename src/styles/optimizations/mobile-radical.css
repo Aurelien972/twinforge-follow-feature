@@ -1,237 +1,181 @@
 /**
- * Mobile Radical Optimizations
- * Ultra-aggressive optimizations for mobile stability
- * PRIORITY: Stability > Performance > Visual Effects
+ * Mobile Radical Optimizations - SURGICAL APPROACH
+ * PRIORITY: Functionality > Performance > Visual Effects
+ * CRITICAL: Preserve header, bottom bar, and icon visibility
  */
 
 /* =========================================
-   MOBILE: DISABLE THREE.JS COMPLETELY
+   CRITICAL WHITELIST - PRESERVE THESE ELEMENTS
+   Header, Bottom Bar, Navigation Icons MUST work
    ========================================= */
-.disable-threejs canvas,
-.disable-threejs .three-scene,
-.disable-threejs .webgl-renderer,
+
+/* PRESERVE: Header - Must stay fixed and visible */
+.is-mobile .header-liquid-glass,
+.is-mobile .header-liquid-glass *,
+.is-mobile .header-liquid-glass .icon-container,
+.is-mobile .header-liquid-glass .spatial-icon,
+.is-mobile .header-liquid-glass .user-panel-toggle {
+  /* Keep essential visual effects */
+  backdrop-filter: blur(12px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(130%) !important;
+  /* Keep transforms for fixed positioning */
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  /* Preserve visibility */
+  opacity: 1 !important;
+  display: flex !important;
+}
+
+/* PRESERVE: Bottom Bar - Must stay fixed and visible */
+.is-mobile .new-mobile-bottom-bar,
+.is-mobile .new-mobile-bottom-bar *,
+.is-mobile .new-mobile-bottom-bar-container,
+.is-mobile .new-bottom-bar-icon-container,
+.is-mobile .new-bottom-bar-button {
+  /* Keep essential visual effects */
+  backdrop-filter: blur(12px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(130%) !important;
+  /* Keep transforms for fixed positioning */
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  /* Preserve visibility */
+  opacity: 1 !important;
+  display: flex !important;
+}
+
+/* PRESERVE: All SpatialIcon components - Must be visible */
+.is-mobile .spatial-icon,
+.is-mobile .icon-container,
+.is-mobile .spatial-icon *,
+.is-mobile .icon-container * {
+  /* Ensure icons are always visible */
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+  /* Preserve minimal effects for visibility */
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* PRESERVE: PageHeader icons - Must be visible */
+.is-mobile .page-header-title,
+.is-mobile .page-header-subtitle,
+.is-mobile .breathing-icon,
+.is-mobile .breathing-icon * {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+}
+
+/* =========================================
+   MOBILE: DISABLE THREE.JS
+   ========================================= */
 .is-mobile canvas[data-engine="three.js"],
 .is-mobile .Avatar3DViewer,
 .is-mobile .FaceViewer3D {
   display: none !important;
   visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* =========================================
-   MOBILE: DISABLE FRAMER MOTION
-   ========================================= */
-.disable-framer-motion [data-framer-motion],
-.disable-framer-motion .motion-div,
-.is-mobile [data-framer-motion],
-.is-mobile .motion-div {
-  animation: none !important;
-  transition: none !important;
-  transform: none !important;
-  will-change: auto !important;
 }
 
 /* =========================================
    MOBILE: SELECTIVE GLASSMORPHISM
+   Remove glass effects EXCEPT for navigation
    ========================================= */
-
-/* PRESERVE glassmorphism for navigation */
-.is-mobile .header-liquid-glass,
-.is-mobile .new-mobile-bottom-bar-container,
-.is-mobile .glass-orb-button,
-.is-mobile .icon-container {
-  /* Keep glass effects for premium navigation */
-  /* Styles handled by specific component CSS */
-}
-
-/* Simplify glassmorphism for other elements */
-.disable-glassmorphism .glass-card,
-.disable-glassmorphism .glass-card-cta,
-.disable-glassmorphism .glass-button,
-.disable-glassmorphism .btn-glass,
-.is-mobile .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.glass-orb-button):not(.icon-container),
+.is-mobile .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container),
 .is-mobile .glass-card-cta:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container),
-.is-mobile .glass-button:not(.glass-orb-button),
-.is-mobile .btn-glass:not(.glass-orb-button) {
+.is-mobile .glass-button:not(.glass-orb-button):not(.new-bottom-bar-icon-container),
+.is-mobile .btn-glass:not(.glass-orb-button):not(.new-bottom-bar-icon-container) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: rgba(255, 255, 255, 0.08) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
-/* Remove decorative pseudo-elements (but keep navigation ones) */
-.is-mobile .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container)::before,
-.is-mobile .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container)::after,
-.is-mobile .glass-card-cta:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container)::before,
-.is-mobile .glass-card-cta:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container)::after,
-.is-mobile .btn-glass:not(.glass-orb-button)::before,
-.is-mobile .btn-glass:not(.glass-orb-button)::after {
-  display: none !important;
+/* =========================================
+   MOBILE: DISABLE ANIMATIONS EXCEPT CRITICAL
+   ========================================= */
+.is-mobile *:not(.header-liquid-glass):not(.header-liquid-glass *):not(.new-mobile-bottom-bar):not(.new-mobile-bottom-bar *) {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Keep minimal transitions for navigation */
+.is-mobile .header-liquid-glass,
+.is-mobile .new-mobile-bottom-bar,
+.is-mobile .new-bottom-bar-button,
+.is-mobile .new-bottom-bar-icon-container {
+  transition: background-color 0.15s ease, border-color 0.15s ease !important;
 }
 
 /* =========================================
-   MOBILE: DISABLE ALL ANIMATIONS
+   MOBILE: DISABLE PARTICLES & DECORATIONS
    ========================================= */
-.disable-all-animations *,
-.is-low-end-mobile * {
-  animation: none !important;
-  transition: none !important;
-  will-change: auto !important;
+.is-mobile [class*="particle"]:not(.spatial-icon):not(.icon-container),
+.is-mobile [class*="spark"],
+.is-mobile .breathing-glow:not(.breathing-icon) {
+  display: none !important;
+  visibility: hidden !important;
 }
 
 /* =========================================
    MOBILE: SELECTIVE GPU ACCELERATION
+   Only for fixed elements
    ========================================= */
-
-/* CRITICAL: Preserve fixed positioning for navigation */
 .is-mobile .header-liquid-glass,
-.is-mobile .new-mobile-bottom-bar,
-.is-mobile .new-mobile-bottom-bar *,
-.is-mobile .header-liquid-glass * {
-  /* Allow transforms needed for fixed positioning */
-  transform: translateZ(0) !important;
-  -webkit-transform: translateZ(0) !important;
+.is-mobile .new-mobile-bottom-bar {
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
+  will-change: transform !important;
 }
 
 /* Disable GPU acceleration on everything else */
-.is-mobile *:not(.header-liquid-glass):not(.header-liquid-glass *):not(.new-mobile-bottom-bar):not(.new-mobile-bottom-bar *):not(.mobile-safe-transform) {
+.is-mobile *:not(.header-liquid-glass):not(.new-mobile-bottom-bar) {
   backface-visibility: visible !important;
   -webkit-backface-visibility: visible !important;
   perspective: none !important;
   -webkit-perspective: none !important;
   transform-style: flat !important;
   -webkit-transform-style: flat !important;
-}
-
-/* Only allow GPU acceleration on specific critical elements */
-.is-mobile .mobile-safe-transform {
-  transform: translateZ(0) !important;
-  -webkit-transform: translateZ(0) !important;
-  will-change: transform !important;
-}
-
-/* =========================================
-   MOBILE: SELECTIVE BLUR EFFECTS
-   ========================================= */
-
-/* PRESERVE blur for navigation elements */
-.is-mobile .header-liquid-glass,
-.is-mobile .new-mobile-bottom-bar-container,
-.is-mobile .glass-orb-button,
-.is-mobile .icon-container {
-  /* Keep minimal blur for premium look */
-  backdrop-filter: blur(12px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(130%) !important;
-}
-
-/* Disable blur on everything else */
-.is-mobile *:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.glass-orb-button):not(.icon-container)[style*="filter"],
-.is-mobile *:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.glass-orb-button):not(.icon-container)[style*="backdrop-filter"] {
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* =========================================
-   MOBILE: SELECTIVE BOX SHADOWS
-   ========================================= */
-
-/* PRESERVE shadows for navigation elements */
-.is-mobile .header-liquid-glass,
-.is-mobile .new-mobile-bottom-bar-container,
-.is-mobile .glass-orb-button,
-.is-mobile .icon-container {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Disable shadows on everything else */
-.is-mobile *:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.glass-orb-button):not(.icon-container):not(.critical-shadow) {
-  box-shadow: none !important;
-  text-shadow: none !important;
-}
-
-/* Critical shadows for specific elements */
-.is-mobile .critical-shadow {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* =========================================
-   MOBILE: SIMPLIFY LAYOUTS
-   ========================================= */
-.is-mobile .complex-grid {
-  display: block !important;
-}
-
-.is-mobile .complex-flex {
-  display: block !important;
-}
-
-/* =========================================
-   MOBILE: DISABLE PARTICLES & EFFECTS
-   ========================================= */
-.is-mobile [class*="particle"],
-.is-mobile [class*="spark"],
-.is-mobile [class*="glow"],
-.is-mobile [class*="shimmer"],
-.is-mobile .breathing-glow,
-.is-mobile .breathing-icon,
-.is-mobile .spatial-icon,
-.is-mobile .icon-pulse {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* =========================================
-   MOBILE: LIMIT CONCURRENT ANIMATIONS
-   ========================================= */
-.is-mobile .animation-slot-1,
-.is-mobile .animation-slot-2 {
-  animation-duration: 0.2s !important;
-  animation-timing-function: ease-out !important;
-}
-
-.is-mobile .animation-slot-3,
-.is-mobile .animation-slot-4,
-.is-mobile .animation-slot-5,
-.is-mobile .animation-slot-6,
-.is-mobile .animation-slot-7,
-.is-mobile .animation-slot-8 {
-  animation: none !important;
-}
-
-/* =========================================
-   MOBILE: DISABLE OVERLAYS & MODALS EFFECTS
-   ========================================= */
-.is-mobile .modal-overlay,
-.is-mobile .drawer-overlay {
-  background: rgba(0, 0, 0, 0.7) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* =========================================
-   MOBILE: OPTIMIZE IMAGES
-   ========================================= */
-.is-mobile img {
-  image-rendering: auto !important;
   will-change: auto !important;
 }
 
 /* =========================================
-   MOBILE: REDUCE BORDER RADIUS COMPLEXITY
+   MOBILE: DISABLE SHADOWS EXCEPT NAVIGATION
    ========================================= */
-.is-mobile * {
-  border-radius: min(var(--radius, 8px), 12px) !important;
+.is-mobile *:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.new-bottom-bar-icon-container) {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Keep shadows for navigation */
+.is-mobile .header-liquid-glass,
+.is-mobile .new-mobile-bottom-bar-container {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* =========================================
+   MOBILE: ENSURE SCROLL WORKS
+   ========================================= */
+.is-mobile {
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+}
+
+.is-mobile #main-content,
+.is-mobile [role="main"] {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: auto !important;
 }
 
 /* =========================================
    MOBILE: DISABLE HOVER EFFECTS
    ========================================= */
 @media (hover: none) and (pointer: coarse) {
-  * {
+  *:not(.header-liquid-glass):not(.new-mobile-bottom-bar) {
     transition: none !important;
   }
 
@@ -239,107 +183,6 @@
     transform: none !important;
     scale: 1 !important;
   }
-}
-
-/* =========================================
-   MOBILE: FORCE SIMPLICITY ON SPECIFIC COMPONENTS
-   ========================================= */
-
-/* Sidebar */
-.is-mobile .sidebar-glass-enhanced {
-  background: rgba(20, 20, 30, 0.95) !important;
-  backdrop-filter: none !important;
-}
-
-/* Header */
-.is-mobile .header-liquid-glass {
-  background: rgba(20, 20, 30, 0.95) !important;
-  backdrop-filter: none !important;
-}
-
-/* Cards */
-.is-mobile .glass-card {
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.03)
-  ) !important;
-}
-
-/* Buttons */
-.is-mobile .btn-glass {
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.08),
-    rgba(255, 255, 255, 0.04)
-  ) !important;
-}
-
-/* =========================================
-   LOW-END MOBILE: EXTREME MEASURES
-   ========================================= */
-.is-low-end-mobile * {
-  will-change: auto !important;
-  contain: none !important;
-  isolation: auto !important;
-}
-
-.is-low-end-mobile img {
-  max-width: 100% !important;
-  height: auto !important;
-}
-
-/* =========================================
-   MOBILE: ENSURE CRITICAL ELEMENTS WORK
-   ========================================= */
-.is-mobile button,
-.is-mobile a,
-.is-mobile input,
-.is-mobile textarea {
-  cursor: pointer !important;
-  -webkit-tap-highlight-color: rgba(24, 227, 255, 0.3) !important;
-}
-
-/* =========================================
-   MOBILE: PREVENT SCROLL JANK
-   ========================================= */
-.is-mobile * {
-  -webkit-overflow-scrolling: touch !important;
-  overscroll-behavior: contain !important;
-}
-
-/* =========================================
-   MOBILE: REDUCE PAINT AREAS
-   ========================================= */
-.is-mobile * {
-  contain: layout style !important;
-}
-
-.is-mobile .contain-paint {
-  contain: layout style paint !important;
-}
-
-/* =========================================
-   MOBILE: SAFE TRANSITIONS ONLY
-   ========================================= */
-.is-mobile .safe-transition {
-  transition: opacity 0.15s ease-out !important;
-}
-
-.is-mobile .safe-transition-transform {
-  transition: transform 0.15s ease-out !important;
-}
-
-/* =========================================
-   MOBILE: MEMORY OPTIMIZATION
-   ========================================= */
-
-/* Unload heavy content when not visible */
-.is-mobile [aria-hidden="true"] img,
-.is-mobile [aria-hidden="true"] video,
-.is-mobile [aria-hidden="true"] canvas {
-  display: none !important;
-  visibility: hidden !important;
 }
 
 /* =========================================
@@ -353,24 +196,25 @@
 }
 
 /* =========================================
-   MOBILE: FORCE LAYOUT STABILITY
+   MOBILE: FORCE INTERACTIVE ELEMENTS VISIBLE
    ========================================= */
-.is-mobile img,
-.is-mobile video {
-  aspect-ratio: attr(width) / attr(height) !important;
+.is-mobile button,
+.is-mobile a,
+.is-mobile input,
+.is-mobile textarea {
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: rgba(24, 227, 255, 0.3) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* =========================================
-   MOBILE: EMERGENCY FALLBACK
+   LOW-END MOBILE: EXTREME MEASURES
    ========================================= */
-.mobile-fallback-ui {
-  display: none;
-}
-
-.is-mobile.emergency-mode .mobile-fallback-ui {
-  display: block !important;
-}
-
-.is-mobile.emergency-mode .main-ui {
-  display: none !important;
+.is-low-end-mobile * {
+  will-change: auto !important;
+  contain: none !important;
+  isolation: auto !important;
+  animation: none !important;
+  transition: none !important;
 }

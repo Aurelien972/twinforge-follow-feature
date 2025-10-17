@@ -9,8 +9,8 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.webmanifest" />
 
-    <!-- Viewport & iOS focus -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <!-- Viewport & iOS focus - CRITICAL: Maximum touch area for safe-area-inset -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no, interactive-widget=resizes-content" />
     <meta name="format-detection" content="telephone=no" />
     <title>TwinForge</title>
 
@@ -29,8 +29,15 @@
         --ember:#FF6B35; --cyan:#18E3FF; --primary:#3D13B3;
       }
 
-      /* Body scrollable, aucune interception d’events par le fond */
-      body.bg-halo-crucible{ position:static !important; overflow-x:hidden; }
+      /* Body scrollable, aucune interception d'events par le fond */
+      /* CRITICAL FIX: Remove overflow-x:hidden which breaks position:fixed on mobile */
+      body.bg-halo-crucible{
+        position:static !important;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
 
       /* Calque fixe derrière l’UI (click-through) */
       body.bg-halo-crucible::before{

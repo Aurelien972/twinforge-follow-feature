@@ -135,8 +135,8 @@ const NewMobileBottomBar: React.FC = () => {
 
   return (
     <>
-      <nav 
-        className="new-mobile-bottom-bar" 
+      <nav
+        className="new-mobile-bottom-bar"
         aria-label="Navigation principale mobile"
         style={{
           position: 'fixed',
@@ -144,6 +144,8 @@ const NewMobileBottomBar: React.FC = () => {
           left: '8px',
           right: '8px',
           zIndex: 9996,
+          transform: 'translate3d(0, 0, 0)', // CRITICAL: Force GPU layer
+          willChange: 'transform', // CRITICAL: Optimize for fixed positioning
         }}
       >
         <div className="new-mobile-bottom-bar-container">

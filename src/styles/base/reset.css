@@ -9,6 +9,11 @@
     overscroll-behavior: auto;
     font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     touch-action: manipulation;
+    /* CRITICAL FIX: Eliminate white borders on mobile */
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: clip; /* clip instead of hidden to preserve position:fixed */
   }
 
   body {
@@ -24,6 +29,12 @@
     min-height: 100dvh;
     overscroll-behavior: auto;
     -webkit-overflow-scrolling: touch;
+    /* CRITICAL FIX: Eliminate white borders and preserve position:fixed */
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: clip; /* clip instead of hidden to preserve position:fixed */
+    overflow-y: auto;
   }
 
   /* Touch optimization for interactive elements */
