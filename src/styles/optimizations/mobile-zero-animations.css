@@ -54,11 +54,23 @@
 }
 
 /* =========================================
-   DISABLE DECORATIVE CORNER SQUARES IN HEADER
+   DISABLE DECORATIVE CORNER SQUARES EVERYWHERE
    ========================================= */
 
 .mobile-device .header-corner-square,
-.mobile-device header [class*="corner-square"] {
+.mobile-device header [class*="corner-square"],
+.mobile-device [class*="corner-particle"],
+.mobile-device .corner-particle,
+.mobile-device .training-hero-corners {
+  animation: none !important;
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* Hide corner squares in all glass cards */
+.mobile-device .glass-card [class*="corner"],
+.mobile-device [data-corner],
+.mobile-device [class*="corner-square"] {
   animation: none !important;
   opacity: 0 !important;
   display: none !important;
@@ -73,6 +85,33 @@
 .mobile-device .new-mobile-bottom-bar-container::before,
 .mobile-device .new-mobile-bottom-bar-container::after {
   animation: none !important;
+}
+
+/* =========================================
+   DISABLE BACKGROUND GRADIENT ANIMATIONS
+   ========================================= */
+
+/* Disable borderPulse and glowPulse everywhere */
+.mobile-device [class*="glass-card"]::before,
+.mobile-device [class*="glass-card"]::after,
+.mobile-device .glass-card::before,
+.mobile-device .glass-card::after {
+  animation: none !important;
+}
+
+/* Disable all pseudo-element animations */
+.mobile-device *::before,
+.mobile-device *::after {
+  animation: borderPulse 0s !important;
+  animation: glowPulse 0s !important;
+  animation: activePulse 0s !important;
+}
+
+/* Disable gradient position animations */
+.mobile-device [style*="background-position"],
+.mobile-device [style*="background-size"] {
+  animation: none !important;
+  background-position: center !important;
 }
 
 /* =========================================
@@ -128,6 +167,141 @@
 
 .mobile-device .floating-chat-button--step2-notification {
   animation: none !important;
+}
+
+/* =========================================
+   DISABLE SHIMMER EFFECTS ON BUTTONS
+   ========================================= */
+
+.mobile-device button [class*="shimmer"],
+.mobile-device [class*="shimmer-effect"],
+.mobile-device [data-shimmer] {
+  animation: none !important;
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* Disable gradient sweep animations in buttons */
+.mobile-device button > div[class*="absolute"][class*="inset"],
+.mobile-device button > motion\.div[class*="absolute"] {
+  animation: none !important;
+  transform: translateX(0) !important;
+}
+
+/* =========================================
+   DISABLE BUBBLE AND PARTICLE ANIMATIONS
+   ========================================= */
+
+.mobile-device [class*="bubble"],
+.mobile-device [class*="particle"],
+.mobile-device [data-bubble],
+.mobile-device [data-particle] {
+  animation: none !important;
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* Disable pulsating rings and halos */
+.mobile-device [class*="pulse-ring"],
+.mobile-device [class*="halo"],
+.mobile-device div[class*="absolute"][class*="inset-0"][class*="rounded-full"][class*="border"] {
+  animation: none !important;
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* =========================================
+   DISABLE BREATHING ICON ANIMATIONS
+   ========================================= */
+
+.mobile-device [class*="breathing"],
+.mobile-device [class*="icon-container"][style*="scale"] {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Freeze motion.div scales for icons */
+.mobile-device motion\.div[style*="scale"] {
+  animation: none !important;
+}
+
+/* =========================================
+   DISABLE SKELETON PULSE ANIMATIONS
+   ========================================= */
+
+.mobile-device [class*="skeleton"],
+.mobile-device [class*="Skeleton"],
+.mobile-device [data-skeleton] {
+  animation: none !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Keep only essential loaders animated */
+.mobile-device .loader-essential,
+.mobile-device [aria-busy="true"] [class*="Loader"],
+.mobile-device [class*="spinner"] {
+  animation: spin-simple 2s linear infinite !important;
+}
+
+/* =========================================
+   OPTIMIZE CENTRAL ACTIONS MENU ON MOBILE
+   ========================================= */
+
+.mobile-device .central-actions-menu,
+.mobile-device .central-actions-panel {
+  animation-duration: 0.15s !important;
+  transition-duration: 0.15s !important;
+}
+
+/* Disable staggered animations in pills */
+.mobile-device .central-actions-menu button {
+  animation-delay: 0s !important;
+  transition-delay: 0s !important;
+}
+
+/* Disable glow pulses on menu buttons */
+.mobile-device .central-actions-menu [class*="glow"],
+.mobile-device .avatar-twin-button {
+  animation: none !important;
+}
+
+/* =========================================
+   DISABLE AVATAR BUTTON FLASH ON LOAD
+   ========================================= */
+
+.mobile-device .glass-orb-button--avatar,
+.mobile-device [class*="avatar-button"] {
+  animation: none !important;
+}
+
+/* =========================================
+   OPTIMIZE SIDEBAR ON MOBILE
+   ========================================= */
+
+/* Simplify sidebar open/close animations */
+.mobile-device .sidebar,
+.mobile-device [class*="sidebar"],
+.mobile-device .sidebar-glass-enhanced {
+  transition-duration: 0.2s !important;
+}
+
+/* Disable decorative effects in sidebar */
+.mobile-device .sidebar [class*="glow"],
+.mobile-device .sidebar [class*="shimmer"],
+.mobile-device .sidebar-glass-enhanced::before,
+.mobile-device .sidebar-glass-enhanced::after {
+  animation: none !important;
+}
+
+/* Disable hover effects on sidebar items */
+.mobile-device .sidebar-item:hover {
+  animation: none !important;
+}
+
+/* Simplify sidebar item transitions */
+.mobile-device .sidebar-item,
+.mobile-device .sidebar-nav-item-container {
+  transition-duration: 0.15s !important;
 }
 
 /* =========================================
