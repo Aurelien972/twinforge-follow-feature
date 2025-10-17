@@ -19,7 +19,7 @@
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
 
-  /* Ultra-transparent Liquid Glass matching bottom bar */
+  /* DESKTOP ONLY - Ultra-transparent Liquid Glass */
   background:
     var(--liquid-reflections-multi),
     var(--liquid-highlight-ambient),
@@ -114,8 +114,9 @@
     0 0 16px color-mix(in srgb, var(--color-plasma-cyan) 40%, transparent) !important;
 }
 
-/* Mobile adaptations - OPTIMIZED FOR PERFORMANCE */
-@media (max-width: 768px) {
+/* Mobile adaptations - FORCE BLUE GLOW LIKE BOTTOMBAR */
+@media (max-width: 1024px) {
+  body .header-liquid-glass,
   .header-liquid-glass {
     left: 8px !important;
     right: 8px !important;
@@ -148,6 +149,7 @@
   }
 
   /* Disable animated border on mobile */
+  body .header-liquid-glass::before,
   .header-liquid-glass::before {
     animation: none !important;
     opacity: 0.6 !important;
@@ -156,6 +158,7 @@
   }
 
   /* Disable glow animation on mobile but keep same glow as bottombar */
+  body .header-liquid-glass::after,
   .header-liquid-glass::after {
     animation: none !important;
     opacity: 0.5 !important;
@@ -171,6 +174,7 @@
 }
 
 /* Mobile device class enforcement - MATCH BOTTOMBAR EXACTLY */
+body.mobile-device .header-liquid-glass,
 .mobile-device .header-liquid-glass {
   /* EXACT MATCH BOTTOMBAR - Ultra-transparent with BLUE GLOW VISIBLE */
   background:
@@ -197,6 +201,7 @@
   transition: none !important;
 }
 
+body.mobile-device .header-liquid-glass::before,
 .mobile-device .header-liquid-glass::before {
   animation: none !important;
   opacity: 0.6 !important;
@@ -204,6 +209,7 @@
   background: var(--liquid-border-gradient-tricolor) !important;
 }
 
+body.mobile-device .header-liquid-glass::after,
 .mobile-device .header-liquid-glass::after {
   animation: none !important;
   opacity: 0.5 !important;

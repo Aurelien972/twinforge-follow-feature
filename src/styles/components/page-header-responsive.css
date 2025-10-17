@@ -55,41 +55,28 @@
 }
 
 /* =========================================
-   MOBILE ICON SIZE OPTIMIZATIONS - FORCE LARGE ICONS
+   MOBILE ICON SIZE OPTIMIZATIONS - CLEAN & PROPORTIONAL
    ========================================= */
 
-/* FORCE LARGE ICON SIZE ON MOBILE/TABLET - CRITICAL FIX */
+/* PROPORTIONAL ICON SIZE ON MOBILE/TABLET */
 @media (max-width: 1024px) {
   /* Target all PageHeader icons via SpatialIcon wrapper */
   header[role="banner"] .breathing-icon svg {
-    width: 80px !important;
-    height: 80px !important;
-    min-width: 80px !important;
-    min-height: 80px !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
   }
 
   /* Alternative selector for direct icon sizing */
   header[role="banner"] .breathing-icon [class*="lucide"] {
-    width: 80px !important;
-    height: 80px !important;
-    stroke-width: 1.5 !important; /* Thinner stroke for larger icon */
+    width: 48px !important;
+    height: 48px !important;
+    stroke-width: 1.75 !important;
   }
 }
 
-/* Extra enforcement on small screens */
-@media (max-width: 768px) {
-  header[role="banner"] .breathing-icon svg {
-    width: 76px !important;
-    height: 76px !important;
-  }
-
-  header[role="banner"] .breathing-icon [class*="lucide"] {
-    width: 76px !important;
-    height: 76px !important;
-  }
-}
-
-/* Small mobile screens: Slightly smaller text */
+/* Small mobile screens: Slightly smaller */
 @media (max-width: 480px) {
   .page-header-title {
     font-size: 1.5rem !important; /* 24px */
@@ -101,13 +88,13 @@
 
   /* Adjust icon for very small screens */
   header[role="banner"] .breathing-icon svg {
-    width: 70px !important;
-    height: 70px !important;
+    width: 44px !important;
+    height: 44px !important;
   }
 
   header[role="banner"] .breathing-icon [class*="lucide"] {
-    width: 70px !important;
-    height: 70px !important;
+    width: 44px !important;
+    height: 44px !important;
   }
 }
 
@@ -122,12 +109,12 @@
   }
 
   header[role="banner"] .breathing-icon svg {
-    width: 64px !important;
-    height: 64px !important;
+    width: 40px !important;
+    height: 40px !important;
   }
 
   header[role="banner"] .breathing-icon [class*="lucide"] {
-    width: 64px !important;
-    height: 64px !important;
+    width: 40px !important;
+    height: 40px !important;
   }
 }
