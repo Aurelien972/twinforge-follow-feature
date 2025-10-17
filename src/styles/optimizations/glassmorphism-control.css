@@ -35,10 +35,10 @@
   opacity: 0 !important;
 }
 
-/* Désactiver les animations de pulse et glow du fond */
-.glassmorphism-disabled *[class*="borderPulse"],
-.glassmorphism-disabled *[class*="glowPulse"],
-.glassmorphism-disabled *[class*="activePulse"] {
+/* Désactiver les animations de pulse et glow du fond - SAUF pour les éléments de navigation */
+.glassmorphism-disabled *[class*="borderPulse"]:not(.header-liquid-glass *):not(.new-mobile-bottom-bar *):not(.sidebar-glass-enhanced *):not(.floating-chat-button *):not(.central-actions-menu *),
+.glassmorphism-disabled *[class*="glowPulse"]:not(.header-liquid-glass *):not(.new-mobile-bottom-bar *):not(.sidebar-glass-enhanced *):not(.floating-chat-button *):not(.central-actions-menu *),
+.glassmorphism-disabled *[class*="activePulse"]:not(.header-liquid-glass *):not(.new-mobile-bottom-bar *):not(.sidebar-glass-enhanced *):not(.floating-chat-button *):not(.central-actions-menu *) {
   animation: none !important;
 }
 
@@ -90,12 +90,81 @@
 }
 
 /* =========================================
+   EXCLUSION DES ÉLÉMENTS DE NAVIGATION
+   Les éléments de navigation ne sont jamais affectés par le mode performance
+   ========================================= */
+
+/* Préserver complètement le header */
+.glassmorphism-disabled .header-liquid-glass,
+.glassmorphism-disabled .header-liquid-glass * {
+  position: revert !important;
+  animation: revert !important;
+  transition: revert !important;
+  backdrop-filter: revert !important;
+  -webkit-backdrop-filter: revert !important;
+}
+
+/* Préserver complètement la bottom bar */
+.glassmorphism-disabled .new-mobile-bottom-bar,
+.glassmorphism-disabled .new-mobile-bottom-bar *,
+.glassmorphism-disabled .new-mobile-bottom-bar-container,
+.glassmorphism-disabled .new-mobile-bottom-bar-container * {
+  position: revert !important;
+  animation: revert !important;
+  transition: revert !important;
+  backdrop-filter: revert !important;
+  -webkit-backdrop-filter: revert !important;
+}
+
+/* Préserver complètement la sidebar */
+.glassmorphism-disabled .sidebar-glass-enhanced,
+.glassmorphism-disabled .sidebar-glass-enhanced * {
+  position: revert !important;
+  animation: revert !important;
+  transition: revert !important;
+  backdrop-filter: revert !important;
+  -webkit-backdrop-filter: revert !important;
+}
+
+/* Préserver complètement le bouton de chat flottant */
+.glassmorphism-disabled .floating-chat-button,
+.glassmorphism-disabled .floating-chat-button * {
+  position: revert !important;
+  animation: revert !important;
+  transition: revert !important;
+  backdrop-filter: revert !important;
+  -webkit-backdrop-filter: revert !important;
+}
+
+/* Préserver complètement le panneau outils du forgeron */
+.glassmorphism-disabled .central-actions-menu,
+.glassmorphism-disabled .central-actions-menu *,
+.glassmorphism-disabled .central-action-button,
+.glassmorphism-disabled .central-action-button * {
+  position: revert !important;
+  animation: revert !important;
+  transition: revert !important;
+  backdrop-filter: revert !important;
+  -webkit-backdrop-filter: revert !important;
+}
+
+/* Préserver complètement le mobile drawer */
+.glassmorphism-disabled [class*="mobile-drawer"],
+.glassmorphism-disabled [class*="mobile-drawer"] * {
+  position: revert !important;
+  animation: revert !important;
+  transition: revert !important;
+  backdrop-filter: revert !important;
+  -webkit-backdrop-filter: revert !important;
+}
+
+/* =========================================
    EXTENDED PERFORMANCE OPTIMIZATIONS
    For old devices like iPhone 8
    ========================================= */
 
-/* Simplify all transitions to 150ms max */
-.glassmorphism-disabled * {
+/* Simplify all transitions to 150ms max - SAUF pour les éléments de navigation */
+.glassmorphism-disabled *:not(.header-liquid-glass):not(.header-liquid-glass *):not(.new-mobile-bottom-bar):not(.new-mobile-bottom-bar *):not(.sidebar-glass-enhanced):not(.sidebar-glass-enhanced *):not(.floating-chat-button):not(.floating-chat-button *):not(.central-actions-menu):not(.central-actions-menu *):not([class*="mobile-drawer"]):not([class*="mobile-drawer"] *) {
   transition-duration: 150ms !important;
 }
 
@@ -119,14 +188,22 @@
     transform: translate3d(0, 0, 0);
   }
 
-  /* Remove all animations on mobile when in performance mode */
-  .glassmorphism-disabled * {
+  /* Remove all animations on mobile when in performance mode - SAUF pour les éléments de navigation */
+  .glassmorphism-disabled *:not(.header-liquid-glass):not(.header-liquid-glass *):not(.new-mobile-bottom-bar):not(.new-mobile-bottom-bar *):not(.sidebar-glass-enhanced):not(.sidebar-glass-enhanced *):not(.floating-chat-button):not(.floating-chat-button *):not(.central-actions-menu):not(.central-actions-menu *):not([class*="mobile-drawer"]):not([class*="mobile-drawer"] *) {
     animation: none !important;
   }
 
   /* Keep only critical animations */
   .glassmorphism-disabled .loader-essential {
     animation: icon-spin-css 2s linear infinite !important;
+  }
+
+  /* Preserve navigation animations explicitly */
+  .glassmorphism-disabled .header-liquid-glass::before,
+  .glassmorphism-disabled .header-liquid-glass::after,
+  .glassmorphism-disabled .new-mobile-bottom-bar-container::before,
+  .glassmorphism-disabled .new-mobile-bottom-bar-container::after {
+    animation: revert !important;
   }
 }
 
