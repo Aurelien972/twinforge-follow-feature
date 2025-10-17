@@ -145,6 +145,8 @@ class ChatAIService {
 
       logger.info('CHAT_AI_SERVICE', 'Starting to read stream chunks', { requestId });
 
+      let buffer = ''; // Buffer pour accumuler les lignes partielles
+
       while (true) {
         const { done, value } = await reader.read();
 
@@ -158,15 +160,21 @@ class ChatAIService {
           break;
         }
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
+        // Ajouter le nouveau chunk au buffer
+        buffer += decoder.decode(value, { stream: true });
+
+        // Séparer par les lignes complètes
+        const lines = buffer.split('\n');
+
+        // Garder la dernière ligne (potentiellement incomplète) dans le buffer
+        buffer = lines.pop() || '';
 
         if (chunkCount < 3) {
           logger.debug('CHAT_AI_SERVICE', 'Stream chunk received', {
             requestId,
             chunkNumber: chunkCount,
             lineCount: lines.length,
-            preview: chunk.substring(0, 150)
+            bufferSize: buffer.length
           });
         }
 
@@ -204,9 +212,11 @@ class ChatAIService {
                 }
               }
             } catch (parseError) {
+              // Log plus détaillé pour comprendre l'erreur
               logger.warn('CHAT_AI_SERVICE', 'Failed to parse SSE data', {
                 requestId,
-                data: data.substring(0, 100),
+                dataLength: data.length,
+                dataPreview: data.substring(0, 200),
                 error: parseError instanceof Error ? parseError.message : String(parseError)
               });
             }

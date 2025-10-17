@@ -77,7 +77,6 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
     updateVisualization
   } = useUnifiedCoachStore();
 
-  const set = useUnifiedCoachStore.setState;
   const modeConfig = modeConfigs[currentMode];
   const modeColor = modeConfig.color;
   const isTextMode = communicationMode === 'text';
@@ -132,7 +131,7 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
         });
 
         // Utiliser setState directement pour garantir l'immutabilité
-        set((state) => {
+        useUnifiedCoachStore.setState((state) => {
           const lastMessage = state.messages[state.messages.length - 1];
 
           if (lastMessage && lastMessage.role === 'coach') {
@@ -276,7 +275,7 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
           const history = await chatConversationService.getConversationMessages(convId);
 
           if (history.length > 0) {
-            set({ conversationId: convId, messages: history });
+            useUnifiedCoachStore.setState({ conversationId: convId, messages: history });
             logger.debug('UNIFIED_COACH_DRAWER', 'Loaded conversation history', {
               conversationId: convId,
               messageCount: history.length,
@@ -369,7 +368,7 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
         }
 
         if (!conversationId) {
-          set({ conversationId: convId });
+          useUnifiedCoachStore.setState({ conversationId: convId });
         }
 
         await chatConversationService.saveMessage(convId, userMessage);
