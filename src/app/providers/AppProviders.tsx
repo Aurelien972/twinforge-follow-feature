@@ -242,6 +242,33 @@ function ForgeBackground() {
         console.log('  - Background display:', bgStyles.display);
         console.log('  - Background opacity:', bgStyles.opacity);
         console.log('  - Background background:', bgStyles.background.substring(0, 100));
+
+        // CHECK WHAT'S ON TOP OF BACKGROUND
+        const body = document.body;
+        const bodyStyles = window.getComputedStyle(body);
+        console.log('🔍 BODY STYLES:');
+        console.log('  - background:', bodyStyles.background);
+        console.log('  - backgroundColor:', bodyStyles.backgroundColor);
+
+        const root = document.getElementById('root');
+        if (root) {
+          const rootStyles = window.getComputedStyle(root);
+          console.log('🔍 ROOT DIV STYLES:');
+          console.log('  - background:', rootStyles.background);
+          console.log('  - backgroundColor:', rootStyles.backgroundColor);
+          console.log('  - position:', rootStyles.position);
+          console.log('  - zIndex:', rootStyles.zIndex);
+        }
+
+        const appDiv = document.querySelector('.min-h-screen');
+        if (appDiv) {
+          const appStyles = window.getComputedStyle(appDiv);
+          console.log('🔍 APP CONTAINER STYLES:');
+          console.log('  - background:', appStyles.background);
+          console.log('  - backgroundColor:', appStyles.backgroundColor);
+          console.log('  - position:', appStyles.position);
+          console.log('  - zIndex:', appStyles.zIndex);
+        }
       }
 
       if (particlesContainer) {
@@ -268,7 +295,8 @@ function ForgeBackground() {
       <div className="bg-twinforge-visionos" style={{
         position: 'fixed',
         inset: 0,
-        zIndex: -10,
+        zIndex: 0,
+        pointerEvents: 'none',
         background: 'radial-gradient(circle at 50% 50%, #1A1F2E 0%, #0F1419 60%, #0B0E17 100%)'
       }} />
 
@@ -276,7 +304,7 @@ function ForgeBackground() {
       <div className="cosmic-forge-particles" ref={particlesRef} style={{
         position: 'fixed',
         inset: 0,
-        zIndex: -1,
+        zIndex: 1,
         pointerEvents: 'none',
         opacity: 0.4
       }}>

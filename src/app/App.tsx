@@ -179,7 +179,7 @@ function AppContent() {
   return (
     <div
       className="min-h-screen flex flex-col z-auto-important will-change-auto-important position-static-important transform-none-important filter-none-important perspective-none-important contain-none-important isolation-auto-important overflow-visible-important"
-      style={{ position: 'relative', zIndex: 0 }}
+      style={{ position: 'relative', zIndex: 10, pointerEvents: 'auto' }}
     >
       <Header />
 
