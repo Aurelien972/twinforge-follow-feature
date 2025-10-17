@@ -246,10 +246,8 @@ export const Header = React.memo(() => {
                   setDrawer(true);
                 }
               }}
-              {...safeMotionProps(isMobile, {
-                whileHover: { scale: 1.05 },
-                whileTap: { scale: 0.98 }
-              })}
+              whileHover={isMobile ? {} : { scale: 1.05 }}
+              whileTap={isMobile ? {} : { scale: 0.98 }}
             >
               <SpatialIcon
                 Icon={ICONS.Menu}
