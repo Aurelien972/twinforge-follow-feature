@@ -116,7 +116,6 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
           alignItems: 'center',
           justifyContent: 'center',
           padding: '0',
-          isolation: 'isolate',
           width: isDesktop ? '60px' : '68px',
           height: isDesktop ? '60px' : '68px',
           background: isVoiceMode
@@ -163,8 +162,7 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
           cursor: 'pointer',
           transition:
             'right 400ms cubic-bezier(0.25, 0.1, 0.25, 1), transform var(--liquid-transition-medium), background var(--liquid-transition-fast), box-shadow var(--liquid-transition-fast), border-color var(--liquid-transition-fast)',
-          willChange: 'right, transform, filter',
-          transform: 'translateZ(0)'
+          willChange: 'right, transform, filter'
         }}
         initial={false}
         animate={
@@ -333,7 +331,9 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
                 justifyContent: 'center',
                 boxShadow: isVoiceMode
                   ? '0 0 16px rgba(239, 68, 68, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4)'
-                  : `0 0 16px color-mix(in srgb, ${modeColor} 60%, transparent), 0 2px 8px rgba(0, 0, 0, 0.4)`
+                  : `0 0 16px color-mix(in srgb, ${modeColor} 60%, transparent), 0 2px 8px rgba(0, 0, 0, 0.4)`,
+                zIndex: 10,
+                pointerEvents: 'none'
               }}
             >
               <SpatialIcon
@@ -386,7 +386,9 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
                       boxShadow: `
                         0 0 16px color-mix(in srgb, ${modeColor} 60%, transparent),
                         0 2px 8px rgba(0, 0, 0, 0.4)
-                      `
+                      `,
+                      zIndex: 10,
+                      pointerEvents: 'none'
                     }
               }
             >
