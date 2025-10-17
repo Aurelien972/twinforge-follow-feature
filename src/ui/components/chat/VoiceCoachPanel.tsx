@@ -99,10 +99,17 @@ const VoiceCoachPanel: React.FC = () => {
 
       logger.info('VOICE_COACH_PANEL', 'Voice session started successfully');
     } catch (error) {
-      logger.error('VOICE_COACH_PANEL', 'Failed to start voice session', { error });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to start voice session';
+      logger.error('VOICE_COACH_PANEL', 'Failed to start voice session', { error: errorMessage });
+
       setVoiceState('error');
-      setError(error instanceof Error ? error.message : 'Failed to start voice session');
+      setError(errorMessage);
       setShowReadyPrompt(true);
+
+      // Afficher une notification toast pour les erreurs StackBlitz
+      if (errorMessage.includes('StackBlitz') || errorMessage.includes('WebContainer')) {
+        console.error('❌ LIMITATION STACKBLITZ DÉTECTÉE :\n\n' + errorMessage);
+      }
     }
   };
 

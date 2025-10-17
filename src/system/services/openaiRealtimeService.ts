@@ -109,9 +109,28 @@ class OpenAIRealtimeService {
       });
 
     } catch (error) {
-      logger.error('REALTIME_API', 'Connection failed', {
-        error: error instanceof Error ? error.message : String(error)
-      });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      // Détecter si on est dans StackBlitz (WebContainer)
+      const isStackBlitz = window.location.hostname.includes('stackblitz') ||
+                          window.location.hostname.includes('webcontainer');
+
+      if (isStackBlitz) {
+        const stackBlitzError = new Error(
+          '🚫 La fonctionnalité vocale n\'est pas disponible dans l\'environnement de développement StackBlitz.\n\n' +
+          'Raison : Les WebSockets externes ne sont pas supportés dans WebContainer.\n\n' +
+          '💡 Solutions :\n' +
+          '• Utilisez le chat texte à la place\n' +
+          '• Déployez l\'application en production pour accéder au chat vocal'
+        );
+        logger.error('REALTIME_API', 'StackBlitz WebSocket limitation', {
+          message: 'WebSockets are not supported in StackBlitz WebContainer environment',
+          suggestion: 'Use text chat or deploy to production'
+        });
+        throw stackBlitzError;
+      }
+
+      logger.error('REALTIME_API', 'Connection failed', { error: errorMessage });
       throw error;
     }
   }
