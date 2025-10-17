@@ -39,11 +39,24 @@
   -webkit-backdrop-filter: none !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 
-  /* FORCER POSITION FIXED POUR LE HEADER */
+  /* FORCER POSITION FIXED POUR LE HEADER - CRITIQUE POUR LA NAVIGATION */
   position: fixed !important;
   top: 8px !important;
   left: 24px !important;
   right: 24px !important;
+  z-index: 9999 !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  /* Assurer que le header reste au-dessus de tout */
+  contain: layout style paint !important;
+  isolation: isolate !important;
+}
+
+/* Forcer aussi sur le header HTML direct */
+.glassmorphism-disabled header[class*="header"] {
+  position: fixed !important;
   z-index: 9999 !important;
   transform: translateZ(0) !important;
   will-change: transform !important;
@@ -90,26 +103,50 @@
    SIDEBAR SIMPLIFICATIONS
    ========================================= */
 
-.glassmorphism-disabled .sidebar-glass-container {
+.glassmorphism-disabled .sidebar-glass-container,
+.glassmorphism-disabled .sidebar-glass-enhanced,
+.glassmorphism-disabled aside[class*="sidebar"] {
   background: rgba(11, 14, 23, 0.95) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 
-  /* FORCER POSITION FIXED POUR LA SIDEBAR */
-  position: fixed !important;
+  /* FORCER POSITION STICKY/FIXED POUR LA SIDEBAR */
+  position: sticky !important;
   transform: translateZ(0) !important;
   will-change: transform !important;
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
+  /* Assurer que la sidebar reste toujours visible */
+  contain: layout style !important;
+  isolation: isolate !important;
 }
 
-.glassmorphism-disabled .sidebar-glass-container::before,
-.glassmorphism-disabled .sidebar-glass-container::after {
+/* CRITIQUE: Assurer que le contenu de la sidebar est scrollable en mode performance */
+.glassmorphism-disabled .sidebar-content {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  max-height: calc(100vh - 120px) !important;
+  scrollbar-width: none !important; /* Firefox */
+  -webkit-overflow-scrolling: touch !important; /* iOS smooth scroll */
+  scroll-behavior: smooth !important;
+  overscroll-behavior: contain !important;
+}
+
+/* Webkit - Scrollbar invisible mais scrollable */
+.glassmorphism-disabled .sidebar-content::-webkit-scrollbar {
   display: none !important;
 }
 
-.glassmorphism-disabled .sidebar-nav-item {
+.glassmorphism-disabled .sidebar-glass-container::before,
+.glassmorphism-disabled .sidebar-glass-container::after,
+.glassmorphism-disabled .sidebar-glass-enhanced::before,
+.glassmorphism-disabled .sidebar-glass-enhanced::after {
+  display: none !important;
+}
+
+.glassmorphism-disabled .sidebar-nav-item,
+.glassmorphism-disabled .sidebar-item {
   background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -118,14 +155,16 @@
   filter: none !important;
 }
 
-.glassmorphism-disabled .sidebar-nav-item:hover {
+.glassmorphism-disabled .sidebar-nav-item:hover,
+.glassmorphism-disabled .sidebar-item:hover {
   background: rgba(255, 255, 255, 0.08) !important;
   transform: translateX(4px) translateZ(0) !important;
   box-shadow: none !important;
   filter: none !important;
 }
 
-.glassmorphism-disabled .sidebar-nav-item.active {
+.glassmorphism-disabled .sidebar-nav-item.active,
+.glassmorphism-disabled .sidebar-item[aria-current="page"] {
   background: rgba(255, 255, 255, 0.12) !important;
   box-shadow: none !important;
   filter: none !important;
@@ -136,11 +175,24 @@
    ========================================= */
 
 .glassmorphism-disabled .new-mobile-bottom-bar {
-  /* FORCER POSITION FIXED POUR LA BOTTOM BAR */
+  /* FORCER POSITION FIXED POUR LA BOTTOM BAR - CRITIQUE POUR LA NAVIGATION MOBILE */
   position: fixed !important;
   bottom: var(--new-bottom-bar-bottom-offset) !important;
   left: 8px !important;
   right: 8px !important;
+  z-index: 9996 !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  /* Assurer que la bottom bar reste toujours visible */
+  contain: layout style paint !important;
+  isolation: isolate !important;
+}
+
+/* Forcer aussi sur le nav HTML direct */
+.glassmorphism-disabled nav[class*="bottom-bar"] {
+  position: fixed !important;
   z-index: 9996 !important;
   transform: translateZ(0) !important;
   will-change: transform !important;
@@ -328,8 +380,23 @@
   box-shadow: none !important;
   filter: none !important;
 
-  /* FORCER POSITION FIXED POUR LES BOUTONS FLOTTANTS */
+  /* FORCER POSITION FIXED POUR LES BOUTONS FLOTTANTS - CRITIQUE POUR LE CHAT */
   position: fixed !important;
+  transform: translateZ(0) !important;
+  will-change: transform, right !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  /* Assurer que le bouton reste au-dessus de tout */
+  contain: layout style paint !important;
+  isolation: isolate !important;
+  /* Maintenir le z-index correct */
+  z-index: 9998 !important;
+}
+
+/* Forcer position fixed sur tous les boutons flottants */
+.glassmorphism-disabled button[class*="floating"] {
+  position: fixed !important;
+  z-index: 9998 !important;
   transform: translateZ(0) !important;
   will-change: transform, right !important;
   backface-visibility: hidden !important;
@@ -419,18 +486,28 @@
   display: none !important;
 }
 
-/* Le texte TWINFØRGE reste visible avec couleurs */
-.glassmorphism-disabled [class*="TwinForgeLogo"] span {
-  filter: none !important;
-  opacity: 1 !important;
-}
-
-/* Forcer le gradient orangé sur FØRGE en mode performance */
-.glassmorphism-disabled [class*="TwinForgeLogo"] span[style*="gradient"] {
+/* CRITIQUE: Le texte TWINFØRGE doit rester VISIBLE avec son gradient orangé */
+/* Exception au filter: none pour préserver la lisibilité du texte */
+.glassmorphism-disabled .header-liquid-glass span[style*="gradient"],
+.glassmorphism-disabled header span[style*="gradient"],
+.glassmorphism-disabled [class*="TwinForgeLogo"] span[style*="gradient"],
+.glassmorphism-disabled span[style*="linear-gradient"][style*="WebkitBackgroundClip"] {
+  /* FORCER le gradient orangé visible */
   background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
+  /* PAS de filter: none ici - on laisse le texte avec son gradient */
+  opacity: 1 !important;
+}
+
+/* Le texte TWIN reste blanc et visible */
+.glassmorphism-disabled .header-liquid-glass span[style*="color: rgb(229, 231, 235)"],
+.glassmorphism-disabled header span[style*="color: rgb(229, 231, 235)"],
+.glassmorphism-disabled [class*="TwinForgeLogo"] span[style*="color: rgb(229, 231, 235)"] {
+  color: #E5E7EB !important;
+  opacity: 1 !important;
+  /* Supprimer le drop-shadow mais garder la couleur */
   filter: none !important;
 }
 
