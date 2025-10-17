@@ -116,18 +116,26 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    // Vérifier l'authentification (header ou sous-protocole WebSocket)
+    const url = new URL(req.url);
+
+    // Vérifier l'authentification
+    // Pour les WebSockets, le token peut être dans l'URL (apikey query param)
+    const apikeyFromUrl = url.searchParams.get('apikey');
     const authHeader = req.headers.get('Authorization') ||
-                       req.headers.get('authorization') ||
-                       req.headers.get('apikey');
+                       req.headers.get('authorization');
 
-    // Pour les WebSockets, Supabase passe aussi l'auth via sec-websocket-protocol
-    const wsProtocol = req.headers.get('sec-websocket-protocol');
+    console.log('[VOICE-PROXY] Request info', {
+      hasApikeyInUrl: !!apikeyFromUrl,
+      hasAuthHeader: !!authHeader,
+      upgrade: req.headers.get('upgrade'),
+      connection: req.headers.get('connection')
+    });
 
-    if (!authHeader && !wsProtocol) {
-      console.error('[VOICE-PROXY] Missing authorization');
+    // Vérifier qu'on a au moins un moyen d'authentification
+    if (!apikeyFromUrl && !authHeader) {
+      console.error('[VOICE-PROXY] Missing authentication');
       return new Response(
-        JSON.stringify({ error: 'Missing authorization' }),
+        JSON.stringify({ error: 'Missing authentication (apikey or Authorization header)' }),
         {
           status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -152,7 +160,7 @@ Deno.serve(async (req: Request) => {
 
     const upgrade = req.headers.get('upgrade') || '';
     if (upgrade.toLowerCase() !== 'websocket') {
-      console.error('Not a WebSocket upgrade request');
+      console.error('[VOICE-PROXY] Not a WebSocket upgrade request');
       return new Response(
         JSON.stringify({ error: 'Expected WebSocket upgrade' }),
         {
@@ -162,7 +170,6 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const url = new URL(req.url);
     const model = url.searchParams.get('model') || 'gpt-4o-realtime-preview-2024-10-01';
 
     console.log('[VOICE-PROXY] Initiating connection', { model, timestamp: new Date().toISOString() });

@@ -64,20 +64,29 @@ class OpenAIRealtimeService {
       }
 
       // URL de notre edge function proxy
-      // Convertir https:// en wss:// pour WebSocket
-      const edgeFunctionUrl = supabaseUrl.replace('https://', 'wss://') +
-        `/functions/v1/voice-coach-realtime?model=${encodeURIComponent(config.model)}`;
+      // Pour les WebSockets, on doit construire l'URL correctement
+      // Format: wss://[project-ref].supabase.co/functions/v1/[function-name]
+      // Important: Supabase nécessite l'apikey dans l'URL pour les WebSockets
+      const wsUrl = supabaseUrl
+        .replace('https://', 'wss://')
+        .replace('/rest/v1', '') // Retirer le path REST si présent
+        + `/functions/v1/voice-coach-realtime?model=${encodeURIComponent(config.model)}&apikey=${supabaseAnonKey}`;
 
-      logger.debug('REALTIME_API', 'Connecting to edge function', { url: edgeFunctionUrl });
+      logger.info('REALTIME_API', 'WebSocket URL constructed', {
+        originalUrl: supabaseUrl,
+        wsUrl: wsUrl.replace(supabaseAnonKey, '[REDACTED]'),
+        model: config.model
+      });
 
       // Créer la connexion WebSocket via notre edge function
-      // Pour l'authentification avec Supabase, on doit passer le token dans les sous-protocoles
-      this.ws = new WebSocket(edgeFunctionUrl, [
-        'apikey.' + supabaseAnonKey,
-        'authorization.' + supabaseAnonKey
-      ]);
+      logger.info('REALTIME_API', 'Creating WebSocket connection...');
+      this.ws = new WebSocket(wsUrl);
+
+      // Note: WebSocket ne supporte pas les headers custom dans le constructeur
+      // L'authentification Supabase se fait via le paramètre apikey dans l'URL
 
       this.ws.binaryType = 'arraybuffer';
+      logger.info('REALTIME_API', 'WebSocket instance created, waiting for connection...');
 
       this.ws.onopen = () => this.handleOpen();
       this.ws.onmessage = (event) => this.handleMessage(event);
@@ -285,8 +294,17 @@ class OpenAIRealtimeService {
   }
 
   private handleError(event: Event): void {
-    const error = new Error('WebSocket error');
-    logger.error('REALTIME_API', 'WebSocket error', { event });
+    // Essayer d'extraire plus d'informations sur l'erreur
+    const errorDetails: any = {
+      type: event.type,
+      target: event.target ? {
+        readyState: (event.target as WebSocket).readyState,
+        url: (event.target as WebSocket).url
+      } : null
+    };
+
+    const error = new Error(`WebSocket error: ${JSON.stringify(errorDetails)}`);
+    logger.error('REALTIME_API', 'WebSocket error', errorDetails);
 
     this.errorHandlers.forEach(handler => handler(error));
   }
