@@ -200,8 +200,15 @@ function ForgeBackground() {
   }>>([]);
 
   useEffect(() => {
+    console.log('🎨 ForgeBackground: Component mounted');
+    console.log('🎨 Window dimensions:', window.innerWidth, 'x', window.innerHeight);
+    console.log('🎨 Device classes on body:', document.body.className);
+    console.log('🎨 Device classes on html:', document.documentElement.className);
+
     // Generate particles on mount
     const particleCount = window.innerWidth <= 768 ? 6 : 12;
+    console.log('🎨 Generating', particleCount, 'particles');
+
     const newParticles = Array.from({ length: particleCount }, (_, i) => ({
       id: i + 1,
       x0: `${20 + Math.random() * 60}vw`,
@@ -213,16 +220,66 @@ function ForgeBackground() {
       duration: `${20 + Math.random() * 15}s`,
       delay: `${Math.random() * -20}s`,
     }));
+
     setParticles(newParticles);
+    console.log('🎨 Particles generated:', newParticles.length);
+
+    // Check if background elements exist in DOM
+    setTimeout(() => {
+      const bgElement = document.querySelector('.bg-twinforge-visionos');
+      const particlesContainer = document.querySelector('.cosmic-forge-particles');
+      const forgeParticles = document.querySelectorAll('.forge-particle');
+
+      console.log('🎨 DOM Check:');
+      console.log('  - Background element exists:', !!bgElement);
+      console.log('  - Particles container exists:', !!particlesContainer);
+      console.log('  - Forge particles count:', forgeParticles.length);
+
+      if (bgElement) {
+        const bgStyles = window.getComputedStyle(bgElement);
+        console.log('  - Background position:', bgStyles.position);
+        console.log('  - Background z-index:', bgStyles.zIndex);
+        console.log('  - Background display:', bgStyles.display);
+        console.log('  - Background opacity:', bgStyles.opacity);
+        console.log('  - Background background:', bgStyles.background.substring(0, 100));
+      }
+
+      if (particlesContainer) {
+        const containerStyles = window.getComputedStyle(particlesContainer);
+        console.log('  - Particles opacity:', containerStyles.opacity);
+        console.log('  - Particles display:', containerStyles.display);
+      }
+
+      if (forgeParticles.length > 0) {
+        const firstParticle = forgeParticles[0] as HTMLElement;
+        const particleStyles = window.getComputedStyle(firstParticle);
+        console.log('  - First particle opacity:', particleStyles.opacity);
+        console.log('  - First particle display:', particleStyles.display);
+        console.log('  - First particle animation:', particleStyles.animation);
+      }
+    }, 500);
   }, []);
+
+  console.log('🎨 ForgeBackground: Rendering with', particles.length, 'particles');
 
   return (
     <>
       {/* Background gradient */}
-      <div className="bg-twinforge-visionos" />
+      <div className="bg-twinforge-visionos" style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: -10,
+        background: 'radial-gradient(circle at 50% 50%, #1A1F2E 0%, #0F1419 60%, #0B0E17 100%)'
+      }} />
 
       {/* Particles container */}
-      <div className="cosmic-forge-particles" ref={particlesRef}>
+      <div className="cosmic-forge-particles" ref={particlesRef} style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: -1,
+        pointerEvents: 'none',
+        opacity: 0.4
+      }}>
         {particles.map((particle) => (
           <div
             key={particle.id}
@@ -236,6 +293,12 @@ function ForgeBackground() {
               '--size': particle.size,
               '--duration': particle.duration,
               '--delay': particle.delay,
+              position: 'absolute',
+              width: particle.size,
+              height: particle.size,
+              borderRadius: '50%',
+              background: '#FF6B35',
+              opacity: 0.6
             } as React.CSSProperties}
           />
         ))}
