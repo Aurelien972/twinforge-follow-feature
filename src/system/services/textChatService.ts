@@ -111,16 +111,26 @@ class TextChatService {
             chunkCount++;
             accumulatedResponse += chunk;
 
-            if (chunkCount <= 3) {
-              logger.debug('TEXT_CHAT_SERVICE', 'Delta received', {
+            if (chunkCount <= 10) {
+              logger.info('TEXT_CHAT_SERVICE', '📨 Delta received', {
                 messageId,
                 chunkNumber: chunkCount,
                 chunkLength: chunk.length,
-                accumulatedLength: accumulatedResponse.length
+                accumulatedLength: accumulatedResponse.length,
+                handlersCount: this.messageHandlers.length
               });
             }
 
+            logger.info('TEXT_CHAT_SERVICE', '🔔 Calling messageHandlers', {
+              chunkNumber: chunkCount,
+              handlersCount: this.messageHandlers.length
+            });
+
             this.messageHandlers.forEach(handler => handler(chunk, true));
+
+            logger.info('TEXT_CHAT_SERVICE', '✅ Handlers called', {
+              chunkNumber: chunkCount
+            });
           }
         );
 

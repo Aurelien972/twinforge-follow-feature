@@ -142,8 +142,10 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
               content: lastMessage.content + chunk
             };
 
-            logger.debug('UNIFIED_COACH_DRAWER', 'Appending to existing coach message', {
+            logger.info('UNIFIED_COACH_DRAWER', '✅ Appending to existing coach message', {
               messageId: lastMessage.id,
+              chunkLength: chunk.length,
+              previousLength: lastMessage.content.length,
               newContentLength: updatedMessages[updatedMessages.length - 1].content.length
             });
 
@@ -157,9 +159,10 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
               timestamp: new Date()
             };
 
-            logger.info('UNIFIED_COACH_DRAWER', 'Creating new coach message', {
+            logger.info('UNIFIED_COACH_DRAWER', '🆕 Creating new coach message', {
               messageId: newMessage.id,
-              contentLength: chunk.length
+              contentLength: chunk.length,
+              lastMessageRole: lastMessage?.role || 'none'
             });
 
             return { messages: [...state.messages, newMessage] };
