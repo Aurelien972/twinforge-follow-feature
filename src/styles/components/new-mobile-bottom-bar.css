@@ -169,7 +169,7 @@
   box-shadow: none !important;
 }
 
-/* Hover effects (desktop/tablet) - Enhanced glass interaction */
+/* Hover effects (desktop/tablet) - ROUNDED glass interaction */
 @media (hover: hover) and (pointer: fine) {
   .new-bottom-bar-button:hover {
     background: transparent !important;
@@ -182,10 +182,11 @@
 
   .new-bottom-bar-button:hover .new-bottom-bar-icon-container {
     transform: scale(1.08) translateZ(0);
+    /* ROUNDED GLOW - pas de bords carrés */
     box-shadow:
-      var(--liquid-pill-shadow),
-      0 0 20px rgba(255,255,255,0.15),
-      0 4px 16px rgba(0,0,0,0.2);
+      0 4px 12px rgba(0,0,0,0.2),
+      0 0 16px rgba(255,255,255,0.12),
+      inset 0 1px 0 rgba(255,255,255,0.2);
     border-color: rgba(255,255,255,0.3);
   }
 
@@ -197,11 +198,12 @@
   }
 
   .new-bottom-bar-button--central:hover .new-bottom-bar-icon-container {
+    /* ROUNDED ORANGE GLOW pour bouton central */
     box-shadow:
-      var(--liquid-pill-shadow),
-      0 0 35px rgba(247, 147, 30, 0.35),
-      0 0 70px rgba(253, 200, 48, 0.2),
-      0 4px 20px rgba(0,0,0,0.25);
+      0 4px 16px rgba(0,0,0,0.25),
+      0 0 24px rgba(247, 147, 30, 0.3),
+      0 0 48px rgba(253, 200, 48, 0.15),
+      inset 0 1px 0 rgba(255,255,255,0.25);
     border-color: rgba(247, 147, 30, 0.5);
   }
 }
