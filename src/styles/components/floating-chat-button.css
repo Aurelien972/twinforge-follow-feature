@@ -16,6 +16,13 @@
   height: 56px !important;
   position: fixed !important;
   overflow: visible !important;
+  /* CRITICAL for iOS Safari */
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  pointer-events: auto !important;
+  will-change: transform !important;
 
   /* Position par défaut (mobile/tablette) : au-dessus du coin droit de la bottom bar */
   right: 8px !important;

@@ -130,6 +130,7 @@
 @import './effects/motion.css';
 @import './utilities/inline-style-overrides.css';
 @import './utilities/debug.css';
+@import './utilities/ios-fixed-positioning-fix.css';
 
 /* =========================================
    PHASE 11: MOBILE PERFORMANCE (CRITICAL - MUST BE LAST)

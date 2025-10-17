@@ -35,6 +35,9 @@
     padding: 0;
     overflow-x: clip; /* clip instead of hidden to preserve position:fixed */
     overflow-y: auto;
+    /* CRITICAL: iOS Safari fixed positioning fix */
+    position: relative;
+    isolation: isolate;
   }
 
   /* Touch optimization for interactive elements */

@@ -30,17 +30,17 @@ export const Header = React.memo(() => {
           transition-all duration-300
         "
         style={{
+          position: 'fixed',
           left: '24px',
           right: '24px',
           top: '8px',
           borderRadius: '20px',
           overflow: 'hidden',
+          transform: 'translate3d(0, 0, 0)',
+          WebkitTransform: 'translate3d(0, 0, 0)',
           backfaceVisibility: 'hidden',
           WebkitBackfaceVisibility: 'hidden',
-          WebkitTransformStyle: 'preserve-3d',
-          transformStyle: 'preserve-3d',
-          WebkitPerspective: '1000px',
-          perspective: '1000px',
+          pointerEvents: 'auto',
         }}
         role="banner"
         aria-label="TwinForge Pont de Commandement"

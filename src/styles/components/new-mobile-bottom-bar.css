@@ -34,9 +34,15 @@
   z-index: var(--new-bottom-bar-z-index) !important;
   height: var(--new-bottom-bar-height) !important;
   transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
   will-change: transform !important;
   contain: layout style paint !important;
   isolation: isolate !important;
+  /* CRITICAL for iOS Safari */
+  -webkit-overflow-scrolling: touch !important;
+  pointer-events: auto !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
 }
 
 .new-mobile-bottom-bar-container {
