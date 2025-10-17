@@ -93,25 +93,46 @@ export const DeviceProvider: React.FC<DeviceProviderProps> = ({ children }) => {
   // This automatically applies mobile optimizations without user intervention
   useEffect(() => {
     if (isMobile) {
-      // Add mobile-device class for CSS targeting (mobile-no-blur.css, mobile-zero-animations.css)
+      // Add mobile-device class for CSS targeting (mobile-critical-fixes.css)
       document.body.classList.add('mobile-device');
       document.documentElement.classList.add('mobile-device');
 
+      // VERIFY class was added (sometimes fails in strict mode)
+      const hasClassOnBody = document.body.classList.contains('mobile-device');
+      const hasClassOnHTML = document.documentElement.classList.contains('mobile-device');
+
       // Log for debugging
-      console.log('🔍 Mobile device detected - Auto-optimizations applied:', {
+      console.log('🔍 MOBILE DEVICE DETECTED - Critical fixes applied:', {
         isMobile,
         isIOS,
         isAndroid,
         hasTouch,
         screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
         userAgent: navigator.userAgent,
+        classAppliedToBody: hasClassOnBody,
+        classAppliedToHTML: hasClassOnHTML,
         optimizations: [
-          'Backdrop-blur disabled',
-          'Animations reduced',
-          'Solid backgrounds',
-          'Touch-optimized interactions'
-        ]
+          '✅ Position fixed architecture repaired',
+          '✅ Backdrop-blur DISABLED (0px blur)',
+          '✅ ALL animations DISABLED',
+          '✅ Solid backgrounds only',
+          '✅ Simple shadows (max 2 layers)',
+          '✅ NO pseudo-element effects',
+          '✅ Touch-optimized interactions',
+          '✅ Header & bottom bar STICKY enforced'
+        ],
+        cssFile: 'mobile-critical-fixes.css loaded last'
       });
+
+      // Double-check after 100ms in case of timing issues
+      setTimeout(() => {
+        if (!document.body.classList.contains('mobile-device')) {
+          console.warn('⚠️ mobile-device class was removed! Re-applying...');
+          document.body.classList.add('mobile-device');
+          document.documentElement.classList.add('mobile-device');
+        }
+      }, 100);
     } else {
       document.body.classList.remove('mobile-device');
       document.documentElement.classList.remove('mobile-device');

@@ -9,6 +9,7 @@ import { useOverlayStore } from '../../system/store/overlayStore';
 import { useGlobalChatStore } from '../../system/store/globalChatStore';
 import { Haptics } from '../../utils/haptics';
 import CentralActionsMenu from './CentralActionsMenu';
+import { useIsMobile } from '../../system/device/DeviceProvider';
 
 /**
  * Configuration des boutons de la nouvelle barre inférieure
@@ -83,16 +84,22 @@ function BarButton({
 
   const iconSize = 20;
 
+  // Use button element directly on mobile to avoid Framer Motion overhead
+  const ButtonComponent = isMobile ? 'button' : motion.button;
+  const animationProps = isMobile ? {} : {
+    whileHover: { scale: 1.03 },
+    whileTap: { scale: 0.98 },
+  };
+
   return (
-    <motion.button
+    <ButtonComponent
       onClick={handleClick}
       className="new-bottom-bar-button"
       style={{
         '--button-color': button.color,
         '--button-active': active ? '1' : '0'
       } as React.CSSProperties}
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.98 }}
+      {...animationProps}
       aria-current={active ? 'page' : undefined}
       aria-label={`Aller à ${button.label}`}
     >
@@ -108,7 +115,7 @@ function BarButton({
       <div className={`new-bottom-bar-label ${active ? 'new-bottom-bar-label--active' : ''}`}>
         {button.label}
       </div>
-    </motion.button>
+    </ButtonComponent>
   );
 }
 
@@ -121,6 +128,7 @@ const NewMobileBottomBar: React.FC = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { close } = useOverlayStore();
+  const isMobile = useIsMobile();
 
   const handleButtonClick = (button: typeof BOTTOM_BAR_BUTTONS[0]) => {
     if (button.route) {

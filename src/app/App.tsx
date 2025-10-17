@@ -171,8 +171,18 @@ function AppContent() {
 
   return (
     <div
-      className="min-h-screen flex flex-col z-auto-important will-change-auto-important position-static-important transform-none-important filter-none-important perspective-none-important contain-none-important isolation-auto-important overflow-visible-important"
-      style={{ position: 'relative', zIndex: 0 }}
+      className="min-h-screen flex flex-col"
+      style={{
+        position: 'relative',
+        zIndex: 0,
+        // CRITICAL: No transforms on root to prevent breaking position:fixed on mobile
+        transform: 'none',
+        transformStyle: 'flat',
+        perspective: 'none',
+        filter: 'none',
+        isolation: 'auto',
+        contain: 'none'
+      }}
     >
       <Header />
 
@@ -180,7 +190,21 @@ function AppContent() {
       <Sidebar />
 
       {/* Parent flex : on autorise la contraction des enfants */}
-      <div className="flex-1 flex min-w-0 position-static-important overflow-visible-important transform-none-important filter-none-important perspective-none-important contain-none-important isolation-auto-important z-auto-important">
+      <div
+        className="flex-1 flex min-w-0"
+        style={{
+          // CRITICAL: No transforms to prevent breaking position:fixed
+          position: 'static',
+          overflow: 'visible',
+          transform: 'none',
+          transformStyle: 'flat',
+          filter: 'none',
+          perspective: 'none',
+          contain: 'none',
+          isolation: 'auto',
+          zIndex: 'auto'
+        }}
+      >
         {/* Sidebar spacer (hidden on mobile) - maintains layout spacing */}
         <div className="hidden lg:block lg:w-[240px] xl:w-[260px] shrink-0" aria-hidden="true" />
 

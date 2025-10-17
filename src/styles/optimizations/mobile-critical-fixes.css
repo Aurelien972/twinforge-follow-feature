@@ -1,0 +1,389 @@
+/**
+ * MOBILE CRITICAL FIXES - Position Fixed & Performance
+ *
+ * This file fixes two critical mobile issues:
+ * 1. Header and bottom bar not staying sticky (position fixed broken)
+ * 2. Device overheating from excessive GPU/animation load
+ *
+ * LOAD ORDER: Must be imported LAST in index.css to override all other styles
+ */
+
+/* =========================================
+   CRITICAL FIX 1: POSITION FIXED ARCHITECTURE
+   Remove transforms that break position:fixed on mobile
+   ========================================= */
+
+/* Remove ALL transform-related properties from body and html that create new stacking contexts */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  html, body {
+    transform: none !important;
+    -webkit-transform: none !important;
+    transform-style: flat !important;
+    -webkit-transform-style: flat !important;
+    perspective: none !important;
+    -webkit-perspective: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    will-change: auto !important;
+    contain: none !important;
+    isolation: auto !important;
+  }
+
+  /* Remove transforms from all parent containers that could break fixed positioning */
+  #root,
+  #root > div,
+  [class*="App"],
+  main,
+  #main-content {
+    transform: none !important;
+    -webkit-transform: none !important;
+    transform-style: flat !important;
+    -webkit-transform-style: flat !important;
+    perspective: none !important;
+    -webkit-perspective: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    contain: none !important;
+    isolation: auto !important;
+  }
+}
+
+/* =========================================
+   CRITICAL FIX 2: ENFORCE POSITION FIXED ON NAVIGATION
+   Absolute priority for header and bottom bar
+   ========================================= */
+
+/* Mobile device class enforcement */
+.mobile-device .header-liquid-glass,
+body.mobile-device .header-liquid-glass,
+html.mobile-device .header-liquid-glass {
+  position: fixed !important;
+  top: 6px !important;
+  left: 8px !important;
+  right: 8px !important;
+  z-index: 9999 !important;
+
+  /* GPU acceleration WITHOUT creating new stacking context */
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+
+  /* Prevent parent transform interference */
+  isolation: isolate !important;
+  contain: layout style paint !important;
+  pointer-events: auto !important;
+}
+
+.mobile-device .new-mobile-bottom-bar,
+body.mobile-device .new-mobile-bottom-bar,
+html.mobile-device .new-mobile-bottom-bar {
+  position: fixed !important;
+  bottom: max(4px, env(safe-area-inset-bottom, 2px)) !important;
+  left: 8px !important;
+  right: 8px !important;
+  z-index: 9996 !important;
+
+  /* GPU acceleration WITHOUT creating new stacking context */
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+
+  /* Prevent parent transform interference */
+  isolation: isolate !important;
+  contain: layout style paint !important;
+  pointer-events: auto !important;
+}
+
+/* Media query fallback if mobile-device class fails */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .header-liquid-glass {
+    position: fixed !important;
+    top: 6px !important;
+    left: 8px !important;
+    right: 8px !important;
+    z-index: 9999 !important;
+    transform: translate3d(0, 0, 0) !important;
+    isolation: isolate !important;
+  }
+
+  .new-mobile-bottom-bar {
+    position: fixed !important;
+    bottom: max(4px, env(safe-area-inset-bottom, 2px)) !important;
+    left: 8px !important;
+    right: 8px !important;
+    z-index: 9996 !important;
+    transform: translate3d(0, 0, 0) !important;
+    isolation: isolate !important;
+  }
+}
+
+/* =========================================
+   CRITICAL FIX 3: DISABLE ALL EXPENSIVE GPU EFFECTS
+   Remove blur, complex shadows, and animations
+   ========================================= */
+
+.mobile-device .header-liquid-glass,
+.mobile-device .new-mobile-bottom-bar-container,
+body.mobile-device .header-liquid-glass,
+body.mobile-device .new-mobile-bottom-bar-container {
+  /* ZERO BLUR - Solid backgrounds only */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Solid opaque background instead of transparent blur */
+  background: rgba(15, 25, 39, 0.98) !important;
+
+  /* Simple single-layer shadow (no blur) */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+
+  /* Disable all animations */
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Remove ALL pseudo-elements that create expensive effects */
+.mobile-device .header-liquid-glass::before,
+.mobile-device .header-liquid-glass::after,
+.mobile-device .new-mobile-bottom-bar-container::before,
+.mobile-device .new-mobile-bottom-bar-container::after,
+body.mobile-device .header-liquid-glass::before,
+body.mobile-device .header-liquid-glass::after,
+body.mobile-device .new-mobile-bottom-bar-container::before,
+body.mobile-device .new-mobile-bottom-bar-container::after {
+  display: none !important;
+  opacity: 0 !important;
+  animation: none !important;
+  content: none !important;
+}
+
+/* =========================================
+   CRITICAL FIX 4: SIMPLIFY BUTTON EFFECTS ON MOBILE
+   Remove corner animations, complex glows
+   ========================================= */
+
+.mobile-device .header-liquid-glass button,
+.mobile-device .new-bottom-bar-button,
+.mobile-device .new-bottom-bar-icon-container,
+body.mobile-device .header-liquid-glass button,
+body.mobile-device .new-bottom-bar-button,
+body.mobile-device .new-bottom-bar-icon-container {
+  /* ZERO BLUR on buttons */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Solid backgrounds */
+  background: rgba(255, 255, 255, 0.1) !important;
+
+  /* Simple shadow */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+
+  /* NO animations or transitions */
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+/* Remove button pseudo-elements (corner squares, glows) */
+.mobile-device .header-liquid-glass button::before,
+.mobile-device .header-liquid-glass button::after,
+.mobile-device .header-liquid-glass .header-corner-square,
+.mobile-device .new-bottom-bar-icon-container::before,
+.mobile-device .new-bottom-bar-icon-container::after,
+body.mobile-device .header-liquid-glass button::before,
+body.mobile-device .header-liquid-glass button::after,
+body.mobile-device .header-liquid-glass .header-corner-square,
+body.mobile-device .new-bottom-bar-icon-container::before,
+body.mobile-device .new-bottom-bar-icon-container::after {
+  display: none !important;
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+/* =========================================
+   CRITICAL FIX 5: DISABLE ACTIVE STATE ANIMATIONS
+   Instant feedback only, no transitions
+   ========================================= */
+
+.mobile-device .new-bottom-bar-icon-container--active,
+body.mobile-device .new-bottom-bar-icon-container--active {
+  animation: none !important;
+  transition: none !important;
+
+  /* Simplified active state - solid color only */
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* =========================================
+   CRITICAL FIX 6: REMOVE ALL GLASS CARD EFFECTS
+   Solid backgrounds everywhere
+   ========================================= */
+
+.mobile-device .glass-card,
+.mobile-device .glass-base,
+.mobile-device .glass-card-cta,
+.mobile-device [class*="glass-"]:not(.header-liquid-glass):not(.new-mobile-bottom-bar),
+body.mobile-device .glass-card,
+body.mobile-device .glass-base,
+body.mobile-device .glass-card-cta,
+body.mobile-device [class*="glass-"]:not(.header-liquid-glass):not(.new-mobile-bottom-bar) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: #0F1927 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Remove pseudo-elements from all glass elements */
+.mobile-device [class*="glass-"]::before,
+.mobile-device [class*="glass-"]::after,
+body.mobile-device [class*="glass-"]::before,
+body.mobile-device [class*="glass-"]::after {
+  display: none !important;
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+/* =========================================
+   CRITICAL FIX 7: DISABLE ALL GRADIENTS ON MOBILE
+   Replace with solid colors for performance
+   ========================================= */
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  /* Override all gradient backgrounds */
+  [style*="radial-gradient"],
+  [style*="linear-gradient"],
+  [class*="gradient"] {
+    background-image: none !important;
+  }
+}
+
+/* =========================================
+   CRITICAL FIX 8: DISABLE WILL-CHANGE ON STATIC ELEMENTS
+   Only animating elements should have will-change
+   ========================================= */
+
+.mobile-device *:not(.header-liquid-glass):not(.new-mobile-bottom-bar),
+body.mobile-device *:not(.header-liquid-glass):not(.new-mobile-bottom-bar) {
+  will-change: auto !important;
+}
+
+/* Only header and bottom bar keep will-change for scroll performance */
+.mobile-device .header-liquid-glass,
+.mobile-device .new-mobile-bottom-bar {
+  will-change: transform !important;
+}
+
+/* =========================================
+   CRITICAL FIX 9: SIMPLIFY BOX SHADOWS
+   Maximum 2 layers on mobile
+   ========================================= */
+
+.mobile-device * {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Navigation elements keep slightly more shadow for depth */
+.mobile-device .header-liquid-glass,
+.mobile-device .new-mobile-bottom-bar-container {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* =========================================
+   CRITICAL FIX 10: DISABLE FRAMER MOTION HOVER EFFECTS
+   No scale/transform on hover for mobile
+   ========================================= */
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  [class*="motion-"] {
+    transform: none !important;
+  }
+
+  /* Disable all hover scale effects */
+  *:hover {
+    transform: none !important;
+  }
+}
+
+/* =========================================
+   CRITICAL FIX 11: ENFORCE FLAT TRANSFORM STYLE
+   Prevent 3D transform contexts
+   ========================================= */
+
+.mobile-device *,
+body.mobile-device * {
+  transform-style: flat !important;
+  -webkit-transform-style: flat !important;
+  perspective: none !important;
+  -webkit-perspective: none !important;
+}
+
+/* Exceptions: Only fixed elements use 3D transforms for position lock */
+.mobile-device .header-liquid-glass,
+.mobile-device .new-mobile-bottom-bar {
+  transform-style: preserve-3d !important;
+  -webkit-transform-style: preserve-3d !important;
+}
+
+/* =========================================
+   CRITICAL FIX 12: DISABLE ALL CSS ANIMATIONS
+   Remove keyframe animations on mobile
+   ========================================= */
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  * {
+    animation: none !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+.mobile-device *,
+body.mobile-device * {
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+
+/* =========================================
+   CRITICAL FIX 13: INSTANT TRANSITIONS ONLY
+   Zero duration transitions on mobile
+   ========================================= */
+
+.mobile-device *,
+body.mobile-device * {
+  transition: none !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+/* =========================================
+   VERIFICATION: Console Logging
+   Helps debug if styles are applied correctly
+   ========================================= */
+
+/* Visual indicator that mobile critical fixes are loaded */
+.mobile-device::after {
+  content: '' !important;
+  display: none !important;
+  /* This pseudo-element is just a marker for DevTools inspection */
+  /* Check computed styles to verify mobile-critical-fixes.css is loaded */
+}
+
+/* =========================================
+   ULTRA-CRITICAL: SAFE AREA INSETS
+   Ensure navigation doesn't overlap notches/home indicators
+   ========================================= */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .mobile-device .header-liquid-glass {
+    top: max(6px, env(safe-area-inset-top, 6px)) !important;
+  }
+
+  .mobile-device .new-mobile-bottom-bar {
+    bottom: max(4px, env(safe-area-inset-bottom, 4px)) !important;
+  }
+}

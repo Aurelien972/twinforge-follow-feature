@@ -155,6 +155,13 @@
 @import './optimizations/mobile-scroll-fix.css';
 
 /* =========================================
+   PHASE 15: MOBILE CRITICAL FIXES (ABSOLUTE FINAL - MUST BE LAST)
+   Fixes position:fixed sticky issues and removes ALL performance-heavy effects
+   This MUST be the last import to override everything else
+   ========================================= */
+@import './optimizations/mobile-critical-fixes.css';
+
+/* =========================================
    ENFORCEMENT GLOBAL - ÉLÉMENTS CRITIQUES
    Positionnement fixe pour les éléments flottants
    ========================================= */

@@ -22,25 +22,37 @@ export const Header = React.memo(() => {
   return (
     <>
       <header
-        className="
-          header-liquid-glass h-[64px] z-9997-important will-change-transform-important position-fixed-important transform-gpu-important isolation-isolate-important contain-layout-style-paint-important
-          fixed top-2 left-4 right-4 z-[9999]
-          rounded-glass-lg
-          backdrop-blur-xl
-          transition-all duration-300
-        "
+        className="header-liquid-glass"
         style={{
-          left: '24px',
-          right: '24px',
-          top: '8px',
-          borderRadius: '20px',
-          overflow: 'hidden',
-          backfaceVisibility: 'hidden',
-          WebkitBackfaceVisibility: 'hidden',
-          WebkitTransformStyle: 'preserve-3d',
-          transformStyle: 'preserve-3d',
-          WebkitPerspective: '1000px',
-          perspective: '1000px',
+          ...(isMobile ? {
+            // Mobile: Minimal styles, position fixed enforced by CSS
+            position: 'fixed',
+            top: '6px',
+            left: '8px',
+            right: '8px',
+            zIndex: 9999,
+            height: '64px',
+            borderRadius: '20px',
+            transform: 'translate3d(0, 0, 0)',
+            WebkitTransform: 'translate3d(0, 0, 0)',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            isolation: 'isolate',
+            pointerEvents: 'auto',
+          } : {
+            // Desktop: Full styles
+            left: '24px',
+            right: '24px',
+            top: '8px',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            WebkitTransformStyle: 'preserve-3d',
+            transformStyle: 'preserve-3d',
+            WebkitPerspective: '1000px',
+            perspective: '1000px',
+          })
         }}
         role="banner"
         aria-label="TwinForge Pont de Commandement"
@@ -100,8 +112,8 @@ export const Header = React.memo(() => {
                   toggle('centralMenu');
                 }
               }}
-              whileHover={isMobile ? {} : { scale: 1.05 }}
-              whileTap={isMobile ? {} : { scale: 0.98 }}
+              whileHover={isMobile ? undefined : { scale: 1.05 }}
+              whileTap={isMobile ? undefined : { scale: 0.98 }}
             >
               {/* Carrés tournants aux 4 coins - Désactivés sur mobile */}
               {!isMobile && [0, 1, 2, 3].map((i) => (
@@ -249,8 +261,8 @@ export const Header = React.memo(() => {
                   setDrawer(true);
                 }
               }}
-              whileHover={isMobile ? {} : { scale: 1.05 }}
-              whileTap={isMobile ? {} : { scale: 0.98 }}
+              whileHover={isMobile ? undefined : { scale: 1.05 }}
+              whileTap={isMobile ? undefined : { scale: 0.98 }}
             >
               <SpatialIcon
                 Icon={ICONS.Menu}
