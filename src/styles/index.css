@@ -67,6 +67,8 @@
 @import './components/chat-messages.css';
 @import './components/chat-input-typing.css';
 @import './components/chat-notification-bubble.css';
+@import './components/floating-voice-coach-button.css';
+@import './components/voice-coach-panel.css';
 @import './components/training-coach-notification.css';
 @import './components/training-loader.css';
 @import './components/training-prescription-card-mobile.css';

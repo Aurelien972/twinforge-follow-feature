@@ -19,8 +19,8 @@ import Sidebar from './shell/Sidebar';
 import NewMobileBottomBar from './shell/NewMobileBottomBar';
 import GlobalExitModal from '../ui/components/GlobalExitModal';
 import CentralActionsMenu from './shell/CentralActionsMenu';
-import FloatingChatButton from '../ui/components/chat/FloatingChatButton';
-import GlobalChatDrawer from '../ui/components/chat/GlobalChatDrawer';
+import FloatingVoiceCoachButton from '../ui/components/chat/FloatingVoiceCoachButton';
+import VoiceCoachPanel from '../ui/components/chat/VoiceCoachPanel';
 import { ChatButtonProvider, useChatButtonRef } from '../system/context/ChatButtonContext';
 
 function AppContent() {
@@ -261,9 +261,9 @@ function AppContent() {
         onClose={close}
       />
 
-      {/* Global Chat System */}
-      <FloatingChatButton ref={chatButtonRef} />
-      <GlobalChatDrawer chatButtonRef={chatButtonRef} />
+      {/* Voice Coach System */}
+      <FloatingVoiceCoachButton ref={chatButtonRef} />
+      <VoiceCoachPanel />
     </div>
   );
 }
