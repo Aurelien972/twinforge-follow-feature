@@ -1,0 +1,249 @@
+/**
+ * MOBILE NO BLUR - CRITICAL
+ *
+ * Replace ALL backdrop-blur with solid opaque backgrounds on mobile
+ * backdrop-blur is EXTREMELY GPU intensive and causes lag
+ *
+ * Applied to .mobile-device class
+ */
+
+/* =========================================
+   GLOBAL BACKDROP BLUR KILL
+   ========================================= */
+
+.mobile-device *,
+.mobile-device *::before,
+.mobile-device *::after {
+  /* KILL ALL BACKDROP FILTERS */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   GLASS CARDS - Solid backgrounds
+   ========================================= */
+
+.mobile-device .glass-card,
+.mobile-device .glass-base,
+.mobile-device .glass-card-cta,
+.mobile-device [class*="glass-"] {
+  /* Replace transparent glass with solid dark background */
+  background: #0F1927 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Keep simple border */
+  border-color: rgba(255, 255, 255, 0.1) !important;
+
+  /* Simple shadow instead of complex glows */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Remove pseudo-element effects */
+.mobile-device .glass-card::before,
+.mobile-device .glass-card::after,
+.mobile-device .glass-card-cta::before,
+.mobile-device .glass-card-cta::after {
+  display: none !important;
+}
+
+/* =========================================
+   HEADER - Solid background
+   ========================================= */
+
+.mobile-device header,
+.mobile-device .header-liquid-glass,
+.mobile-device [class*="header"] {
+  /* Solid background instead of blur */
+  background: rgba(15, 25, 39, 0.95) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Simple shadow */
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* =========================================
+   BOTTOM BAR - Solid background
+   ========================================= */
+
+.mobile-device .new-mobile-bottom-bar,
+.mobile-device [class*="bottom-bar"],
+.mobile-device nav[aria-label*="mobile"] {
+  background: rgba(15, 25, 39, 0.95) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* =========================================
+   SIDEBAR/DRAWER - Solid background
+   ========================================= */
+
+.mobile-device .sidebar,
+.mobile-device .mobile-drawer,
+.mobile-device [class*="drawer"],
+.mobile-device [role="dialog"] {
+  background: rgba(15, 25, 39, 0.98) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   MODALS/OVERLAYS - Solid backgrounds
+   ========================================= */
+
+.mobile-device [class*="modal"],
+.mobile-device [class*="overlay"],
+.mobile-device [role="alertdialog"] {
+  background: rgba(15, 25, 39, 0.98) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Modal backdrop - solid dark */
+.mobile-device [class*="backdrop"],
+.mobile-device [class*="overlay"]::before {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   TOOLTIPS/POPOVERS - Solid backgrounds
+   ========================================= */
+
+.mobile-device [role="tooltip"],
+.mobile-device [class*="tooltip"],
+.mobile-device [class*="popover"] {
+  background: #1A2332 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   BUTTONS - Solid backgrounds
+   ========================================= */
+
+.mobile-device button,
+.mobile-device [role="button"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Glass buttons get solid backgrounds */
+.mobile-device button[class*="glass"],
+.mobile-device [class*="glass-button"] {
+  background: rgba(30, 40, 55, 0.9) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   FLOATING ELEMENTS - Solid backgrounds
+   ========================================= */
+
+.mobile-device [class*="floating"],
+.mobile-device [class*="fab"],
+.mobile-device .floating-chat-button,
+.mobile-device .floating-voice-coach-button {
+  background: rgba(247, 147, 30, 0.95) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   CHAT/VOICE COMPONENTS - Solid backgrounds
+   ========================================= */
+
+.mobile-device .voice-coach-panel,
+.mobile-device .global-chat-drawer,
+.mobile-device [class*="chat-"] {
+  background: #0F1927 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   CARDS WITH TRANSPARENCY - Make opaque
+   ========================================= */
+
+.mobile-device [class*="card-"] {
+  background: #0F1927 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   GENERIC BLUR REMOVAL
+   ========================================= */
+
+.mobile-device [style*="backdrop-filter"],
+.mobile-device [style*="-webkit-backdrop-filter"],
+.mobile-device [style*="blur("] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* =========================================
+   SHEEN/SPOTLIGHT EFFECTS - Remove
+   ========================================= */
+
+.mobile-device .glass-sheen,
+.mobile-device [class*="sheen"],
+.mobile-device [class*="spotlight"] {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* =========================================
+   PERFORMANCE MODE + MOBILE = Ultra solid
+   ========================================= */
+
+.mobile-device.performance-mode * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* =========================================
+   FALLBACK: Media query based
+   ========================================= */
+
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+  /* Kill all backdrop filters */
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Make glass elements opaque */
+  [class*="glass-"] {
+    background: #0F1927 !important;
+  }
+
+  /* Solid header */
+  header {
+    background: rgba(15, 25, 39, 0.95) !important;
+  }
+
+  /* Solid bottom bar */
+  nav[aria-label*="mobile"] {
+    background: rgba(15, 25, 39, 0.95) !important;
+  }
+}
+
+/* =========================================
+   LOW-END DEVICES: Extra safety
+   ========================================= */
+
+@media (max-width: 480px) {
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+  }
+}

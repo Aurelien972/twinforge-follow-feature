@@ -1,0 +1,270 @@
+/**
+ * MOBILE ZERO ANIMATIONS - CRITICAL
+ *
+ * This file KILLS ALL animations on mobile devices
+ * Applied via .mobile-device class added by DeviceProvider
+ *
+ * Goal: 60fps scroll on iPhone 14 Pro Max
+ */
+
+/* =========================================
+   GLOBAL ANIMATION KILL SWITCH
+   Target: .mobile-device class
+   ========================================= */
+
+.mobile-device *,
+.mobile-device *::before,
+.mobile-device *::after {
+  /* KILL ALL ANIMATIONS */
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 0 !important;
+
+  /* KILL ALL TRANSITIONS except tap feedback */
+  transition: none !important;
+
+  /* KILL ALL TRANSFORMS except tap feedback */
+  transform: none !important;
+  transform-style: flat !important;
+
+  /* KILL GPU ACCELERATION HINTS */
+  will-change: auto !important;
+
+  /* KILL PERSPECTIVE */
+  perspective: none !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+}
+
+/* =========================================
+   EXCEPTION: Minimal tap feedback ONLY
+   ========================================= */
+
+.mobile-device *:active {
+  transform: scale(0.98) !important;
+  transition: transform 0.08s ease-out !important;
+}
+
+/* =========================================
+   EXCEPTION: Essential loaders/spinners
+   ========================================= */
+
+.mobile-device .loader-essential,
+.mobile-device [class*="spinner"],
+.mobile-device [aria-busy="true"] > [class*="spin"] {
+  animation: spin-simple 2s linear infinite !important;
+}
+
+@keyframes spin-simple {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* =========================================
+   KILL SPECIFIC ANIMATION CLASSES
+   ========================================= */
+
+.mobile-device .breathing-icon,
+.mobile-device .icon-pulse-css,
+.mobile-device .icon-breathing-css,
+.mobile-device .particle-css,
+.mobile-device [class*="breathing"],
+.mobile-device [class*="pulse"],
+.mobile-device [class*="glow"],
+.mobile-device [class*="shimmer"],
+.mobile-device [class*="float"],
+.mobile-device [class*="bounce"],
+.mobile-device [class*="fade"],
+.mobile-device [class*="slide"],
+.mobile-device [class*="zoom"] {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* =========================================
+   KILL FRAMER MOTION ANIMATIONS
+   ========================================= */
+
+.mobile-device [data-framer-motion],
+.mobile-device [style*="transform:"],
+.mobile-device [style*="opacity:"] {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Reset inline transform styles from Framer Motion */
+.mobile-device [data-framer-motion] {
+  transform: none !important;
+}
+
+/* =========================================
+   KILL SCROLL REVEAL ANIMATIONS
+   ========================================= */
+
+.mobile-device .glass-card-scroll-reveal,
+.mobile-device [data-scroll-reveal],
+.mobile-device [data-scroll-visible],
+.mobile-device [data-scroll-active] {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+/* =========================================
+   KILL HOVER EFFECTS (useless on mobile)
+   ========================================= */
+
+.mobile-device *:hover {
+  transform: none !important;
+  filter: none !important;
+  box-shadow: inherit !important;
+}
+
+/* =========================================
+   KILL CSS FILTERS (GPU intensive)
+   ========================================= */
+
+.mobile-device [style*="filter:"],
+.mobile-device [class*="blur"],
+.mobile-device [class*="saturate"],
+.mobile-device [class*="brightness"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* =========================================
+   KILL BOX-SHADOW ANIMATIONS
+   ========================================= */
+
+.mobile-device [class*="shadow-"],
+.mobile-device [style*="box-shadow"] {
+  /* Keep simple shadow, remove animated ones */
+  animation: none !important;
+  transition: none !important;
+}
+
+/* =========================================
+   KILL GRADIENT ANIMATIONS
+   ========================================= */
+
+.mobile-device [style*="background-position"],
+.mobile-device [class*="gradient-animated"] {
+  animation: none !important;
+  background-position: 0 0 !important;
+}
+
+/* =========================================
+   KILL PARTICLE EFFECTS
+   ========================================= */
+
+.mobile-device [class*="particle"],
+.mobile-device [class*="spark"],
+.mobile-device [class*="ember"] {
+  display: none !important;
+}
+
+/* =========================================
+   KILL CIRCUIT ANIMATIONS
+   ========================================= */
+
+.mobile-device [class*="circuit"],
+.mobile-device [class*="forge-glow"],
+.mobile-device [class*="cosmic"] {
+  animation: none !important;
+  filter: none !important;
+  opacity: 0.6 !important;
+}
+
+/* =========================================
+   KILL HEADER/NAV ANIMATIONS
+   ========================================= */
+
+.mobile-device header *,
+.mobile-device nav *,
+.mobile-device .sidebar *,
+.mobile-device .bottom-bar * {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+/* Exception: tap feedback only */
+.mobile-device header *:active,
+.mobile-device nav *:active {
+  transform: scale(0.98) !important;
+  transition: transform 0.08s ease-out !important;
+}
+
+/* =========================================
+   KILL MODAL/DRAWER ANIMATIONS
+   ========================================= */
+
+.mobile-device [role="dialog"],
+.mobile-device [class*="modal"],
+.mobile-device [class*="drawer"],
+.mobile-device [class*="overlay"] {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* =========================================
+   KILL TOAST/NOTIFICATION ANIMATIONS
+   ========================================= */
+
+.mobile-device [role="alert"],
+.mobile-device [class*="toast"],
+.mobile-device [class*="notification"] {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* =========================================
+   PERFORMANCE MODE + MOBILE = ULTRA STATIC
+   ========================================= */
+
+.mobile-device.performance-mode * {
+  /* Double kill for extra safety */
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  will-change: auto !important;
+}
+
+/* =========================================
+   FALLBACK: Media query based kill switch
+   In case class is not applied for some reason
+   ========================================= */
+
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+  * {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+  }
+
+  /* Keep tap feedback */
+  *:active {
+    transform: scale(0.98) !important;
+    transition: transform 0.08s ease-out !important;
+  }
+
+  /* Keep essential loaders */
+  .loader-essential {
+    animation: spin-simple 2s linear infinite !important;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION: Honor user preference
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
