@@ -9,6 +9,8 @@ import { useOverlayStore } from '../../system/store/overlayStore';
 import { useGlobalChatStore } from '../../system/store/globalChatStore';
 import { Haptics } from '../../utils/haptics';
 import CentralActionsMenu from './CentralActionsMenu';
+import { useScrollDirection } from '../../hooks/useScrollDirection';
+import { useIsMobile } from '../../system/device/DeviceProvider';
 
 /**
  * Configuration des boutons de la nouvelle barre inférieure
@@ -121,6 +123,11 @@ const NewMobileBottomBar: React.FC = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { close } = useOverlayStore();
+  const isMobile = useIsMobile();
+  const { isScrollingDown } = useScrollDirection({ threshold: 10 });
+
+  // Sur desktop, cacher la bottom bar quand on scroll vers le bas
+  const shouldHideBottomBar = !isMobile && isScrollingDown;
 
   const handleButtonClick = (button: typeof BOTTOM_BAR_BUTTONS[0]) => {
     if (button.route) {
@@ -140,7 +147,7 @@ const NewMobileBottomBar: React.FC = () => {
         aria-label="Navigation principale mobile"
         style={{
           position: 'fixed',
-          bottom: 'max(4px, env(safe-area-inset-bottom, 2px))',
+          bottom: shouldHideBottomBar ? '-100px' : 'max(4px, env(safe-area-inset-bottom, 2px))',
           left: '8px',
           right: '8px',
           zIndex: 9996,
@@ -150,6 +157,7 @@ const NewMobileBottomBar: React.FC = () => {
           backfaceVisibility: 'hidden',
           WebkitBackfaceVisibility: 'hidden',
           pointerEvents: 'auto',
+          transition: 'bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         <div className="new-mobile-bottom-bar-container">
