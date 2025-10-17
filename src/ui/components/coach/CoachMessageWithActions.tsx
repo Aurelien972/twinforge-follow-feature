@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
 import { useFeedback } from '../../../hooks/useFeedback';
+import { Haptics } from '../../../utils/haptics';
 
 export interface CTAButton {
   id: string;
@@ -32,10 +33,11 @@ const CoachMessageWithActions: React.FC<CoachMessageWithActionsProps> = ({
   stepColor,
   className = ''
 }) => {
-  const { triggerHaptic } = useFeedback();
+  const { click } = useFeedback();
 
   const handleClick = (buttonId: string) => {
-    triggerHaptic('light');
+    click();
+    Haptics.tap();
     onButtonClick(buttonId);
   };
 

@@ -10,6 +10,7 @@ import { ICONS } from '../../icons/registry';
 import { FEEDBACK_BUTTONS, FEEDBACK_CATEGORIES } from '../../../config/feedbackButtonsConfig';
 import type { FeedbackCategory } from '../../../domain/coachChat';
 import { useFeedback } from '../../../hooks/useFeedback';
+import { Haptics } from '../../../utils/haptics';
 
 interface FeedbackPanelProps {
   onFeedbackSelect: (category: FeedbackCategory, message: string) => void;
@@ -25,11 +26,12 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   onToggleExpand
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { triggerHaptic } = useFeedback();
+  const { click } = useFeedback();
 
   const handleFeedbackClick = (button: typeof FEEDBACK_BUTTONS[0]) => {
     onFeedbackSelect(button.id, button.message);
-    triggerHaptic('medium');
+    click();
+    Haptics.press();
 
     setTimeout(() => {
       if (onToggleExpand) {

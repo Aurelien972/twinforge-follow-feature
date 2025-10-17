@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
 import { useFeedback } from '../../../hooks/useFeedback';
+import { Haptics } from '../../../utils/haptics';
 
 interface ChatInputBarProps {
   onSendMessage: (message: string) => void;
@@ -37,7 +38,7 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const { triggerHaptic } = useFeedback();
+  const { click } = useFeedback();
 
   useEffect(() => {
     if (inputRef.current) {
@@ -50,7 +51,8 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
     if (message.trim() && !disabled) {
       onSendMessage(message.trim());
       setMessage('');
-      triggerHaptic('light');
+      click();
+      Haptics.tap();
       if (inputRef.current) {
         inputRef.current.style.height = 'auto';
       }
@@ -70,7 +72,8 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
     } else {
       onStartVoiceRecording();
     }
-    triggerHaptic('medium');
+    click();
+    Haptics.press();
   };
 
   return (
