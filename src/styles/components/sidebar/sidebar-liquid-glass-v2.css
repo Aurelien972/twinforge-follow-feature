@@ -531,6 +531,59 @@
   min-height: auto;
 }
 
+/* Mobile performance - Disable all animations and effects */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  /* CRITICAL: Disable ALL animations on sidebar for mobile */
+  .sidebar-glass-enhanced,
+  .sidebar-glass-enhanced::before,
+  .sidebar-glass-enhanced::after,
+  .sidebar-item,
+  .sidebar-item::before,
+  .sidebar-item::after,
+  .sidebar-item-icon-container,
+  .sidebar-item-icon,
+  .sidebar-item-label,
+  .sidebar-item-subtitle,
+  .sidebar-submenu,
+  .sidebar-submenu-item,
+  .sidebar-submenu-item-icon-container,
+  .sidebar-expand-button,
+  .sidebar-expand-icon {
+    animation: none !important;
+    transition: none !important;
+    will-change: auto !important;
+    transform: none !important;
+  }
+
+  /* Disable all hover and active effects on mobile */
+  .sidebar-item:hover,
+  .sidebar-item:active,
+  .sidebar-item:hover .sidebar-item-icon-container,
+  .sidebar-item:active .sidebar-item-icon-container,
+  .sidebar-submenu-item:hover,
+  .sidebar-submenu-item:active,
+  .sidebar-submenu-item:hover .sidebar-item-icon-container,
+  .sidebar-expand-button:hover,
+  .sidebar-expand-button:active {
+    transform: none !important;
+    box-shadow: none !important;
+    background: initial !important;
+    scale: 1 !important;
+  }
+
+  /* Disable border animations */
+  .sidebar-glass-enhanced::before {
+    animation: none !important;
+    opacity: 0.6 !important;
+  }
+
+  /* Disable glow animations */
+  .sidebar-glass-enhanced::after {
+    animation: none !important;
+    opacity: 0.4 !important;
+  }
+}
+
 /* Responsive adjustments - CORRECTIONS MOBILES */
 @media (max-width: 1024px) {
   .sidebar-content {
@@ -639,15 +692,15 @@
 
   .sidebar-item-icon,
   .sidebar-item-label {
-    transition: color 0.2s ease;
+    transition: none !important;
   }
 
   .sidebar-submenu {
-    transition: grid-template-rows 0.2s ease, opacity 0.2s ease;
+    transition: none !important;
   }
 
   .sidebar-expand-icon {
-    transition: transform 0.2s ease;
+    transition: none !important;
   }
 
   .sidebar-submenu-item:hover {
@@ -721,6 +774,17 @@
   grid-template-rows: 1fr;
   opacity: 1;
   margin-top: 0.125rem;
+}
+
+/* Mobile - Disable submenu animations completely */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .sidebar-submenu {
+    transition: none !important;
+  }
+
+  .sidebar-submenu--expanded {
+    transition: none !important;
+  }
 }
 
 /* Inner wrapper for grid-based animation */

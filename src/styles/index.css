@@ -132,6 +132,11 @@
 @import './utilities/debug.css';
 
 /* =========================================
+   PHASE 11: MOBILE PERFORMANCE (CRITICAL - MUST BE LAST)
+   ========================================= */
+@import './optimizations/mobile-performance-strict.css';
+
+/* =========================================
    ENFORCEMENT GLOBAL - ÉLÉMENTS CRITIQUES
    Positionnement fixe pour les éléments flottants
    ========================================= */

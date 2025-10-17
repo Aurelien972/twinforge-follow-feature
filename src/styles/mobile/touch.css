@@ -45,11 +45,38 @@ input[type="submit"],input[type="button"]{
   touch-action:manipulation;
 }
 
-/* CRITICAL: Ensure body and main containers allow scroll */
+/* CRITICAL: Ensure body and main containers allow scroll WITHOUT animations */
 body, #root, [class*="route-container"], main {
   touch-action: pan-y pinch-zoom !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior-y: auto !important;
+}
+
+/* Mobile - Disable all will-change on scrollable elements */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  body,
+  #root,
+  [class*="route-container"],
+  main,
+  .sidebar-content,
+  [class*="scroll"],
+  [class*="overflow"] {
+    will-change: auto !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* Disable animations on scroll */
+  * {
+    animation-play-state: paused !important;
+  }
+
+  /* Re-enable only essential animations */
+  .loader-essential,
+  [class*="spinner"],
+  [class*="loading"] {
+    animation-play-state: running !important;
+  }
 }
 
 /* Expansion halos */
@@ -122,31 +149,24 @@ body, #root, [class*="route-container"], main {
   }
 }
 
-/* Mobile feedback for glass cards - FORGE HAMMER IMPACT REDUIT */
+/* Mobile feedback for glass cards - COMPLETELY DISABLED */
 @media (max-width:640px), (hover: none), (pointer: coarse){
-  /* Désactiver complètement les effets hover sur mobile */
-  .glass-card:hover{
+  /* Désactiver complètement TOUS les effets sur mobile */
+  .glass-card:hover,
+  .glass-card:active {
     background: initial !important;
     transform: none !important;
     box-shadow: none !important;
+    opacity: 1 !important;
+    scale: 1 !important;
+    transition: none !important;
   }
 
-  /* Lueur orange réduite uniquement au tap sur mobile */
-  .glass-card:active{
-    background:
-      radial-gradient(circle at center,
-        var(--color-ember-copper,#FF7A45) 6%,
-        rgba(255, 122, 69, 0.3) 20%,
-        transparent 60%
-      ),
-      rgba(255,255,255,.12) !important;
-    transform:scale(.98) translateZ(0) !important;
-    box-shadow:
-      inset 0 2px 6px rgba(0,0,0,.25) !important,
-      0 0 15px rgba(255, 122, 69, 0.4) !important,
-      0 0 30px rgba(255, 122, 69, 0.2) !important;
-    opacity:.95 !important;
-    transition:all 80ms ease-out !important;
+  /* Supprimer tous les pseudo-éléments d'animation */
+  .glass-card::before,
+  .glass-card::after {
+    display: none !important;
+    animation: none !important;
   }
   .tab-content{
     max-height:calc(100vh - var(--header-height,80px) - var(--tabs-height,60px));
@@ -170,11 +190,18 @@ body, #root, [class*="route-container"], main {
     padding-right:0 !important;
   }
 
-  /* Ensure body can scroll */
+  /* Ensure body can scroll WITHOUT flickering */
   body {
     overflow-y: auto !important;
     touch-action: pan-y pinch-zoom !important;
     -webkit-overflow-scrolling: touch !important;
+    will-change: auto !important;
+    transform: none !important;
+  }
+
+  /* Disable all transforms and animations during scroll */
+  body *:not(.loader-essential):not([class*="spinner"]):not([class*="loading"]) {
+    will-change: auto !important;
   }
 
   /* IMPORTANT: garder les particules actives et visibles sur mobile */
@@ -226,6 +253,21 @@ body, #root, [class*="route-container"], main {
 }
 .touch-scroll-optimized::-webkit-scrollbar-thumb:active{ background:rgba(255,255,255,.3); }
 
+/* Mobile - Disable scroll-linked animations */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .touch-scroll-optimized {
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable position: fixed animations during scroll */
+  [style*="position: fixed"],
+  .fixed,
+  [class*="fixed"] {
+    will-change: auto !important;
+    transform: none !important;
+  }
+}
+
 /* Ripple */
 .touch-ripple{ position:relative; overflow:hidden; }
 .touch-ripple::before{
@@ -258,10 +300,17 @@ body, #root, [class*="route-container"], main {
   }
 }
 
-/* Désactiver les sparks sur mobile pour performance */
+/* Désactiver TOUS les effets visuels sur mobile pour performance */
 @media (max-width: 640px), (hover: none), (pointer: coarse) {
-  .glass-card::before{
+  .glass-card::before,
+  .glass-card::after,
+  button::before,
+  button::after,
+  [role="button"]::before,
+  [role="button"]::after {
     display: none !important;
+    opacity: 0 !important;
+    animation: none !important;
   }
 }
 

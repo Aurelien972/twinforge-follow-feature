@@ -192,7 +192,7 @@
    ========================================= */
 
 @media (max-width: 768px), (hover: none), (pointer: coarse) {
-  /* CRITICAL: Disable icon animations on mobile and touch devices */
+  /* CRITICAL: Disable ALL animations and effects on mobile and touch devices */
   .spatial-icon,
   .icon-container,
   .breathing-icon,
@@ -200,22 +200,44 @@
   .icon-breathing-css,
   .breathing-glow,
   .particle-float,
-  .particle-css {
+  .particle-css,
+  button,
+  [role="button"],
+  .glass-card,
+  .sidebar-item,
+  .sidebar-item-icon-container,
+  .nav-item,
+  .hover-lift {
     animation: none !important;
-    transform: translateZ(0) !important;
+    transform: none !important;
     transition: none !important;
-    opacity: 0.9 !important;
+    will-change: auto !important;
   }
 
-  /* Désactiver complètement hover sur mobile */
+  /* Désactiver complètement hover et active states sur mobile */
   .spatial-icon:hover,
+  .spatial-icon:active,
   .icon-container:hover,
-  .hover-lift:hover {
+  .icon-container:active,
+  .hover-lift:hover,
+  .hover-lift:active,
+  button:hover,
+  button:active,
+  .glass-card:hover,
+  .glass-card:active {
     transform: none !important;
     box-shadow: none !important;
+    background: initial !important;
+    scale: 1 !important;
+    filter: none !important;
   }
 
-  .spatial-icon:hover::after {
+  .spatial-icon:hover::after,
+  .spatial-icon:active::after,
+  .spatial-icon:hover::before,
+  .spatial-icon:active::before,
+  .icon-container::before,
+  .icon-container::after {
     opacity: 0 !important;
     display: none !important;
   }

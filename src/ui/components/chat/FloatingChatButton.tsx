@@ -129,7 +129,7 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
         transform: 'translateZ(0)'
       }}
       initial={false}
-      whileHover={{
+      whileHover={isDesktop ? {
         scale: 1.08,
         boxShadow: `
           var(--liquid-pill-shadow),
@@ -140,11 +140,11 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
           duration: 0.25,
           ease: [0.16, 1, 0.3, 1]
         }
-      }}
-      whileTap={{
+      } : {}}
+      whileTap={isDesktop ? {
         scale: 0.92,
         transition: { duration: 0.15 }
-      }}
+      } : {}}
       aria-label={isOpen ? 'Fermer le chat' : 'Ouvrir le chat'}
       aria-expanded={isOpen}
     >
@@ -165,8 +165,8 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
 
       {/* Icon with mode color */}
       <motion.div
-        animate={{ rotate: isOpen ? 180 : 0 }}
-        transition={{ duration: 0.3 }}
+        animate={isDesktop ? { rotate: isOpen ? 180 : 0 } : {}}
+        transition={isDesktop ? { duration: 0.3 } : { duration: 0 }}
         className="button-icon"
         style={{
           display: 'flex',
