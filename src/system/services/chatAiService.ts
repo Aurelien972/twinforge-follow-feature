@@ -219,6 +219,14 @@ class ChatAIService {
               if (content) {
                 chunkCount++;
                 totalContent += content;
+
+                logger.info('CHAT_AI_SERVICE', '🔥 CALLING onChunk with content', {
+                  requestId,
+                  chunkNumber: chunkCount,
+                  contentLength: content.length,
+                  contentPreview: content.substring(0, 50)
+                });
+
                 onChunk(content);
 
                 if (chunkCount <= 3) {
@@ -230,7 +238,7 @@ class ChatAIService {
                   });
                 }
               } else if (chunkCount < 3) {
-                logger.debug('CHAT_AI_SERVICE', 'No content in chunk', {
+                logger.warn('CHAT_AI_SERVICE', '❌ NO CONTENT in chunk', {
                   requestId,
                   parsed: JSON.stringify(parsed).substring(0, 200)
                 });
