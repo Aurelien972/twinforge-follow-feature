@@ -1,0 +1,346 @@
+/**
+ * MOBILE ZERO EFFECTS - GLOBAL ENFORCEMENT
+ *
+ * This file ELIMINATES ALL visual effects on mobile for maximum performance
+ * Applied via .mobile-device class AND media queries (belt and suspenders)
+ *
+ * Goal: 60fps scroll, zero flickering, instant interactions
+ */
+
+/* =========================================
+   CRITICAL: TOTAL ANIMATION ELIMINATION
+   Every selector that could possibly animate
+   ========================================= */
+
+.mobile-device *,
+.mobile-device *::before,
+.mobile-device *::after {
+  /* Kill all animations globally */
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+}
+
+/* Media query fallback if DeviceProvider fails */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  *:not(.loader-essential):not([class*="spinner"]):not([aria-busy="true"] *),
+  *:not(.loader-essential):not([class*="spinner"])::before,
+  *:not(.loader-essential):not([class*="spinner"])::after {
+    animation: none !important;
+    animation-duration: 0s !important;
+  }
+}
+
+/* =========================================
+   FRAMER MOTION - COMPLETE DISABLE
+   ========================================= */
+
+.mobile-device [data-framer-motion],
+.mobile-device [data-framer-component-type] {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  [data-framer-motion],
+  [data-framer-component-type] {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* =========================================
+   SHIMMER EFFECTS - KILL COMPLETELY
+   ========================================= */
+
+.mobile-device [class*="shimmer"],
+.mobile-device [class*="shimmer"]::before,
+.mobile-device [class*="shimmer"]::after,
+.mobile-device .glass-shimmer,
+.mobile-device .glass-shimmer::before,
+.mobile-device .active-exercise-shimmer {
+  animation: none !important;
+  opacity: 0 !important;
+  display: none !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  [class*="shimmer"],
+  [class*="shimmer"]::before,
+  [class*="shimmer"]::after,
+  .glass-shimmer,
+  .glass-shimmer::before {
+    animation: none !important;
+    opacity: 0 !important;
+    display: none !important;
+  }
+}
+
+/* =========================================
+   PULSE/BREATHING EFFECTS - TOTAL REMOVAL
+   ========================================= */
+
+.mobile-device [class*="pulse"],
+.mobile-device [class*="breathing"],
+.mobile-device [class*="glow"],
+.mobile-device .breathing-glow,
+.mobile-device .breathing-icon {
+  animation: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  [class*="pulse"],
+  [class*="breathing"],
+  [class*="glow"],
+  .breathing-glow,
+  .breathing-icon {
+    animation: none !important;
+    filter: none !important;
+  }
+}
+
+/* =========================================
+   SKELETON LOADERS - STATIC ON MOBILE
+   ========================================= */
+
+.mobile-device .skeleton-shimmer,
+.mobile-device .skeleton-wave,
+.mobile-device .skeleton-pulse,
+.mobile-device [class*="skeleton"]::before,
+.mobile-device [class*="skeleton"]::after {
+  animation: none !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .skeleton-shimmer,
+  .skeleton-wave,
+  .skeleton-pulse,
+  [class*="skeleton"]::before,
+  [class*="skeleton"]::after {
+    animation: none !important;
+  }
+}
+
+/* =========================================
+   PARTICLES & DECORATIVE ELEMENTS
+   ========================================= */
+
+.mobile-device [class*="particle"],
+.mobile-device [class*="spark"],
+.mobile-device [class*="ember"],
+.mobile-device [class*="float"],
+.mobile-device [class*="drift"] {
+  animation: none !important;
+  opacity: 0 !important;
+  display: none !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  [class*="particle"],
+  [class*="spark"],
+  [class*="ember"],
+  [class*="float"],
+  [class*="drift"] {
+    animation: none !important;
+    opacity: 0 !important;
+    display: none !important;
+  }
+}
+
+/* =========================================
+   HEADER DECORATIVE ANIMATIONS
+   ========================================= */
+
+.mobile-device .header-corner-square,
+.mobile-device .header-liquid-glass::before,
+.mobile-device .header-liquid-glass::after {
+  animation: none !important;
+  opacity: 0 !important;
+  display: none !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .header-corner-square {
+    animation: none !important;
+    opacity: 0 !important;
+    display: none !important;
+  }
+}
+
+/* =========================================
+   GLASS CARD EFFECTS - REMOVE PSEUDO-ELEMENTS
+   ========================================= */
+
+.mobile-device .glass-card::before,
+.mobile-device .glass-card::after,
+.mobile-device [class*="glass-card"]::before,
+.mobile-device [class*="glass-card"]::after {
+  display: none !important;
+  animation: none !important;
+  opacity: 0 !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .glass-card::before,
+  .glass-card::after,
+  [class*="glass-card"]::before,
+  [class*="glass-card"]::after {
+    display: none !important;
+    animation: none !important;
+  }
+}
+
+/* =========================================
+   HOVER STATES - DISABLE ON MOBILE
+   ========================================= */
+
+.mobile-device *:hover {
+  transform: none !important;
+  scale: 1 !important;
+  filter: none !important;
+  box-shadow: initial !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  *:hover {
+    transform: none !important;
+    scale: 1 !important;
+  }
+}
+
+/* =========================================
+   TRANSITIONS - INSTANT ON MOBILE
+   ========================================= */
+
+.mobile-device * {
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+/* Exception: Keep minimal transitions for modals/drawers */
+.mobile-device [role="dialog"],
+.mobile-device [class*="modal"],
+.mobile-device [class*="drawer"] {
+  transition-duration: 0.15s !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  *:not([role="dialog"]):not([class*="modal"]):not([class*="drawer"]) {
+    transition-duration: 0s !important;
+  }
+}
+
+/* =========================================
+   WILL-CHANGE - DISABLE ON STATIC ELEMENTS
+   ========================================= */
+
+.mobile-device *:not(.overflow-y-auto):not(.overflow-auto):not([class*="scroll"]) {
+  will-change: auto !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  * {
+    will-change: auto !important;
+  }
+
+  /* Exception: scrollable elements */
+  .overflow-y-auto,
+  .overflow-auto,
+  [class*="scroll"] {
+    will-change: scroll-position !important;
+  }
+}
+
+/* =========================================
+   TRANSFORMS - STATIC ON MOBILE
+   ========================================= */
+
+.mobile-device *:not([class*="fixed"]):not(.header-liquid-glass):not(.new-mobile-bottom-bar) {
+  transform: none !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  *:not([class*="fixed"]):not(.header-liquid-glass):not(.new-mobile-bottom-bar):not([class*="modal"]):not([class*="drawer"]) {
+    transform: none !important;
+  }
+}
+
+/* =========================================
+   TAP FEEDBACK - INSTANT ONLY
+   ========================================= */
+
+.mobile-device button:active,
+.mobile-device [role="button"]:active {
+  transform: scale(0.98) translateZ(0) !important;
+  transition: transform 0.05s ease-out !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  button:active,
+  [role="button"]:active {
+    transform: scale(0.98) translateZ(0) !important;
+    transition: transform 0.05s ease-out !important;
+  }
+}
+
+/* =========================================
+   ESSENTIAL LOADERS ONLY
+   ========================================= */
+
+.mobile-device .loader-essential,
+.mobile-device [class*="spinner"][aria-busy="true"],
+.mobile-device [class*="loading"][aria-busy="true"] {
+  animation: spin-simple 2s linear infinite !important;
+}
+
+@keyframes spin-simple {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .loader-essential,
+  [class*="spinner"][aria-busy="true"],
+  [class*="loading"][aria-busy="true"] {
+    animation: spin-simple 2s linear infinite !important;
+  }
+}
+
+/* =========================================
+   SCROLL REVEAL - INSTANT ON MOBILE
+   ========================================= */
+
+.mobile-device [data-scroll-reveal],
+.mobile-device .glass-card-scroll-reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  [data-scroll-reveal],
+  .glass-card-scroll-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION - HONOR USER PREFERENCE
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

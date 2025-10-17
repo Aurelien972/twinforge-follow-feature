@@ -3,7 +3,7 @@
  * VisionOS 26 inspired skeleton animations optimized for mobile
  */
 
-/* Base skeleton shimmer effect - DISABLED ON MOBILE */
+/* Base skeleton shimmer effect */
 .skeleton-shimmer {
   background: linear-gradient(
     90deg,
@@ -13,6 +13,25 @@
   );
   background-size: 200% 100%;
   animation: shimmer 2s ease-in-out infinite;
+}
+
+/* MOBILE: Disable all skeleton animations */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .skeleton-shimmer,
+  .animate-pulse-subtle,
+  .skeleton-glow,
+  .skeleton-glow::after {
+    animation: none !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+  }
+}
+
+.mobile-device .skeleton-shimmer,
+.mobile-device .animate-pulse-subtle,
+.mobile-device .skeleton-glow,
+.mobile-device .skeleton-glow::after {
+  animation: none !important;
+  background: rgba(255, 255, 255, 0.06) !important;
 }
 
 @keyframes shimmer {

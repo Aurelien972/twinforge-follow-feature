@@ -384,13 +384,62 @@
   }
 }
 
+/* =========================================
+   MOBILE OPTIMIZATIONS - DISABLE ANIMATIONS
+   ========================================= */
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  /* Disable border pulse animation on mobile */
+  .new-mobile-bottom-bar-container::before {
+    animation: none !important;
+    opacity: 0.6 !important;
+  }
+
+  /* Disable glow animation on mobile */
+  .new-mobile-bottom-bar-container::after {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+
+  /* Disable active pulse animation */
+  .new-bottom-bar-icon-container--active {
+    animation: none !important;
+  }
+
+  /* Instant transitions on mobile */
+  .new-bottom-bar-button,
+  .new-bottom-bar-icon-container {
+    transition: none !important;
+  }
+}
+
+/* Mobile device class enforcement */
+.mobile-device .new-mobile-bottom-bar-container::before {
+  animation: none !important;
+  opacity: 0.6 !important;
+}
+
+.mobile-device .new-mobile-bottom-bar-container::after {
+  animation: none !important;
+  opacity: 0.5 !important;
+}
+
+.mobile-device .new-bottom-bar-icon-container--active {
+  animation: none !important;
+}
+
+.mobile-device .new-bottom-bar-button,
+.mobile-device .new-bottom-bar-icon-container {
+  transition: none !important;
+}
+
 /* Accessibilité / fallbacks / perf */
 @media (prefers-reduced-motion: reduce) {
   .new-bottom-bar-button,
   .new-bottom-bar-icon-container {
     transition: background-color 0.2s ease, color 0.2s ease !important;
   }
-  
+
   .new-bottom-bar-button:hover,
   .new-bottom-bar-button[aria-current="page"] {
     transform: none !important;

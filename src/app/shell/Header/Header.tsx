@@ -10,12 +10,15 @@ import { useFeedback } from '../../../hooks';
 import { BackButton } from '../../../ui/buttons';
 import { useOverlayStore } from '../../../system/store/overlayStore';
 import CentralActionsMenu from '../CentralActionsMenu';
+import { useIsMobile } from '../../../system/device/DeviceProvider';
+import { safeMotionProps } from '../../../lib/motion/mobileMotionConfig';
 
 export const Header = React.memo(() => {
   const { setDrawer } = useShell();
   const { click } = useFeedback();
   const { isOpen, toggle } = useOverlayStore();
   const centralMenuOpen = isOpen('centralMenu');
+  const isMobile = useIsMobile();
 
   return (
     <>
@@ -78,9 +81,9 @@ export const Header = React.memo(() => {
                 boxShadow: centralMenuOpen
                   ? `0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 4px 32px rgba(247, 147, 30, 0.5), 0 2px 16px rgba(0, 0, 0, 0.25)`
                   : `0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 4px 24px rgba(247, 147, 30, 0.25), 0 2px 12px rgba(0, 0, 0, 0.2)`,
-                transition: 'transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1)',
+                transition: isMobile ? 'none' : 'transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1)',
                 transform: 'translateZ(0)',
-                willChange: 'transform, filter',
+                willChange: isMobile ? 'auto' : 'transform, filter',
                 cursor: 'pointer'
               }}
               aria-label="Ouvrir les outils du forgeron"
@@ -95,11 +98,13 @@ export const Header = React.memo(() => {
                   toggle('centralMenu');
                 }
               }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
+              {...safeMotionProps(isMobile, {
+                whileHover: { scale: 1.05 },
+                whileTap: { scale: 0.98 }
+              })}
             >
-              {/* Carrés tournants aux 4 coins - Désactivés sur mobile via CSS */}
-              {[0, 1, 2, 3].map((i) => (
+              {/* Carrés tournants aux 4 coins - Désactivés sur mobile */}
+              {!isMobile && [0, 1, 2, 3].map((i) => (
                 <motion.div
                   key={i}
                   className="header-corner-square"
@@ -145,28 +150,30 @@ export const Header = React.memo(() => {
                 aria-hidden="true"
               />
 
-              <motion.div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: 'radial-gradient(circle at center, rgba(247, 147, 30, 0.25) 0%, transparent 70%)',
-                  filter: 'blur(10px)',
-                  zIndex: -1,
-                  pointerEvents: 'none'
-                }}
-                animate={centralMenuOpen ? {
-                  scale: [1, 1.4, 1.3],
-                  opacity: [0.7, 1, 0.8]
-                } : {
-                  scale: [1, 1.15, 1],
-                  opacity: [0.4, 0.6, 0.4]
-                }}
-                transition={{
-                  duration: 2.5,
-                  repeat: Infinity,
-                  ease: 'easeInOut'
-                }}
-                aria-hidden="true"
-              />
+              {!isMobile && (
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: 'radial-gradient(circle at center, rgba(247, 147, 30, 0.25) 0%, transparent 70%)',
+                    filter: 'blur(10px)',
+                    zIndex: -1,
+                    pointerEvents: 'none'
+                  }}
+                  animate={centralMenuOpen ? {
+                    scale: [1, 1.4, 1.3],
+                    opacity: [0.7, 1, 0.8]
+                  } : {
+                    scale: [1, 1.15, 1],
+                    opacity: [0.4, 0.6, 0.4]
+                  }}
+                  transition={{
+                    duration: 2.5,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
+                  }}
+                  aria-hidden="true"
+                />
+              )}
             </motion.button>
 
             {/* Bouton Hamburger - Menu de navigation - MASQUÉ sur desktop */}
@@ -195,9 +202,9 @@ export const Header = React.memo(() => {
                   0 2px 12px rgba(0, 0, 0, 0.18),
                   inset 0 1px 0 rgba(255, 255, 255, 0.12)
                 `,
-                transition: 'transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1)',
+                transition: isMobile ? 'none' : 'transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1)',
                 transform: 'translateZ(0)',
-                willChange: 'transform, filter',
+                willChange: isMobile ? 'auto' : 'transform, filter',
                 cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
@@ -242,8 +249,10 @@ export const Header = React.memo(() => {
                   setDrawer(true);
                 }
               }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
+              {...safeMotionProps(isMobile, {
+                whileHover: { scale: 1.05 },
+                whileTap: { scale: 0.98 }
+              })}
             >
               <SpatialIcon
                 Icon={ICONS.Menu}

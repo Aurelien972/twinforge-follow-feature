@@ -114,17 +114,56 @@
     0 0 16px color-mix(in srgb, var(--color-plasma-cyan) 40%, transparent) !important;
 }
 
-/* Mobile adaptations */
+/* Mobile adaptations - OPTIMIZED FOR PERFORMANCE */
 @media (max-width: 768px) {
   .header-liquid-glass {
     left: 8px !important;
     right: 8px !important;
     top: 6px !important;
+
+    /* Solid blur like bottombar - no transparency */
+    background: rgba(15, 25, 39, 0.92) !important;
+    backdrop-filter: blur(12px) saturate(130%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(130%) !important;
+
+    /* Simplified shadow - single layer */
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+
+    /* Disable animations */
+    transition: none !important;
   }
 
+  /* Disable animated border on mobile */
+  .header-liquid-glass::before {
+    animation: none !important;
+    opacity: 0.6 !important;
+  }
+
+  /* Disable glow animation on mobile */
   .header-liquid-glass::after {
+    animation: none !important;
+    opacity: 0.5 !important;
     filter: blur(8px);
   }
+}
+
+/* Mobile device class enforcement */
+.mobile-device .header-liquid-glass {
+  background: rgba(15, 25, 39, 0.92) !important;
+  backdrop-filter: blur(12px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(130%) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+  transition: none !important;
+}
+
+.mobile-device .header-liquid-glass::before {
+  animation: none !important;
+  opacity: 0.6 !important;
+}
+
+.mobile-device .header-liquid-glass::after {
+  animation: none !important;
+  opacity: 0.5 !important;
 }
 
 /* Tablet optimizations */
