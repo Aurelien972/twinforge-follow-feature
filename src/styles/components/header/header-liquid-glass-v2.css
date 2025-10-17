@@ -121,17 +121,17 @@
     right: 8px !important;
     top: 6px !important;
 
-    /* EXACT MATCH WITH BOTTOMBAR - Ultra-transparent Liquid Glass */
+    /* FORCE SAME BACKGROUND AS BOTTOMBAR - Ultra-transparent Liquid Glass */
     background:
       var(--liquid-reflections-multi),
       var(--liquid-highlight-ambient),
       var(--liquid-glass-bg-base) !important;
 
-    /* EXACT MATCH WITH BOTTOMBAR */
+    /* FORCE SAME BLUR AS BOTTOMBAR */
     backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
     -webkit-backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
 
-    /* EXACT MATCH WITH BOTTOMBAR */
+    /* FORCE SAME SHADOWS/GLOW AS BOTTOMBAR */
     box-shadow: var(--liquid-bottombar-shadow), var(--liquid-bottombar-glow) !important;
 
     /* Disable animations */
@@ -142,29 +142,38 @@
   .header-liquid-glass::before {
     animation: none !important;
     opacity: 0.6 !important;
+    /* FORCE SAME BORDER AS BOTTOMBAR */
+    background: var(--liquid-border-gradient-tricolor) !important;
   }
 
-  /* Disable glow animation on mobile */
+  /* Disable glow animation on mobile but keep same glow as bottombar */
   .header-liquid-glass::after {
     animation: none !important;
     opacity: 0.5 !important;
     filter: blur(8px);
+    /* FORCE SAME AMBIENT GLOW AS BOTTOMBAR */
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      rgba(24, 227, 255, 0.15) 0%,
+      rgba(61, 19, 179, 0.1) 40%,
+      transparent 70%
+    ) !important;
   }
 }
 
 /* Mobile device class enforcement - MATCH BOTTOMBAR EXACTLY */
 .mobile-device .header-liquid-glass {
-  /* EXACT MATCH WITH BOTTOMBAR - Ultra-transparent Liquid Glass */
+  /* FORCE SAME BACKGROUND AS BOTTOMBAR - Ultra-transparent Liquid Glass */
   background:
     var(--liquid-reflections-multi),
     var(--liquid-highlight-ambient),
     var(--liquid-glass-bg-base) !important;
 
-  /* EXACT MATCH WITH BOTTOMBAR */
+  /* FORCE SAME BLUR AS BOTTOMBAR */
   backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
   -webkit-backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
 
-  /* EXACT MATCH WITH BOTTOMBAR */
+  /* FORCE SAME SHADOWS/GLOW AS BOTTOMBAR */
   box-shadow: var(--liquid-bottombar-shadow), var(--liquid-bottombar-glow) !important;
 
   transition: none !important;
@@ -173,11 +182,20 @@
 .mobile-device .header-liquid-glass::before {
   animation: none !important;
   opacity: 0.6 !important;
+  /* FORCE SAME BORDER AS BOTTOMBAR */
+  background: var(--liquid-border-gradient-tricolor) !important;
 }
 
 .mobile-device .header-liquid-glass::after {
   animation: none !important;
   opacity: 0.5 !important;
+  /* FORCE SAME AMBIENT GLOW AS BOTTOMBAR */
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(24, 227, 255, 0.15) 0%,
+    rgba(61, 19, 179, 0.1) 40%,
+    transparent 70%
+  ) !important;
 }
 
 /* Tablet optimizations */

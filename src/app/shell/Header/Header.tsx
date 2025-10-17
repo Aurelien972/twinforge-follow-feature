@@ -50,7 +50,10 @@ export const Header = React.memo(() => {
           <div className="flex items-center gap-1 md:gap-3">
             {/* Bouton Retour - Référence visuelle */}
             <BackButton />
-            <HeaderLogo />
+            {/* Logo visible uniquement sur desktop (>= 1024px) */}
+            <div className="hidden lg:block">
+              <HeaderLogo />
+            </div>
           </div>
 
           {/* Right */}
