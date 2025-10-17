@@ -27,25 +27,16 @@
 }
 
 .new-mobile-bottom-bar {
-  /* CRITICAL: Fixed positioning with explicit values */
   position: fixed !important;
   bottom: var(--new-bottom-bar-bottom-offset) !important;
   left: 8px !important;
   right: 8px !important;
-  z-index: var(--z-mobile-bottom-bar) !important;
+  z-index: var(--new-bottom-bar-z-index) !important;
   height: var(--new-bottom-bar-height) !important;
-
-  /* GPU acceleration for sticky positioning */
   transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
   will-change: transform !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-
-  /* Force compositing layer */
   contain: layout style paint !important;
   isolation: isolate !important;
-  pointer-events: auto !important;
 }
 
 .new-mobile-bottom-bar-container {
@@ -57,7 +48,7 @@
   position: relative;
   isolation: isolate;
 
-  /* Desktop: Ultra-transparent Liquid Glass */
+  /* Ultra-transparent Liquid Glass - VisionOS 26 Premium */
   background:
     var(--liquid-reflections-multi),
     var(--liquid-highlight-ambient),
@@ -396,29 +387,20 @@
 }
 
 /* =========================================
-   MOBILE OPTIMIZATIONS - SOLID METALLIC GRAY
+   MOBILE OPTIMIZATIONS - DISABLE ANIMATIONS
    ========================================= */
 
 @media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  /* SOLID METALLIC GRAY - No blur, no transparency */
-  .new-mobile-bottom-bar-container {
-    background: var(--mobile-metallic-gray) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    box-shadow: var(--mobile-metallic-shadow-bottom) !important;
-    border: 1px solid var(--mobile-metallic-border) !important;
-  }
-
-  /* Remove all pseudo-element effects on mobile */
+  /* Disable border pulse animation on mobile */
   .new-mobile-bottom-bar-container::before {
-    display: none !important;
-    opacity: 0 !important;
+    animation: none !important;
+    opacity: 0.6 !important;
   }
 
-  /* Remove all glow effects on mobile */
+  /* Disable glow animation on mobile */
   .new-mobile-bottom-bar-container::after {
-    display: none !important;
-    opacity: 0 !important;
+    animation: none !important;
+    opacity: 0.5 !important;
   }
 
   /* Disable active pulse animation */
@@ -431,30 +413,17 @@
   .new-bottom-bar-icon-container {
     transition: none !important;
   }
-
-  /* Solid backgrounds for icon containers */
-  .new-bottom-bar-icon-container {
-    background: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
 }
 
-/* Mobile device class enforcement - SOLID METALLIC GRAY */
-.mobile-device .new-mobile-bottom-bar-container {
-  background: var(--mobile-metallic-gray) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: var(--mobile-metallic-shadow-bottom) !important;
-  border: 1px solid var(--mobile-metallic-border) !important;
-}
-
+/* Mobile device class enforcement */
 .mobile-device .new-mobile-bottom-bar-container::before {
-  display: none !important;
+  animation: none !important;
+  opacity: 0.6 !important;
 }
 
 .mobile-device .new-mobile-bottom-bar-container::after {
-  display: none !important;
+  animation: none !important;
+  opacity: 0.5 !important;
 }
 
 .mobile-device .new-bottom-bar-icon-container--active {
@@ -464,12 +433,6 @@
 .mobile-device .new-bottom-bar-button,
 .mobile-device .new-bottom-bar-icon-container {
   transition: none !important;
-}
-
-.mobile-device .new-bottom-bar-icon-container {
-  background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 
 /* Accessibilité / fallbacks / perf */

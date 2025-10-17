@@ -173,19 +173,6 @@
   --new-bottom-bar-bottom-offset: max(2px, env(safe-area-inset-bottom, 0px));
   --drawer-header-height: 64px;
 
-  /* Mobile Metallic Gray Theme - Solid backgrounds without blur/transparency */
-  --mobile-metallic-gray: rgba(45, 52, 64, 0.98);
-  --mobile-metallic-gray-dark: rgba(38, 44, 54, 0.98);
-  --mobile-metallic-border: rgba(255, 255, 255, 0.12);
-  --mobile-metallic-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --mobile-metallic-shadow-bottom: 0 -2px 8px rgba(0, 0, 0, 0.3), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
-
-  /* Mobile Sticky Positioning - Z-index layers */
-  --z-mobile-header: 9999;
-  --z-mobile-chat-bubble: 9998;
-  --z-mobile-bottom-bar: 9996;
-  --z-mobile-fab: 9997;
-
   /* Legacy Support - Mapped to new system */
   --glass-blur: var(--glass-blur-base);
   --glass-saturate: var(--glass-saturate-base);

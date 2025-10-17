@@ -54,28 +54,17 @@
 /* Ensure fixed elements stay fixed despite overflow changes */
 @media (max-width: 1024px) {
   .header-liquid-glass,
-  .new-mobile-bottom-bar,
-  .chat-notification-bubble,
-  .floating-chat-button,
-  .unified-floating-button {
-    /* CRITICAL: Fixed positioning */
+  .new-mobile-bottom-bar {
     position: fixed !important;
-
-    /* GPU acceleration for sticky positioning */
     transform: translate3d(0, 0, 0) !important;
     -webkit-transform: translate3d(0, 0, 0) !important;
     will-change: transform !important;
     backface-visibility: hidden !important;
     -webkit-backface-visibility: hidden !important;
-
-    /* Force compositing layer */
     contain: layout style paint !important;
     isolation: isolate !important;
+    /* CRITICAL: Force compositing layer */
     pointer-events: auto !important;
-
-    /* iOS-specific optimizations */
-    -webkit-perspective: 1000 !important;
-    perspective: 1000 !important;
   }
 
   /* Header must stay at top */
@@ -83,7 +72,7 @@
     top: 6px !important;
     left: 8px !important;
     right: 8px !important;
-    z-index: var(--z-mobile-header, 9999) !important;
+    z-index: 9999 !important;
   }
 
   /* Bottom bar must stay at bottom */
@@ -91,18 +80,7 @@
     bottom: var(--new-bottom-bar-bottom-offset, 4px) !important;
     left: 8px !important;
     right: 8px !important;
-    z-index: var(--z-mobile-bottom-bar, 9996) !important;
-  }
-
-  /* Chat bubble must stay above bottom bar */
-  .chat-notification-bubble {
-    z-index: var(--z-mobile-chat-bubble, 9998) !important;
-  }
-
-  /* FAB buttons must stay above bottom bar */
-  .floating-chat-button,
-  .unified-floating-button {
-    z-index: var(--z-mobile-fab, 9997) !important;
+    z-index: 9996 !important;
   }
 }
 
@@ -152,28 +130,14 @@
 
   /* Prevent iOS scroll bounce on fixed elements */
   .header-liquid-glass,
-  .new-mobile-bottom-bar,
-  .chat-notification-bubble,
-  .floating-chat-button,
-  .unified-floating-button {
+  .new-mobile-bottom-bar {
     -webkit-overflow-scrolling: auto !important;
     overscroll-behavior: contain !important;
-
     /* iOS specific optimizations for sticky positioning */
     -webkit-perspective: 1000 !important;
     perspective: 1000 !important;
     -webkit-backface-visibility: hidden !important;
     backface-visibility: hidden !important;
-
-    /* Force hardware acceleration on iOS */
-    -webkit-transform: translate3d(0, 0, 0) !important;
-    transform: translate3d(0, 0, 0) !important;
-  }
-
-  /* Prevent sidebar scroll chaining */
-  .sidebar-content {
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: contain !important;
   }
 }
 

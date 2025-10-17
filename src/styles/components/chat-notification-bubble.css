@@ -6,15 +6,13 @@
  */
 
 .chat-notification-bubble {
-  /* CRITICAL: Fixed positioning with explicit z-index */
-  position: fixed !important;
-  z-index: var(--z-mobile-chat-bubble) !important;
+  position: fixed;
+  z-index: 9997;
   pointer-events: auto;
   cursor: pointer;
 
   border-radius: 16px;
 
-  /* Desktop: Liquid glass effect */
   background:
     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.16) 0%, transparent 50%),
     radial-gradient(circle at 70% 70%, rgba(255,255,255,0.08) 0%, transparent 60%),
@@ -31,12 +29,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 
   isolation: isolate;
-
-  /* GPU acceleration for sticky positioning */
-  transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 
   transition:
     transform var(--liquid-transition-medium),
@@ -45,38 +38,23 @@
     border-color var(--liquid-transition-fast);
 }
 
-/* Mobile - SOLID METALLIC GRAY WITHOUT BLUR */
+/* Mobile - Disable animations and reduce effects */
 @media (max-width: 1024px), (hover: none), (pointer: coarse) {
   .chat-notification-bubble {
-    /* CRITICAL: Maintain fixed positioning */
-    position: fixed !important;
-    z-index: var(--z-mobile-chat-bubble) !important;
-
-    /* SOLID METALLIC GRAY - No blur, no transparency */
-    background: var(--mobile-metallic-gray) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    box-shadow: var(--mobile-metallic-shadow) !important;
-    border: 1px solid var(--mobile-metallic-border) !important;
-
-    /* GPU acceleration for sticky positioning */
-    transform: translate3d(0, 0, 0) !important;
-    -webkit-transform: translate3d(0, 0, 0) !important;
-    will-change: transform !important;
-    backface-visibility: hidden !important;
-    -webkit-backface-visibility: hidden !important;
-
-    /* Disable animations */
+    will-change: auto !important;
     transition: none !important;
+    transform: none !important;
+    backdrop-filter: blur(8px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
   }
 
   .chat-notification-bubble::before {
-    display: none !important;
+    opacity: 0.5 !important;
   }
 
   .chat-notification-bubble:hover,
   .chat-notification-bubble:active {
-    transform: translate3d(0, 0, 0) !important;
+    transform: none !important;
     scale: 1 !important;
   }
 }
@@ -96,21 +74,12 @@
   border-radius: 16px;
   width: auto !important;
   max-width: calc(100vw - 56px - 8px - 8px - 16px) !important; /* 100vw - largeur bouton chat - marge droite - marge entre bulle et bouton - marge gauche */
-
-  /* CRITICAL: Fixed positioning relative to viewport */
-  position: fixed !important;
   bottom: calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px) !important;
   left: 8px !important;
   right: calc(56px + 8px + 8px) !important; /* largeur bouton chat + marge droite + espacement */
   top: auto !important;
-  z-index: var(--z-mobile-chat-bubble) !important;
-
-  /* GPU acceleration for sticky positioning */
-  transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
-  will-change: transform !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
+  transform: none !important;
+  z-index: 9998;
 }
 
 .chat-notification-bubble::before {
