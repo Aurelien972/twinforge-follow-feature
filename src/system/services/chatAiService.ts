@@ -146,6 +146,8 @@ class ChatAIService {
       logger.info('CHAT_AI_SERVICE', 'Starting to read stream chunks', { requestId });
 
       let buffer = ''; // Buffer pour accumuler les lignes partielles
+      let totalLinesProcessed = 0;
+      let dataLinesProcessed = 0;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -155,6 +157,8 @@ class ChatAIService {
             requestId,
             chunkCount,
             totalLength: totalContent.length,
+            totalLinesProcessed,
+            dataLinesProcessed,
             durationMs: Date.now() - startTime
           });
           break;
@@ -169,19 +173,22 @@ class ChatAIService {
         // Garder la dernière ligne (potentiellement incomplète) dans le buffer
         buffer = lines.pop() || '';
 
-        if (chunkCount < 3) {
+        if (totalLinesProcessed < 10) {
           logger.debug('CHAT_AI_SERVICE', 'Stream chunk received', {
             requestId,
-            chunkNumber: chunkCount,
             lineCount: lines.length,
-            bufferSize: buffer.length
+            bufferSize: buffer.length,
+            firstLinePreview: lines[0]?.substring(0, 100)
           });
         }
 
         for (const line of lines) {
+          totalLinesProcessed++;
+
           if (!line.trim()) continue;
 
           if (line.startsWith('data: ')) {
+            dataLinesProcessed++;
             const data = line.slice(6).trim();
 
             if (data === '[DONE]') {
@@ -195,6 +202,18 @@ class ChatAIService {
 
             try {
               const parsed = JSON.parse(data);
+
+              if (chunkCount < 3) {
+                logger.debug('CHAT_AI_SERVICE', 'Parsed SSE data', {
+                  requestId,
+                  hasChoices: !!parsed.choices,
+                  choicesLength: parsed.choices?.length,
+                  hasDelta: !!parsed.choices?.[0]?.delta,
+                  deltaKeys: parsed.choices?.[0]?.delta ? Object.keys(parsed.choices[0].delta) : [],
+                  hasContent: !!parsed.choices?.[0]?.delta?.content
+                });
+              }
+
               const content = parsed.choices?.[0]?.delta?.content;
 
               if (content) {
@@ -210,6 +229,11 @@ class ChatAIService {
                     contentPreview: content.substring(0, 50)
                   });
                 }
+              } else if (chunkCount < 3) {
+                logger.debug('CHAT_AI_SERVICE', 'No content in chunk', {
+                  requestId,
+                  parsed: JSON.stringify(parsed).substring(0, 200)
+                });
               }
             } catch (parseError) {
               // Log plus détaillé pour comprendre l'erreur
