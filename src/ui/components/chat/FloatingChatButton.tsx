@@ -90,7 +90,7 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
         bottom: isDesktop ? '24px' : 'calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px)',
         zIndex: Z_INDEX.FLOATING_CHAT_BUTTON,
         borderRadius: '50%',
-        overflow: 'hidden',
+        overflow: 'visible',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

@@ -45,6 +45,7 @@
   border-radius: 16px;
   width: 280px;
   max-width: 280px;
+  z-index: 9998;
 }
 
 /* Mobile/Tablet version - à gauche du bouton de chat */
@@ -58,6 +59,7 @@
   right: calc(56px + 8px + 8px) !important; /* largeur bouton chat + marge droite + espacement */
   top: auto !important;
   transform: none !important;
+  z-index: 9998;
 }
 
 .chat-notification-bubble::before {

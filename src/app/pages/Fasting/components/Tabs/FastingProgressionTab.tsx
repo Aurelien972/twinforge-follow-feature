@@ -124,61 +124,226 @@ const FastingProgressionTab: React.FC = () => {
       {progressionData && progressionData.metrics.totalSessions === 0 && !isLoading && (
         <GlassCard className="p-8 text-center" style={{
           background: `
-            radial-gradient(circle at 30% 20%, color-mix(in srgb, #06B6D4 15%, transparent) 0%, transparent 60%),
-            radial-gradient(circle at 70% 80%, color-mix(in srgb, #06B6D4 12%, transparent) 0%, transparent 50%),
-            linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%),
-            var(--glass-opacity)
+            radial-gradient(ellipse at center,
+              rgba(6, 182, 212, 0.15) 0%,
+              rgba(34, 211, 238, 0.08) 50%,
+              rgba(0, 0, 0, 0.4) 100%)
           `,
           borderColor: 'color-mix(in srgb, #06B6D4 30%, transparent)',
           boxShadow: `
-            0 12px 40px rgba(0, 0, 0, 0.25),
-            0 0 30px color-mix(in srgb, #06B6D4 20%, transparent),
-            inset 0 2px 0 rgba(255, 255, 255, 0.15)
-          `
+            0 0 30px rgba(6, 182, 212, 0.2),
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1)
+          `,
+          backdropFilter: 'blur(20px) saturate(1.2)'
         }}>
-          <div className="space-y-4">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <div
-                className="w-20 h-20 rounded-full flex items-center justify-center"
+          <div className="space-y-6 flex flex-col items-center">
+            {/* Icon */}
+            <div
+              className="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center"
+              style={{
+                background: `radial-gradient(circle,
+                  rgba(6, 182, 212, 0.3) 0%,
+                  rgba(34, 211, 238, 0.15) 70%,
+                  transparent 100%)`,
+                border: '1px solid rgba(6, 182, 212, 0.4)',
+                boxShadow: `
+                  0 0 25px rgba(6, 182, 212, 0.3),
+                  0 4px 20px rgba(0, 0, 0, 0.2),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                `
+              }}
+            >
+              <SpatialIcon
+                Icon={ICONS.TrendingUp}
+                size={48}
+                className="text-cyan-400"
                 style={{
-                  background: `
-                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-                    linear-gradient(135deg, color-mix(in srgb, #06B6D4 30%, transparent), color-mix(in srgb, #06B6D4 20%, transparent))
-                  `,
-                  border: '2px solid color-mix(in srgb, #06B6D4 40%, transparent)',
-                  boxShadow: '0 0 30px color-mix(in srgb, #06B6D4 30%, transparent)'
+                  filter: `drop-shadow(0 0 12px rgba(6, 182, 212, 0.8))
+                           drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))`
                 }}
-              >
-                <SpatialIcon Icon={ICONS.TrendingUp} size={40} style={{ color: '#06B6D4' }} />
-              </div>
-              <div className="text-left">
-                <h3 className="text-2xl font-bold text-white">Progression en Construction</h3>
-                <p className="text-white/70 text-base">Plus de sessions nécessaires</p>
-              </div>
+              />
             </div>
 
+            {/* Title */}
             <div>
-              <p className="text-white/70 text-base leading-relaxed max-w-lg mx-auto">
-                Enregistrez plus de sessions de jeûne pour débloquer une analyse de progression complète
-                et visualiser l'évolution de votre discipline temporelle.
+              <h2 className="text-2xl font-bold text-white mb-3">
+                Progression en Construction
+              </h2>
+              <p className="text-white/70 text-lg">
+                Plus de sessions nécessaires pour l'analyse
               </p>
             </div>
 
-            <button
-              onClick={() => navigate('/fasting/input')}
-              className="px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200"
+            {/* Benefits Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
+              <div className="text-center space-y-3">
+                <div
+                  className="w-12 h-12 mx-auto rounded-xl flex items-center justify-center"
+                  style={{
+                    background: `radial-gradient(circle,
+                      rgba(6, 182, 212, 0.3) 0%,
+                      rgba(34, 211, 238, 0.1) 70%,
+                      transparent 100%)`,
+                    border: '1px solid rgba(6, 182, 212, 0.4)',
+                    boxShadow: `
+                      0 0 20px rgba(6, 182, 212, 0.3),
+                      0 4px 15px rgba(0, 0, 0, 0.2),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                    `
+                  }}
+                >
+                  <SpatialIcon
+                    Icon={ICONS.BarChart3}
+                    size={24}
+                    className="text-cyan-400"
+                    style={{
+                      filter: `drop-shadow(0 0 8px rgba(6, 182, 212, 0.6))
+                               drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))`
+                    }}
+                  />
+                </div>
+                <h3 className="font-semibold text-white">Graphiques Évolutifs</h3>
+                <p className="text-white/60 text-sm">
+                  Visualisez votre progression avec des graphiques détaillés
+                </p>
+              </div>
+
+              <div className="text-center space-y-3">
+                <div
+                  className="w-12 h-12 mx-auto rounded-xl flex items-center justify-center"
+                  style={{
+                    background: `radial-gradient(circle,
+                      rgba(6, 182, 212, 0.3) 0%,
+                      rgba(34, 211, 238, 0.1) 70%,
+                      transparent 100%)`,
+                    border: '1px solid rgba(6, 182, 212, 0.4)',
+                    boxShadow: `
+                      0 0 20px rgba(6, 182, 212, 0.3),
+                      0 4px 15px rgba(0, 0, 0, 0.2),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                    `
+                  }}
+                >
+                  <SpatialIcon
+                    Icon={ICONS.Activity}
+                    size={24}
+                    className="text-cyan-400"
+                    style={{
+                      filter: `drop-shadow(0 0 8px rgba(6, 182, 212, 0.6))
+                               drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))`
+                    }}
+                  />
+                </div>
+                <h3 className="font-semibold text-white">Métriques Avancées</h3>
+                <p className="text-white/60 text-sm">
+                  Suivez votre consistance, vos streaks et vos tendances
+                </p>
+              </div>
+
+              <div className="text-center space-y-3">
+                <div
+                  className="w-12 h-12 mx-auto rounded-xl flex items-center justify-center"
+                  style={{
+                    background: `radial-gradient(circle,
+                      rgba(6, 182, 212, 0.3) 0%,
+                      rgba(34, 211, 238, 0.1) 70%,
+                      transparent 100%)`,
+                    border: '1px solid rgba(6, 182, 212, 0.4)',
+                    boxShadow: `
+                      0 0 20px rgba(6, 182, 212, 0.3),
+                      0 4px 15px rgba(0, 0, 0, 0.2),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                    `
+                  }}
+                >
+                  <SpatialIcon
+                    Icon={ICONS.Award}
+                    size={24}
+                    className="text-cyan-400"
+                    style={{
+                      filter: `drop-shadow(0 0 8px rgba(6, 182, 212, 0.6))
+                               drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))`
+                    }}
+                  />
+                </div>
+                <h3 className="font-semibold text-white">Suivi des Objectifs</h3>
+                <p className="text-white/60 text-sm">
+                  Mesurez vos progrès vers vos objectifs de jeûne
+                </p>
+              </div>
+            </div>
+
+            {/* 3D CTA Button */}
+            <div className="pt-4">
+              <button
+                onClick={() => navigate('/fasting/input')}
+                className="group relative px-8 py-4 text-white font-semibold rounded-2xl transform hover:scale-105 transition-all duration-300"
+                style={{
+                  background: `linear-gradient(135deg,
+                    rgba(6, 182, 212, 0.8) 0%,
+                    rgba(34, 211, 238, 0.9) 100%)`,
+                  border: '2px solid rgba(6, 182, 212, 0.6)',
+                  boxShadow: `
+                    0 0 30px rgba(6, 182, 212, 0.4),
+                    0 8px 25px rgba(0, 0, 0, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                    inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+                  `,
+                  backdropFilter: 'blur(10px) saturate(1.2)'
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <SpatialIcon
+                    Icon={ICONS.Timer}
+                    size={24}
+                    className="group-hover:rotate-12 transition-transform duration-300"
+                    style={{
+                      color: 'white',
+                      filter: `drop-shadow(0 0 10px rgba(6, 182, 212, 0.8))
+                               drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3))`
+                    }}
+                  />
+                  <span className="text-lg">Ajouter des Sessions de Jeûne</span>
+                </div>
+
+                {/* 3D Effect */}
+                <div
+                  className="absolute inset-0 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300 -z-10"
+                  style={{
+                    background: `linear-gradient(135deg,
+                      rgba(6, 182, 212, 0.6) 0%,
+                      rgba(34, 211, 238, 0.6) 100%)`
+                  }}
+                ></div>
+              </button>
+            </div>
+
+            {/* Additional Info */}
+            <div
+              className="text-white/50 text-sm p-3 rounded-xl"
               style={{
-                background: 'linear-gradient(135deg, color-mix(in srgb, #06B6D4 80%, transparent), color-mix(in srgb, #06B6D4 60%, transparent))',
-                border: '2px solid color-mix(in srgb, #06B6D4 60%, transparent)',
-                boxShadow: `0 12px 40px color-mix(in srgb, #06B6D4 40%, transparent), 0 0 60px color-mix(in srgb, #06B6D4 30%, transparent)`,
-                color: '#fff'
+                background: `radial-gradient(ellipse at center,
+                  rgba(6, 182, 212, 0.1) 0%,
+                  transparent 70%)`,
+                border: '1px solid rgba(6, 182, 212, 0.2)',
+                boxShadow: `0 0 15px rgba(6, 182, 212, 0.1)`
               }}
             >
-              <div className="flex items-center gap-2">
-                <SpatialIcon Icon={ICONS.Timer} size={16} />
-                <span>Ajouter des Sessions</span>
+              <div className="flex items-center justify-center gap-2">
+                <SpatialIcon
+                  Icon={ICONS.Info}
+                  size={16}
+                  className="text-cyan-400"
+                  style={{
+                    filter: `drop-shadow(0 0 6px rgba(6, 182, 212, 0.6))`
+                  }}
+                />
+                <span>
+                  Continuez à enregistrer vos sessions pour débloquer des analyses détaillées de votre évolution !
+                </span>
               </div>
-            </button>
+            </div>
           </div>
         </GlassCard>
       )}

@@ -388,6 +388,71 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
               </div>
 
               <div className="flex items-center gap-2">
+                {/* Voice Coach Button - Prominent */}
+                <motion.button
+                  className="voice-coach-button"
+                  onClick={() => {
+                    console.log('Voice Coach activation');
+                  }}
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '50%',
+                    background: `
+                      radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.4) 0%, transparent 70%),
+                      linear-gradient(135deg, rgba(239, 68, 68, 0.85), rgba(220, 38, 38, 0.95))
+                    `,
+                    border: '2px solid rgba(239, 68, 68, 0.6)',
+                    boxShadow: `
+                      0 0 20px rgba(239, 68, 68, 0.4),
+                      0 4px 12px rgba(0, 0, 0, 0.3),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                    `,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    position: 'relative'
+                  }}
+                  whileHover={{
+                    scale: 1.08,
+                    boxShadow: `
+                      0 0 30px rgba(239, 68, 68, 0.6),
+                      0 6px 16px rgba(0, 0, 0, 0.4),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.3)
+                    `
+                  }}
+                  whileTap={{ scale: 0.92 }}
+                >
+                  <SpatialIcon
+                    Icon={ICONS.Mic}
+                    size={22}
+                    style={{
+                      color: 'white',
+                      filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.6))'
+                    }}
+                  />
+                  <motion.div
+                    style={{
+                      position: 'absolute',
+                      inset: -2,
+                      borderRadius: '50%',
+                      background: 'rgba(239, 68, 68, 0.3)',
+                      filter: 'blur(8px)',
+                      zIndex: -1
+                    }}
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.5, 0.8, 0.5]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut'
+                    }}
+                  />
+                </motion.button>
+
                 {/* Scroll to Bottom Button */}
                 <AnimatePresence>
                   {showScrollButton && (

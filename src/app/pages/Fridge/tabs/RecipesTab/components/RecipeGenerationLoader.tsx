@@ -17,19 +17,19 @@ const RecipeGenerationLoader: React.FC = () => {
       transition={{ duration: 0.5 }}
       className="mb-6"
     >
-      <GlassCard 
+      <GlassCard
         className="p-8 text-center"
         style={{
           background: `
-            radial-gradient(circle at 30% 20%, color-mix(in srgb, #EC4899 12%, transparent) 0%, transparent 60%),
-            radial-gradient(circle at 70% 80%, color-mix(in srgb, #F472B6 8%, transparent) 0%, transparent 50%),
+            radial-gradient(circle at 30% 20%, color-mix(in srgb, #10B981 12%, transparent) 0%, transparent 60%),
+            radial-gradient(circle at 70% 80%, color-mix(in srgb, #34D399 8%, transparent) 0%, transparent 50%),
             rgba(255, 255, 255, 0.05)
           `,
-          borderColor: 'color-mix(in srgb, #EC4899 25%, transparent)',
+          borderColor: 'color-mix(in srgb, #10B981 25%, transparent)',
           boxShadow: `
             0 12px 40px rgba(0, 0, 0, 0.25),
-            0 0 30px color-mix(in srgb, #EC4899 15%, transparent),
-            0 0 60px color-mix(in srgb, #F472B6 10%, transparent),
+            0 0 30px color-mix(in srgb, #10B981 15%, transparent),
+            0 0 60px color-mix(in srgb, #34D399 10%, transparent),
             inset 0 2px 0 rgba(255, 255, 255, 0.15)
           `
         }}
@@ -37,15 +37,15 @@ const RecipeGenerationLoader: React.FC = () => {
         <div className="space-y-6">
           {/* Animated Icon */}
           <div className="flex justify-center">
-            <div 
+            <div
               className="w-20 h-20 rounded-full flex items-center justify-center"
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                  linear-gradient(135deg, color-mix(in srgb, #EC4899 35%, transparent), color-mix(in srgb, #EC4899 25%, transparent))
+                  linear-gradient(135deg, color-mix(in srgb, #10B981 35%, transparent), color-mix(in srgb, #10B981 25%, transparent))
                 `,
-                border: '2px solid color-mix(in srgb, #EC4899 50%, transparent)',
-                boxShadow: '0 0 30px color-mix(in srgb, #EC4899 40%, transparent)'
+                border: '2px solid color-mix(in srgb, #10B981 50%, transparent)',
+                boxShadow: '0 0 30px color-mix(in srgb, #10B981 40%, transparent)'
               }}
             >
               <SpatialIcon 
@@ -64,18 +64,18 @@ const RecipeGenerationLoader: React.FC = () => {
 
           {/* Loading Text */}
           <div className="space-y-2">
-            <h3 
+            <h3
               className="text-2xl font-bold text-white"
               style={{
-                textShadow: '0 0 20px rgba(236, 72, 153, 0.5), 0 0 40px rgba(236, 72, 153, 0.3)'
+                textShadow: '0 0 20px rgba(16, 185, 129, 0.5), 0 0 40px rgba(16, 185, 129, 0.3)'
               }}
             >
               Création de recettes en cours...
             </h3>
-            <p 
+            <p
               className="text-white/80 text-lg"
               style={{
-                textShadow: '0 0 10px rgba(244, 114, 182, 0.3)'
+                textShadow: '0 0 10px rgba(52, 211, 153, 0.3)'
               }}
             >
               La Forge Spatiale travaille...
@@ -116,7 +116,7 @@ const RecipeGenerationLoader: React.FC = () => {
             {/* Animated Progress Bar */}
             <div className="w-full max-w-xs mx-auto h-2 bg-white/10 rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full"
+                className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"
                 animate={{
                   x: ['-100%', '100%']
                 }}
