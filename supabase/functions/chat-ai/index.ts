@@ -18,7 +18,28 @@ interface ChatRequest {
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
+function log(level: 'info' | 'warn' | 'error', message: string, requestId: string, data?: any) {
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    level,
+    service: 'chat-ai',
+    requestId,
+    message,
+    ...data
+  };
+
+  if (level === 'error') {
+    console.error(JSON.stringify(logEntry));
+  } else if (level === 'warn') {
+    console.warn(JSON.stringify(logEntry));
+  } else {
+    console.log(JSON.stringify(logEntry));
+  }
+}
+
 Deno.serve(async (req: Request) => {
+  const requestId = crypto.randomUUID();
+
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 200,
@@ -27,15 +48,32 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    log('info', 'Chat request received', requestId, { method: req.method });
+
     if (!OPENAI_API_KEY) {
+      log('error', 'OPENAI_API_KEY not configured', requestId);
       throw new Error("OPENAI_API_KEY is not configured");
     }
 
     const { messages, mode, contextData, stream = false }: ChatRequest = await req.json();
 
+    log('info', 'Request parsed', requestId, {
+      mode,
+      messageCount: messages.length,
+      stream,
+      lastMessageRole: messages[messages.length - 1]?.role
+    });
+
     if (!messages || messages.length === 0) {
+      log('error', 'Empty messages array', requestId);
       throw new Error("Messages array is required");
     }
+
+    log('info', 'Calling OpenAI API', requestId, {
+      model: 'gpt-5-mini',
+      messageCount: messages.length,
+      stream
+    });
 
     const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -51,48 +89,118 @@ Deno.serve(async (req: Request) => {
       }),
     });
 
+    log('info', 'OpenAI response received', requestId, {
+      status: openAIResponse.status,
+      ok: openAIResponse.ok,
+      stream
+    });
+
     if (!openAIResponse.ok) {
       const error = await openAIResponse.text();
-      console.error("OpenAI API Error:", error);
-      throw new Error(`OpenAI API error: ${openAIResponse.status}`);
+      log('error', 'OpenAI API error', requestId, {
+        status: openAIResponse.status,
+        error
+      });
+      throw new Error(`OpenAI API error: ${openAIResponse.status} - ${error}`);
     }
 
     if (stream) {
-      return new Response(openAIResponse.body, {
+      log('info', 'Starting SSE stream', requestId);
+
+      let chunkCount = 0;
+      const reader = openAIResponse.body?.getReader();
+      const encoder = new TextEncoder();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        log('error', 'No response body reader', requestId);
+        throw new Error('No response body available');
+      }
+
+      const stream = new ReadableStream({
+        async start(controller) {
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+
+              if (done) {
+                log('info', 'Stream completed', requestId, { chunkCount });
+                controller.close();
+                break;
+              }
+
+              chunkCount++;
+              const chunk = decoder.decode(value, { stream: true });
+
+              if (chunkCount <= 3) {
+                log('info', 'Stream chunk received', requestId, {
+                  chunkNumber: chunkCount,
+                  chunkLength: chunk.length,
+                  preview: chunk.substring(0, 100)
+                });
+              }
+
+              controller.enqueue(encoder.encode(chunk));
+            }
+          } catch (error) {
+            log('error', 'Stream error', requestId, {
+              error: error instanceof Error ? error.message : String(error),
+              chunkCount
+            });
+            controller.error(error);
+          }
+        }
+      });
+
+      return new Response(stream, {
         headers: {
           ...corsHeaders,
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-cache",
           "Connection": "keep-alive",
+          "X-Request-Id": requestId,
         },
       });
     }
 
     const data = await openAIResponse.json();
 
+    log('info', 'Non-stream response parsed', requestId, {
+      hasMessage: !!data.choices[0]?.message,
+      tokensUsed: data.usage?.total_tokens
+    });
+
     return new Response(
       JSON.stringify({
         message: data.choices[0].message,
         usage: data.usage,
+        requestId
       }),
       {
         headers: {
           ...corsHeaders,
           "Content-Type": "application/json",
+          "X-Request-Id": requestId,
         },
       }
     );
   } catch (error) {
-    console.error("Chat AI Error:", error);
+    log('error', 'Fatal error', requestId, {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+
     return new Response(
       JSON.stringify({
         error: error.message || "An error occurred processing your request",
+        requestId
       }),
       {
         status: 500,
         headers: {
           ...corsHeaders,
           "Content-Type": "application/json",
+          "X-Request-Id": requestId,
         },
       }
     );

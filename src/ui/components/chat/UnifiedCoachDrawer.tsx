@@ -611,9 +611,58 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
                   />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-lg">
-                    {modeConfig.displayName}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-white font-bold text-lg">
+                      {modeConfig.displayName}
+                    </h3>
+                    <motion.div
+                      animate={{
+                        scale: isProcessing || voiceState === 'processing' || voiceState === 'connecting' ? [1, 1.3, 1] : 1,
+                        opacity: isProcessing || voiceState === 'processing' || voiceState === 'connecting' ? [1, 0.6, 1] : 1
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: isProcessing || voiceState === 'processing' || voiceState === 'connecting' ? Infinity : 0,
+                        ease: 'easeInOut'
+                      }}
+                      style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: voiceState === 'error' || errorMessage
+                          ? '#EF4444'
+                          : isProcessing || voiceState === 'processing' || voiceState === 'connecting'
+                          ? '#FBBF24'
+                          : voiceState === 'listening' || voiceState === 'speaking'
+                          ? '#10B981'
+                          : isTextMode
+                          ? modeColor
+                          : 'rgba(255, 255, 255, 0.5)',
+                        boxShadow: voiceState === 'error' || errorMessage
+                          ? '0 0 8px #EF4444'
+                          : isProcessing || voiceState === 'processing' || voiceState === 'connecting'
+                          ? '0 0 8px #FBBF24'
+                          : voiceState === 'listening' || voiceState === 'speaking'
+                          ? '0 0 8px #10B981'
+                          : isTextMode
+                          ? `0 0 8px ${modeColor}`
+                          : 'none'
+                      }}
+                      title={
+                        voiceState === 'error' || errorMessage
+                          ? 'Erreur de connexion'
+                          : isProcessing || voiceState === 'processing'
+                          ? 'Traitement en cours'
+                          : voiceState === 'connecting'
+                          ? 'Connexion...'
+                          : voiceState === 'listening' || voiceState === 'speaking'
+                          ? 'Connecté'
+                          : isTextMode
+                          ? 'Mode texte actif'
+                          : 'Inactif'
+                      }
+                    />
+                  </div>
                   <p className="text-white/60 text-xs">
                     {isTextMode
                       ? isProcessing ? 'Traitement...' : 'Mode texte'
@@ -623,6 +672,8 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
                       ? 'En train de parler...'
                       : voiceState === 'processing'
                       ? 'Traitement...'
+                      : voiceState === 'connecting'
+                      ? 'Connexion...'
                       : voiceState === 'error'
                       ? 'Erreur de connexion'
                       : 'Prêt à écouter'}

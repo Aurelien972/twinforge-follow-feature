@@ -77,27 +77,75 @@ function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
     }
   };
 
+  let messageToClientCount = 0;
+  let messageToOpenAICount = 0;
+
   openaiSocket.onmessage = (event) => {
     try {
+      messageToClientCount++;
+
+      if (messageToClientCount <= 5) {
+        try {
+          const parsed = JSON.parse(event.data);
+          log('info', 'OpenAI message received', {
+            messageNumber: messageToClientCount,
+            messageType: parsed.type,
+            hasContent: !!parsed.delta?.audio || !!parsed.delta?.transcript,
+            dataPreview: event.data.substring(0, 200)
+          });
+        } catch {
+          log('info', 'OpenAI message received (non-JSON)', {
+            messageNumber: messageToClientCount,
+            dataLength: event.data.length,
+            dataPreview: event.data.substring(0, 100)
+          });
+        }
+      }
+
       if (clientSocket.readyState === WebSocket.OPEN) {
         clientSocket.send(event.data);
       } else {
-        log('warn', 'Client socket not ready, dropping message');
+        log('warn', 'Client socket not ready, dropping message', {
+          messageNumber: messageToClientCount,
+          clientState: clientSocket.readyState
+        });
       }
     } catch (error) {
-      log('error', 'Error forwarding to client', { error: String(error) });
+      log('error', 'Error forwarding to client', {
+        error: String(error),
+        messageNumber: messageToClientCount
+      });
     }
   };
 
-  // Client handlers
   clientSocket.onmessage = (event) => {
     try {
+      messageToOpenAICount++;
+
+      if (messageToOpenAICount <= 5) {
+        try {
+          const parsed = JSON.parse(event.data);
+          log('info', 'Client message received', {
+            messageNumber: messageToOpenAICount,
+            messageType: parsed.type,
+            hasAudio: !!parsed.audio,
+            dataPreview: event.data.substring(0, 200)
+          });
+        } catch {
+          log('info', 'Client message received (non-JSON)', {
+            messageNumber: messageToOpenAICount,
+            dataLength: event.data.length
+          });
+        }
+      }
+
       if (openaiSocket.readyState === WebSocket.OPEN) {
         openaiSocket.send(event.data);
       } else {
         log('warn', 'OpenAI socket not ready', {
           state: openaiSocket.readyState,
-          connected: openaiConnected
+          connected: openaiConnected,
+          messageNumber: messageToOpenAICount
         });
 
         if (clientSocket.readyState === WebSocket.OPEN) {
@@ -108,7 +156,10 @@ function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
         }
       }
     } catch (error) {
-      log('error', 'Error forwarding to OpenAI', { error: String(error) });
+      log('error', 'Error forwarding to OpenAI', {
+        error: String(error),
+        messageNumber: messageToOpenAICount
+      });
     }
   };
 

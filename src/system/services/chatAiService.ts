@@ -85,10 +85,21 @@ class ChatAIService {
     request: ChatAIRequest,
     onChunk: (chunk: string) => void
   ): Promise<void> {
+    const startTime = Date.now();
+    let chunkCount = 0;
+    let totalContent = '';
+    let requestId = 'unknown';
+
     try {
+      logger.info('CHAT_AI_SERVICE', 'Starting stream request', {
+        mode: request.mode,
+        messageCount: request.messages.length
+      });
+
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
+        logger.error('CHAT_AI_SERVICE', 'User not authenticated for stream');
         throw new Error('User not authenticated');
       }
 
@@ -105,48 +116,118 @@ class ChatAIService {
         })
       });
 
+      requestId = response.headers.get('X-Request-Id') || 'unknown';
+
+      logger.info('CHAT_AI_SERVICE', 'Stream response received', {
+        requestId,
+        status: response.status,
+        ok: response.ok,
+        contentType: response.headers.get('Content-Type')
+      });
+
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        const errorText = await response.text();
+        logger.error('CHAT_AI_SERVICE', 'Stream response not ok', {
+          requestId,
+          status: response.status,
+          error: errorText
+        });
+        throw new Error(`API error: ${response.status} - ${errorText}`);
       }
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
 
       if (!reader) {
+        logger.error('CHAT_AI_SERVICE', 'No response body reader', { requestId });
         throw new Error('Response body is not readable');
       }
+
+      logger.info('CHAT_AI_SERVICE', 'Starting to read stream chunks', { requestId });
 
       while (true) {
         const { done, value } = await reader.read();
 
-        if (done) break;
+        if (done) {
+          logger.info('CHAT_AI_SERVICE', 'Stream reading completed', {
+            requestId,
+            chunkCount,
+            totalLength: totalContent.length,
+            durationMs: Date.now() - startTime
+          });
+          break;
+        }
 
-        const chunk = decoder.decode(value);
+        const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split('\n');
 
+        if (chunkCount < 3) {
+          logger.debug('CHAT_AI_SERVICE', 'Stream chunk received', {
+            requestId,
+            chunkNumber: chunkCount,
+            lineCount: lines.length,
+            preview: chunk.substring(0, 150)
+          });
+        }
+
         for (const line of lines) {
+          if (!line.trim()) continue;
+
           if (line.startsWith('data: ')) {
-            const data = line.slice(6);
+            const data = line.slice(6).trim();
 
             if (data === '[DONE]') {
+              logger.info('CHAT_AI_SERVICE', 'Stream [DONE] marker received', {
+                requestId,
+                totalChunks: chunkCount,
+                totalLength: totalContent.length
+              });
               return;
             }
 
             try {
               const parsed = JSON.parse(data);
-              const content = parsed.choices[0]?.delta?.content;
+              const content = parsed.choices?.[0]?.delta?.content;
 
               if (content) {
+                chunkCount++;
+                totalContent += content;
                 onChunk(content);
+
+                if (chunkCount <= 3) {
+                  logger.debug('CHAT_AI_SERVICE', 'Content chunk extracted', {
+                    requestId,
+                    chunkNumber: chunkCount,
+                    contentLength: content.length,
+                    contentPreview: content.substring(0, 50)
+                  });
+                }
               }
-            } catch (e) {
-              // Skip invalid JSON
+            } catch (parseError) {
+              logger.warn('CHAT_AI_SERVICE', 'Failed to parse SSE data', {
+                requestId,
+                data: data.substring(0, 100),
+                error: parseError instanceof Error ? parseError.message : String(parseError)
+              });
             }
           }
         }
       }
+
+      if (chunkCount === 0) {
+        logger.warn('CHAT_AI_SERVICE', 'No content chunks received in stream', {
+          requestId,
+          durationMs: Date.now() - startTime
+        });
+      }
     } catch (error) {
-      logger.error('CHAT_AI_SERVICE', 'Error in stream', { error });
+      logger.error('CHAT_AI_SERVICE', 'Error in stream', {
+        requestId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        chunkCount,
+        durationMs: Date.now() - startTime
+      });
       throw error;
     }
   }

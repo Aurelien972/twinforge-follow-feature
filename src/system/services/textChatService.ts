@@ -52,17 +52,20 @@ class TextChatService {
     }
 
     this.isProcessing = true;
+    const messageId = crypto.randomUUID();
+    const startTime = Date.now();
 
     try {
       logger.info('TEXT_CHAT_SERVICE', 'Sending text message', {
+        messageId,
         mode: this.currentMode,
         messageLength: userMessage.length,
-        stream
+        stream,
+        historySize: this.conversationHistory.length
       });
 
-      // Ajouter le message de l'utilisateur à l'historique
       const userChatMessage: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: messageId,
         role: 'user',
         content: userMessage,
         timestamp: Date.now()
@@ -70,7 +73,11 @@ class TextChatService {
 
       this.conversationHistory.push(userChatMessage);
 
-      // Construire le tableau de messages pour l'API
+      logger.debug('TEXT_CHAT_SERVICE', 'User message added to history', {
+        messageId,
+        historySize: this.conversationHistory.length
+      });
+
       const apiMessages = [
         {
           role: 'system' as const,
@@ -82,9 +89,17 @@ class TextChatService {
         }))
       ];
 
+      logger.debug('TEXT_CHAT_SERVICE', 'API messages prepared', {
+        messageId,
+        totalMessages: apiMessages.length,
+        systemPromptLength: this.systemPrompt.length
+      });
+
       if (stream) {
-        // Mode streaming pour une réponse progressive
+        logger.info('TEXT_CHAT_SERVICE', 'Starting streaming mode', { messageId });
+
         let accumulatedResponse = '';
+        let chunkCount = 0;
 
         await chatAIService.sendStreamMessage(
           {
@@ -93,12 +108,36 @@ class TextChatService {
             stream: true
           },
           (chunk: string) => {
+            chunkCount++;
             accumulatedResponse += chunk;
+
+            if (chunkCount <= 3) {
+              logger.debug('TEXT_CHAT_SERVICE', 'Delta received', {
+                messageId,
+                chunkNumber: chunkCount,
+                chunkLength: chunk.length,
+                accumulatedLength: accumulatedResponse.length
+              });
+            }
+
             this.messageHandlers.forEach(handler => handler(chunk, true));
           }
         );
 
-        // Ajouter la réponse complète à l'historique
+        logger.info('TEXT_CHAT_SERVICE', 'Stream completed', {
+          messageId,
+          totalChunks: chunkCount,
+          responseLength: accumulatedResponse.length,
+          durationMs: Date.now() - startTime
+        });
+
+        if (accumulatedResponse.length === 0) {
+          logger.warn('TEXT_CHAT_SERVICE', 'Empty response received', {
+            messageId,
+            durationMs: Date.now() - startTime
+          });
+        }
+
         const assistantMessage: ChatMessage = {
           id: crypto.randomUUID(),
           role: 'coach',
@@ -108,21 +147,29 @@ class TextChatService {
 
         this.conversationHistory.push(assistantMessage);
 
-        // Notifier que le message est complet
         this.messageHandlers.forEach(handler => handler('', false));
 
         logger.info('TEXT_CHAT_SERVICE', 'Stream response completed', {
-          responseLength: accumulatedResponse.length
+          messageId,
+          responseLength: accumulatedResponse.length,
+          totalDurationMs: Date.now() - startTime
         });
       } else {
-        // Mode non-streaming pour une réponse unique
+        logger.info('TEXT_CHAT_SERVICE', 'Starting non-streaming mode', { messageId });
+
         const response = await chatAIService.sendMessage({
           messages: apiMessages,
           mode: this.currentMode,
           stream: false
         });
 
-        // Ajouter la réponse à l'historique
+        logger.debug('TEXT_CHAT_SERVICE', 'Non-stream response received', {
+          messageId,
+          responseLength: response.message.content.length,
+          tokensUsed: response.usage?.total_tokens,
+          durationMs: Date.now() - startTime
+        });
+
         const assistantMessage: ChatMessage = {
           id: crypto.randomUUID(),
           role: 'coach',
@@ -132,17 +179,22 @@ class TextChatService {
 
         this.conversationHistory.push(assistantMessage);
 
-        // Notifier avec le message complet
         this.messageHandlers.forEach(handler => handler(response.message.content, false));
 
         logger.info('TEXT_CHAT_SERVICE', 'Response received', {
+          messageId,
           responseLength: response.message.content.length,
-          tokensUsed: response.usage?.total_tokens
+          tokensUsed: response.usage?.total_tokens,
+          durationMs: Date.now() - startTime
         });
       }
     } catch (error) {
       logger.error('TEXT_CHAT_SERVICE', 'Error sending message', {
-        error: error instanceof Error ? error.message : String(error)
+        messageId,
+        mode: this.currentMode,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        durationMs: Date.now() - startTime
       });
 
       this.errorHandlers.forEach(handler => {
@@ -152,6 +204,7 @@ class TextChatService {
       throw error;
     } finally {
       this.isProcessing = false;
+      logger.debug('TEXT_CHAT_SERVICE', 'Processing flag cleared', { messageId });
     }
   }
 

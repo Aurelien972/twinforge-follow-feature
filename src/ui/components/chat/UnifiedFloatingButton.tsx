@@ -111,15 +111,21 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
             : 'calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px)',
           zIndex: Z_INDEX.FLOATING_CHAT_BUTTON,
           borderRadius: '50%',
-          overflow: 'hidden',
+          overflow: 'visible',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           padding: '0',
           isolation: 'isolate',
-          width: isDesktop ? '60px' : '56px',
-          height: isDesktop ? '60px' : '56px',
-          background: hasUnreadMessages
+          width: isDesktop ? '60px' : '68px',
+          height: isDesktop ? '60px' : '68px',
+          background: isVoiceMode
+            ? `
+                radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 40%, transparent) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(255,255,255,0.30) 0%, transparent 60%),
+                var(--liquid-pill-bg)
+              `
+            : hasUnreadMessages
             ? `
                 radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 30%, transparent) 0%, transparent 50%),
                 radial-gradient(circle at 70% 70%, rgba(255,255,255,0.25) 0%, transparent 60%),
@@ -129,13 +135,22 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.20) 0%, transparent 50%),
                 var(--liquid-pill-bg)
               `,
-          border: hasUnreadMessages
+          border: isVoiceMode
+            ? `2px solid color-mix(in srgb, ${modeColor} 50%, transparent)`
+            : hasUnreadMessages
             ? `1.5px solid color-mix(in srgb, ${modeColor} 40%, transparent)`
             : '1.5px solid rgba(255,255,255,0.22)',
           backdropFilter: 'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
           WebkitBackdropFilter:
             'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
-          boxShadow: hasUnreadMessages
+          boxShadow: isVoiceMode
+            ? `
+                var(--liquid-pill-shadow),
+                0 0 48px color-mix(in srgb, ${modeColor} 40%, transparent),
+                0 0 72px color-mix(in srgb, ${modeColor} 20%, transparent),
+                0 4px 24px rgba(0, 0, 0, 0.3)
+              `
+            : hasUnreadMessages
             ? `
                 var(--liquid-pill-shadow),
                 0 0 40px color-mix(in srgb, ${modeColor} 30%, transparent),
@@ -152,8 +167,29 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
           transform: 'translateZ(0)'
         }}
         initial={false}
+        animate={
+          isVoiceMode && !isPanelOpen
+            ? {
+                scale: [1, 1.06, 1],
+                boxShadow: [
+                  `var(--liquid-pill-shadow), 0 0 48px color-mix(in srgb, ${modeColor} 40%, transparent), 0 0 72px color-mix(in srgb, ${modeColor} 20%, transparent)`,
+                  `var(--liquid-pill-shadow), 0 0 56px color-mix(in srgb, ${modeColor} 50%, transparent), 0 0 84px color-mix(in srgb, ${modeColor} 25%, transparent)`,
+                  `var(--liquid-pill-shadow), 0 0 48px color-mix(in srgb, ${modeColor} 40%, transparent), 0 0 72px color-mix(in srgb, ${modeColor} 20%, transparent)`,
+                ],
+              }
+            : {}
+        }
+        transition={
+          isVoiceMode && !isPanelOpen
+            ? {
+                duration: 2.5,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }
+            : {}
+        }
         whileHover={{
-          scale: 1.08,
+          scale: 1.12,
           boxShadow: `
             var(--liquid-pill-shadow),
             0 0 48px color-mix(in srgb, ${modeColor} 25%, transparent),
@@ -171,6 +207,57 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
         aria-label={isPanelOpen ? 'Fermer le coach' : 'Ouvrir le coach'}
         aria-expanded={isPanelOpen}
       >
+        {/* Pulse Ring Effect for Voice Mode */}
+        <AnimatePresence>
+          {isVoiceMode && !isPanelOpen && (
+            <>
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{
+                  scale: [1, 1.4, 1.6],
+                  opacity: [0.6, 0.3, 0],
+                }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeOut',
+                }}
+                style={{
+                  position: 'absolute',
+                  inset: '-8px',
+                  borderRadius: '50%',
+                  border: `2px solid ${modeColor}`,
+                  pointerEvents: 'none',
+                  zIndex: -1,
+                }}
+              />
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{
+                  scale: [1, 1.3, 1.5],
+                  opacity: [0.5, 0.25, 0],
+                }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeOut',
+                  delay: 0.5,
+                }}
+                style={{
+                  position: 'absolute',
+                  inset: '-8px',
+                  borderRadius: '50%',
+                  border: `2px solid ${modeColor}`,
+                  pointerEvents: 'none',
+                  zIndex: -1,
+                }}
+              />
+            </>
+          )}
+        </AnimatePresence>
+
         {/* Corner highlight effect */}
         <div
           style={{
@@ -211,11 +298,13 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
         >
           <SpatialIcon
             Icon={ButtonIcon}
-            size={isDesktop ? 28 : 24}
+            size={isDesktop ? 28 : isVoiceMode ? 30 : 26}
             style={{
               color: modeColor,
               filter: isStep2Active
                 ? `drop-shadow(0 0 16px rgba(59, 130, 246, 0.8))`
+                : isVoiceMode
+                ? `drop-shadow(0 0 18px color-mix(in srgb, ${modeColor} 70%, transparent))`
                 : `drop-shadow(0 0 14px color-mix(in srgb, ${modeColor} 60%, transparent))`
             }}
           />
