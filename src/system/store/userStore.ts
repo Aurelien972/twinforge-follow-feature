@@ -103,8 +103,6 @@ type Profile = UserProfile & {
   country_health_cache?: CountryHealthData;
   health_enriched_at?: string;
   health_schema_version?: '1.0' | '2.0';
-  // UI preferences
-  glassEffectsEnabled?: boolean;
 };
 
 type UserState = {
@@ -648,7 +646,6 @@ export const useUserStore = create<UserState>()(
           avatarStatus: state.profile.avatarStatus,
           avatarUrl: state.profile.avatarUrl,
           health: state.profile.health,
-          glassEffectsEnabled: state.profile.glassEffectsEnabled,
           // Exclude large objects that can be re-fetched
           // preferences, nutrition, etc will be loaded from DB
         } : null,
@@ -695,9 +692,7 @@ function mapProfileUpdatesToDb(updates: Partial<Profile>, currentProfile: Profil
     'full_name', 'email', 'language',
     // Enhanced nutrition preferences for Recipe Workshop
     'household_details', 'meal_prep_preferences', 'kitchen_equipment',
-    'food_preferences', 'sensory_preferences', 'macro_targets', 'shopping_preferences',
-    // UI preferences
-    'glass_effects_enabled'
+    'food_preferences', 'sensory_preferences', 'macro_targets', 'shopping_preferences'
   ]);
 
   // Text fields that should be null instead of empty strings
@@ -809,8 +804,6 @@ async function mapDbProfileToProfile(dbProfile: any): Promise<Profile> {
     avatarOnboardingCompleted: dbProfile.avatar_onboarding_completed,
     portraitUrl: emptyStringToNull(dbProfile.portrait_url),
     portraitSource: emptyStringToNull(dbProfile.portrait_source),
-    // UI preferences
-    glassEffectsEnabled: dbProfile.glass_effects_enabled ?? true,
   };
 }
 
@@ -848,7 +841,5 @@ function mapProfileToDb(profile: Profile, userId: string): any {
     avatar_status: profile.avatarStatus,
     avatar_url: profile.avatarUrl,
     avatar_onboarding_completed: profile.avatarOnboardingCompleted,
-    // UI preferences
-    glass_effects_enabled: profile.glassEffectsEnabled ?? true,
   };
 }

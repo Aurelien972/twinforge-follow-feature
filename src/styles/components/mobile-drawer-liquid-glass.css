@@ -413,16 +413,6 @@
 .mobile-drawer .sidebar-submenu-item--primary .sidebar-submenu-item-icon-container {
   width: 32px;
   height: 32px;
-  /* Par défaut, pas de fond coloré, juste un fond neutre */
-  background: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.08),
-    rgba(255, 255, 255, 0.04));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* L'icône est colorée par défaut pour les items primaires */
-.mobile-drawer .sidebar-submenu-item--primary .sidebar-submenu-item-icon {
-  color: var(--item-circuit-color, rgba(255, 255, 255, 0.7));
 }
 
 /* Sous-menus secondaires plus discrets */
@@ -500,16 +490,6 @@
     color-mix(in srgb, var(--submenu-color) 10%, transparent));
   color: white;
   font-weight: 600;
-}
-
-/* IMPORTANT: Le fond coloré n'apparaît QUE pour les items actifs - mobile drawer */
-.mobile-drawer .sidebar-submenu-item--primary.sidebar-submenu-item--active .sidebar-submenu-item-icon-container {
-  /* Fond coloré uniquement quand actif */
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--submenu-color) 25%, transparent),
-    color-mix(in srgb, var(--submenu-color) 15%, transparent));
-  border-color: color-mix(in srgb, var(--submenu-color) 40%, transparent);
-  box-shadow: 0 0 16px color-mix(in srgb, var(--submenu-color) 25%, transparent);
 }
 
 /* Couleurs spécifiques pour les onglets selon le contexte */

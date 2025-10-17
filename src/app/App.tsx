@@ -22,11 +22,11 @@ import CentralActionsMenu from './shell/CentralActionsMenu';
 import FloatingChatButton from '../ui/components/chat/FloatingChatButton';
 import GlobalChatDrawer from '../ui/components/chat/GlobalChatDrawer';
 import { ChatButtonProvider, useChatButtonRef } from '../system/context/ChatButtonContext';
-import { useGlassmorphismPreference } from '../hooks/useGlassmorphismPreference';
+import PerformanceRecommendationModal from '../ui/components/PerformanceRecommendationModal';
+import { usePreferencesStore } from '../system/store/preferencesStore';
+import { useUserStore } from '../system/store/userStore';
 
 function AppContent() {
-  // Apply glassmorphism preference to root element
-  useGlassmorphismPreference();
   const { isInstallable, isInstalled } = usePWAInstall();
   const { isUpdateAvailable, updateInfo, applyUpdate, dismissUpdate } = usePWAUpdate();
   const { showToast } = useToast();
@@ -34,8 +34,20 @@ function AppContent() {
   const { isAnyOpen, isOpen: checkIsOpen, close } = useOverlayStore();
   const isCentralMenuOpen = checkIsOpen('centralMenu');
   const { chatButtonRef } = useChatButtonRef();
+  const { user } = useUserStore();
+  const { loadPreferences, applyPreferencesToDOM } = usePreferencesStore();
 
   useGlobalEscapeKey();
+
+  useEffect(() => {
+    if (user?.id) {
+      loadPreferences(user.id);
+    }
+  }, [user?.id, loadPreferences]);
+
+  useEffect(() => {
+    applyPreferencesToDOM();
+  }, [applyPreferencesToDOM]);
 
   React.useEffect(() => {
     const anyOverlayOpen = isAnyOpen();
@@ -226,6 +238,8 @@ function AppContent() {
           }
         />
       )}
+
+      <PerformanceRecommendationModal />
 
       <UpdateNotification
         isVisible={isUpdateAvailable}

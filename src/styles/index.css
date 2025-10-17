@@ -33,6 +33,14 @@
 @import './glassV2/liquid-glass-premium.css';
 
 /* =========================================
+   PHASE 2.5: PERFORMANCE & THEME SYSTEMS
+   ========================================= */
+@import './performance/ultra-performance.css';
+@import './performance/optimized-mode.css';
+@import './themes/dark-mode.css';
+@import './themes/light-mode.css';
+
+/* =========================================
    PHASE 3: SYSTÈME D'ANIMATION UNIFIÉ
    ========================================= */
 @import './glassV2/animations.css';
@@ -124,12 +132,6 @@
 @import './effects/motion.css';
 @import './utilities/inline-style-overrides.css';
 @import './utilities/debug.css';
-
-/* =========================================
-   PHASE 11: GLASSMORPHISM CONTROL SYSTEM
-   Doit être chargé après tous les styles glass
-   ========================================= */
-@import './optimizations/glassmorphism-control.css';
 
 /* =========================================
    ENFORCEMENT GLOBAL - ÉLÉMENTS CRITIQUES

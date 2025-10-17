@@ -1,0 +1,292 @@
+/* =========================================
+   OPTIMIZED MODE - Reduced Glassmorphism
+   Minimal blur, subtle effects, optimized for 60fps on most devices
+   ========================================= */
+
+html.perf-optimized {
+  /* Reduced glass properties */
+  --glass-blur-adaptive: 4px;
+  --glass-saturate: 115%;
+  --animation-duration-adaptive: 150ms;
+}
+
+/* =========================================
+   OPTIMIZED GLASS CARDS
+   ========================================= */
+
+html.perf-optimized .glass-card,
+html.perf-optimized .glass-base {
+  /* Minimal blur */
+  backdrop-filter: blur(4px) saturate(115%) !important;
+
+  /* Lighter background for better performance */
+  background: color-mix(in srgb, var(--color-deep-forge-indigo) 4%, rgba(255, 255, 255, 0.04)) !important;
+
+  /* Subtle border */
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 12%, rgba(255, 255, 255, 0.12)) !important;
+
+  /* Simple shadow */
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+
+  /* Optimize rendering */
+  will-change: transform !important;
+  contain: layout style !important;
+}
+
+/* Hover - minimal animation */
+html.perf-optimized .glass-card:hover {
+  backdrop-filter: blur(6px) saturate(120%) !important;
+
+  background: color-mix(in srgb, var(--color-deep-forge-indigo) 5%, rgba(255, 255, 255, 0.05)) !important;
+
+  border-color: color-mix(in srgb, var(--color-plasma-cyan) 18%, rgba(255, 255, 255, 0.15)) !important;
+
+  transform: translateY(-1px) translateZ(0) !important;
+
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+
+  transition: all 150ms ease !important;
+}
+
+/* =========================================
+   DISABLE EXPENSIVE EFFECTS
+   ========================================= */
+
+html.perf-optimized .glass-sheen {
+  display: none !important;
+}
+
+html.perf-optimized .glass-card::before {
+  display: none !important;
+}
+
+html.perf-optimized .ambient-glow::after {
+  opacity: 0.3 !important;
+  filter: blur(20px) !important;
+}
+
+/* =========================================
+   OPTIMIZED BUTTONS
+   ========================================= */
+
+html.perf-optimized .btn-glass,
+html.perf-optimized button[class*="glass"] {
+  backdrop-filter: blur(4px) saturate(115%) !important;
+
+  background: color-mix(in srgb, var(--color-plasma-cyan) 6%, rgba(255, 255, 255, 0.04)) !important;
+
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 20%, rgba(255, 255, 255, 0.15)) !important;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+html.perf-optimized .btn-glass:hover {
+  backdrop-filter: blur(6px) saturate(120%) !important;
+
+  background: color-mix(in srgb, var(--color-plasma-cyan) 8%, rgba(255, 255, 255, 0.05)) !important;
+
+  transform: translateY(-1px) translateZ(0) !important;
+  transition: all 150ms ease !important;
+}
+
+/* =========================================
+   SIMPLIFIED ANIMATIONS
+   ========================================= */
+
+html.perf-optimized * {
+  animation-duration: calc(var(--animation-duration-adaptive) * 1.2) !important;
+  transition-duration: 150ms !important;
+}
+
+/* Disable shimmer and pulse */
+html.perf-optimized [class*="shimmer"],
+html.perf-optimized [class*="pulse"] {
+  animation: none !important;
+}
+
+/* Simplify glow effects */
+html.perf-optimized [class*="glow"]::after {
+  opacity: 0.4 !important;
+  filter: blur(16px) !important;
+}
+
+/* =========================================
+   NAVIGATION ELEMENTS
+   ========================================= */
+
+html.perf-optimized .sidebar-liquid-glass,
+html.perf-optimized .sidebar-glass-enhanced {
+  backdrop-filter: blur(8px) saturate(115%) !important;
+
+  background: color-mix(in srgb, var(--color-deep-forge-indigo) 5%, rgba(15, 23, 42, 0.85)) !important;
+
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 12%, rgba(255, 255, 255, 0.12)) !important;
+  border-radius: 24px !important;
+}
+
+/* Preserve sidebar icon containers */
+html.perf-optimized .sidebar-item-icon-container {
+  backdrop-filter: blur(6px) saturate(115%) !important;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 8%, rgba(255, 255, 255, 0.05)) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 18%, rgba(255, 255, 255, 0.15)) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html.perf-optimized .sidebar-item-icon-container--active {
+  background: color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 15%, rgba(255, 255, 255, 0.08)) !important;
+  border-color: color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 30%, rgba(255, 255, 255, 0.2)) !important;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 15%, transparent) !important;
+}
+
+html.perf-optimized .header-liquid-glass {
+  backdrop-filter: blur(8px) saturate(115%) !important;
+
+  background: color-mix(in srgb, var(--color-deep-forge-indigo) 4%, rgba(15, 23, 42, 0.8)) !important;
+
+  border-bottom: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 12%, rgba(255, 255, 255, 0.12)) !important;
+
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+html.perf-optimized .new-mobile-bottom-bar {
+  border-radius: 24px !important;
+}
+
+html.perf-optimized .new-mobile-bottom-bar-container {
+  backdrop-filter: blur(8px) saturate(115%) !important;
+
+  background: color-mix(in srgb, var(--color-deep-forge-indigo) 6%, rgba(10, 15, 30, 0.88)) !important;
+
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 15%, rgba(255, 255, 255, 0.12)) !important;
+  border-radius: 24px !important;
+}
+
+/* Preserve bottom bar icon containers */
+html.perf-optimized .new-bottom-bar-icon-container {
+  backdrop-filter: blur(6px) saturate(115%) !important;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 8%, rgba(255, 255, 255, 0.05)) !important;
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 18%, rgba(255, 255, 255, 0.15)) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html.perf-optimized .new-bottom-bar-icon-container--active {
+  background: color-mix(in srgb, var(--button-color) 15%, rgba(255, 255, 255, 0.08)) !important;
+  border-color: color-mix(in srgb, var(--button-color) 30%, rgba(255, 255, 255, 0.2)) !important;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--button-color) 15%, transparent) !important;
+}
+
+html.perf-optimized .new-bottom-bar-button--central .new-bottom-bar-icon-container {
+  background: color-mix(in srgb, var(--color-ember-copper) 12%, rgba(30, 27, 75, 0.15)) !important;
+  border-color: color-mix(in srgb, var(--color-ember-copper) 25%, rgba(255, 255, 255, 0.2)) !important;
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-ember-copper) 15%, transparent) !important;
+}
+
+/* =========================================
+   MODALS & OVERLAYS
+   ========================================= */
+
+html.perf-optimized .modal-content,
+html.perf-optimized .drawer-panel {
+  backdrop-filter: blur(6px) saturate(115%) !important;
+
+  background: color-mix(in srgb, var(--color-deep-forge-indigo) 8%, rgba(15, 23, 42, 0.9)) !important;
+
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 15%, rgba(255, 255, 255, 0.15)) !important;
+}
+
+html.perf-optimized .modal-backdrop {
+  backdrop-filter: blur(3px) !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* =========================================
+   3D VIEWER OPTIMIZATIONS
+   ========================================= */
+
+html.perf-optimized canvas {
+  image-rendering: auto !important;
+}
+
+html.perf-optimized .transform-gpu {
+  will-change: transform !important;
+}
+
+/* =========================================
+   SCROLL OPTIMIZATIONS
+   ========================================= */
+
+html.perf-optimized [data-scroll-reveal] {
+  transition: opacity 200ms ease, transform 200ms ease !important;
+}
+
+html.perf-optimized [data-scroll-reveal]:not([data-scroll-active]) {
+  opacity: 0.8 !important;
+}
+
+/* =========================================
+   INPUTS & FORMS
+   ========================================= */
+
+html.perf-optimized input,
+html.perf-optimized textarea,
+html.perf-optimized select {
+  backdrop-filter: blur(4px) saturate(110%) !important;
+
+  background: color-mix(in srgb, var(--color-deep-forge-indigo) 5%, rgba(255, 255, 255, 0.03)) !important;
+
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 15%, rgba(255, 255, 255, 0.12)) !important;
+}
+
+html.perf-optimized input:focus,
+html.perf-optimized textarea:focus {
+  backdrop-filter: blur(6px) saturate(115%) !important;
+
+  border-color: color-mix(in srgb, var(--color-plasma-cyan) 25%, rgba(255, 255, 255, 0.2)) !important;
+
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-plasma-cyan) 10%, rgba(255, 255, 255, 0.08)) !important;
+}
+
+/* =========================================
+   ACCENT ELEMENTS
+   ========================================= */
+
+html.perf-optimized [class*="accent"],
+html.perf-optimized .badge {
+  backdrop-filter: blur(4px) saturate(120%) !important;
+
+  background: color-mix(in srgb, var(--color-ember-copper) 12%, rgba(255, 255, 255, 0.06)) !important;
+
+  border: 1px solid color-mix(in srgb, var(--color-ember-copper) 25%, rgba(255, 255, 255, 0.15)) !important;
+}
+
+/* =========================================
+   PERFORMANCE MODE INDICATOR
+   ========================================= */
+
+html.perf-optimized .perf-indicator {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  padding: 6px 12px;
+  backdrop-filter: blur(4px) saturate(115%);
+  background: color-mix(in srgb, var(--color-plasma-cyan) 8%, rgba(255, 255, 255, 0.04));
+  border: 1px solid color-mix(in srgb, var(--color-plasma-cyan) 20%, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  color: var(--color-plasma-cyan);
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 9000;
+  pointer-events: none;
+}
