@@ -4,6 +4,23 @@ import { ICONS } from '../icons/registry';
 import SpatialIcon from '../icons/SpatialIcon';
 import { CIRCUIT_COLORS, type CircuitKey } from '../theme/circuits';
 
+// Hook pour détecter mobile
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return isMobile;
+};
+
 type Props = {
   icon?: keyof typeof ICONS;
   title: string;
@@ -14,15 +31,17 @@ type Props = {
   iconColor?: string;
 };
 
-export default function PageHeader({ 
-  icon = 'Home', 
-  title, 
-  subtitle, 
-  actions, 
+export default function PageHeader({
+  icon = 'Home',
+  title,
+  subtitle,
+  actions,
   className = '',
   circuit = 'home',
   iconColor
 }: Props) {
+  const isMobile = useIsMobile();
+
   // Gestion spéciale pour certains circuits
   const finalIcon = (() => {
     if (circuit === 'track') return ICONS.Target;
@@ -31,6 +50,9 @@ export default function PageHeader({
 
   // Utiliser la couleur spécifique ou celle du circuit
   const finalCircuitColor = iconColor || CIRCUIT_COLORS[circuit];
+
+  // Taille de l'icône: beaucoup plus grande sur mobile pour remplir le conteneur
+  const iconSize = isMobile ? 72 : 56;
   
   return (
     <header
@@ -77,7 +99,7 @@ export default function PageHeader({
           >
             <SpatialIcon
               Icon={finalIcon}
-              size={56}
+              size={iconSize}
               variant="pure"
               className="text-white relative z-10"
               style={{
