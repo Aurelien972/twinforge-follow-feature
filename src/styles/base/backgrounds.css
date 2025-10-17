@@ -39,6 +39,9 @@
   inset: 0;
   z-index: -10;
   overflow: hidden;
+  display: block !important;
+  visibility: visible !important;
+  pointer-events: none;
 
   background:
     /* Nébuleuse chaude (bas-gauche) - réduite 60% pour glass prominence */
@@ -73,12 +76,14 @@
 .cosmic-forge-particles {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -5;
   pointer-events: none;
   overflow: visible; /* S'assurer qu'aucune particule n'est masquée */
   width: 100vw;
   height: 100vh;
   opacity: 0.4; /* Réduit pour prominence du glass */
+  display: block !important;
+  visibility: visible !important;
 
   transform: translateZ(0);
   will-change: opacity;

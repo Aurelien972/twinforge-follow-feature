@@ -291,22 +291,26 @@ function ForgeBackground() {
 
   return (
     <>
-      {/* Background gradient */}
+      {/* Background gradient - CRITICAL: Must be visible on all devices */}
       <div className="bg-twinforge-visionos" style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 0,
+        zIndex: -10,
         pointerEvents: 'none',
-        background: 'radial-gradient(circle at 50% 50%, #1A1F2E 0%, #0F1419 60%, #0B0E17 100%)'
+        background: 'radial-gradient(circle at 50% 50%, #1A1F2E 0%, #0F1419 60%, #0B0E17 100%)',
+        display: 'block',
+        visibility: 'visible'
       }} />
 
-      {/* Particles container */}
+      {/* Particles container - CRITICAL: Must be visible on all devices */}
       <div className="cosmic-forge-particles" ref={particlesRef} style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 1,
+        zIndex: -5,
         pointerEvents: 'none',
-        opacity: 0.4
+        opacity: 0.4,
+        display: 'block',
+        visibility: 'visible'
       }}>
         {particles.map((particle) => (
           <div

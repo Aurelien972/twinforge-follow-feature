@@ -32,13 +32,17 @@
     background: transparent;
     position: relative;
     z-index: 5;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   /* Main app container gets the dark background */
   #root > div {
-    background: rgba(11, 14, 23, 0.95) !important;
+    background: transparent !important;
     position: relative;
     z-index: 10;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   /* Touch optimization for interactive elements */
