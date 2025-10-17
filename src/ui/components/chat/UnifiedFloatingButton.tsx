@@ -17,7 +17,6 @@ import { Haptics } from '../../../utils/haptics';
 import ContextualTooltip from '../ContextualTooltip';
 import ChatNotificationBubble from './ChatNotificationBubble';
 import { chatNotificationService } from '../../../system/services/chatNotificationService';
-import { useScrollDirection } from '../../../hooks/useScrollDirection';
 import '../../../styles/components/unified-floating-button.css';
 
 interface UnifiedFloatingButtonProps {
@@ -29,7 +28,6 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
     const location = useLocation();
     const { click } = useFeedback();
     const isMobile = useIsMobile();
-    const { isScrollingDown } = useScrollDirection({ threshold: 10 });
     const [isDesktop, setIsDesktop] = useState(
       typeof window !== 'undefined' ? window.innerWidth >= 1025 : false
     );
@@ -48,9 +46,6 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
     } = useUnifiedCoachStore();
 
     const isStep2Active = isInStep2 || location.pathname.includes('/pipeline/step-2');
-
-    // Sur desktop, cacher le bouton chat quand on scroll vers le bas
-    const shouldHideButton = !isMobile && isScrollingDown;
 
     useEffect(() => {
       const handleResize = () => {
@@ -112,7 +107,7 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
         } ${isVoiceMode ? 'unified-floating-button--voice' : 'unified-floating-button--text'} ${className}`}
         style={{
           position: 'fixed',
-          right: shouldHideButton || (isPanelOpen && !isDesktop) ? '-100px' : isDesktop ? '24px' : '8px',
+          right: isPanelOpen && !isDesktop ? '-100px' : isDesktop ? '24px' : '8px',
           bottom: isDesktop
             ? '24px'
             : 'calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px)',
@@ -122,7 +117,6 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
           backfaceVisibility: 'hidden',
           WebkitBackfaceVisibility: 'hidden',
           pointerEvents: 'auto',
-          transition: 'right 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           borderRadius: '50%',
           overflow: 'visible',
           display: 'flex',

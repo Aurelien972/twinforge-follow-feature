@@ -11,7 +11,6 @@ import { BackButton } from '../../../ui/buttons';
 import { useOverlayStore } from '../../../system/store/overlayStore';
 import CentralActionsMenu from '../CentralActionsMenu';
 import { useIsMobile } from '../../../system/device/DeviceProvider';
-import { useScrollDirection } from '../../../hooks/useScrollDirection';
 
 export const Header = React.memo(() => {
   const { setDrawer } = useShell();
@@ -19,10 +18,6 @@ export const Header = React.memo(() => {
   const { isOpen, toggle } = useOverlayStore();
   const centralMenuOpen = isOpen('centralMenu');
   const isMobile = useIsMobile();
-  const { isScrollingDown, isStatic } = useScrollDirection({ threshold: 10 });
-
-  // Sur desktop, cacher le header quand on scroll vers le bas
-  const shouldHideHeader = !isMobile && isScrollingDown;
 
   return (
     <>
@@ -38,7 +33,7 @@ export const Header = React.memo(() => {
           position: 'fixed',
           left: '24px',
           right: '24px',
-          top: shouldHideHeader ? '-80px' : '8px',
+          top: '8px',
           borderRadius: '20px',
           overflow: 'hidden',
           transform: 'translate3d(0, 0, 0)',
@@ -46,7 +41,6 @@ export const Header = React.memo(() => {
           backfaceVisibility: 'hidden',
           WebkitBackfaceVisibility: 'hidden',
           pointerEvents: 'auto',
-          transition: 'top 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
         role="banner"
         aria-label="TwinForge Pont de Commandement"
