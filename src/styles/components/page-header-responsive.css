@@ -55,10 +55,41 @@
 }
 
 /* =========================================
-   MOBILE ICON SIZE OPTIMIZATIONS
+   MOBILE ICON SIZE OPTIMIZATIONS - FORCE LARGE ICONS
    ========================================= */
 
-/* Small mobile screens: Slightly smaller icons */
+/* FORCE LARGE ICON SIZE ON MOBILE/TABLET - CRITICAL FIX */
+@media (max-width: 1024px) {
+  /* Target all PageHeader icons via SpatialIcon wrapper */
+  header[role="banner"] .breathing-icon svg {
+    width: 80px !important;
+    height: 80px !important;
+    min-width: 80px !important;
+    min-height: 80px !important;
+  }
+
+  /* Alternative selector for direct icon sizing */
+  header[role="banner"] .breathing-icon [class*="lucide"] {
+    width: 80px !important;
+    height: 80px !important;
+    stroke-width: 1.5 !important; /* Thinner stroke for larger icon */
+  }
+}
+
+/* Extra enforcement on small screens */
+@media (max-width: 768px) {
+  header[role="banner"] .breathing-icon svg {
+    width: 76px !important;
+    height: 76px !important;
+  }
+
+  header[role="banner"] .breathing-icon [class*="lucide"] {
+    width: 76px !important;
+    height: 76px !important;
+  }
+}
+
+/* Small mobile screens: Slightly smaller text */
 @media (max-width: 480px) {
   .page-header-title {
     font-size: 1.5rem !important; /* 24px */
@@ -66,6 +97,17 @@
 
   .page-header-subtitle {
     font-size: 1rem !important; /* 16px */
+  }
+
+  /* Adjust icon for very small screens */
+  header[role="banner"] .breathing-icon svg {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  header[role="banner"] .breathing-icon [class*="lucide"] {
+    width: 70px !important;
+    height: 70px !important;
   }
 }
 
@@ -77,5 +119,15 @@
 
   .page-header-subtitle {
     font-size: 0.9375rem !important; /* 15px */
+  }
+
+  header[role="banner"] .breathing-icon svg {
+    width: 64px !important;
+    height: 64px !important;
+  }
+
+  header[role="banner"] .breathing-icon [class*="lucide"] {
+    width: 64px !important;
+    height: 64px !important;
   }
 }
