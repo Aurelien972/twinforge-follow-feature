@@ -112,11 +112,6 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
             ? '24px'
             : 'calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px)',
           zIndex: Z_INDEX.FLOATING_CHAT_BUTTON,
-          transform: 'translate3d(0, 0, 0)',
-          WebkitTransform: 'translate3d(0, 0, 0)',
-          backfaceVisibility: 'hidden',
-          WebkitBackfaceVisibility: 'hidden',
-          pointerEvents: 'auto',
           borderRadius: '50%',
           overflow: 'visible',
           display: 'flex',

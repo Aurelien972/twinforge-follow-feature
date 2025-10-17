@@ -14,14 +14,10 @@
   isolation: isolate !important;
   border-radius: 20px !important;
   overflow: visible !important;
-  transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
-  will-change: transform !important;
+  transform: translateZ(0) !important;
+  will-change: transform, filter !important;
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
-  /* CRITICAL for iOS Safari */
-  -webkit-overflow-scrolling: touch !important;
-  pointer-events: auto !important;
 
   /* DESKTOP ONLY - Ultra-transparent Liquid Glass */
   background:
@@ -122,13 +118,9 @@
 @media (max-width: 1024px) {
   body .header-liquid-glass,
   .header-liquid-glass {
-    position: fixed !important;
     left: 8px !important;
     right: 8px !important;
     top: 6px !important;
-    /* CRITICAL: Force fixed positioning on mobile */
-    transform: translate3d(0, 0, 0) !important;
-    -webkit-transform: translate3d(0, 0, 0) !important;
 
     /* USE EXACT SAME BACKGROUND AS BOTTOMBAR */
     background:
