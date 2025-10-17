@@ -3,6 +3,7 @@ import { fr } from 'date-fns/locale';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { useRecentActivities } from '../../hooks/useActivitiesData';
 import React from 'react';
 
 // Optimized with CSS classes - see dailyRecap.css
@@ -22,6 +23,10 @@ interface DailyStatsGridProps {
  * OPTIMIZED: Styles inline remplacés par classes CSS réutilisables
  */
 const DailyStatsGrid: React.FC<DailyStatsGridProps> = React.memo(({ todayStats }) => {
+  // Récupérer la dernière activité de l'historique
+  const { data: recentActivities = [] } = useRecentActivities(1);
+  const lastActivity = recentActivities[0];
+
   return (
     <div className="daily-stats-grid">
       {/* Énergie Quotidienne (Calories brûlées) */}
@@ -58,21 +63,34 @@ const DailyStatsGrid: React.FC<DailyStatsGridProps> = React.memo(({ todayStats }
         </div>
       </GlassCard>
 
-      {/* Dernière Activité */}
+      {/* Dernière Activité de l'historique */}
       <GlassCard className="daily-stat-card daily-stat-card-accent">
         <div className="text-center mb-6">
           <div className="daily-stat-icon-container daily-stat-icon-accent">
             <SpatialIcon Icon={ICONS.Clock} size={28} className="text-purple-400" />
           </div>
           <h3 className="daily-stat-title">Dernière Activité</h3>
-          <p className="daily-stat-subtitle">Heure de la dernière forge</p>
+          <p className="daily-stat-subtitle">Historique des forges</p>
         </div>
-        <div className="daily-stat-value">
-          {todayStats?.lastActivityTime ? format(todayStats.lastActivityTime, 'HH:mm') : '--:--'}
-        </div>
-        <div className="daily-stat-label">
-          {todayStats?.lastActivityTime ? format(todayStats.lastActivityTime, 'dd/MM', { locale: fr }) : 'Aucune aujourd\'hui'}
-        </div>
+        {lastActivity ? (
+          <>
+            <div className="daily-stat-value text-lg">
+              {lastActivity.type}
+            </div>
+            <div className="daily-stat-label">
+              {format(new Date(lastActivity.timestamp), 'dd MMM à HH:mm', { locale: fr })} • {lastActivity.duration_min} min
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="daily-stat-value">
+              --:--
+            </div>
+            <div className="daily-stat-label">
+              Aucune activité
+            </div>
+          </>
+        )}
       </GlassCard>
     </div>
   );
