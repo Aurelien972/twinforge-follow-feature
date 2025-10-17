@@ -14,6 +14,8 @@ import { useGlobalChatStore } from '../../../system/store/globalChatStore';
 import { Z_INDEX } from '../../../system/store/overlayStore';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
+import { voiceCoachOrchestrator } from '../../../system/services/voiceCoachOrchestrator';
+import logger from '../../../lib/utils/logger';
 import '../../../styles/components/floating-voice-coach-button.css';
 
 interface FloatingVoiceCoachButtonProps {
@@ -79,18 +81,35 @@ const FloatingVoiceCoachButton = React.forwardRef<HTMLButtonElement, FloatingVoi
       click();
       Haptics.press();
 
-      if (voiceState === 'idle') {
-        // Ouvrir le panel et démarrer l'écoute
-        togglePanel();
-        if (!isPanelOpen) {
-          await startListening();
+      try {
+        if (voiceState === 'idle') {
+          // Vérifier que l'orchestrateur est initialisé
+          if (!voiceCoachOrchestrator.initialized) {
+            logger.error('VOICE_COACH_BUTTON', 'Orchestrator not initialized');
+            return;
+          }
+
+          // Ouvrir le panel
+          if (!isPanelOpen) {
+            togglePanel();
+          }
+
+          // Démarrer une session vocale via l'orchestrateur
+          await voiceCoachOrchestrator.startVoiceSession(currentMode);
+
+          logger.info('VOICE_COACH_BUTTON', 'Voice session started', { mode: currentMode });
+
+        } else if (voiceState === 'listening' || voiceState === 'speaking') {
+          // Arrêter la session vocale
+          await voiceCoachOrchestrator.stopVoiceSession();
+          logger.info('VOICE_COACH_BUTTON', 'Voice session stopped');
+
+        } else {
+          // Toggle panel pour les autres états (processing, error)
+          togglePanel();
         }
-      } else if (voiceState === 'listening') {
-        // Arrêter l'écoute
-        // La fonction sera implémentée via le store
-      } else {
-        // Toggle panel pour les autres états
-        togglePanel();
+      } catch (error) {
+        logger.error('VOICE_COACH_BUTTON', 'Error handling click', { error });
       }
     };
 

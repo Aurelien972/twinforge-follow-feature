@@ -22,6 +22,7 @@ import CentralActionsMenu from './shell/CentralActionsMenu';
 import FloatingVoiceCoachButton from '../ui/components/chat/FloatingVoiceCoachButton';
 import VoiceCoachPanel from '../ui/components/chat/VoiceCoachPanel';
 import { ChatButtonProvider, useChatButtonRef } from '../system/context/ChatButtonContext';
+import { useVoiceCoachInitialization } from '../hooks/useVoiceCoachInitialization';
 
 function AppContent() {
   const { isInstallable, isInstalled } = usePWAInstall();
@@ -31,6 +32,9 @@ function AppContent() {
   const { isAnyOpen, isOpen: checkIsOpen, close } = useOverlayStore();
   const isCentralMenuOpen = checkIsOpen('centralMenu');
   const { chatButtonRef } = useChatButtonRef();
+
+  // Initialiser le système Voice Coach
+  useVoiceCoachInitialization();
 
   useGlobalEscapeKey();
 

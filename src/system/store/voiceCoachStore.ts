@@ -11,6 +11,7 @@ import type { ChatMode } from './globalChatStore';
 export type VoiceState = 'idle' | 'listening' | 'processing' | 'speaking' | 'error';
 export type VoiceMode = 'auto' | 'push-to-talk' | 'continuous';
 export type VoiceType = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+export type CommunicationMode = 'voice' | 'text';
 
 export interface VoiceMessage {
   id: string;
@@ -57,6 +58,7 @@ interface VoiceCoachState {
   // État vocal
   voiceState: VoiceState;
   currentMode: ChatMode;
+  communicationMode: CommunicationMode;
 
   // Conversation active
   activeConversationId: string | null;
@@ -119,6 +121,8 @@ interface VoiceCoachState {
   minimizePanel: () => void;
   maximizePanel: () => void;
   toggleTranscript: () => void;
+  setCommunicationMode: (mode: CommunicationMode) => void;
+  toggleCommunicationMode: () => void;
 
   // Actions d'état
   setVoiceState: (state: VoiceState) => void;
@@ -151,6 +155,7 @@ export const useVoiceCoachStore = create<VoiceCoachState>()(
       connectionError: null,
       voiceState: 'idle',
       currentMode: 'general',
+      communicationMode: 'voice',
       activeConversationId: null,
       messages: [],
       currentTranscription: '',
@@ -503,6 +508,18 @@ export const useVoiceCoachStore = create<VoiceCoachState>()(
         logger.debug('VOICE_COACH', 'Transcript toggled', { show: !show });
       },
 
+      setCommunicationMode: (mode: CommunicationMode) => {
+        set({ communicationMode: mode });
+        logger.debug('VOICE_COACH', 'Communication mode changed', { mode });
+      },
+
+      toggleCommunicationMode: () => {
+        const currentMode = get().communicationMode;
+        const newMode: CommunicationMode = currentMode === 'voice' ? 'text' : 'voice';
+        set({ communicationMode: newMode });
+        logger.debug('VOICE_COACH', 'Communication mode toggled', { newMode });
+      },
+
       // Actions d'état
       setVoiceState: (state: VoiceState) => {
         set({ voiceState: state });
@@ -527,7 +544,8 @@ export const useVoiceCoachStore = create<VoiceCoachState>()(
       partialize: (state) => ({
         preferences: state.preferences,
         showTranscript: state.showTranscript,
-        isPanelMinimized: state.isPanelMinimized
+        isPanelMinimized: state.isPanelMinimized,
+        communicationMode: state.communicationMode
       })
     }
   )

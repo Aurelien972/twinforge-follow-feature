@@ -9,6 +9,7 @@ import { useVoiceCoachStore } from '../store/voiceCoachStore';
 import { useGlobalChatStore } from '../store/globalChatStore';
 import { openaiRealtimeService } from './openaiRealtimeService';
 import { audioInputService } from './audioInputService';
+import { audioOutputService } from './audioOutputService';
 import type { VoiceState } from '../store/voiceCoachStore';
 
 class VoiceCoachOrchestrator {
@@ -17,6 +18,7 @@ class VoiceCoachOrchestrator {
   private isProcessingAudio = false;
   private silenceTimer: NodeJS.Timeout | null = null;
   private silenceDuration = 1500; // ms de silence avant d'envoyer
+  private currentCoachMessage = ''; // Accumulation de la transcription du coach
 
   /**
    * Initialiser l'orchestrateur
@@ -42,6 +44,9 @@ class VoiceCoachOrchestrator {
 
       // Setup event handlers pour l'audio input
       this.setupAudioHandlers();
+
+      // Initialiser le service de sortie audio
+      await audioOutputService.initialize(24000);
 
       this.isInitialized = true;
 
@@ -131,6 +136,9 @@ class VoiceCoachOrchestrator {
 
       // Déconnecter de l'API
       openaiRealtimeService.disconnect();
+
+      // Arrêter la lecture audio
+      audioOutputService.stop();
 
       // Nettoyer l'audio input
       audioInputService.cleanup();
@@ -295,7 +303,14 @@ class VoiceCoachOrchestrator {
     const store = useVoiceCoachStore.getState();
 
     switch (message.type) {
-      // Transcription de l'utilisateur
+      // Transcription de l'utilisateur en cours (delta)
+      case 'conversation.item.input_audio_transcription.delta':
+        if (message.delta) {
+          store.updateTranscription(store.currentTranscription + message.delta);
+        }
+        break;
+
+      // Transcription de l'utilisateur complète
       case 'conversation.item.input_audio_transcription.completed':
         if (message.transcript) {
           store.updateTranscription(message.transcript);
@@ -305,31 +320,70 @@ class VoiceCoachOrchestrator {
 
       // Début de réponse du coach
       case 'response.audio.delta':
+        // Changer l'état en speaking dès le premier chunk audio
         if (store.voiceState !== 'speaking') {
           store.setVoiceState('speaking');
         }
-        // Ici on pourrait jouer l'audio reçu
+
+        // Jouer l'audio reçu
+        if (message.delta) {
+          audioOutputService.addAudioChunk(message.delta);
+        }
         break;
 
-      // Transcription de la réponse du coach
+      // Transcription de la réponse du coach (delta)
       case 'response.audio_transcript.delta':
         if (message.delta) {
-          // Ajouter au message du coach
-          const lastMessage = store.messages[store.messages.length - 1];
-          if (lastMessage && lastMessage.role === 'coach') {
-            // Update le contenu du dernier message
+          this.currentCoachMessage += message.delta;
+
+          // Mettre à jour le dernier message ou en créer un nouveau
+          const messages = store.messages;
+          const lastMessage = messages[messages.length - 1];
+
+          if (lastMessage && lastMessage.role === 'coach' && !lastMessage.content.includes('[COMPLETE]')) {
+            // Mettre à jour le message existant
+            // Note: Zustand nécessite une nouvelle référence
+            const updatedMessages = [...messages];
+            updatedMessages[updatedMessages.length - 1] = {
+              ...lastMessage,
+              content: this.currentCoachMessage
+            };
           } else {
-            // Créer un nouveau message
+            // Créer un nouveau message du coach
             store.addMessage({
               role: 'coach',
-              content: message.delta
+              content: this.currentCoachMessage
             });
           }
         }
         break;
 
-      // Fin de réponse
+      // Transcription du coach complète
+      case 'response.audio_transcript.done':
+        if (this.currentCoachMessage) {
+          // Finaliser le message du coach
+          const messages = store.messages;
+          const lastMessage = messages[messages.length - 1];
+
+          if (lastMessage && lastMessage.role === 'coach') {
+            const updatedMessages = [...messages];
+            updatedMessages[updatedMessages.length - 1] = {
+              ...lastMessage,
+              content: this.currentCoachMessage + '[COMPLETE]'
+            };
+          }
+
+          // Réinitialiser l'accumulation
+          this.currentCoachMessage = '';
+        }
+        break;
+
+      // Fin de réponse audio
       case 'response.audio.done':
+        logger.debug('VOICE_ORCHESTRATOR', 'Audio response completed');
+        break;
+
+      // Fin de réponse complète
       case 'response.done':
         store.setVoiceState('idle');
 
@@ -337,7 +391,7 @@ class VoiceCoachOrchestrator {
         if (store.preferences.defaultMode === 'continuous') {
           setTimeout(() => {
             if (store.voiceState === 'idle') {
-              store.startListening();
+              this.startVoiceSession(store.currentMode);
             }
           }, 500);
         }
@@ -348,6 +402,18 @@ class VoiceCoachOrchestrator {
         logger.error('VOICE_ORCHESTRATOR', 'Realtime API error', { message });
         store.setVoiceState('error');
         store.setError(message.error?.message || 'Unknown error');
+        audioOutputService.stop();
+        break;
+
+      // Session mise à jour
+      case 'session.updated':
+        logger.info('VOICE_ORCHESTRATOR', 'Session configuration updated');
+        break;
+
+      // Début de création de réponse
+      case 'response.created':
+        logger.debug('VOICE_ORCHESTRATOR', 'Response creation started');
+        store.setVoiceState('processing');
         break;
 
       default:
@@ -380,9 +446,18 @@ class VoiceCoachOrchestrator {
       this.silenceTimer = null;
     }
 
+    audioOutputService.cleanup();
     this.audioBuffer = [];
     this.isProcessingAudio = false;
+    this.currentCoachMessage = '';
     this.isInitialized = false;
+  }
+
+  /**
+   * Vérifier si l'orchestrateur est initialisé
+   */
+  get initialized(): boolean {
+    return this.isInitialized;
   }
 }
 

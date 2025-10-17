@@ -13,7 +13,9 @@ import { useGlobalChatStore } from '../../../system/store/globalChatStore';
 import { Z_INDEX } from '../../../system/store/overlayStore';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
+import { openaiRealtimeService } from '../../../system/services/openaiRealtimeService';
 import AudioWaveform from './AudioWaveform';
+import TextChatInput from './TextChatInput';
 import '../../../styles/components/voice-coach-panel.css';
 
 const VoiceCoachPanel: React.FC = () => {
@@ -29,11 +31,14 @@ const VoiceCoachPanel: React.FC = () => {
     showTranscript,
     visualization,
     preferences,
+    communicationMode,
     closePanel,
     minimizePanel,
     maximizePanel,
     toggleTranscript,
-    stopListening
+    toggleCommunicationMode,
+    stopListening,
+    addMessage
   } = useVoiceCoachStore();
 
   const { currentMode, modeConfigs } = useGlobalChatStore();
@@ -72,6 +77,19 @@ const VoiceCoachPanel: React.FC = () => {
       stopListening();
     }
   };
+
+  const handleSendTextMessage = (text: string) => {
+    // Ajouter le message de l'utilisateur
+    addMessage({
+      role: 'user',
+      content: text
+    });
+
+    // Envoyer via l'API Realtime
+    openaiRealtimeService.sendTextMessage(text);
+  };
+
+  const isTextMode = communicationMode === 'text';
 
   return (
     <AnimatePresence>
@@ -219,12 +237,16 @@ const VoiceCoachPanel: React.FC = () => {
                   <div>
                     <h3 className="text-white font-bold text-base">{modeConfig.displayName}</h3>
                     <p className="text-white/60 text-xs">
-                      {voiceState === 'listening'
+                      {isTextMode
+                        ? 'Mode texte'
+                        : voiceState === 'listening'
                         ? 'En écoute...'
                         : voiceState === 'speaking'
                         ? 'En train de parler...'
                         : voiceState === 'processing'
                         ? 'Traitement...'
+                        : voiceState === 'error'
+                        ? 'Erreur de connexion'
                         : 'Prêt à écouter'}
                     </p>
                   </div>
@@ -232,8 +254,40 @@ const VoiceCoachPanel: React.FC = () => {
               )}
 
               <div className="flex items-center gap-2">
-                {/* Toggle transcript */}
+                {/* Toggle communication mode (voice/text) */}
                 {!isPanelMinimized && (
+                  <motion.button
+                    onClick={toggleCommunicationMode}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      background: isTextMode
+                        ? `rgba(255, 255, 255, 0.15)`
+                        : 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer'
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    title={isTextMode ? 'Passer en mode vocal' : 'Passer en mode texte'}
+                  >
+                    <SpatialIcon
+                      Icon={isTextMode ? ICONS.Mic : ICONS.MessageSquare}
+                      size={16}
+                      style={{
+                        color: isTextMode ? modeColor : 'rgba(255, 255, 255, 0.7)',
+                        filter: isTextMode ? `drop-shadow(0 0 8px ${modeColor})` : 'none'
+                      }}
+                    />
+                  </motion.button>
+                )}
+
+                {/* Toggle transcript (only in voice mode) */}
+                {!isPanelMinimized && !isTextMode && (
                   <motion.button
                     onClick={toggleTranscript}
                     style={{
@@ -315,8 +369,8 @@ const VoiceCoachPanel: React.FC = () => {
             {/* Content */}
             {!isPanelMinimized && (
               <div className="voice-panel-content flex-1 overflow-hidden flex flex-col">
-                {/* Visualisation audio */}
-                {preferences.showVisualizations && (
+                {/* Visualisation audio (only in voice mode) */}
+                {!isTextMode && preferences.showVisualizations && (
                   <div
                     className="audio-visualization-container"
                     style={{
@@ -333,8 +387,8 @@ const VoiceCoachPanel: React.FC = () => {
                   </div>
                 )}
 
-                {/* Messages / Transcription */}
-                {showTranscript && (
+                {/* Messages / Transcription (always shown in text mode, conditional in voice mode) */}
+                {(isTextMode || showTranscript) && (
                   <div
                     className="messages-container flex-1 overflow-y-auto px-4 py-3"
                     style={{
@@ -429,6 +483,16 @@ const VoiceCoachPanel: React.FC = () => {
                       </>
                     )}
                   </div>
+                )}
+
+                {/* Text Chat Input (only in text mode) */}
+                {isTextMode && !isPanelMinimized && (
+                  <TextChatInput
+                    onSendMessage={handleSendTextMessage}
+                    disabled={voiceState === 'processing'}
+                    placeholder="Tapez votre message..."
+                    color={modeColor}
+                  />
                 )}
               </div>
             )}
