@@ -25,25 +25,41 @@ class AudioOutputService {
    */
   async initialize(sampleRate = 24000): Promise<void> {
     try {
-      logger.info('AUDIO_OUTPUT', 'Initializing audio output service');
+      logger.info('AUDIO_OUTPUT', 'Initializing audio output service', { sampleRate });
 
       this.sampleRate = sampleRate;
 
       // Créer le contexte audio s'il n'existe pas
       if (!this.audioContext) {
-        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({
+        logger.debug('AUDIO_OUTPUT', 'Creating AudioContext');
+
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioContextClass) {
+          throw new Error('AudioContext not supported in this browser');
+        }
+
+        this.audioContext = new AudioContextClass({
           sampleRate: this.sampleRate
+        });
+
+        logger.debug('AUDIO_OUTPUT', 'AudioContext created', {
+          state: this.audioContext.state,
+          sampleRate: this.audioContext.sampleRate
         });
       }
 
       // Créer le gain node pour contrôler le volume
+      logger.debug('AUDIO_OUTPUT', 'Creating gain node');
       this.gainNode = this.audioContext.createGain();
       this.gainNode.gain.value = this.volume;
       this.gainNode.connect(this.audioContext.destination);
 
       logger.info('AUDIO_OUTPUT', 'Audio output service initialized successfully');
     } catch (error) {
-      logger.error('AUDIO_OUTPUT', 'Failed to initialize audio output', { error });
+      logger.error('AUDIO_OUTPUT', 'Failed to initialize audio output', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       throw error;
     }
   }

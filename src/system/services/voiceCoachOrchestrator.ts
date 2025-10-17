@@ -33,26 +33,36 @@ class VoiceCoachOrchestrator {
       logger.info('VOICE_ORCHESTRATOR', 'Initializing voice coach orchestrator');
 
       // Récupérer la clé API depuis l'environnement
+      logger.debug('VOICE_ORCHESTRATOR', 'Checking for OpenAI API key');
       const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
       if (!apiKey) {
+        logger.error('VOICE_ORCHESTRATOR', 'OpenAI API key not found in environment variables');
         throw new Error('OpenAI API key not found');
       }
 
+      logger.debug('VOICE_ORCHESTRATOR', 'API key found, setting up handlers');
+
       // Setup event handlers pour l'API Realtime
+      logger.debug('VOICE_ORCHESTRATOR', 'Setting up Realtime handlers');
       this.setupRealtimeHandlers();
 
       // Setup event handlers pour l'audio input
+      logger.debug('VOICE_ORCHESTRATOR', 'Setting up audio input handlers');
       this.setupAudioHandlers();
 
       // Initialiser le service de sortie audio
+      logger.debug('VOICE_ORCHESTRATOR', 'Initializing audio output service');
       await audioOutputService.initialize(24000);
 
       this.isInitialized = true;
 
-      logger.info('VOICE_ORCHESTRATOR', 'Voice coach orchestrator initialized');
+      logger.info('VOICE_ORCHESTRATOR', 'Voice coach orchestrator initialized successfully');
     } catch (error) {
-      logger.error('VOICE_ORCHESTRATOR', 'Initialization failed', { error });
+      logger.error('VOICE_ORCHESTRATOR', 'Initialization failed', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       throw error;
     }
   }

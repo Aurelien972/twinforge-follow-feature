@@ -85,9 +85,22 @@ const FloatingVoiceCoachButton = React.forwardRef<HTMLButtonElement, FloatingVoi
         if (voiceState === 'idle') {
           // Vérifier que l'orchestrateur est initialisé
           if (!voiceCoachOrchestrator.initialized) {
-            logger.error('VOICE_COACH_BUTTON', 'Orchestrator not initialized');
+            logger.error('VOICE_COACH_BUTTON', 'Orchestrator not initialized - voice system is disabled. Check if VITE_OPENAI_API_KEY is configured.');
+
+            // Message détaillé pour l'utilisateur
+            const message =
+              'Le système vocal n\'est pas disponible.\n\n' +
+              'Pour l\'activer :\n' +
+              '1. Ajoutez votre clé API OpenAI dans le fichier .env\n' +
+              '2. Créez la variable VITE_OPENAI_API_KEY=sk-votre-cle\n' +
+              '3. Redémarrez l\'application\n\n' +
+              'Consultez VOICE_COACH_SETUP.md pour plus de détails.';
+
+            alert(message);
             return;
           }
+
+          logger.info('VOICE_COACH_BUTTON', 'Starting voice session', { currentMode });
 
           // Ouvrir le panel
           if (!isPanelOpen) {

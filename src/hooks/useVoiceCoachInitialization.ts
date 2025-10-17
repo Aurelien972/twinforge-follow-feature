@@ -26,9 +26,15 @@ export function useVoiceCoachInitialization() {
           await voiceCoachOrchestrator.initialize();
           isInitialized.current = true;
           logger.info('VOICE_COACH_INIT', 'Voice coach orchestrator ready');
+        } else {
+          logger.debug('VOICE_COACH_INIT', 'Voice coach orchestrator already initialized');
+          isInitialized.current = true;
         }
       } catch (error) {
-        logger.error('VOICE_COACH_INIT', 'Failed to initialize voice coach orchestrator', { error });
+        logger.error('VOICE_COACH_INIT', 'Failed to initialize voice coach orchestrator', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined
+        });
         // Ne pas throw pour ne pas crasher l'app
         // Le système voice sera simplement désactivé
       } finally {
