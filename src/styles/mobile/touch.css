@@ -6,9 +6,14 @@
 html{
   -webkit-tap-highlight-color:transparent;
   -webkit-touch-callout:none;
+  /* DO NOT disable user-select globally - breaks scroll */
+}
+
+button, [role="button"] {
   -webkit-user-select:none;
   user-select:none;
 }
+
 input, textarea, [contenteditable]{ -webkit-user-select:auto; user-select:auto; }
 
 /* Touch feedback (CSS-only) - Réduit pour mobile */
@@ -40,6 +45,13 @@ input[type="submit"],input[type="button"]{
   touch-action:manipulation;
 }
 
+/* CRITICAL: Ensure body and main containers allow scroll */
+body, #root, [class*="route-container"], main {
+  touch-action: pan-y pinch-zoom !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: auto !important;
+}
+
 /* Expansion halos */
 .touch-extend::before,.touch-target-expanded::before{
   content:""; position:absolute; inset:-8px; border-radius:inherit; z-index:-1;
@@ -54,10 +66,15 @@ input[type="submit"],input[type="button"]{
 .momentum-scroll-enhanced{
   -webkit-overflow-scrolling:touch;
   scroll-behavior:smooth;
-  overscroll-behavior:contain;
-  scroll-snap-type:y proximity;
+  overscroll-behavior-y:auto;
+  /* REMOVED: scroll-snap-type causing scroll issues */
 }
-.modal-scroll-lock{ overscroll-behavior:none; -webkit-overflow-scrolling:auto; }
+.modal-scroll-lock{
+  overscroll-behavior:none;
+  -webkit-overflow-scrolling:auto;
+  /* PREVENT body scroll when modal open */
+  touch-action: none;
+}
 
 /* iOS */
 @supports (-webkit-touch-callout: none){
@@ -140,11 +157,25 @@ input[type="submit"],input[type="button"]{
 
 /* Mobile full-width */
 @media (max-width:768px){
-  .responsive-content-container{padding:0 !important; position:static !important; transform:none !important; filter:none !important;}
-  .space-y-6 > *:not(.header-liquid-glass):not(.fab-nexus-forge){
-    margin-left:0 !important; margin-right:0 !important; position:static !important; transform:none !important;
+  .responsive-content-container{
+    padding:0 !important;
+    /* ALLOW SCROLL - do not use position:static with transforms */
   }
-  .route-container{padding-left:0 !important; padding-right:0 !important; position:static !important; transform:none !important;}
+  .space-y-6 > *:not(.header-liquid-glass):not(.fab-nexus-forge){
+    margin-left:0 !important;
+    margin-right:0 !important;
+  }
+  .route-container{
+    padding-left:0 !important;
+    padding-right:0 !important;
+  }
+
+  /* Ensure body can scroll */
+  body {
+    overflow-y: auto !important;
+    touch-action: pan-y pinch-zoom !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
 
   /* IMPORTANT: garder les particules actives et visibles sur mobile */
   .cosmic-forge-particles{ display:block !important; opacity:.8 !important; }
@@ -179,9 +210,9 @@ input[type="submit"],input[type="button"]{
 
 /* Gestures */
 .swipe-container{ touch-action:pan-x; -webkit-overflow-scrolling:touch; overscroll-behavior-x:none; }
-.swipe-vertical{ touch-action:pan-y; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; }
+.swipe-vertical{ touch-action:pan-y; -webkit-overflow-scrolling:touch; overscroll-behavior-y:auto; }
 .pinch-zoom-enabled{ touch-action:pinch-zoom; }
-.touch-action-none{ touch-action:none; }
+/* REMOVED: .touch-action-none to prevent scroll blocking */
 
 /* Scrollbars */
 .touch-scroll-optimized{

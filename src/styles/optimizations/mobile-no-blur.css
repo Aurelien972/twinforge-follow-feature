@@ -1,32 +1,19 @@
 /**
- * MOBILE NO BLUR - CRITICAL
+ * MOBILE SELECTIVE BLUR - BALANCED
  *
- * Replace ALL backdrop-blur with solid opaque backgrounds on mobile
- * backdrop-blur is EXTREMELY GPU intensive and causes lag
+ * Replace SOME backdrop-blur with solid backgrounds on mobile
+ * Keep blur for navigation elements (header, bottom bar, chat)
  *
- * Applied to .mobile-device class
+ * Goal: Performance + Brand Identity
  */
 
 /* =========================================
-   GLOBAL BACKDROP BLUR KILL
-   ========================================= */
-
-.mobile-device *,
-.mobile-device *::before,
-.mobile-device *::after {
-  /* KILL ALL BACKDROP FILTERS */
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* =========================================
-   GLASS CARDS - Solid backgrounds
+   GLASS CARDS - Solid backgrounds (performance)
    ========================================= */
 
 .mobile-device .glass-card,
 .mobile-device .glass-base,
-.mobile-device .glass-card-cta,
-.mobile-device [class*="glass-"] {
+.mobile-device .glass-card-cta {
   /* Replace transparent glass with solid dark background */
   background: #0F1927 !important;
   backdrop-filter: none !important;
@@ -39,7 +26,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Remove pseudo-element effects */
+/* Remove pseudo-element effects that create square shadows */
 .mobile-device .glass-card::before,
 .mobile-device .glass-card::after,
 .mobile-device .glass-card-cta::before,
@@ -48,32 +35,46 @@
 }
 
 /* =========================================
-   HEADER - Solid background
+   HEADER - LIGHT BLUR (preserve identity)
    ========================================= */
 
-.mobile-device header,
-.mobile-device .header-liquid-glass,
-.mobile-device [class*="header"] {
-  /* Solid background instead of blur */
-  background: rgba(15, 25, 39, 0.95) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+.mobile-device .header-liquid-glass {
+  /* Semi-transparent with light blur */
+  background: rgba(15, 25, 39, 0.92) !important;
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
 
   /* Simple shadow */
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* =========================================
-   BOTTOM BAR - Solid background
+   BOTTOM BAR - LIGHT BLUR (preserve identity)
    ========================================= */
 
-.mobile-device .new-mobile-bottom-bar,
-.mobile-device [class*="bottom-bar"],
-.mobile-device nav[aria-label*="mobile"] {
-  background: rgba(15, 25, 39, 0.95) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+.mobile-device .new-mobile-bottom-bar-container {
+  /* Semi-transparent with light blur */
+  background: rgba(15, 25, 39, 0.92) !important;
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Bottom bar icon containers keep their glass effect */
+.mobile-device .new-bottom-bar-icon-container {
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+}
+
+/* =========================================
+   HEADER BUTTONS - LIGHT BLUR
+   ========================================= */
+
+.mobile-device .header-liquid-glass .glass-orb-button,
+.mobile-device .header-liquid-glass button {
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
 }
 
 /* =========================================
@@ -82,8 +83,8 @@
 
 .mobile-device .sidebar,
 .mobile-device .mobile-drawer,
-.mobile-device [class*="drawer"],
-.mobile-device [role="dialog"] {
+.mobile-device [class*="drawer"]:not(.global-chat-drawer):not(.unified-coach-drawer),
+.mobile-device [role="dialog"]:not([class*="chat"]) {
   background: rgba(15, 25, 39, 0.98) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -122,69 +123,39 @@
 }
 
 /* =========================================
-   BUTTONS - Solid backgrounds
+   FLOATING ELEMENTS - LIGHT BLUR (preserve identity)
    ========================================= */
 
-.mobile-device button,
-.mobile-device [role="button"] {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Glass buttons get solid backgrounds */
-.mobile-device button[class*="glass"],
-.mobile-device [class*="glass-button"] {
-  background: rgba(30, 40, 55, 0.9) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* =========================================
-   FLOATING ELEMENTS - Solid backgrounds
-   ========================================= */
-
-.mobile-device [class*="floating"],
-.mobile-device [class*="fab"],
 .mobile-device .floating-chat-button,
-.mobile-device .floating-voice-coach-button {
-  background: rgba(247, 147, 30, 0.95) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+.mobile-device .floating-voice-coach-button,
+.mobile-device [class*="floating"]:not([class*="floating-generate"]) {
+  /* Semi-transparent with light blur */
+  background: rgba(247, 147, 30, 0.88) !important;
+  backdrop-filter: blur(6px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(120%) !important;
 }
 
 /* =========================================
-   CHAT/VOICE COMPONENTS - Solid backgrounds
+   CHAT/VOICE COMPONENTS - LIGHT BLUR
    ========================================= */
 
 .mobile-device .voice-coach-panel,
 .mobile-device .global-chat-drawer,
-.mobile-device [class*="chat-"] {
-  background: #0F1927 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+.mobile-device .unified-coach-drawer,
+.mobile-device [class*="chat-"]:not(.glass-card) {
+  background: rgba(15, 25, 39, 0.92) !important;
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
 }
 
 /* =========================================
-   CARDS WITH TRANSPARENCY - Make opaque
+   GENERIC CARDS - Solid backgrounds
    ========================================= */
 
-.mobile-device [class*="card-"] {
+.mobile-device [class*="card-"]:not(.new-bottom-bar-icon-container):not(.glass-orb-button) {
   background: #0F1927 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-}
-
-/* =========================================
-   GENERIC BLUR REMOVAL
-   ========================================= */
-
-.mobile-device [style*="backdrop-filter"],
-.mobile-device [style*="-webkit-backdrop-filter"],
-.mobile-device [style*="blur("] {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  filter: none !important;
-  -webkit-filter: none !important;
 }
 
 /* =========================================
@@ -199,51 +170,46 @@
 }
 
 /* =========================================
-   PERFORMANCE MODE + MOBILE = Ultra solid
-   ========================================= */
-
-.mobile-device.performance-mode * {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  filter: none !important;
-  -webkit-filter: none !important;
-}
-
-/* =========================================
    FALLBACK: Media query based
    ========================================= */
 
 @media (max-width: 768px), (hover: none), (pointer: coarse) {
-  /* Kill all backdrop filters */
-  * {
+  /* Solid glass cards by default */
+  .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.floating-chat-button):not(.floating-voice-coach-button) {
+    background: #0F1927 !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
 
-  /* Make glass elements opaque */
-  [class*="glass-"] {
-    background: #0F1927 !important;
+  /* Light blur for navigation */
+  .header-liquid-glass,
+  .new-mobile-bottom-bar-container {
+    backdrop-filter: blur(8px) saturate(130%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
   }
 
-  /* Solid header */
-  header {
-    background: rgba(15, 25, 39, 0.95) !important;
-  }
-
-  /* Solid bottom bar */
-  nav[aria-label*="mobile"] {
-    background: rgba(15, 25, 39, 0.95) !important;
+  /* Light blur for floating buttons */
+  .floating-chat-button,
+  .floating-voice-coach-button {
+    backdrop-filter: blur(6px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(6px) saturate(120%) !important;
   }
 }
 
 /* =========================================
-   LOW-END DEVICES: Extra safety
+   LOW-END DEVICES: Reduce blur further
    ========================================= */
 
 @media (max-width: 480px) {
-  * {
+  /* Only navigation keeps minimal blur on very small screens */
+  .header-liquid-glass,
+  .new-mobile-bottom-bar-container {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+  }
+
+  .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container) {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    filter: none !important;
   }
 }
