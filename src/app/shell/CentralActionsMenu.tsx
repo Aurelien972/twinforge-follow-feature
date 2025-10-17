@@ -337,7 +337,11 @@ const CentralActionsMenu: React.FC<CentralActionsMenuProps> = ({ isOpen }) => {
                   onClick={(e) => handleActionClick(homeAction, false, e)}
                   className="glass-card rounded-full px-2.5 py-1 flex items-center gap-1.5"
                   style={{
-                    background: 'transparent',
+                    background: `
+                      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18) 0%, transparent 60%),
+                      radial-gradient(circle at 70% 70%, rgba(247, 147, 30, 0.15) 0%, transparent 65%),
+                      var(--liquid-pill-bg)
+                    `,
                     border: '1px solid rgba(247, 147, 30, 0.35)',
                     boxShadow: `
                       0 2px 8px rgba(247, 147, 30, 0.15),

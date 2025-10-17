@@ -38,7 +38,6 @@ class DeviceCapabilityManager {
   private frameRateHistory: number[] = [];
   private lastFrameTime = performance.now();
   private rafId: number | null = null;
-  private lastDegradationTime: number | null = null;
 
   constructor() {
     this.capabilities = this.detectCapabilities();
@@ -282,10 +281,9 @@ class DeviceCapabilityManager {
         this.frameRateHistory.shift();
       }
 
-      // Check average FPS - more lenient thresholds to avoid unnecessary degradation
+      // Check average FPS
       const avgFPS = this.frameRateHistory.reduce((a, b) => a + b, 0) / this.frameRateHistory.length;
-      // Only degrade if consistently below 50 FPS (was 55)
-      if (avgFPS < 50 && this.frameRateHistory.length >= 60) {
+      if (avgFPS < 55 && this.frameRateHistory.length >= 60) {
         this.degradePerformanceIfNeeded();
       }
 
@@ -298,34 +296,16 @@ class DeviceCapabilityManager {
 
   private degradePerformanceIfNeeded() {
     const currentLevel = this.capabilities.performanceLevel;
-
-    // Add throttling: only degrade once every 5 seconds to avoid rapid changes
-    const now = performance.now();
-    if (!this.lastDegradationTime) {
-      this.lastDegradationTime = now;
-    }
-
-    const timeSinceLastDegradation = now - this.lastDegradationTime;
-    if (timeSinceLastDegradation < 5000) {
-      return; // Too soon to degrade again
-    }
-
     if (currentLevel === 'high') {
       this.capabilities.performanceLevel = 'medium';
       this.config = this.generateConfig();
       this.applyConfigToDOM();
-      this.lastDegradationTime = now;
       console.warn('[DeviceCapability] Degraded to medium performance');
     } else if (currentLevel === 'medium') {
-      // More reluctant to go to low - require even worse performance
-      const recentAvgFPS = this.frameRateHistory.slice(-30).reduce((a, b) => a + b, 0) / 30;
-      if (recentAvgFPS < 45) {
-        this.capabilities.performanceLevel = 'low';
-        this.config = this.generateConfig();
-        this.applyConfigToDOM();
-        this.lastDegradationTime = now;
-        console.warn('[DeviceCapability] Degraded to low performance');
-      }
+      this.capabilities.performanceLevel = 'low';
+      this.config = this.generateConfig();
+      this.applyConfigToDOM();
+      console.warn('[DeviceCapability] Degraded to low performance');
     }
   }
 
@@ -344,36 +324,15 @@ class DeviceCapabilityManager {
     document.documentElement.classList.remove('perf-high', 'perf-medium', 'perf-low');
     document.documentElement.classList.add(`perf-${this.capabilities.performanceLevel}`);
 
-    // Apply effect disabling classes carefully - only for decorative effects
     if (!this.config.enableShimmer) {
       document.documentElement.classList.add('disable-shimmer');
-    } else {
-      document.documentElement.classList.remove('disable-shimmer');
     }
-
     if (!this.config.enablePulse) {
       document.documentElement.classList.add('disable-pulse');
-    } else {
-      document.documentElement.classList.remove('disable-pulse');
     }
-
     if (!this.config.enableGlow) {
       document.documentElement.classList.add('disable-glow');
-    } else {
-      document.documentElement.classList.remove('disable-glow');
     }
-
-    // Log current performance mode for debugging
-    console.info('[DeviceCapability] Applied config:', {
-      performanceLevel: this.capabilities.performanceLevel,
-      glassBlur: this.config.glassBlur,
-      animationDuration: this.config.animationDuration,
-      effects: {
-        shimmer: this.config.enableShimmer,
-        pulse: this.config.enablePulse,
-        glow: this.config.enableGlow,
-      }
-    });
   }
 
   private pauseMonitoring() {

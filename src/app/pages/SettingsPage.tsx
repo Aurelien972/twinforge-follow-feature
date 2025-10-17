@@ -5,7 +5,6 @@ import PageHeader from '../../ui/page/PageHeader';
 import GlassCard from '../../ui/cards/GlassCard';
 import UnderConstructionCard from '../components/UnderConstructionCard';
 import ConnectedDevicesTab from './Settings/ConnectedDevicesTab';
-import GeneralSettingsTab from './Settings/GeneralSettingsTab';
 import { PLACEHOLDER_PAGES_CONFIG } from '../../config/placeholderPagesConfig';
 
 /**
@@ -48,11 +47,7 @@ const SettingsPage: React.FC = () => {
 
         {config.tabs.map((tab) => (
           <Tabs.Panel key={tab.value} value={tab.value}>
-            {tab.value === 'general' ? (
-              <GlassCard className="p-6">
-                <GeneralSettingsTab />
-              </GlassCard>
-            ) : tab.value === 'appareils' ? (
+            {tab.value === 'appareils' ? (
               <ConnectedDevicesTab />
             ) : (
               <GlassCard className="p-6">
