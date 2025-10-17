@@ -1,0 +1,183 @@
+/**
+ * MOBILE ANIMATIONS ONLY - SURGICAL APPROACH
+ *
+ * This file ONLY disables decorative animations on mobile
+ * NO background changes, NO blur changes, NO glass system modifications
+ * Applied via .mobile-device class added by DeviceProvider
+ *
+ * Goal: 60fps scroll by removing animation overhead only
+ */
+
+/* =========================================
+   DISABLE BORDER/GLOW ANIMATIONS
+   Remove pulsing borders and glows only
+   ========================================= */
+
+.mobile-device .header-liquid-glass::before,
+.mobile-device .header-liquid-glass::after {
+  animation: none !important;
+}
+
+.mobile-device .new-mobile-bottom-bar-container::before,
+.mobile-device .new-mobile-bottom-bar-container::after {
+  animation: none !important;
+}
+
+.mobile-device .central-actions-panel::before,
+.mobile-device .central-actions-panel::after {
+  animation: none !important;
+}
+
+/* =========================================
+   DISABLE CORNER SQUARES IN HEADER
+   Remove decorative animated squares
+   ========================================= */
+
+.mobile-device .header-corner-square,
+.mobile-device header [class*="corner-square"] {
+  animation: none !important;
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* =========================================
+   DISABLE DECORATIVE BUTTON ANIMATIONS
+   Remove shimmer, border-rotate, icon-glow
+   ========================================= */
+
+.mobile-device .floating-chat-button--step2::before,
+.mobile-device .floating-chat-button--step2 .button-icon {
+  animation: none !important;
+}
+
+.mobile-device .floating-chat-button--step2-notification {
+  animation: none !important;
+}
+
+/* =========================================
+   DISABLE AVATAR TWIN BUTTON ANIMATIONS
+   Remove border flow animation only
+   ========================================= */
+
+.mobile-device .avatar-twin-button::before {
+  animation: none !important;
+}
+
+/* =========================================
+   DISABLE ACTIVE PULSE ON PILLS
+   Remove pulsing glow on active navigation pills
+   ========================================= */
+
+.mobile-device .new-bottom-bar-icon-container--active {
+  animation: none !important;
+}
+
+/* =========================================
+   DISABLE GENERIC DECORATIVE ANIMATIONS
+   Remove breathing, floating, particles, etc.
+   ========================================= */
+
+.mobile-device [class*="breathing"],
+.mobile-device [class*="shimmer"],
+.mobile-device [class*="float"]:not(.floating-chat-button):not(.floating-voice-coach-button),
+.mobile-device [class*="bounce"]:not(.new-bottom-bar-icon-container),
+.mobile-device [class*="particle"],
+.mobile-device [class*="spark"],
+.mobile-device [class*="ember"] {
+  animation: none !important;
+}
+
+/* =========================================
+   PRESERVE TAP FEEDBACK
+   Keep essential touch feedback animations
+   ========================================= */
+
+.mobile-device button:active,
+.mobile-device [role="button"]:active {
+  transform: scale(0.98) translateZ(0) !important;
+  transition: transform 0.08s ease-out !important;
+}
+
+/* =========================================
+   PRESERVE ESSENTIAL LOADERS
+   Keep spinners for loading states
+   ========================================= */
+
+.mobile-device .loader-essential,
+.mobile-device [class*="spinner"],
+.mobile-device [aria-busy="true"] > [class*="spin"] {
+  animation: spin-simple 2s linear infinite !important;
+}
+
+@keyframes spin-simple {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* =========================================
+   INSTANT SCROLL REVEAL
+   No animation delay on scroll-reveal cards
+   ========================================= */
+
+.mobile-device .glass-card-scroll-reveal,
+.mobile-device [data-scroll-reveal],
+.mobile-device [data-scroll-visible],
+.mobile-device [data-scroll-active] {
+  opacity: 1 !important;
+  transition: none !important;
+}
+
+/* =========================================
+   SIMPLIFY MODAL/DRAWER TRANSITIONS
+   Faster animations for overlays
+   ========================================= */
+
+.mobile-device [role="dialog"],
+.mobile-device [class*="modal"],
+.mobile-device [class*="drawer"],
+.mobile-device [class*="overlay"] {
+  animation-duration: 0.2s !important;
+  transition-duration: 0.2s !important;
+}
+
+/* =========================================
+   SIMPLIFY FRAMER MOTION
+   Reduce animation duration globally
+   ========================================= */
+
+.mobile-device [data-framer-motion] {
+  animation-duration: 0.15s !important;
+  transition-duration: 0.15s !important;
+}
+
+/* =========================================
+   FALLBACK: Media query based
+   ========================================= */
+
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+  /* Reduce generic animation duration */
+  [class*="breathing"],
+  [class*="shimmer"],
+  [class*="pulse"]:not(.new-bottom-bar-icon-container):not(.glass-orb-button) {
+    animation-duration: 0.15s !important;
+  }
+
+  /* Keep tap feedback */
+  button:active,
+  [role="button"]:active {
+    transform: scale(0.98) translateZ(0) !important;
+    transition: transform 0.08s ease-out !important;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION: Honor user preference
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

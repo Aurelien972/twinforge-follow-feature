@@ -99,9 +99,9 @@
 @import './optimizations/pipeline-animations.css';
 @import './mobile/touch.css';
 
-/* CRITICAL: Mobile Zero Animations - MUST be last for proper override */
-@import './optimizations/mobile-zero-animations.css';
-@import './optimizations/mobile-no-blur.css';
+/* CRITICAL: Mobile Optimizations - Surgical approach to preserve liquid glass identity */
+@import './optimizations/mobile-animations-only.css';
+@import './optimizations/mobile-blur-selective.css';
 
 /* =========================================
    PHASE 8: FORGE PIPELINE STYLES

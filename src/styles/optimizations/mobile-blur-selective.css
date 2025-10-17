@@ -1,0 +1,267 @@
+/**
+ * MOBILE SELECTIVE BLUR REDUCTION
+ *
+ * CRITICAL: This file ONLY targets CONTENT cards, NOT navigation components
+ * Navigation components (header, bottom bar, central menu) are EXPLICITLY EXCLUDED
+ *
+ * Goal: Improve performance on content-heavy pages while preserving brand identity
+ */
+
+/* =========================================
+   CONTENT CARDS - Solid backgrounds
+   EXPLICIT EXCLUSIONS for navigation
+   ========================================= */
+
+.mobile-device .glass-card:not(.new-bottom-bar-icon-container):not(.glass-orb-button),
+.mobile-device .glass-base:not([class*="header"]):not([class*="bottom-bar"]),
+.mobile-device .glass-card-cta:not([class*="central-actions"]) {
+  /* Replace transparent glass with solid dark background ONLY on content cards */
+  background: #0F1927 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Keep simple border */
+  border-color: rgba(255, 255, 255, 0.1) !important;
+
+  /* Simple shadow instead of complex glows */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* CRITICAL: Exclude cards inside navigation components */
+.mobile-device .header-liquid-glass .glass-card,
+.mobile-device .new-mobile-bottom-bar-container .glass-card,
+.mobile-device .central-actions-panel .glass-card,
+.mobile-device .central-actions-menu .glass-card {
+  /* Restore transparent glass for navigation */
+  background: var(--liquid-pill-bg) !important;
+  backdrop-filter: blur(16px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: var(--liquid-pill-shadow) !important;
+}
+
+/* Remove pseudo-element effects on CONTENT cards only */
+.mobile-device .glass-card:not(.new-bottom-bar-icon-container):not(.glass-orb-button)::before,
+.mobile-device .glass-card:not(.new-bottom-bar-icon-container):not(.glass-orb-button)::after,
+.mobile-device .glass-card-cta:not([class*="central-actions"])::before,
+.mobile-device .glass-card-cta:not([class*="central-actions"])::after {
+  display: none !important;
+}
+
+/* CRITICAL: Preserve pseudo-elements in navigation */
+.mobile-device .header-liquid-glass::before,
+.mobile-device .header-liquid-glass::after,
+.mobile-device .new-mobile-bottom-bar-container::before,
+.mobile-device .new-mobile-bottom-bar-container::after,
+.mobile-device .central-actions-panel::before,
+.mobile-device .central-actions-panel::after,
+.mobile-device .new-bottom-bar-icon-container::before,
+.mobile-device .new-bottom-bar-icon-container::after {
+  display: block !important; /* Override any none */
+}
+
+/* =========================================
+   NAVIGATION - PRESERVE LIGHT BLUR
+   CRITICAL: Do NOT change these values
+   ========================================= */
+
+.mobile-device .header-liquid-glass {
+  /* Semi-transparent with light blur - PRESERVE */
+  background: rgba(15, 25, 39, 0.92) !important;
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+.mobile-device .new-mobile-bottom-bar-container {
+  /* Semi-transparent with light blur - PRESERVE */
+  background: rgba(15, 25, 39, 0.92) !important;
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Bottom bar icon containers keep their glass effect */
+.mobile-device .new-bottom-bar-icon-container {
+  backdrop-filter: blur(16px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+}
+
+/* =========================================
+   HEADER BUTTONS - PRESERVE LIGHT BLUR
+   ========================================= */
+
+.mobile-device .header-liquid-glass .glass-orb-button,
+.mobile-device .header-liquid-glass button {
+  backdrop-filter: blur(16px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+}
+
+/* =========================================
+   CENTRAL ACTIONS MENU - PRESERVE PREMIUM GLASS
+   ========================================= */
+
+.mobile-device .central-actions-panel {
+  /* Ultra-transparent Liquid Glass - PRESERVE */
+  background:
+    var(--liquid-reflections-multi),
+    var(--liquid-highlight-ambient),
+    var(--liquid-panel-bg) !important;
+
+  backdrop-filter: blur(var(--liquid-panel-blur)) saturate(var(--liquid-panel-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--liquid-panel-blur)) saturate(var(--liquid-panel-saturate)) !important;
+  box-shadow: var(--liquid-panel-shadow) !important;
+}
+
+/* =========================================
+   SIDEBAR/DRAWER - Solid background for performance
+   ========================================= */
+
+.mobile-device .sidebar,
+.mobile-device .mobile-drawer,
+.mobile-device [class*="drawer"]:not(.global-chat-drawer):not(.unified-coach-drawer),
+.mobile-device [role="dialog"]:not([class*="chat"]):not(.central-actions-menu) {
+  background: rgba(15, 25, 39, 0.98) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   MODALS/OVERLAYS - Solid backgrounds
+   ========================================= */
+
+.mobile-device [class*="modal"]:not(.central-actions-menu),
+.mobile-device [class*="overlay"]:not([class*="header"]):not([class*="bottom-bar"]),
+.mobile-device [role="alertdialog"] {
+  background: rgba(15, 25, 39, 0.98) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Modal backdrop - solid dark */
+.mobile-device [class*="backdrop"],
+.mobile-device [class*="overlay"]::before {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   TOOLTIPS/POPOVERS - Solid backgrounds
+   ========================================= */
+
+.mobile-device [role="tooltip"],
+.mobile-device [class*="tooltip"],
+.mobile-device [class*="popover"] {
+  background: #1A2332 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   FLOATING ELEMENTS - PRESERVE LIGHT BLUR
+   CRITICAL: Keep brand identity on floating buttons
+   ========================================= */
+
+.mobile-device .floating-chat-button,
+.mobile-device .floating-voice-coach-button,
+.mobile-device [class*="floating"]:not([class*="floating-generate"]) {
+  /* Semi-transparent with light blur - PRESERVE */
+  background: rgba(247, 147, 30, 0.88) !important;
+  backdrop-filter: blur(6px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(120%) !important;
+}
+
+/* =========================================
+   CHAT/VOICE COMPONENTS - LIGHT BLUR
+   ========================================= */
+
+.mobile-device .voice-coach-panel,
+.mobile-device .global-chat-drawer,
+.mobile-device .unified-coach-drawer,
+.mobile-device [class*="chat-"]:not(.glass-card) {
+  background: rgba(15, 25, 39, 0.92) !important;
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+}
+
+/* =========================================
+   SHEEN/SPOTLIGHT EFFECTS - Remove
+   ========================================= */
+
+.mobile-device .glass-sheen,
+.mobile-device [class*="sheen"],
+.mobile-device [class*="spotlight"] {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* =========================================
+   FALLBACK: Media query based
+   ========================================= */
+
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+  /* Solid glass cards by default - with explicit exclusions */
+  .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.new-bottom-bar-icon-container):not(.floating-chat-button):not(.floating-voice-coach-button):not(.glass-orb-button) {
+    background: #0F1927 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* CRITICAL: Exclude cards in navigation components */
+  .header-liquid-glass .glass-card,
+  .new-mobile-bottom-bar-container .glass-card,
+  .central-actions-panel .glass-card,
+  .central-actions-menu .glass-card {
+    background: var(--liquid-pill-bg) !important;
+    backdrop-filter: blur(16px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+  }
+
+  /* Light blur for navigation - PRESERVE */
+  .header-liquid-glass,
+  .new-mobile-bottom-bar-container {
+    backdrop-filter: blur(8px) saturate(130%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+  }
+
+  /* Light blur for floating buttons - PRESERVE */
+  .floating-chat-button,
+  .floating-voice-coach-button {
+    backdrop-filter: blur(6px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(6px) saturate(120%) !important;
+  }
+
+  /* PRESERVE Central Actions Menu premium glass */
+  .central-actions-panel {
+    backdrop-filter: blur(var(--liquid-panel-blur)) saturate(var(--liquid-panel-saturate)) !important;
+    -webkit-backdrop-filter: blur(var(--liquid-panel-blur)) saturate(var(--liquid-panel-saturate)) !important;
+  }
+}
+
+/* =========================================
+   LOW-END DEVICES: Reduce blur further
+   ========================================= */
+
+@media (max-width: 480px) {
+  /* Only navigation keeps minimal blur on very small screens */
+  .header-liquid-glass,
+  .new-mobile-bottom-bar-container {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+  }
+
+  /* Content cards stay solid */
+  .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.new-bottom-bar-icon-container):not(.glass-orb-button) {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* PRESERVE navigation glass even on small screens */
+  .header-liquid-glass .glass-card,
+  .new-mobile-bottom-bar-container .glass-card,
+  .central-actions-panel .glass-card {
+    backdrop-filter: blur(12px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  }
+}
