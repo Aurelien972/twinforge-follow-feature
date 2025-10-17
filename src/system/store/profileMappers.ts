@@ -23,12 +23,12 @@ export interface Profile extends UserProfile {
 
 // Database columns whitelist
 const DB_COLUMNS = new Set([
-  'user_id', 'display_name', 'birthdate', 'sex', 'height_cm', 'weight_kg', 
+  'user_id', 'display_name', 'birthdate', 'sex', 'height_cm', 'weight_kg',
   'target_weight_kg', 'body_fat_perc', 'activity_level', 'job_category', 'phone_number',
   'objective', 'avatar_status', 'avatar_url', 'created_at', 'updated_at',
   'goals', 'constraints', 'preferences', 'emotion_baseline', 'role',
   'emotions', 'nutrition', 'health', 'avatar_onboarding_completed',
-  'portrait_url', 'portrait_source'
+  'portrait_url', 'portrait_source', 'glass_effects_enabled'
 ]);
 
 // Text fields that should be null instead of empty strings
@@ -82,6 +82,7 @@ export function mapProfileUpdatesToDb(updates: Partial<Profile>): any {
     else if (key === 'portraitUrl') dbKey = 'portrait_url';
     else if (key === 'portraitSource') dbKey = 'portrait_source';
     else if (key === 'emotionBaseline') dbKey = 'emotion_baseline';
+    else if (key === 'glassEffectsEnabled') dbKey = 'glass_effects_enabled';
 
     // Only include valid database columns
     if (DB_COLUMNS.has(dbKey)) {
@@ -238,6 +239,7 @@ export async function mapDbProfileToProfile(dbProfile: any): Promise<Profile> {
     avatarOnboardingCompleted: dbProfile.avatar_onboarding_completed,
     portraitUrl: emptyStringToNull(dbProfile.portrait_url),
     portraitSource: emptyStringToNull(dbProfile.portrait_source),
+    glassEffectsEnabled: dbProfile.glass_effects_enabled ?? true,
   };
   
   // CRITICAL DEBUG: Log the final mapped profile

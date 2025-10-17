@@ -648,6 +648,7 @@ export const useUserStore = create<UserState>()(
           avatarStatus: state.profile.avatarStatus,
           avatarUrl: state.profile.avatarUrl,
           health: state.profile.health,
+          glassEffectsEnabled: state.profile.glassEffectsEnabled,
           // Exclude large objects that can be re-fetched
           // preferences, nutrition, etc will be loaded from DB
         } : null,

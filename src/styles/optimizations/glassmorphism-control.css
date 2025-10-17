@@ -298,6 +298,76 @@
 }
 
 /* =========================================
+   EXTENDED PERFORMANCE OPTIMIZATIONS
+   For old devices like iPhone 8
+   ========================================= */
+
+/* Force GPU acceleration on all critical elements */
+.glassmorphism-disabled * {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Remove all complex filters */
+.glassmorphism-disabled *[style*="filter"],
+.glassmorphism-disabled *[class*="filter"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* Simplify all transitions to 150ms max */
+.glassmorphism-disabled * {
+  transition-duration: 150ms !important;
+}
+
+/* Remove decorative particles completely */
+.glassmorphism-disabled .forge-particle,
+.glassmorphism-disabled .cosmic-forge-particles,
+.glassmorphism-disabled *[class*="particle"] {
+  display: none !important;
+}
+
+/* Disable all hover scale transforms */
+.glassmorphism-disabled *:hover {
+  transform: translateZ(0) !important;
+}
+
+/* Force simple backgrounds everywhere */
+.glassmorphism-disabled * {
+  background-image: none !important;
+}
+
+/* Remove all box-shadows except simple drop shadows */
+.glassmorphism-disabled * {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Keep essential focus shadows */
+.glassmorphism-disabled *:focus-visible {
+  box-shadow: 0 0 0 3px rgba(24, 227, 255, 0.4) !important;
+}
+
+/* Mobile specific optimizations */
+@media (max-width: 768px) {
+  .glassmorphism-disabled {
+    /* Force hardware acceleration */
+    --webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* Remove all animations on mobile when in performance mode */
+  .glassmorphism-disabled * {
+    animation: none !important;
+  }
+
+  /* Keep only critical animations */
+  .glassmorphism-disabled .loader-essential {
+    animation: icon-spin-css 2s linear infinite !important;
+  }
+}
+
+/* =========================================
    PERFORMANCE NOTES
    ========================================= */
 

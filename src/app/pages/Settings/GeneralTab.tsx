@@ -9,10 +9,12 @@ import { motion } from 'framer-motion';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import { useGlassmorphismPreference } from '../../../hooks/useGlassmorphismPreference';
+import { usePerformanceMode } from '../../../hooks/usePerformanceMode';
 import logger from '../../../lib/utils/logger';
 
 const GeneralTab: React.FC = () => {
   const { glassEffectsEnabled, toggleGlassEffects } = useGlassmorphismPreference();
+  const performanceMetrics = usePerformanceMode();
   const [isToggling, setIsToggling] = useState(false);
 
   const handleToggle = async () => {
@@ -127,6 +129,21 @@ const GeneralTab: React.FC = () => {
                     Mode Performance
                   </span>
                 )}
+                {performanceMetrics.isLowEndDevice && glassEffectsEnabled && (
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '6px',
+                      background: 'rgba(251, 191, 36, 0.15)',
+                      color: '#FBB F24',
+                      border: '1px solid rgba(251, 191, 36, 0.3)',
+                    }}
+                  >
+                    Appareil ancien détecté
+                  </span>
+                )}
               </div>
               <p
                 style={{
@@ -140,6 +157,19 @@ const GeneralTab: React.FC = () => {
                   ? 'Les effets de transparence et de flou sont activés pour une expérience visuelle premium.'
                   : 'Les effets de transparence sont désactivés pour améliorer les performances sur votre appareil.'}
               </p>
+              {performanceMetrics.deviceInfo !== 'Unknown' && (
+                <p
+                  style={{
+                    fontSize: '0.8125rem',
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    lineHeight: '1.4',
+                    margin: '0.5rem 0 0 0',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  Appareil détecté : {performanceMetrics.deviceInfo} • FPS estimé : ~{Math.round(performanceMetrics.estimatedFPS)}
+                </p>
+              )}
             </div>
 
             {/* Toggle Switch */}
@@ -246,7 +276,9 @@ const GeneralTab: React.FC = () => {
                 }}
               >
                 {glassEffectsEnabled
-                  ? 'Recommandé pour les appareils récents et performants.'
+                  ? performanceMetrics.isLowEndDevice
+                    ? 'Votre appareil est ancien. Activez le mode performance pour une meilleure expérience (iPhone 8, etc.).'
+                    : 'Recommandé pour les appareils récents et performants.'
                   : 'Toutes les fonctionnalités et couleurs restent identiques. Seuls les effets visuels sont simplifiés.'}
               </p>
             </div>
