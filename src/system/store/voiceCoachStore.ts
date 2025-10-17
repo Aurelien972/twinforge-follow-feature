@@ -8,7 +8,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import logger from '../../lib/utils/logger';
 import type { ChatMode } from './globalChatStore';
 
-export type VoiceState = 'idle' | 'listening' | 'processing' | 'speaking' | 'error';
+export type VoiceState = 'idle' | 'ready' | 'connecting' | 'listening' | 'processing' | 'speaking' | 'error';
 export type VoiceMode = 'auto' | 'push-to-talk' | 'continuous';
 export type VoiceType = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
 export type CommunicationMode = 'voice' | 'text';
@@ -81,6 +81,7 @@ interface VoiceCoachState {
   isPanelOpen: boolean;
   isPanelMinimized: boolean;
   showTranscript: boolean;
+  showReadyPrompt: boolean;
 
   // Actions de connexion
   connect: () => Promise<void>;
@@ -128,6 +129,7 @@ interface VoiceCoachState {
   setVoiceState: (state: VoiceState) => void;
   setMode: (mode: ChatMode) => void;
   setError: (error: string | null) => void;
+  setShowReadyPrompt: (show: boolean) => void;
 }
 
 const DEFAULT_PREFERENCES: VoicePreferences = {
@@ -166,6 +168,7 @@ export const useVoiceCoachStore = create<VoiceCoachState>()(
       isPanelOpen: false,
       isPanelMinimized: false,
       showTranscript: true,
+      showReadyPrompt: false,
 
       // Actions de connexion
       connect: async () => {
@@ -536,6 +539,11 @@ export const useVoiceCoachStore = create<VoiceCoachState>()(
         if (error) {
           logger.error('VOICE_COACH', 'Error set', { error });
         }
+      },
+
+      setShowReadyPrompt: (show: boolean) => {
+        set({ showReadyPrompt: show });
+        logger.debug('VOICE_COACH', 'Ready prompt visibility changed', { show });
       }
     }),
     {

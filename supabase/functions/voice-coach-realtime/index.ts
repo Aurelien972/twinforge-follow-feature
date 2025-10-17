@@ -4,12 +4,12 @@
  * Garde la clé API côté serveur pour plus de sécurité
  */
 
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { corsHeaders } from '../_shared/cors.ts';
 
 const OPENAI_REALTIME_URL = 'wss://api.openai.com/v1/realtime';
 
 Deno.serve(async (req: Request) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 200,
@@ -18,9 +18,9 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    // Vérifier l'authentification
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.error('Missing authorization header');
       return new Response(
         JSON.stringify({ error: 'Missing authorization header' }),
         {
@@ -30,12 +30,14 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Récupérer la clé API OpenAI depuis les secrets Supabase
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiApiKey) {
       console.error('OPENAI_API_KEY not configured in Supabase secrets');
       return new Response(
-        JSON.stringify({ error: 'OpenAI API key not configured' }),
+        JSON.stringify({
+          error: 'OpenAI API key not configured on server',
+          details: 'Please configure OPENAI_API_KEY in Supabase Edge Function secrets'
+        }),
         {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -43,9 +45,9 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Vérifier si c'est une requête WebSocket
     const upgrade = req.headers.get('upgrade') || '';
     if (upgrade.toLowerCase() !== 'websocket') {
+      console.error('Not a WebSocket upgrade request');
       return new Response(
         JSON.stringify({ error: 'Expected WebSocket upgrade' }),
         {
@@ -55,16 +57,15 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Récupérer les paramètres du modèle depuis les query params
     const url = new URL(req.url);
     const model = url.searchParams.get('model') || 'gpt-4o-realtime-preview-2024-10-01';
 
-    console.log('Opening WebSocket connection to OpenAI Realtime API', { model });
+    console.log('[VOICE-PROXY] Initiating connection', { model, timestamp: new Date().toISOString() });
 
-    // Créer la connexion WebSocket vers OpenAI
-    const openaiWsUrl = `${OPENAI_REALTIME_URL}?model=${model}`;
+    const openaiWsUrl = `${OPENAI_REALTIME_URL}?model=${encodeURIComponent(model)}`;
 
-    // Établir la connexion avec OpenAI
+    console.log('[VOICE-PROXY] Connecting to OpenAI', { url: openaiWsUrl });
+
     const openaiSocket = new WebSocket(openaiWsUrl, {
       headers: {
         'Authorization': `Bearer ${openaiApiKey}`,
@@ -72,89 +73,117 @@ Deno.serve(async (req: Request) => {
       },
     });
 
-    // Créer le WebSocket côté client
     const { socket: clientSocket, response } = Deno.upgradeWebSocket(req);
 
-    // Proxy des messages du client vers OpenAI
-    clientSocket.onmessage = (event) => {
-      try {
-        if (openaiSocket.readyState === WebSocket.OPEN) {
-          openaiSocket.send(event.data);
-          console.log('Forwarded message from client to OpenAI');
-        } else {
-          console.warn('OpenAI socket not ready, state:', openaiSocket.readyState);
-        }
-      } catch (error) {
-        console.error('Error forwarding to OpenAI:', error);
+    let openaiConnected = false;
+    let clientConnected = false;
+
+    openaiSocket.onopen = () => {
+      console.log('[VOICE-PROXY] OpenAI connection established');
+      openaiConnected = true;
+
+      if (clientSocket.readyState === WebSocket.OPEN) {
+        clientSocket.send(JSON.stringify({
+          type: 'proxy.connected',
+          timestamp: new Date().toISOString()
+        }));
       }
     };
 
-    // Proxy des messages d'OpenAI vers le client
+    openaiSocket.onerror = (error) => {
+      console.error('[VOICE-PROXY] OpenAI WebSocket error', error);
+
+      if (clientSocket.readyState === WebSocket.OPEN) {
+        clientSocket.send(JSON.stringify({
+          type: 'error',
+          error: {
+            message: 'Failed to connect to OpenAI Realtime API',
+            details: 'Check server logs for more information'
+          },
+        }));
+        clientSocket.close(1011, 'OpenAI connection failed');
+      }
+    };
+
+    openaiSocket.onclose = (event) => {
+      console.log('[VOICE-PROXY] OpenAI connection closed', {
+        code: event.code,
+        reason: event.reason,
+        wasClean: event.wasClean
+      });
+      openaiConnected = false;
+
+      if (clientSocket.readyState === WebSocket.OPEN) {
+        clientSocket.close(event.code, event.reason || 'OpenAI disconnected');
+      }
+    };
+
     openaiSocket.onmessage = (event) => {
       try {
         if (clientSocket.readyState === WebSocket.OPEN) {
           clientSocket.send(event.data);
-          console.log('Forwarded message from OpenAI to client');
+        } else {
+          console.warn('[VOICE-PROXY] Client socket not ready, dropping message');
         }
       } catch (error) {
-        console.error('Error forwarding to client:', error);
+        console.error('[VOICE-PROXY] Error forwarding to client', error);
       }
     };
 
-    // Gestion des erreurs OpenAI
-    openaiSocket.onerror = (error) => {
-      console.error('OpenAI WebSocket error:', error);
-      if (clientSocket.readyState === WebSocket.OPEN) {
-        clientSocket.send(
-          JSON.stringify({
-            type: 'error',
-            error: { message: 'OpenAI connection error' },
-          })
-        );
+    clientSocket.onopen = () => {
+      console.log('[VOICE-PROXY] Client connection established');
+      clientConnected = true;
+    };
+
+    clientSocket.onmessage = (event) => {
+      try {
+        if (openaiSocket.readyState === WebSocket.OPEN) {
+          openaiSocket.send(event.data);
+        } else {
+          console.warn('[VOICE-PROXY] OpenAI socket not ready', {
+            state: openaiSocket.readyState,
+            connected: openaiConnected
+          });
+
+          if (clientSocket.readyState === WebSocket.OPEN) {
+            clientSocket.send(JSON.stringify({
+              type: 'error',
+              error: { message: 'OpenAI connection not ready' }
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('[VOICE-PROXY] Error forwarding to OpenAI', error);
       }
     };
 
-    // Gestion de la fermeture OpenAI
-    openaiSocket.onclose = (event) => {
-      console.log('OpenAI WebSocket closed', {
-        code: event.code,
-        reason: event.reason,
-      });
-      if (clientSocket.readyState === WebSocket.OPEN) {
-        clientSocket.close(event.code, event.reason);
-      }
-    };
-
-    // Gestion de la fermeture client
     clientSocket.onclose = (event) => {
-      console.log('Client WebSocket closed', {
+      console.log('[VOICE-PROXY] Client connection closed', {
         code: event.code,
-        reason: event.reason,
+        reason: event.reason
       });
+      clientConnected = false;
+
       if (openaiSocket.readyState === WebSocket.OPEN) {
-        openaiSocket.close(event.code, event.reason);
+        openaiSocket.close(1000, 'Client disconnected');
       }
     };
 
-    // Gestion des erreurs client
     clientSocket.onerror = (error) => {
-      console.error('Client WebSocket error:', error);
-      if (openaiSocket.readyState === WebSocket.OPEN) {
-        openaiSocket.close();
-      }
-    };
+      console.error('[VOICE-PROXY] Client WebSocket error', error);
 
-    // Gestion de l'ouverture de la connexion OpenAI
-    openaiSocket.onopen = () => {
-      console.log('OpenAI WebSocket connection established');
+      if (openaiSocket.readyState === WebSocket.OPEN) {
+        openaiSocket.close(1011, 'Client error');
+      }
     };
 
     return response;
   } catch (error) {
-    console.error('Error in voice-coach-realtime:', error);
+    console.error('[VOICE-PROXY] Fatal error', error);
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
       }),
       {
         status: 500,

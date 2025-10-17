@@ -72,10 +72,20 @@ class VoiceCoachOrchestrator {
    * Démarrer une session vocale
    */
   async startVoiceSession(mode: string): Promise<void> {
+    const store = useVoiceCoachStore.getState();
+
     try {
       logger.info('VOICE_ORCHESTRATOR', 'Starting voice session', { mode });
 
-      const store = useVoiceCoachStore.getState();
+      // Vérifier l'état actuel
+      if (store.voiceState === 'listening' || store.voiceState === 'speaking') {
+        logger.warn('VOICE_ORCHESTRATOR', 'Session already active');
+        return;
+      }
+
+      // Passer en état connecting
+      store.setVoiceState('connecting');
+
       const globalStore = useGlobalChatStore.getState();
 
       // Récupérer la configuration du mode
@@ -85,8 +95,19 @@ class VoiceCoachOrchestrator {
         throw new Error(`Invalid mode: ${mode}`);
       }
 
+      // Vérifier les permissions micro
+      try {
+        const hasPermission = await store.requestMicrophonePermission();
+        if (!hasPermission) {
+          throw new Error('Microphone permission denied');
+        }
+      } catch (permError) {
+        throw new Error('Microphone access required for voice sessions');
+      }
+
       // Initialiser l'audio input si pas déjà fait
       if (!audioInputService.initialized) {
+        logger.info('VOICE_ORCHESTRATOR', 'Initializing audio input service');
         await audioInputService.initialize({
           sampleRate: 24000,
           channelCount: 1,
@@ -97,6 +118,8 @@ class VoiceCoachOrchestrator {
       }
 
       // Connexion à l'API Realtime via notre edge function
+      logger.info('VOICE_ORCHESTRATOR', 'Connecting to Realtime API');
+
       await openaiRealtimeService.connect({
         model: 'gpt-4o-realtime-preview-2024-10-01',
         voice: store.preferences.preferredVoice,
@@ -105,21 +128,41 @@ class VoiceCoachOrchestrator {
       });
 
       // Configurer la session avec le system prompt
+      logger.info('VOICE_ORCHESTRATOR', 'Configuring session');
       openaiRealtimeService.configureSession(modeConfig.systemPrompt, mode as any);
 
       // Démarrer une conversation dans le store
       await store.startConversation(mode as any);
 
       // Démarrer l'enregistrement audio
+      logger.info('VOICE_ORCHESTRATOR', 'Starting audio recording');
       audioInputService.startRecording();
+
+      // Passer en état listening
+      store.setVoiceState('listening');
 
       logger.info('VOICE_ORCHESTRATOR', 'Voice session started successfully');
     } catch (error) {
-      logger.error('VOICE_ORCHESTRATOR', 'Failed to start voice session', { error });
+      logger.error('VOICE_ORCHESTRATOR', 'Failed to start voice session', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
 
-      const store = useVoiceCoachStore.getState();
       store.setVoiceState('error');
-      store.setError('Failed to start voice session');
+
+      // Message d'erreur détaillé
+      let errorMessage = 'Failed to start voice session';
+      if (error instanceof Error) {
+        if (error.message.includes('permission')) {
+          errorMessage = 'Microphone permission required';
+        } else if (error.message.includes('connect')) {
+          errorMessage = 'Unable to connect to voice service';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      store.setError(errorMessage);
 
       throw error;
     }

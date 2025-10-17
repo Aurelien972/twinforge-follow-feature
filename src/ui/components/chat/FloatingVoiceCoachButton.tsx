@@ -37,7 +37,9 @@ const FloatingVoiceCoachButton = React.forwardRef<HTMLButtonElement, FloatingVoi
       voiceState,
       isPanelOpen,
       togglePanel,
-      startListening,
+      openPanel,
+      setShowReadyPrompt,
+      setVoiceState,
       visualization,
       preferences
     } = useVoiceCoachStore();
@@ -51,6 +53,10 @@ const FloatingVoiceCoachButton = React.forwardRef<HTMLButtonElement, FloatingVoi
     // Déterminer l'icône selon l'état vocal
     const getIconForState = () => {
       switch (voiceState) {
+        case 'ready':
+          return ICONS.Mic;
+        case 'connecting':
+          return ICONS.Loader;
         case 'listening':
           return ICONS.Mic;
         case 'processing':
@@ -83,42 +89,26 @@ const FloatingVoiceCoachButton = React.forwardRef<HTMLButtonElement, FloatingVoi
 
       try {
         if (voiceState === 'idle') {
-          // Vérifier que l'orchestrateur est initialisé
-          if (!voiceCoachOrchestrator.initialized) {
-            logger.error('VOICE_COACH_BUTTON', 'Orchestrator not initialized - voice system is disabled. Check if VITE_OPENAI_API_KEY is configured.');
+          // Ouvrir le panel et afficher le prompt "ready"
+          logger.info('VOICE_COACH_BUTTON', 'Opening panel with ready prompt');
 
-            // Message détaillé pour l'utilisateur
-            const message =
-              'Le système vocal n\'est pas disponible.\n\n' +
-              'Pour l\'activer :\n' +
-              '1. Ajoutez votre clé API OpenAI dans le fichier .env\n' +
-              '2. Créez la variable VITE_OPENAI_API_KEY=sk-votre-cle\n' +
-              '3. Redémarrez l\'application\n\n' +
-              'Consultez VOICE_COACH_SETUP.md pour plus de détails.';
-
-            alert(message);
-            return;
-          }
-
-          logger.info('VOICE_COACH_BUTTON', 'Starting voice session', { currentMode });
-
-          // Ouvrir le panel
           if (!isPanelOpen) {
-            togglePanel();
+            openPanel();
           }
 
-          // Démarrer une session vocale via l'orchestrateur
-          await voiceCoachOrchestrator.startVoiceSession(currentMode);
+          // Afficher le prompt pour inviter à démarrer
+          setShowReadyPrompt(true);
+          setVoiceState('ready');
 
-          logger.info('VOICE_COACH_BUTTON', 'Voice session started', { mode: currentMode });
+          logger.info('VOICE_COACH_BUTTON', 'Ready prompt shown');
 
-        } else if (voiceState === 'listening' || voiceState === 'speaking') {
-          // Arrêter la session vocale
+        } else if (voiceState === 'listening' || voiceState === 'speaking' || voiceState === 'connecting') {
+          // Arrêter la session vocale en cours
           await voiceCoachOrchestrator.stopVoiceSession();
           logger.info('VOICE_COACH_BUTTON', 'Voice session stopped');
 
         } else {
-          // Toggle panel pour les autres états (processing, error)
+          // Toggle panel pour les autres états (ready, processing, error)
           togglePanel();
         }
       } catch (error) {
@@ -127,9 +117,10 @@ const FloatingVoiceCoachButton = React.forwardRef<HTMLButtonElement, FloatingVoi
     };
 
     // Déterminer si on doit animer (état actif)
-    const isActive = voiceState !== 'idle';
+    const isActive = voiceState !== 'idle' && voiceState !== 'ready';
     const isSpeaking = voiceState === 'speaking';
     const isListening = voiceState === 'listening';
+    const isConnecting = voiceState === 'connecting';
 
     return (
       <motion.button
@@ -234,6 +225,10 @@ const FloatingVoiceCoachButton = React.forwardRef<HTMLButtonElement, FloatingVoi
         aria-label={
           voiceState === 'idle'
             ? 'Parler avec le coach'
+            : voiceState === 'ready'
+            ? 'Prêt à démarrer'
+            : voiceState === 'connecting'
+            ? 'Connexion en cours'
             : voiceState === 'listening'
             ? 'En écoute'
             : voiceState === 'speaking'
@@ -302,13 +297,13 @@ const FloatingVoiceCoachButton = React.forwardRef<HTMLButtonElement, FloatingVoi
         {/* Icône avec état */}
         <motion.div
           animate={{
-            rotate: voiceState === 'processing' ? 360 : 0,
+            rotate: (voiceState === 'processing' || isConnecting) ? 360 : 0,
             scale: isSpeaking ? [1, 1.1, 1] : 1
           }}
           transition={{
             rotate: {
               duration: 1,
-              repeat: voiceState === 'processing' ? Infinity : 0,
+              repeat: (voiceState === 'processing' || isConnecting) ? Infinity : 0,
               ease: 'linear'
             },
             scale: {

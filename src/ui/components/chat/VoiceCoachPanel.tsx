@@ -16,6 +16,8 @@ import { Haptics } from '../../../utils/haptics';
 import { openaiRealtimeService } from '../../../system/services/openaiRealtimeService';
 import AudioWaveform from './AudioWaveform';
 import TextChatInput from './TextChatInput';
+import VoiceReadyPrompt from './VoiceReadyPrompt';
+import { voiceCoachOrchestrator } from '../../../system/services/voiceCoachOrchestrator';
 import '../../../styles/components/voice-coach-panel.css';
 
 const VoiceCoachPanel: React.FC = () => {
@@ -29,6 +31,7 @@ const VoiceCoachPanel: React.FC = () => {
     messages,
     currentTranscription,
     showTranscript,
+    showReadyPrompt,
     visualization,
     preferences,
     communicationMode,
@@ -38,7 +41,10 @@ const VoiceCoachPanel: React.FC = () => {
     toggleTranscript,
     toggleCommunicationMode,
     stopListening,
-    addMessage
+    addMessage,
+    setShowReadyPrompt,
+    setVoiceState,
+    setError
   } = useVoiceCoachStore();
 
   const { currentMode, modeConfigs } = useGlobalChatStore();
@@ -76,6 +82,34 @@ const VoiceCoachPanel: React.FC = () => {
     if (voiceState === 'listening') {
       stopListening();
     }
+  };
+
+  const handleStartVoiceSession = async () => {
+    try {
+      setVoiceState('connecting');
+      setShowReadyPrompt(false);
+
+      // Initialiser l'orchestrateur si nécessaire
+      if (!voiceCoachOrchestrator.initialized) {
+        await voiceCoachOrchestrator.initialize();
+      }
+
+      // Démarrer la session vocale
+      await voiceCoachOrchestrator.startVoiceSession(currentMode);
+
+      logger.info('VOICE_COACH_PANEL', 'Voice session started successfully');
+    } catch (error) {
+      logger.error('VOICE_COACH_PANEL', 'Failed to start voice session', { error });
+      setVoiceState('error');
+      setError(error instanceof Error ? error.message : 'Failed to start voice session');
+      setShowReadyPrompt(true);
+    }
+  };
+
+  const handleCancelReadyPrompt = () => {
+    setShowReadyPrompt(false);
+    setVoiceState('idle');
+    closePanel();
   };
 
   const handleSendTextMessage = (text: string) => {
@@ -369,8 +403,18 @@ const VoiceCoachPanel: React.FC = () => {
             {/* Content */}
             {!isPanelMinimized && (
               <div className="voice-panel-content flex-1 overflow-hidden flex flex-col">
+                {/* Voice Ready Prompt */}
+                {showReadyPrompt && !isTextMode && (
+                  <VoiceReadyPrompt
+                    modeColor={modeColor}
+                    modeName={modeConfig.displayName}
+                    onStartSession={handleStartVoiceSession}
+                    onCancel={handleCancelReadyPrompt}
+                  />
+                )}
+
                 {/* Visualisation audio (only in voice mode) */}
-                {!isTextMode && preferences.showVisualizations && (
+                {!showReadyPrompt && !isTextMode && preferences.showVisualizations && (
                   <div
                     className="audio-visualization-container"
                     style={{
@@ -388,7 +432,7 @@ const VoiceCoachPanel: React.FC = () => {
                 )}
 
                 {/* Messages / Transcription (always shown in text mode, conditional in voice mode) */}
-                {(isTextMode || showTranscript) && (
+                {!showReadyPrompt && (isTextMode || showTranscript) && (
                   <div
                     className="messages-container flex-1 overflow-y-auto px-4 py-3"
                     style={{
@@ -486,7 +530,7 @@ const VoiceCoachPanel: React.FC = () => {
                 )}
 
                 {/* Text Chat Input (only in text mode) */}
-                {isTextMode && !isPanelMinimized && (
+                {!showReadyPrompt && isTextMode && !isPanelMinimized && (
                   <TextChatInput
                     onSendMessage={handleSendTextMessage}
                     disabled={voiceState === 'processing'}
