@@ -1,10 +1,10 @@
 /**
- * Voice Coach Panel V2
- * Interface vocale/textuelle intelligente avec détection d'environnement
- * Utilise le bon service selon le mode (vocal ou texte)
+ * Voice Coach Panel
+ * Interface vocale minimale et non-intrusive pour parler avec le coach
+ * Affichage de la transcription en temps réel et visualisations audio
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
@@ -13,20 +13,16 @@ import { useGlobalChatStore } from '../../../system/store/globalChatStore';
 import { Z_INDEX } from '../../../system/store/overlayStore';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
-import { textChatService } from '../../../system/services/textChatService';
-import { environmentDetectionService } from '../../../system/services/environmentDetectionService';
+import { openaiRealtimeService } from '../../../system/services/openaiRealtimeService';
 import AudioWaveform from './AudioWaveform';
 import TextChatInput from './TextChatInput';
 import VoiceReadyPrompt from './VoiceReadyPrompt';
 import { voiceCoachOrchestrator } from '../../../system/services/voiceCoachOrchestrator';
-import logger from '../../../lib/utils/logger';
 import '../../../styles/components/voice-coach-panel.css';
 
 const VoiceCoachPanel: React.FC = () => {
   const { navClose } = useFeedback();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [isTextProcessing, setIsTextProcessing] = useState(false);
-  const [environmentChecked, setEnvironmentChecked] = useState(false);
 
   const {
     isPanelOpen,
@@ -48,8 +44,7 @@ const VoiceCoachPanel: React.FC = () => {
     addMessage,
     setShowReadyPrompt,
     setVoiceState,
-    setError,
-    setCommunicationMode
+    setError
   } = useVoiceCoachStore();
 
   const { currentMode, modeConfigs } = useGlobalChatStore();
@@ -57,87 +52,12 @@ const VoiceCoachPanel: React.FC = () => {
   const modeConfig = modeConfigs[currentMode];
   const modeColor = modeConfig.color;
 
-  // Détection d'environnement au premier rendu
-  useEffect(() => {
-    if (!environmentChecked) {
-      const caps = environmentDetectionService.detect();
-
-      logger.info('VOICE_COACH_PANEL', 'Environment detected', {
-        environment: caps.environmentName,
-        canUseVoice: caps.canUseVoiceMode,
-        isStackBlitz: caps.isStackBlitz
-      });
-
-      // Log pour debugging
-      environmentDetectionService.logEnvironmentInfo();
-
-      // Si on ne peut pas utiliser le mode vocal, forcer le mode texte
-      if (!caps.canUseVoiceMode && communicationMode === 'voice') {
-        logger.warn('VOICE_COACH_PANEL', 'Forcing text mode due to environment limitations');
-        setCommunicationMode('text');
-      }
-
-      setEnvironmentChecked(true);
-    }
-  }, [environmentChecked, communicationMode, setCommunicationMode]);
-
-  // Initialiser le service de chat texte quand le mode change
-  useEffect(() => {
-    if (communicationMode === 'text' && currentMode) {
-      const config = modeConfigs[currentMode];
-
-      textChatService.initialize({
-        mode: currentMode,
-        systemPrompt: config.systemPrompt
-      });
-
-      logger.info('VOICE_COACH_PANEL', 'Text chat service initialized', { mode: currentMode });
-    }
-  }, [communicationMode, currentMode, modeConfigs]);
-
-  // Setup handlers pour le service de chat texte
-  useEffect(() => {
-    if (communicationMode !== 'text') return;
-
-    const unsubscribeMessage = textChatService.onMessage((chunk, isDelta) => {
-      if (isDelta && chunk) {
-        // Mode streaming - mettre à jour le dernier message du coach
-        const lastMessage = messages[messages.length - 1];
-
-        if (lastMessage && lastMessage.role === 'coach') {
-          // Mettre à jour le message existant
-          lastMessage.content += chunk;
-        } else {
-          // Créer un nouveau message coach
-          addMessage({
-            role: 'coach',
-            content: chunk
-          });
-        }
-      } else if (!isDelta) {
-        // Fin du streaming
-        setIsTextProcessing(false);
-      }
-    });
-
-    const unsubscribeError = textChatService.onError((error) => {
-      logger.error('VOICE_COACH_PANEL', 'Text chat error', { error: error.message });
-      setError(error.message);
-      setIsTextProcessing(false);
-    });
-
-    return () => {
-      unsubscribeMessage();
-      unsubscribeError();
-    };
-  }, [communicationMode, messages, addMessage, setError]);
-
   // Auto-scroll vers le bas quand nouveaux messages
   useEffect(() => {
-    if (showTranscript || communicationMode === 'text') {
+    if (showTranscript) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, currentTranscription, showTranscript, communicationMode]);
+  }, [messages, currentTranscription, showTranscript]);
 
   // Fermer avec ESC
   useEffect(() => {
@@ -159,37 +79,12 @@ const VoiceCoachPanel: React.FC = () => {
     navClose();
     Haptics.tap();
     closePanel();
-
     if (voiceState === 'listening') {
       stopListening();
-    }
-
-    if (communicationMode === 'text') {
-      textChatService.cleanup();
     }
   };
 
   const handleStartVoiceSession = async () => {
-    // Vérifier si le mode vocal est disponible
-    const caps = environmentDetectionService.getCapabilities();
-
-    if (!caps.canUseVoiceMode) {
-      logger.error('VOICE_COACH_PANEL', 'Voice mode not available in this environment');
-
-      const errorMessage = environmentDetectionService.getVoiceModeUnavailableMessage();
-      setError(errorMessage);
-      setVoiceState('error');
-
-      // Proposer de basculer en mode texte
-      setTimeout(() => {
-        setCommunicationMode('text');
-        setVoiceState('idle');
-        setShowReadyPrompt(false);
-      }, 3000);
-
-      return;
-    }
-
     try {
       setVoiceState('connecting');
       setShowReadyPrompt(false);
@@ -211,15 +106,9 @@ const VoiceCoachPanel: React.FC = () => {
       setError(errorMessage);
       setShowReadyPrompt(true);
 
-      // Proposer de basculer en mode texte
-      if (errorMessage.includes('StackBlitz') || errorMessage.includes('WebContainer') || errorMessage.includes('WebSocket')) {
-        logger.warn('VOICE_COACH_PANEL', 'Suggesting text mode as fallback');
-
-        setTimeout(() => {
-          setCommunicationMode('text');
-          setVoiceState('idle');
-          setShowReadyPrompt(false);
-        }, 3000);
+      // Afficher une notification toast pour les erreurs StackBlitz
+      if (errorMessage.includes('StackBlitz') || errorMessage.includes('WebContainer')) {
+        console.error('❌ LIMITATION STACKBLITZ DÉTECTÉE :\n\n' + errorMessage);
       }
     }
   };
@@ -230,62 +119,18 @@ const VoiceCoachPanel: React.FC = () => {
     closePanel();
   };
 
-  const handleSendTextMessage = async (text: string) => {
-    try {
-      logger.info('VOICE_COACH_PANEL', 'Sending text message', {
-        mode: currentMode,
-        messageLength: text.length
-      });
+  const handleSendTextMessage = (text: string) => {
+    // Ajouter le message de l'utilisateur
+    addMessage({
+      role: 'user',
+      content: text
+    });
 
-      // Ajouter le message de l'utilisateur
-      addMessage({
-        role: 'user',
-        content: text
-      });
-
-      setIsTextProcessing(true);
-
-      // Créer un message coach vide pour le streaming
-      addMessage({
-        role: 'coach',
-        content: ''
-      });
-
-      // Envoyer via le service de chat texte (pas Realtime!)
-      await textChatService.sendMessage(text, true);
-
-    } catch (error) {
-      logger.error('VOICE_COACH_PANEL', 'Error sending text message', { error });
-      setIsTextProcessing(false);
-
-      const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
-      setError(errorMessage);
-    }
-  };
-
-  const handleToggleCommunicationMode = () => {
-    const caps = environmentDetectionService.getCapabilities();
-
-    // Si on veut passer en mode vocal mais que ce n'est pas disponible
-    if (communicationMode === 'text' && !caps.canUseVoiceMode) {
-      logger.warn('VOICE_COACH_PANEL', 'Voice mode not available, staying in text mode');
-
-      // Afficher un message d'information
-      setError(environmentDetectionService.getVoiceModeUnavailableMessage());
-
-      setTimeout(() => {
-        setError('');
-      }, 5000);
-
-      return;
-    }
-
-    // Sinon, basculer normalement
-    toggleCommunicationMode();
+    // Envoyer via l'API Realtime
+    openaiRealtimeService.sendTextMessage(text);
   };
 
   const isTextMode = communicationMode === 'text';
-  const caps = environmentDetectionService.getCapabilities();
 
   return (
     <AnimatePresence>
@@ -385,25 +230,6 @@ const VoiceCoachPanel: React.FC = () => {
               }}
             />
 
-            {/* Environment Warning Banner (StackBlitz) */}
-            {caps.isStackBlitz && !isPanelMinimized && (
-              <div
-                style={{
-                  padding: '8px 16px',
-                  background: 'rgba(251, 191, 36, 0.15)',
-                  borderBottom: '1px solid rgba(251, 191, 36, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                <SpatialIcon Icon={ICONS.AlertTriangle} size={14} style={{ color: '#fbbf24' }} />
-                <p style={{ fontSize: '11px', color: '#fbbf24', margin: 0 }}>
-                  Mode vocal indisponible en {caps.environmentName}
-                </p>
-              </div>
-            )}
-
             {/* Header */}
             <div
               className="voice-panel-header"
@@ -453,7 +279,7 @@ const VoiceCoachPanel: React.FC = () => {
                     <h3 className="text-white font-bold text-base">{modeConfig.displayName}</h3>
                     <p className="text-white/60 text-xs">
                       {isTextMode
-                        ? isTextProcessing ? 'Traitement...' : 'Mode texte'
+                        ? 'Mode texte'
                         : voiceState === 'listening'
                         ? 'En écoute...'
                         : voiceState === 'speaking'
@@ -472,7 +298,7 @@ const VoiceCoachPanel: React.FC = () => {
                 {/* Toggle communication mode (voice/text) */}
                 {!isPanelMinimized && (
                   <motion.button
-                    onClick={handleToggleCommunicationMode}
+                    onClick={toggleCommunicationMode}
                     style={{
                       width: '36px',
                       height: '36px',
@@ -484,18 +310,11 @@ const VoiceCoachPanel: React.FC = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      cursor: 'pointer',
-                      opacity: !caps.canUseVoiceMode && !isTextMode ? 0.5 : 1
+                      cursor: 'pointer'
                     }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    title={
-                      !caps.canUseVoiceMode && !isTextMode
-                        ? 'Mode vocal indisponible dans cet environnement'
-                        : isTextMode
-                        ? 'Passer en mode vocal'
-                        : 'Passer en mode texte'
-                    }
+                    title={isTextMode ? 'Passer en mode vocal' : 'Passer en mode texte'}
                   >
                     <SpatialIcon
                       Icon={isTextMode ? ICONS.Mic : ICONS.MessageSquare}
@@ -619,7 +438,7 @@ const VoiceCoachPanel: React.FC = () => {
                   </div>
                 )}
 
-                {/* Messages / Transcription */}
+                {/* Messages / Transcription (always shown in text mode, conditional in voice mode) */}
                 {!showReadyPrompt && (isTextMode || showTranscript) && (
                   <div
                     className="messages-container flex-1 overflow-y-auto px-4 py-3"
@@ -643,16 +462,10 @@ const VoiceCoachPanel: React.FC = () => {
                               boxShadow: `0 0 20px color-mix(in srgb, ${modeColor} 25%, transparent)`
                             }}
                           >
-                            <SpatialIcon
-                              Icon={isTextMode ? ICONS.MessageSquare : ICONS.Mic}
-                              size={20}
-                              style={{ color: modeColor }}
-                            />
+                            <SpatialIcon Icon={ICONS.Mic} size={20} style={{ color: modeColor }} />
                           </div>
                           <p className="text-sm text-white/70">
-                            {isTextMode
-                              ? 'Écrivez votre message pour commencer'
-                              : 'Parlez pour commencer la conversation'}
+                            Parlez pour commencer la conversation
                           </p>
                         </motion.div>
                       </div>
@@ -727,7 +540,7 @@ const VoiceCoachPanel: React.FC = () => {
                 {!showReadyPrompt && isTextMode && !isPanelMinimized && (
                   <TextChatInput
                     onSendMessage={handleSendTextMessage}
-                    disabled={isTextProcessing}
+                    disabled={voiceState === 'processing'}
                     placeholder="Tapez votre message..."
                     color={modeColor}
                   />

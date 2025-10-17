@@ -2,6 +2,11 @@
  * Voice Coach Realtime Proxy
  * Proxifie les connexions WebSocket vers l'API Realtime d'OpenAI
  * Garde la clé API côté serveur pour plus de sécurité
+ *
+ * IMPORTANT:
+ * - Cette fonction nécessite OPENAI_API_KEY dans les secrets Supabase
+ * - Les WebSockets ne fonctionnent PAS dans StackBlitz/WebContainer
+ * - En production uniquement
  */
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
@@ -9,11 +14,31 @@ import { corsHeaders } from '../_shared/cors.ts';
 
 const OPENAI_REALTIME_URL = 'wss://api.openai.com/v1/realtime';
 
+// Structured logging helper
+function log(level: 'info' | 'warn' | 'error', message: string, data?: any) {
+  const timestamp = new Date().toISOString();
+  const logEntry = {
+    timestamp,
+    level,
+    service: 'voice-coach-realtime',
+    message,
+    ...data
+  };
+
+  if (level === 'error') {
+    console.error(JSON.stringify(logEntry));
+  } else if (level === 'warn') {
+    console.warn(JSON.stringify(logEntry));
+  } else {
+    console.log(JSON.stringify(logEntry));
+  }
+}
+
 function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
   let openaiConnected = false;
 
   openaiSocket.onopen = () => {
-    console.log('[VOICE-PROXY] OpenAI connection established');
+    log('info', 'OpenAI connection established');
     openaiConnected = true;
 
     if (clientSocket.readyState === WebSocket.OPEN) {
@@ -25,7 +50,7 @@ function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
   };
 
   openaiSocket.onerror = (error) => {
-    console.error('[VOICE-PROXY] OpenAI WebSocket error', error);
+    log('error', 'OpenAI WebSocket error', { error: String(error) });
 
     if (clientSocket.readyState === WebSocket.OPEN) {
       clientSocket.send(JSON.stringify({
@@ -40,7 +65,7 @@ function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
   };
 
   openaiSocket.onclose = (event) => {
-    console.log('[VOICE-PROXY] OpenAI connection closed', {
+    log('info', 'OpenAI connection closed', {
       code: event.code,
       reason: event.reason,
       wasClean: event.wasClean
@@ -57,10 +82,10 @@ function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
       if (clientSocket.readyState === WebSocket.OPEN) {
         clientSocket.send(event.data);
       } else {
-        console.warn('[VOICE-PROXY] Client socket not ready, dropping message');
+        log('warn', 'Client socket not ready, dropping message');
       }
     } catch (error) {
-      console.error('[VOICE-PROXY] Error forwarding to client', error);
+      log('error', 'Error forwarding to client', { error: String(error) });
     }
   };
 
@@ -70,7 +95,7 @@ function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
       if (openaiSocket.readyState === WebSocket.OPEN) {
         openaiSocket.send(event.data);
       } else {
-        console.warn('[VOICE-PROXY] OpenAI socket not ready', {
+        log('warn', 'OpenAI socket not ready', {
           state: openaiSocket.readyState,
           connected: openaiConnected
         });
@@ -83,12 +108,12 @@ function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
         }
       }
     } catch (error) {
-      console.error('[VOICE-PROXY] Error forwarding to OpenAI', error);
+      log('error', 'Error forwarding to OpenAI', { error: String(error) });
     }
   };
 
   clientSocket.onclose = (event) => {
-    console.log('[VOICE-PROXY] Client connection closed', {
+    log('info', 'Client connection closed', {
       code: event.code,
       reason: event.reason
     });
@@ -99,7 +124,7 @@ function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
   };
 
   clientSocket.onerror = (error) => {
-    console.error('[VOICE-PROXY] Client WebSocket error', error);
+    log('error', 'Client WebSocket error', { error: String(error) });
 
     if (openaiSocket.readyState === WebSocket.OPEN) {
       openaiSocket.close(1011, 'Client error');
@@ -108,6 +133,9 @@ function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
 }
 
 Deno.serve(async (req: Request) => {
+  // Generate request ID for tracing
+  const requestId = crypto.randomUUID();
+
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 200,
@@ -118,13 +146,20 @@ Deno.serve(async (req: Request) => {
   try {
     const url = new URL(req.url);
 
+    log('info', 'Incoming WebSocket request', {
+      requestId,
+      method: req.method,
+      url: url.pathname
+    });
+
     // Vérifier l'authentification
     // Pour les WebSockets, le token peut être dans l'URL (apikey query param)
     const apikeyFromUrl = url.searchParams.get('apikey');
     const authHeader = req.headers.get('Authorization') ||
                        req.headers.get('authorization');
 
-    console.log('[VOICE-PROXY] Request info', {
+    log('info', 'Request authentication check', {
+      requestId,
       hasApikeyInUrl: !!apikeyFromUrl,
       hasAuthHeader: !!authHeader,
       upgrade: req.headers.get('upgrade'),
@@ -133,7 +168,7 @@ Deno.serve(async (req: Request) => {
 
     // Vérifier qu'on a au moins un moyen d'authentification
     if (!apikeyFromUrl && !authHeader) {
-      console.error('[VOICE-PROXY] Missing authentication');
+      log('error', 'Missing authentication', { requestId });
       return new Response(
         JSON.stringify({ error: 'Missing authentication (apikey or Authorization header)' }),
         {
@@ -145,7 +180,10 @@ Deno.serve(async (req: Request) => {
 
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiApiKey) {
-      console.error('OPENAI_API_KEY not configured in Supabase secrets');
+      log('error', 'OPENAI_API_KEY not configured', {
+        requestId,
+        message: 'Please configure OPENAI_API_KEY in Supabase Edge Function secrets'
+      });
       return new Response(
         JSON.stringify({
           error: 'OpenAI API key not configured on server',
@@ -160,7 +198,11 @@ Deno.serve(async (req: Request) => {
 
     const upgrade = req.headers.get('upgrade') || '';
     if (upgrade.toLowerCase() !== 'websocket') {
-      console.error('[VOICE-PROXY] Not a WebSocket upgrade request');
+      log('error', 'Not a WebSocket upgrade request', {
+        requestId,
+        upgrade,
+        method: req.method
+      });
       return new Response(
         JSON.stringify({ error: 'Expected WebSocket upgrade' }),
         {
@@ -172,21 +214,32 @@ Deno.serve(async (req: Request) => {
 
     const model = url.searchParams.get('model') || 'gpt-4o-realtime-preview-2024-10-01';
 
-    console.log('[VOICE-PROXY] Initiating connection', { model, timestamp: new Date().toISOString() });
+    log('info', 'Initiating WebSocket connection', {
+      requestId,
+      model,
+      timestamp: new Date().toISOString()
+    });
 
     const openaiWsUrl = `${OPENAI_REALTIME_URL}?model=${encodeURIComponent(model)}`;
 
-    console.log('[VOICE-PROXY] Connecting to OpenAI', { url: openaiWsUrl });
+    log('info', 'Connecting to OpenAI', {
+      requestId,
+      url: openaiWsUrl.replace(model, '[MODEL]')
+    });
 
     // Upgrade the request to WebSocket
     const { socket: clientSocket, response } = Deno.upgradeWebSocket(req);
 
+    log('info', 'WebSocket upgrade successful', { requestId });
+
     // Attendre que le client soit connecté avant de créer la connexion OpenAI
     clientSocket.onopen = () => {
-      console.log('[VOICE-PROXY] Client connection established');
+      log('info', 'Client connection established', { requestId });
 
       // Maintenant créer la connexion OpenAI
       try {
+        log('info', 'Creating OpenAI WebSocket connection', { requestId });
+
         const openaiSocket = new WebSocket(openaiWsUrl, {
           headers: {
             'Authorization': `Bearer ${openaiApiKey}`,
@@ -194,9 +247,14 @@ Deno.serve(async (req: Request) => {
           },
         });
 
+        log('info', 'OpenAI WebSocket instance created', { requestId });
         setupOpenAIHandlers(openaiSocket, clientSocket);
       } catch (error) {
-        console.error('[VOICE-PROXY] Failed to create OpenAI WebSocket', error);
+        log('error', 'Failed to create OpenAI WebSocket', {
+          requestId,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined
+        });
         if (clientSocket.readyState === WebSocket.OPEN) {
           clientSocket.send(JSON.stringify({
             type: 'error',
@@ -209,7 +267,12 @@ Deno.serve(async (req: Request) => {
 
     return response;
   } catch (error) {
-    console.error('[VOICE-PROXY] Fatal error', error);
+    log('error', 'Fatal error in proxy', {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : 'Unknown error',
