@@ -4,16 +4,11 @@
    ========================================= */
 
 /*
-  Ce fichier gère la désactivation complète du glassmorphisme pour les utilisateurs
-  avec des appareils peu performants. Quand .glassmorphism-disabled est appliqué,
-  tous les effets coûteux sont désactivés :
-  - backdrop-filter (blur, saturate)
-  - box-shadow complexes
-  - animations de border gradient
-  - pseudo-éléments décoratifs
-  - effets de glow et reflets
+  Ce fichier gère la désactivation des animations du fond de l'application
+  pour les utilisateurs avec des appareils peu performants.
 
-  Les couleurs, la structure et la fonctionnalité restent intacts.
+  Mode performance: Désactive UNIQUEMENT les animations du fond de l'app
+  NE TOUCHE PAS: header, sidebar, bottom bar, boutons flottants
 */
 
 /* =========================================
@@ -29,493 +24,36 @@
 }
 
 /* =========================================
-   HEADER SIMPLIFICATIONS
+   ANIMATIONS DU FOND - DÉSACTIVATION COMPLÈTE
    ========================================= */
 
-.glassmorphism-disabled .header-liquid-glass {
-  /* Remplacer le glass par un fond solide */
-  background: rgba(11, 14, 23, 0.95) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-
-  /* FORCER POSITION FIXED POUR LE HEADER - CRITIQUE POUR LA NAVIGATION */
-  position: fixed !important;
-  top: 8px !important;
-  left: 24px !important;
-  right: 24px !important;
-  z-index: 9999 !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-  /* Assurer que le header reste au-dessus de tout */
-  contain: layout style paint !important;
-  isolation: isolate !important;
+/* Désactiver toutes les animations des particules de fond */
+.glassmorphism-disabled .forge-particle,
+.glassmorphism-disabled .cosmic-forge-particles,
+.glassmorphism-disabled *[class*="particle"] {
+  animation: none !important;
+  opacity: 0 !important;
 }
 
-/* Forcer aussi sur le header HTML direct */
-.glassmorphism-disabled header[class*="header"] {
-  position: fixed !important;
-  z-index: 9999 !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-}
-
-.glassmorphism-disabled .header-liquid-glass::before,
-.glassmorphism-disabled .header-liquid-glass::after {
-  /* Désactiver les pseudo-éléments décoratifs */
-  display: none !important;
-}
-
-.glassmorphism-disabled .header-liquid-glass .glass-orb-button {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  /* PAS D'OMBRE SUR LES BOUTONS DU HEADER */
-  box-shadow: none !important;
-  filter: none !important;
-}
-
-.glassmorphism-disabled .header-liquid-glass .glass-orb-button::before {
-  display: none !important;
-}
-
-.glassmorphism-disabled .header-liquid-glass .glass-orb-button:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  box-shadow: none !important;
-  filter: none !important;
-  transform: scale(1.05) translateZ(0) !important;
-}
-
-/* Mobile header adjustments */
-@media (max-width: 768px) {
-  .glassmorphism-disabled .header-liquid-glass {
-    left: 8px !important;
-    right: 8px !important;
-    top: 6px !important;
-  }
-}
-
-/* =========================================
-   SIDEBAR SIMPLIFICATIONS
-   ========================================= */
-
-.glassmorphism-disabled .sidebar-glass-container,
-.glassmorphism-disabled .sidebar-glass-enhanced,
-.glassmorphism-disabled aside[class*="sidebar"] {
-  background: rgba(11, 14, 23, 0.95) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-
-  /* FORCER POSITION STICKY/FIXED POUR LA SIDEBAR */
-  position: sticky !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-  /* Assurer que la sidebar reste toujours visible */
-  contain: layout style !important;
-  isolation: isolate !important;
-}
-
-/* CRITIQUE: Assurer que le contenu de la sidebar est scrollable en mode performance */
-.glassmorphism-disabled .sidebar-content {
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  max-height: calc(100vh - 120px) !important;
-  scrollbar-width: none !important; /* Firefox */
-  -webkit-overflow-scrolling: touch !important; /* iOS smooth scroll */
-  scroll-behavior: smooth !important;
-  overscroll-behavior: contain !important;
-}
-
-/* Webkit - Scrollbar invisible mais scrollable */
-.glassmorphism-disabled .sidebar-content::-webkit-scrollbar {
-  display: none !important;
-}
-
-.glassmorphism-disabled .sidebar-glass-container::before,
-.glassmorphism-disabled .sidebar-glass-container::after,
-.glassmorphism-disabled .sidebar-glass-enhanced::before,
-.glassmorphism-disabled .sidebar-glass-enhanced::after {
-  display: none !important;
-}
-
-.glassmorphism-disabled .sidebar-nav-item,
-.glassmorphism-disabled .sidebar-item {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  /* PAS D'OMBRE SUR LES ITEMS DE NAVIGATION */
-  box-shadow: none !important;
-  filter: none !important;
-}
-
-.glassmorphism-disabled .sidebar-nav-item:hover,
-.glassmorphism-disabled .sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  transform: translateX(4px) translateZ(0) !important;
-  box-shadow: none !important;
-  filter: none !important;
-}
-
-.glassmorphism-disabled .sidebar-nav-item.active,
-.glassmorphism-disabled .sidebar-item[aria-current="page"] {
-  background: rgba(255, 255, 255, 0.12) !important;
-  box-shadow: none !important;
-  filter: none !important;
-}
-
-/* =========================================
-   MOBILE BOTTOM BAR SIMPLIFICATIONS
-   ========================================= */
-
-.glassmorphism-disabled .new-mobile-bottom-bar {
-  /* FORCER POSITION FIXED POUR LA BOTTOM BAR - CRITIQUE POUR LA NAVIGATION MOBILE */
-  position: fixed !important;
-  bottom: var(--new-bottom-bar-bottom-offset) !important;
-  left: 8px !important;
-  right: 8px !important;
-  z-index: 9996 !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-  /* Assurer que la bottom bar reste toujours visible */
-  contain: layout style paint !important;
-  isolation: isolate !important;
-}
-
-/* Forcer aussi sur le nav HTML direct */
-.glassmorphism-disabled nav[class*="bottom-bar"] {
-  position: fixed !important;
-  z-index: 9996 !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-}
-
-.glassmorphism-disabled .new-mobile-bottom-bar-container {
-  background: rgba(11, 14, 23, 0.95) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-}
-
-.glassmorphism-disabled .new-mobile-bottom-bar-container::before,
-.glassmorphism-disabled .new-mobile-bottom-bar-container::after {
-  display: none !important;
-}
-
-.glassmorphism-disabled .new-bottom-bar-icon-container {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  /* PAS D'OMBRE SUR LES ICÔNES DE LA BOTTOM BAR */
-  box-shadow: none !important;
-  filter: none !important;
-}
-
-.glassmorphism-disabled .new-bottom-bar-icon-container::before {
-  display: none !important;
-}
-
-.glassmorphism-disabled .new-bottom-bar-icon-container--active {
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--button-color) 25%, rgba(255, 255, 255, 0.15)),
-    color-mix(in srgb, var(--button-color) 15%, rgba(255, 255, 255, 0.08))) !important;
-  box-shadow: none !important;
-  filter: none !important;
-  border: 1.5px solid color-mix(in srgb, var(--button-color) 50%, transparent) !important;
-}
-
-.glassmorphism-disabled .new-bottom-bar-button--central .new-bottom-bar-icon-container {
-  background: rgba(247, 147, 30, 0.15) !important;
-  box-shadow: none !important;
-  filter: none !important;
-  border: 1.5px solid rgba(247, 147, 30, 0.4) !important;
-}
-
-.glassmorphism-disabled .new-bottom-bar-button--central .new-bottom-bar-icon-container--active {
-  background: linear-gradient(135deg,
-    rgba(255, 107, 53, 0.25),
-    rgba(253, 200, 48, 0.15)) !important;
-  box-shadow: none !important;
-  filter: none !important;
-  border: 2px solid rgba(247, 147, 30, 0.6) !important;
-}
-
-/* =========================================
-   USER PANEL SIMPLIFICATIONS
-   ========================================= */
-
-.glassmorphism-disabled .user-panel-container {
-  background: rgba(11, 14, 23, 0.95) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: var(--shadow-elevated) !important;
-}
-
-.glassmorphism-disabled .user-panel-container::before,
-.glassmorphism-disabled .user-panel-container::after {
-  display: none !important;
-}
-
-/* =========================================
-   GENERIC GLASS CARDS SIMPLIFICATIONS
-   ========================================= */
-
-.glassmorphism-disabled .glass-card,
-.glassmorphism-disabled .glass-card-base,
-.glassmorphism-disabled [class*="glass-"] {
-  background: rgba(255, 255, 255, 0.05) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  /* GARDER UNIQUEMENT LES OMBRES DES CARTES PRINCIPALES */
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
-}
-
-.glassmorphism-disabled .glass-card::before,
-.glassmorphism-disabled .glass-card::after,
-.glassmorphism-disabled .glass-card-base::before,
-.glassmorphism-disabled .glass-card-base::after {
-  display: none !important;
-}
-
-.glassmorphism-disabled .glass-card:hover,
-.glassmorphism-disabled .glass-card-base:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
-  transform: translateY(-2px) translateZ(0) !important;
-}
-
-/* =========================================
-   BUTTONS & INTERACTIVE ELEMENTS
-   ========================================= */
-
-.glassmorphism-disabled .btn-glass,
-.glassmorphism-disabled button[class*="glass"] {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: var(--shadow-simple) !important;
-}
-
-.glassmorphism-disabled .btn-glass::before,
-.glassmorphism-disabled .btn-glass::after {
-  display: none !important;
-}
-
-.glassmorphism-disabled .btn-glass:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  box-shadow: var(--shadow-simple) !important;
-}
-
-/* =========================================
-   DRAWERS & MODALS
-   ========================================= */
-
-.glassmorphism-disabled .mobile-drawer-glass,
-.glassmorphism-disabled .generic-drawer,
-.glassmorphism-disabled [class*="drawer-glass"] {
-  background: rgba(11, 14, 23, 0.98) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-
-  /* FORCER POSITION FIXED POUR LES DRAWERS */
-  position: fixed !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-}
-
-.glassmorphism-disabled .mobile-drawer-glass::before,
-.glassmorphism-disabled .mobile-drawer-glass::after,
-.glassmorphism-disabled .generic-drawer::before,
-.glassmorphism-disabled .generic-drawer::after {
-  display: none !important;
-}
-
-/* =========================================
-   CENTRAL ACTIONS MENU
-   ========================================= */
-
-.glassmorphism-disabled .central-actions-menu {
-  background: rgba(11, 14, 23, 0.95) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-
-  /* FORCER POSITION FIXED POUR LE MENU CENTRAL */
-  position: fixed !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-}
-
-.glassmorphism-disabled .central-actions-menu::before,
-.glassmorphism-disabled .central-actions-menu::after {
-  display: none !important;
-}
-
-/* =========================================
-   FLOATING BUTTONS
-   ========================================= */
-
-.glassmorphism-disabled .floating-chat-button,
-.glassmorphism-disabled .floating-generate-button,
-.glassmorphism-disabled [class*="floating-"][class*="button"] {
-  background: rgba(255, 255, 255, 0.10) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  /* PAS D'OMBRE SUR LES BOUTONS FLOTTANTS */
-  box-shadow: none !important;
-  filter: none !important;
-
-  /* FORCER POSITION FIXED POUR LES BOUTONS FLOTTANTS - CRITIQUE POUR LE CHAT */
-  position: fixed !important;
-  transform: translateZ(0) !important;
-  will-change: transform, right !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-  /* Assurer que le bouton reste au-dessus de tout */
-  contain: layout style paint !important;
-  isolation: isolate !important;
-  /* Maintenir le z-index correct */
-  z-index: 9998 !important;
-}
-
-/* Forcer position fixed sur tous les boutons flottants */
-.glassmorphism-disabled button[class*="floating"] {
-  position: fixed !important;
-  z-index: 9998 !important;
-  transform: translateZ(0) !important;
-  will-change: transform, right !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-}
-
-.glassmorphism-disabled .floating-chat-button::before,
-.glassmorphism-disabled .floating-chat-button::after {
-  display: none !important;
-}
-
-/* =========================================
-   SUPPRIMER TOUTES LES OMBRES NON-ESSENTIELLES
-   ========================================= */
-
-/* Supprimer les drop-shadow sur tous les icônes */
-.glassmorphism-disabled svg,
-.glassmorphism-disabled [class*="icon"],
-.glassmorphism-disabled [class*="Icon"] {
-  filter: none !important;
-  -webkit-filter: none !important;
-}
-
-/* Supprimer les text-shadow sur tous les textes */
-.glassmorphism-disabled span,
-.glassmorphism-disabled p,
-.glassmorphism-disabled h1,
-.glassmorphism-disabled h2,
-.glassmorphism-disabled h3,
-.glassmorphism-disabled h4,
-.glassmorphism-disabled h5,
-.glassmorphism-disabled h6,
-.glassmorphism-disabled label,
-.glassmorphism-disabled div[class*="label"],
-.glassmorphism-disabled div[class*="title"] {
-  text-shadow: none !important;
-}
-
-/* Supprimer les ombres sur tous les boutons sauf glass-card */
-.glassmorphism-disabled button:not(.glass-card):not([class*="glass-card"]) {
-  box-shadow: none !important;
-  filter: none !important;
-}
-
-/* =========================================
-   ANIMATIONS DÉSACTIVATION
-   ========================================= */
-
+/* Désactiver les animations de pulse et glow du fond */
 .glassmorphism-disabled *[class*="borderPulse"],
 .glassmorphism-disabled *[class*="glowPulse"],
 .glassmorphism-disabled *[class*="activePulse"] {
   animation: none !important;
 }
 
-/* Conserver uniquement les transitions de couleur essentielles */
-.glassmorphism-disabled * {
-  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease !important;
-}
-
-/* =========================================
-   LOGO FORGE - VISIBILITÉ EN MODE PERFORMANCE
-   ========================================= */
-
-/* Forcer la visibilité du logo avec couleurs comme le marteau */
-.glassmorphism-disabled svg[viewBox="0 0 85 70"],
-.glassmorphism-disabled [class*="ForgeHammer"],
-.glassmorphism-disabled [class*="forge-hammer"] {
-  filter: none !important;
-  -webkit-filter: none !important;
-  opacity: 1 !important;
-}
-
-/* Forcer les couleurs du gradient du logo */
-.glassmorphism-disabled svg[viewBox="0 0 85 70"] path {
-  fill: #F7931E !important;
-  stroke: rgba(15, 23, 42, 0.8) !important;
-  opacity: 1 !important;
-}
-
-/* Les cercles animés du logo restent visibles mais sans animation */
-.glassmorphism-disabled svg[viewBox="0 0 85 70"] circle {
-  opacity: 0.8 !important;
+/* Désactiver les animations breathing et pulse CSS */
+.glassmorphism-disabled .breathing-icon,
+.glassmorphism-disabled .icon-pulse-css,
+.glassmorphism-disabled .particle-css {
   animation: none !important;
 }
 
-.glassmorphism-disabled svg[viewBox="0 0 85 70"] circle animate {
-  display: none !important;
-}
-
-/* CRITIQUE: Le texte TWINFØRGE doit rester VISIBLE avec son gradient orangé */
-/* Exception au filter: none pour préserver la lisibilité du texte */
-.glassmorphism-disabled .header-liquid-glass span[style*="gradient"],
-.glassmorphism-disabled header span[style*="gradient"],
-.glassmorphism-disabled [class*="TwinForgeLogo"] span[style*="gradient"],
-.glassmorphism-disabled span[style*="linear-gradient"][style*="WebkitBackgroundClip"] {
-  /* FORCER le gradient orangé visible */
-  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  /* PAS de filter: none ici - on laisse le texte avec son gradient */
-  opacity: 1 !important;
-}
-
-/* Le texte TWIN reste blanc et visible */
-.glassmorphism-disabled .header-liquid-glass span[style*="color: rgb(229, 231, 235)"],
-.glassmorphism-disabled header span[style*="color: rgb(229, 231, 235)"],
-.glassmorphism-disabled [class*="TwinForgeLogo"] span[style*="color: rgb(229, 231, 235)"] {
-  color: #E5E7EB !important;
-  opacity: 1 !important;
-  /* Supprimer le drop-shadow mais garder la couleur */
-  filter: none !important;
-}
-
 /* =========================================
-   FOND AVEC EFFETS RADIAUX - POSITION FIXE
+   FOND AVEC EFFETS RADIAUX - SIMPLIFICATION
    ========================================= */
 
-/* Le fond cosmique doit rester fixe pendant le scroll */
+/* Le fond cosmique doit rester fixe mais sans animations */
 .glassmorphism-disabled .bg-twinforge-visionos {
   position: fixed !important;
   inset: 0 !important;
@@ -524,7 +62,7 @@
   will-change: auto !important;
 }
 
-/* Les effets radiaux restent en arrière-plan fixe */
+/* Les effets radiaux restent en arrière-plan fixe sans animations */
 .glassmorphism-disabled .cosmic-forge-particles {
   position: fixed !important;
   inset: 0 !important;
@@ -532,16 +70,13 @@
   pointer-events: none !important;
   transform: translateZ(0) !important;
   will-change: auto !important;
+  animation: none !important;
+  opacity: 0 !important;
 }
 
 /* =========================================
    PRESERVE ESSENTIAL FUNCTIONALITY
    ========================================= */
-
-/* Les couleurs de circuits doivent rester visibles */
-.glassmorphism-disabled [data-circuit] {
-  /* Conserver les couleurs de circuits */
-}
 
 /* Les focus states pour l'accessibilité */
 .glassmorphism-disabled *:focus-visible {
@@ -559,20 +94,6 @@
    For old devices like iPhone 8
    ========================================= */
 
-/* Force GPU acceleration on all critical elements */
-.glassmorphism-disabled * {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* Remove all complex filters */
-.glassmorphism-disabled *[style*="filter"],
-.glassmorphism-disabled *[class*="filter"] {
-  filter: none !important;
-  -webkit-filter: none !important;
-}
-
 /* Simplify all transitions to 150ms max */
 .glassmorphism-disabled * {
   transition-duration: 150ms !important;
@@ -583,28 +104,6 @@
 .glassmorphism-disabled .cosmic-forge-particles,
 .glassmorphism-disabled *[class*="particle"] {
   display: none !important;
-}
-
-/* Disable all hover scale transforms */
-.glassmorphism-disabled *:hover {
-  transform: translateZ(0) !important;
-}
-
-/* Force simple backgrounds everywhere */
-.glassmorphism-disabled * {
-  background-image: none !important;
-}
-
-/* Remove all box-shadows except on glass-card */
-.glassmorphism-disabled *:not(.glass-card):not([class*="glass-card"]) {
-  box-shadow: none !important;
-}
-
-/* GARDER les ombres uniquement sur glass-card */
-.glassmorphism-disabled .glass-card,
-.glassmorphism-disabled .glass-card-base,
-.glassmorphism-disabled [class*="glass-card"] {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Keep essential focus shadows */
@@ -637,13 +136,12 @@
 
 /*
   Mode performance activé:
-  ✓ Pas de backdrop-filter (économie GPU considérable)
-  ✓ Shadows simplifiées (réduction des repaints)
-  ✓ Animations désactivées (économie CPU/GPU)
-  ✓ Pseudo-éléments décoratifs cachés (réduction DOM)
+  ✓ Animations du fond désactivées (économie GPU considérable)
+  ✓ Particules cosmiques cachées (réduction des repaints)
   ✓ Transitions réduites au minimum (fluidité préservée)
 
   Préservé:
+  ✓ Header, sidebar, bottom bar, boutons flottants - INTACTS
   ✓ Toutes les couleurs et identité visuelle
   ✓ Structure et layout complets
   ✓ Toutes les fonctionnalités
