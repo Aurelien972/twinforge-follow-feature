@@ -92,43 +92,10 @@ export const DeviceProvider: React.FC<DeviceProviderProps> = ({ children }) => {
   // CRITICAL: Add mobile-device class to body for CSS targeting
   // This automatically applies mobile optimizations without user intervention
   useEffect(() => {
-    console.log('📱 DeviceProvider: useEffect triggered');
-    console.log('📱 Detection results:', { isMobile, isIOS, isAndroid, hasTouch, width: window.innerWidth });
-
     if (isMobile) {
       // Add mobile-device class for CSS targeting (mobile-no-blur.css, mobile-zero-animations.css)
       document.body.classList.add('mobile-device');
       document.documentElement.classList.add('mobile-device');
-
-      console.log('📱 MOBILE DEVICE DETECTED - Classes added!');
-      console.log('📱 Body classes:', document.body.className);
-      console.log('📱 HTML classes:', document.documentElement.className);
-
-      // Check if CSS is hiding background
-      setTimeout(() => {
-        const bg = document.querySelector('.bg-twinforge-visionos');
-        const particles = document.querySelector('.cosmic-forge-particles');
-
-        if (bg) {
-          const bgStyles = window.getComputedStyle(bg);
-          console.log('📱 Background element found:');
-          console.log('  - display:', bgStyles.display);
-          console.log('  - opacity:', bgStyles.opacity);
-          console.log('  - visibility:', bgStyles.visibility);
-          console.log('  - background:', bgStyles.background.substring(0, 80));
-        } else {
-          console.error('📱 ❌ Background element NOT FOUND in DOM!');
-        }
-
-        if (particles) {
-          const pStyles = window.getComputedStyle(particles);
-          console.log('📱 Particles container found:');
-          console.log('  - display:', pStyles.display);
-          console.log('  - opacity:', pStyles.opacity);
-        } else {
-          console.error('📱 ❌ Particles container NOT FOUND in DOM!');
-        }
-      }, 1000);
 
       // Log for debugging
       console.log('🔍 Mobile device detected - Auto-optimizations applied:', {

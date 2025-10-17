@@ -19,18 +19,17 @@
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
 
-  /* Ultra-transparent Liquid Glass matching bottom bar EXACTLY */
+  /* Ultra-transparent Liquid Glass matching bottom bar */
   background:
     var(--liquid-reflections-multi),
     var(--liquid-highlight-ambient),
     var(--liquid-glass-bg-base) !important;
 
-  /* CRITICAL: Use same blur/saturate as bottom bar for visual harmony */
-  backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
-  -webkit-backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
+  backdrop-filter: blur(var(--liquid-blur-intense)) saturate(var(--liquid-saturate-intense)) !important;
+  -webkit-backdrop-filter: blur(var(--liquid-blur-intense)) saturate(var(--liquid-saturate-intense)) !important;
 
-  /* Enhanced shadow system matching bottom bar */
-  box-shadow: var(--liquid-bottombar-shadow), var(--liquid-bottombar-glow) !important;
+  /* Enhanced shadow system */
+  box-shadow: var(--liquid-shadow-elevated) !important;
 
   transition:
     box-shadow var(--liquid-transition-medium),

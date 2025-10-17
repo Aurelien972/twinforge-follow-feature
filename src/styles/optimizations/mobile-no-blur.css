@@ -9,11 +9,10 @@
 
 /* =========================================
    GLASS CARDS - Solid backgrounds (performance)
-   IMPORTANT: Ne pas cibler les containers principaux
    ========================================= */
 
-.mobile-device .glass-card:not(.min-h-screen),
-.mobile-device .glass-base:not(.min-h-screen),
+.mobile-device .glass-card,
+.mobile-device .glass-base,
 .mobile-device .glass-card-cta {
   /* Replace transparent glass with solid dark background */
   background: #0F1927 !important;
@@ -175,8 +174,8 @@
    ========================================= */
 
 @media (max-width: 768px), (hover: none), (pointer: coarse) {
-  /* Solid glass cards by default - IMPORTANT: Exclude main containers */
-  .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.floating-chat-button):not(.floating-voice-coach-button):not(.min-h-screen) {
+  /* Solid glass cards by default */
+  .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.floating-chat-button):not(.floating-voice-coach-button) {
     background: #0F1927 !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;

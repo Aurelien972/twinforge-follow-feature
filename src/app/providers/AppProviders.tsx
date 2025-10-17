@@ -181,119 +181,6 @@ function AutoSyncInitializer({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-/**
- * Background Component - Forge Spatiale TwinForge
- * CRITICAL: This must be rendered at the root level with proper particles
- */
-function ForgeBackground() {
-  const particlesRef = useRef<HTMLDivElement>(null);
-  const [particles, setParticles] = useState<Array<{
-    id: number;
-    x0: string;
-    x1: string;
-    x2: string;
-    x3: string;
-    x4: string;
-    size: string;
-    duration: string;
-    delay: string;
-  }>>([]);
-
-  useEffect(() => {
-    console.log('🎨 ForgeBackground: Component mounted');
-    console.log('🎨 Window dimensions:', window.innerWidth, 'x', window.innerHeight);
-    console.log('🎨 Device classes on body:', document.body.className);
-    console.log('🎨 Device classes on html:', document.documentElement.className);
-
-    // Generate particles on mount
-    const particleCount = window.innerWidth <= 768 ? 6 : 12;
-    console.log('🎨 Generating', particleCount, 'particles');
-
-    const newParticles = Array.from({ length: particleCount }, (_, i) => ({
-      id: i + 1,
-      x0: `${20 + Math.random() * 60}vw`,
-      x1: `${-20 + Math.random() * 40}px`,
-      x2: `${-30 + Math.random() * 60}px`,
-      x3: `${-10 + Math.random() * 20}px`,
-      x4: `${-5 + Math.random() * 10}px`,
-      size: `${2 + Math.random() * 1.5}px`,
-      duration: `${20 + Math.random() * 15}s`,
-      delay: `${Math.random() * -20}s`,
-    }));
-
-    setParticles(newParticles);
-    console.log('🎨 Particles generated:', newParticles.length);
-
-    // Check if background elements exist in DOM
-    setTimeout(() => {
-      const bgElement = document.querySelector('.bg-twinforge-visionos');
-      const particlesContainer = document.querySelector('.cosmic-forge-particles');
-      const forgeParticles = document.querySelectorAll('.forge-particle');
-
-      console.log('🎨 DOM Check:');
-      console.log('  - Background element exists:', !!bgElement);
-      console.log('  - Particles container exists:', !!particlesContainer);
-      console.log('  - Forge particles count:', forgeParticles.length);
-
-      if (bgElement) {
-        const bgStyles = window.getComputedStyle(bgElement);
-        console.log('  - Background position:', bgStyles.position);
-        console.log('  - Background z-index:', bgStyles.zIndex);
-        console.log('  - Background display:', bgStyles.display);
-        console.log('  - Background opacity:', bgStyles.opacity);
-        console.log('  - Background background:', bgStyles.background.substring(0, 100));
-
-        // CHECK WHAT'S ON TOP OF BACKGROUND
-        const body = document.body;
-        const bodyStyles = window.getComputedStyle(body);
-        console.log('🔍 BODY STYLES:');
-        console.log('  - background:', bodyStyles.background);
-        console.log('  - backgroundColor:', bodyStyles.backgroundColor);
-
-        const root = document.getElementById('root');
-        if (root) {
-          const rootStyles = window.getComputedStyle(root);
-          console.log('🔍 ROOT DIV STYLES:');
-          console.log('  - background:', rootStyles.background);
-          console.log('  - backgroundColor:', rootStyles.backgroundColor);
-          console.log('  - position:', rootStyles.position);
-          console.log('  - zIndex:', rootStyles.zIndex);
-        }
-
-        const appDiv = document.querySelector('.min-h-screen');
-        if (appDiv) {
-          const appStyles = window.getComputedStyle(appDiv);
-          console.log('🔍 APP CONTAINER STYLES:');
-          console.log('  - background:', appStyles.background);
-          console.log('  - backgroundColor:', appStyles.backgroundColor);
-          console.log('  - position:', appStyles.position);
-          console.log('  - zIndex:', appStyles.zIndex);
-        }
-      }
-
-      if (particlesContainer) {
-        const containerStyles = window.getComputedStyle(particlesContainer);
-        console.log('  - Particles opacity:', containerStyles.opacity);
-        console.log('  - Particles display:', containerStyles.display);
-      }
-
-      if (forgeParticles.length > 0) {
-        const firstParticle = forgeParticles[0] as HTMLElement;
-        const particleStyles = window.getComputedStyle(firstParticle);
-        console.log('  - First particle opacity:', particleStyles.opacity);
-        console.log('  - First particle display:', particleStyles.display);
-        console.log('  - First particle animation:', particleStyles.animation);
-      }
-    }, 500);
-  }, []);
-
-  console.log('🎨 ForgeBackground: Rendering with', particles.length, 'particles');
-
-  // CRITICAL: The HTML already has a background system in index.html
-  // We don't need to duplicate it here - just return null
-  return null;
-}
-
 export function AppProviders({ children }: { children: React.ReactNode }) {
   // Initialize cache persistence on mount
   React.useEffect(() => {
@@ -309,7 +196,6 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
               <ToastProvider>
                 <PerformanceInitializer>
                   <AutoSyncInitializer>
-                    <ForgeBackground />
                     {children}
                   </AutoSyncInitializer>
                 </PerformanceInitializer>

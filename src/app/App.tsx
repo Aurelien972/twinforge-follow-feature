@@ -178,20 +178,13 @@ function AppContent() {
 
   return (
     <div
-      className="min-h-screen flex flex-col"
-      style={{
-        position: 'relative',
-        zIndex: 10,
-        pointerEvents: 'auto',
-        background: 'transparent',
-        backgroundColor: 'transparent',
-        minHeight: '100dvh'
-      }}
+      className="min-h-screen flex flex-col z-auto-important will-change-auto-important position-static-important transform-none-important filter-none-important perspective-none-important contain-none-important isolation-auto-important overflow-visible-important"
+      style={{ position: 'relative', zIndex: 0 }}
     >
       <Header />
 
       {/* Parent flex : on autorise la contraction des enfants */}
-      <div className="flex-1 flex min-w-0" style={{ background: 'transparent', backgroundColor: 'transparent' }}>
+      <div className="flex-1 flex min-w-0 position-static-important overflow-visible-important transform-none-important filter-none-important perspective-none-important contain-none-important isolation-auto-important z-auto-important">
         {/* Sidebar (hidden on mobile) */}
         <div className="hidden lg:flex lg:flex-col lg:w-[240px] xl:w-[260px] shrink-0 ml-6 mr-3 pt-20">
           <Sidebar />

@@ -1,48 +1,30 @@
 /**
- * MOBILE ZERO ANIMATIONS - STRICT
+ * MOBILE SIMPLIFIED ANIMATIONS - BALANCED
  *
- * This file FREEZES all decorative animations on mobile devices
+ * This file REDUCES animations on mobile devices while preserving visual identity
  * Applied via .mobile-device class added by DeviceProvider
  *
- * Goal: 60fps scroll + reduced battery consumption
- * Strategy: Keep colors and appearance, remove ALL movement
+ * Goal: 60fps scroll while maintaining brand coherence
  */
 
 /* =========================================
-   CRITICAL: FREEZE ALL DECORATIVE ANIMATIONS
-   Keep visual appearance, remove ALL movement
+   TARGETED ANIMATION REDUCTION
+   Only kill decorative animations, not functional ones
    ========================================= */
 
-/* FREEZE: Decorative animations - SAFE SELECTORS ONLY */
+/* KILL decorative animations only */
 .mobile-device [class*="breathing"],
 .mobile-device [class*="pulse"]:not(.new-bottom-bar-icon-container):not(.glass-orb-button),
 .mobile-device [class*="glow"]:not(.floating-chat-button):not(.floating-voice-coach-button),
 .mobile-device [class*="shimmer"],
 .mobile-device [class*="float"],
 .mobile-device [class*="bounce"],
+.mobile-device [class*="particle"],
 .mobile-device [class*="spark"],
 .mobile-device [class*="circuit"],
-.mobile-device [class*="ripple"],
-.mobile-device [class*="wave"] {
+.mobile-device [class*="ember"] {
   animation: none !important;
-  animation-duration: 0s !important;
-  animation-play-state: paused !important;
   filter: none !important;
-  transform: none !important;
-}
-
-/* CRITICAL: REMOVED [class*="particle"] and [class*="ember"] */
-/* These were hiding .forge-particle and background elements! */
-/* Background must remain visible on mobile */
-
-/* MOBILE: Freeze forge particles animation but keep them visible */
-.mobile-device .forge-particle {
-  animation: none !important;
-  animation-play-state: paused !important;
-  /* Keep opacity to show particles */
-  opacity: 0.3 !important;
-  /* Freeze at initial position */
-  transform: translate3d(var(--x0, 50vw), 50vh, 0) !important;
 }
 
 /* =========================================
@@ -72,28 +54,14 @@
 }
 
 /* =========================================
-   DISABLE DECORATIVE CORNER SQUARES EVERYWHERE
+   DISABLE DECORATIVE CORNER SQUARES IN HEADER
    ========================================= */
 
 .mobile-device .header-corner-square,
-.mobile-device header [class*="corner-square"],
-.mobile-device [class*="corner-particle"],
-.mobile-device .corner-particle,
-.mobile-device .training-hero-corners {
+.mobile-device header [class*="corner-square"] {
   animation: none !important;
   opacity: 0 !important;
   display: none !important;
-}
-
-/* Hide corner squares in all glass cards - SAFE SELECTORS ONLY */
-.mobile-device .glass-card [class*="corner-square"],
-.mobile-device .glass-card [class*="corner-particle"],
-.mobile-device [data-corner],
-.mobile-device [class*="corner-square"] {
-  animation: none !important;
-  /* DO NOT use display: none - it's too aggressive */
-  opacity: 0 !important;
-  pointer-events: none !important;
 }
 
 /* =========================================
@@ -105,33 +73,6 @@
 .mobile-device .new-mobile-bottom-bar-container::before,
 .mobile-device .new-mobile-bottom-bar-container::after {
   animation: none !important;
-}
-
-/* =========================================
-   DISABLE BACKGROUND GRADIENT ANIMATIONS
-   ========================================= */
-
-/* Disable borderPulse and glowPulse everywhere */
-.mobile-device [class*="glass-card"]::before,
-.mobile-device [class*="glass-card"]::after,
-.mobile-device .glass-card::before,
-.mobile-device .glass-card::after {
-  animation: none !important;
-}
-
-/* Disable all pseudo-element animations */
-.mobile-device *::before,
-.mobile-device *::after {
-  animation: borderPulse 0s !important;
-  animation: glowPulse 0s !important;
-  animation: activePulse 0s !important;
-}
-
-/* Disable gradient position animations */
-.mobile-device [style*="background-position"],
-.mobile-device [style*="background-size"] {
-  animation: none !important;
-  background-position: center !important;
 }
 
 /* =========================================
@@ -155,23 +96,13 @@
 }
 
 /* =========================================
-   FREEZE FRAMER MOTION - STRICT
+   SIMPLIFY FRAMER MOTION
    ========================================= */
 
-/* CRITICAL: Freeze ALL Framer Motion decorative animations */
-.mobile-device [data-framer-motion],
-.mobile-device motion\.div,
-.mobile-device motion\.span,
-.mobile-device motion\.button {
-  /* Keep only instant transitions for layout changes */
-  animation-duration: 0s !important;
-  transition-duration: 0.08s !important;
-}
-
-/* Exception: Keep tap feedback on interactive elements */
-.mobile-device button[data-framer-motion],
-.mobile-device [role="button"][data-framer-motion] {
-  transition-duration: 0.08s !important;
+.mobile-device [data-framer-motion] {
+  /* Reduce Framer Motion animation duration */
+  animation-duration: 0.15s !important;
+  transition-duration: 0.15s !important;
 }
 
 /* =========================================
@@ -200,168 +131,15 @@
 }
 
 /* =========================================
-   FREEZE SHIMMER EFFECTS ON BUTTONS - STRICT
-   ========================================= */
-
-/* CRITICAL: Hide shimmer effects - SAFE, not content */
-.mobile-device button [class*="shimmer"],
-.mobile-device [class*="shimmer-effect"],
-.mobile-device [data-shimmer],
-.mobile-device .shimmer {
-  animation: none !important;
-  animation-duration: 0s !important;
-  animation-play-state: paused !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  /* DO NOT use display: none globally */
-}
-
-/* CRITICAL: Freeze gradient sweep animations in buttons - SAFE */
-.mobile-device button > div[class*="absolute"][class*="inset"],
-.mobile-device button > motion\.div[class*="absolute"][class*="shimmer"] {
-  animation: none !important;
-  animation-duration: 0s !important;
-  animation-play-state: paused !important;
-  transform: translateX(0) !important;
-}
-
-/* CRITICAL: REMOVED button::before and button::after - TOO DANGEROUS */
-/* These global selectors can break essential button content */
-
-/* =========================================
-   FREEZE BUBBLE AND PARTICLE ANIMATIONS - STRICT
-   ========================================= */
-
-/* CRITICAL: Hide decorative bubbles and particles - DO NOT hide forge-particle! */
-.mobile-device [class*="bubble"],
-.mobile-device [data-bubble],
-.mobile-device [data-particle],
-.mobile-device .bubble {
-  animation: none !important;
-  animation-duration: 0s !important;
-  animation-play-state: paused !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  /* display: none removed - use opacity instead */
-}
-
-/* CRITICAL: REMOVED .particle selector - it was hiding .forge-particle background! */
-/* Background particles (.forge-particle) must remain visible */
-
-/* CRITICAL: Freeze pulsating rings and halos - SAFE SELECTORS */
-.mobile-device [class*="pulse-ring"],
-.mobile-device [class*="halo"],
-.mobile-device div[class*="absolute"][class*="inset-0"][class*="rounded-full"][class*="border"],
-.mobile-device div[class*="absolute"][class*="rounded-full"][class*="pulse"] {
-  animation: none !important;
-  animation-duration: 0s !important;
-  animation-play-state: paused !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  /* display: none removed - [class*="ring"] was too broad */
-}
-
-/* =========================================
-   DISABLE BREATHING ICON ANIMATIONS
-   ========================================= */
-
-.mobile-device [class*="breathing"],
-.mobile-device [class*="icon-container"][style*="scale"] {
-  animation: none !important;
-  transform: none !important;
-}
-
-/* Freeze motion.div scales for icons */
-.mobile-device motion\.div[style*="scale"] {
-  animation: none !important;
-}
-
-/* =========================================
-   DISABLE SKELETON PULSE ANIMATIONS
-   ========================================= */
-
-.mobile-device [class*="skeleton"],
-.mobile-device [class*="Skeleton"],
-.mobile-device [data-skeleton] {
-  animation: none !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-}
-
-/* Keep only essential loaders animated */
-.mobile-device .loader-essential,
-.mobile-device [aria-busy="true"] [class*="Loader"],
-.mobile-device [class*="spinner"] {
-  animation: spin-simple 2s linear infinite !important;
-}
-
-/* =========================================
-   OPTIMIZE CENTRAL ACTIONS MENU ON MOBILE
-   ========================================= */
-
-.mobile-device .central-actions-menu,
-.mobile-device .central-actions-panel {
-  animation-duration: 0.15s !important;
-  transition-duration: 0.15s !important;
-}
-
-/* Disable staggered animations in pills */
-.mobile-device .central-actions-menu button {
-  animation-delay: 0s !important;
-  transition-delay: 0s !important;
-}
-
-/* Disable glow pulses on menu buttons */
-.mobile-device .central-actions-menu [class*="glow"],
-.mobile-device .avatar-twin-button {
-  animation: none !important;
-}
-
-/* =========================================
-   DISABLE AVATAR BUTTON FLASH ON LOAD
-   ========================================= */
-
-.mobile-device .glass-orb-button--avatar,
-.mobile-device [class*="avatar-button"] {
-  animation: none !important;
-}
-
-/* =========================================
-   OPTIMIZE SIDEBAR ON MOBILE
-   ========================================= */
-
-/* Simplify sidebar open/close animations */
-.mobile-device .sidebar,
-.mobile-device [class*="sidebar"],
-.mobile-device .sidebar-glass-enhanced {
-  transition-duration: 0.2s !important;
-}
-
-/* Disable decorative effects in sidebar */
-.mobile-device .sidebar [class*="glow"],
-.mobile-device .sidebar [class*="shimmer"],
-.mobile-device .sidebar-glass-enhanced::before,
-.mobile-device .sidebar-glass-enhanced::after {
-  animation: none !important;
-}
-
-/* Disable hover effects on sidebar items */
-.mobile-device .sidebar-item:hover {
-  animation: none !important;
-}
-
-/* Simplify sidebar item transitions */
-.mobile-device .sidebar-item,
-.mobile-device .sidebar-nav-item-container {
-  transition-duration: 0.15s !important;
-}
-
-/* =========================================
    FALLBACK: Media query based
    ========================================= */
 
 @media (max-width: 768px), (hover: none), (pointer: coarse) {
-  /* CRITICAL: Don't use * selector - it breaks rendering */
-  /* Instead target specific animation classes */
+  /* Reduce animation duration by default */
+  * {
+    animation-duration: 0.15s !important;
+    transition-duration: 0.15s !important;
+  }
 
   /* Keep tap feedback */
   button:active,
@@ -381,10 +159,7 @@
    ========================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  /* Disable animations when user prefers reduced motion */
-  [class*="animate"],
-  [class*="transition"],
-  [data-animate] {
+  * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

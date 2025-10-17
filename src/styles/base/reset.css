@@ -9,50 +9,21 @@
     overscroll-behavior: auto;
     font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     touch-action: manipulation;
-    background: transparent !important;
-    background-color: transparent !important;
   }
 
   body {
-    @apply text-white antialiased;
+    @apply bg-black text-white antialiased;
     font-feature-settings: "kern", "liga";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    background: transparent !important;
-    background-color: transparent !important;
+    background: var(--color-obsidian) !important;
     font-family: inherit;
     touch-action: manipulation;
     min-height: 100vh;
     min-height: 100dvh;
     overscroll-behavior: auto;
     -webkit-overflow-scrolling: touch;
-  }
-
-  /* Root - CRITICAL: Transparent to show background layers behind */
-  #root {
-    background: transparent !important;
-    background-color: transparent !important;
-    position: relative;
-    z-index: 1;
-    min-height: 100vh;
-    min-height: 100dvh;
-  }
-
-  /* Main app container - CRITICAL: Transparent to show background layers behind */
-  #root > div {
-    background: transparent !important;
-    background-color: transparent !important;
-    position: relative;
-    z-index: 1;
-    min-height: 100vh;
-    min-height: 100dvh;
-  }
-
-  /* CRITICAL: Force transparent on ALL direct children that might have white backgrounds */
-  #root > div > div:first-child {
-    background: transparent !important;
-    background-color: transparent !important;
   }
 
   /* Touch optimization for interactive elements */

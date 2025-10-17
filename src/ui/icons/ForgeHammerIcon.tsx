@@ -18,18 +18,6 @@ export const ForgeHammerIcon: React.FC<ForgeHammerIconProps> = ({
   const gradHoverId = `forgeGradHover-${uniqueId}`;
   const filterId = `hammerGlow-${uniqueId}`;
 
-  // Detect mobile to disable animations
-  const [isMobile, setIsMobile] = React.useState(false);
-
-  React.useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768 || document.body.classList.contains('mobile-device'));
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   return (
     <svg
       viewBox="0 0 85 70"
@@ -79,52 +67,41 @@ export const ForgeHammerIcon: React.FC<ForgeHammerIconProps> = ({
         opacity="0.6"
       />
 
-      {/* Decorative circles - animated on desktop, static on mobile */}
-      <circle cx="80" cy="18" r={isMobile ? 3 : 3} fill="#FDC830" opacity={isMobile ? 0.7 : (isHovered ? 1 : 0.9)}>
-        {!isMobile && (
-          <>
-            <animate
-              attributeName="opacity"
-              values="0.4;1;0.4"
-              dur="1.5s"
-              repeatCount="indefinite"
-            />
-            <animate attributeName="r" values="2.5;3.5;2.5" dur="1.5s" repeatCount="indefinite" />
-          </>
-        )}
+      <circle cx="80" cy="18" r="3" fill="#FDC830" opacity={isHovered ? 1 : 0.9}>
+        <animate
+          attributeName="opacity"
+          values="0.4;1;0.4"
+          dur="1.5s"
+          repeatCount="indefinite"
+        />
+        <animate attributeName="r" values="2.5;3.5;2.5" dur="1.5s" repeatCount="indefinite" />
       </circle>
 
-      <circle cx="25" cy="16" r="2.5" fill="#FF6B35" opacity={isMobile ? 0.6 : (isHovered ? 0.9 : 0.8)}>
-        {!isMobile && (
-          <animate
-            attributeName="opacity"
-            values="0.3;0.9;0.3"
-            dur="2s"
-            repeatCount="indefinite"
-          />
-        )}
+      <circle cx="25" cy="16" r="2.5" fill="#FF6B35" opacity={isHovered ? 0.9 : 0.8}>
+        <animate
+          attributeName="opacity"
+          values="0.3;0.9;0.3"
+          dur="2s"
+          repeatCount="indefinite"
+        />
       </circle>
 
-      <circle cx="75" cy="24" r="2" fill="#FDC830" opacity={isMobile ? 0.5 : (isHovered ? 0.8 : 0.7)}>
-        {!isMobile && (
-          <animate
-            attributeName="opacity"
-            values="0.3;0.8;0.3"
-            dur="1.8s"
-            repeatCount="indefinite"
-          />
-        )}
+      <circle cx="75" cy="24" r="2" fill="#FDC830" opacity={isHovered ? 0.8 : 0.7}>
+        <animate
+          attributeName="opacity"
+          values="0.3;0.8;0.3"
+          dur="1.8s"
+          repeatCount="indefinite"
+        />
       </circle>
 
-      <circle cx="52" cy="12" r="2.5" fill="#F7931E" opacity={isMobile ? 0.6 : (isHovered ? 0.9 : 0.75)}>
-        {!isMobile && (
-          <animate
-            attributeName="opacity"
-            values="0.4;0.9;0.4"
-            dur="2.2s"
-            repeatCount="indefinite"
-          />
-        )}
+      <circle cx="52" cy="12" r="2.5" fill="#F7931E" opacity={isHovered ? 0.9 : 0.75}>
+        <animate
+          attributeName="opacity"
+          values="0.4;0.9;0.4"
+          dur="2.2s"
+          repeatCount="indefinite"
+        />
       </circle>
     </svg>
   );
