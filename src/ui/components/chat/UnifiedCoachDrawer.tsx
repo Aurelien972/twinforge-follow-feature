@@ -122,19 +122,52 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
   useEffect(() => {
     if (communicationMode !== 'text') return;
 
+    logger.info('UNIFIED_COACH_DRAWER', 'Setting up text chat handlers');
+
     const unsubscribeMessage = textChatService.onMessage((chunk, isDelta) => {
       if (isDelta && chunk) {
-        const lastMessage = messages[messages.length - 1];
+        logger.debug('UNIFIED_COACH_DRAWER', 'Received delta chunk', {
+          chunkLength: chunk.length,
+          chunkPreview: chunk.substring(0, 50)
+        });
 
-        if (lastMessage && lastMessage.role === 'coach') {
-          lastMessage.content += chunk;
-        } else {
-          addMessage({
-            role: 'coach',
-            content: chunk
-          });
-        }
+        // Utiliser setState directement pour garantir l'immutabilité
+        set((state) => {
+          const lastMessage = state.messages[state.messages.length - 1];
+
+          if (lastMessage && lastMessage.role === 'coach') {
+            // Créer un nouveau tableau avec le message mis à jour
+            const updatedMessages = [...state.messages];
+            updatedMessages[updatedMessages.length - 1] = {
+              ...lastMessage,
+              content: lastMessage.content + chunk
+            };
+
+            logger.debug('UNIFIED_COACH_DRAWER', 'Appending to existing coach message', {
+              messageId: lastMessage.id,
+              newContentLength: updatedMessages[updatedMessages.length - 1].content.length
+            });
+
+            return { messages: updatedMessages };
+          } else {
+            // Créer un nouveau message coach
+            const newMessage = {
+              id: crypto.randomUUID(),
+              role: 'coach' as const,
+              content: chunk,
+              timestamp: new Date()
+            };
+
+            logger.info('UNIFIED_COACH_DRAWER', 'Creating new coach message', {
+              messageId: newMessage.id,
+              contentLength: chunk.length
+            });
+
+            return { messages: [...state.messages, newMessage] };
+          }
+        });
       } else if (!isDelta) {
+        logger.info('UNIFIED_COACH_DRAWER', 'Stream completed, clearing processing state');
         setProcessing(false);
       }
     });
@@ -146,10 +179,11 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
     });
 
     return () => {
+      logger.debug('UNIFIED_COACH_DRAWER', 'Cleaning up text chat handlers');
       unsubscribeMessage();
       unsubscribeError();
     };
-  }, [communicationMode, messages, addMessage, setError, setProcessing]);
+  }, [communicationMode, setError, setProcessing]);
 
   const handleClose = () => {
     const lastMessage = messages[messages.length - 1];
@@ -290,19 +324,24 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
           messageLength: message.length
         });
 
+        // Ajouter le message utilisateur
         addMessage({
           role: 'user',
           content: message
         });
 
+        logger.debug('UNIFIED_COACH_DRAWER', 'User message added to store');
+
         setProcessing(true);
 
-        addMessage({
-          role: 'coach',
-          content: ''
-        });
+        // Ne PAS créer de message coach vide ici
+        // Il sera créé automatiquement par le handler onMessage lors du premier chunk
+
+        logger.info('UNIFIED_COACH_DRAWER', 'Calling textChatService.sendMessage');
 
         await textChatService.sendMessage(message, true);
+
+        logger.info('UNIFIED_COACH_DRAWER', 'Text message sent successfully');
 
       } catch (error) {
         logger.error('UNIFIED_COACH_DRAWER', 'Error sending text message', { error });
