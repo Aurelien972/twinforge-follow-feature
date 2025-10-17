@@ -5,28 +5,31 @@
  * Applied via .mobile-device class AND media queries (belt and suspenders)
  *
  * Goal: 60fps scroll, zero flickering, instant interactions
+ *
+ * CRITICAL: Preserve essential UI elements (header, bottombar, icons)
  */
 
 /* =========================================
-   CRITICAL: TOTAL ANIMATION ELIMINATION
-   Every selector that could possibly animate
+   CRITICAL: ANIMATION ELIMINATION (SELECTIVE)
+   Disable decorative animations only
    ========================================= */
 
-.mobile-device *,
-.mobile-device *::before,
-.mobile-device *::after {
-  /* Kill all animations globally */
+/* Exclude essential navigation elements from animation killing */
+.mobile-device *:not(.header-liquid-glass):not(.header-liquid-glass *):not(.new-mobile-bottom-bar):not(.new-mobile-bottom-bar *):not(.glass-orb-button):not(.icon-container),
+.mobile-device *:not(.header-liquid-glass):not(.header-liquid-glass *)::before:not(.glass-orb-button::before),
+.mobile-device *:not(.header-liquid-glass):not(.header-liquid-glass *)::after:not(.glass-orb-button::after) {
+  /* Kill decorative animations only */
   animation: none !important;
   animation-duration: 0s !important;
   animation-delay: 0s !important;
   animation-iteration-count: 1 !important;
 }
 
-/* Media query fallback if DeviceProvider fails */
+/* Media query fallback - preserve navigation */
 @media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  *:not(.loader-essential):not([class*="spinner"]):not([aria-busy="true"] *),
-  *:not(.loader-essential):not([class*="spinner"])::before,
-  *:not(.loader-essential):not([class*="spinner"])::after {
+  *:not(.header-liquid-glass):not(.header-liquid-glass *):not(.new-mobile-bottom-bar):not(.new-mobile-bottom-bar *):not(.loader-essential):not([class*="spinner"]):not([aria-busy="true"] *),
+  *:not(.header-liquid-glass):not(.header-liquid-glass *)::before:not(.loader-essential)::before,
+  *:not(.header-liquid-glass):not(.header-liquid-glass *)::after:not(.loader-essential)::after {
     animation: none !important;
     animation-duration: 0s !important;
   }

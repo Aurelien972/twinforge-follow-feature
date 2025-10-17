@@ -33,29 +33,40 @@
 }
 
 /* =========================================
-   MOBILE: DISABLE GLASSMORPHISM
+   MOBILE: SELECTIVE GLASSMORPHISM
    ========================================= */
+
+/* PRESERVE glassmorphism for navigation */
+.is-mobile .header-liquid-glass,
+.is-mobile .new-mobile-bottom-bar-container,
+.is-mobile .glass-orb-button,
+.is-mobile .icon-container {
+  /* Keep glass effects for premium navigation */
+  /* Styles handled by specific component CSS */
+}
+
+/* Simplify glassmorphism for other elements */
 .disable-glassmorphism .glass-card,
 .disable-glassmorphism .glass-card-cta,
 .disable-glassmorphism .glass-button,
 .disable-glassmorphism .btn-glass,
-.is-mobile .glass-card,
-.is-mobile .glass-card-cta,
-.is-mobile .glass-button,
-.is-mobile .btn-glass {
+.is-mobile .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.glass-orb-button):not(.icon-container),
+.is-mobile .glass-card-cta:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container),
+.is-mobile .glass-button:not(.glass-orb-button),
+.is-mobile .btn-glass:not(.glass-orb-button) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: rgba(255, 255, 255, 0.08) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
-/* Remove all pseudo-elements that cause repaints */
-.is-mobile .glass-card::before,
-.is-mobile .glass-card::after,
-.is-mobile .glass-card-cta::before,
-.is-mobile .glass-card-cta::after,
-.is-mobile .btn-glass::before,
-.is-mobile .btn-glass::after {
+/* Remove decorative pseudo-elements (but keep navigation ones) */
+.is-mobile .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container)::before,
+.is-mobile .glass-card:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container)::after,
+.is-mobile .glass-card-cta:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container)::before,
+.is-mobile .glass-card-cta:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container)::after,
+.is-mobile .btn-glass:not(.glass-orb-button)::before,
+.is-mobile .btn-glass:not(.glass-orb-button)::after {
   display: none !important;
 }
 
@@ -70,11 +81,23 @@
 }
 
 /* =========================================
-   MOBILE: FORCE GPU ACCELERATION OFF
+   MOBILE: SELECTIVE GPU ACCELERATION
    ========================================= */
-.is-mobile * {
-  transform: none !important;
-  -webkit-transform: none !important;
+
+/* CRITICAL: Preserve fixed positioning for navigation */
+.is-mobile .header-liquid-glass,
+.is-mobile .new-mobile-bottom-bar,
+.is-mobile .new-mobile-bottom-bar *,
+.is-mobile .header-liquid-glass * {
+  /* Allow transforms needed for fixed positioning */
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+
+/* Disable GPU acceleration on everything else */
+.is-mobile *:not(.header-liquid-glass):not(.header-liquid-glass *):not(.new-mobile-bottom-bar):not(.new-mobile-bottom-bar *):not(.mobile-safe-transform) {
   backface-visibility: visible !important;
   -webkit-backface-visibility: visible !important;
   perspective: none !important;
@@ -91,24 +114,46 @@
 }
 
 /* =========================================
-   MOBILE: DISABLE BLUR EFFECTS
+   MOBILE: SELECTIVE BLUR EFFECTS
    ========================================= */
-.is-mobile *[style*="filter"],
-.is-mobile *[style*="backdrop-filter"] {
+
+/* PRESERVE blur for navigation elements */
+.is-mobile .header-liquid-glass,
+.is-mobile .new-mobile-bottom-bar-container,
+.is-mobile .glass-orb-button,
+.is-mobile .icon-container {
+  /* Keep minimal blur for premium look */
+  backdrop-filter: blur(12px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(130%) !important;
+}
+
+/* Disable blur on everything else */
+.is-mobile *:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.glass-orb-button):not(.icon-container)[style*="filter"],
+.is-mobile *:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.glass-orb-button):not(.icon-container)[style*="backdrop-filter"] {
   filter: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
 /* =========================================
-   MOBILE: DISABLE BOX SHADOWS
+   MOBILE: SELECTIVE BOX SHADOWS
    ========================================= */
-.is-mobile * {
+
+/* PRESERVE shadows for navigation elements */
+.is-mobile .header-liquid-glass,
+.is-mobile .new-mobile-bottom-bar-container,
+.is-mobile .glass-orb-button,
+.is-mobile .icon-container {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Disable shadows on everything else */
+.is-mobile *:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.glass-orb-button):not(.icon-container):not(.critical-shadow) {
   box-shadow: none !important;
   text-shadow: none !important;
 }
 
-/* Only critical shadows */
+/* Critical shadows for specific elements */
 .is-mobile .critical-shadow {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
