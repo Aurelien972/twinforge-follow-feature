@@ -181,6 +181,69 @@ function AutoSyncInitializer({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+/**
+ * Background Component - Forge Spatiale TwinForge
+ * CRITICAL: This must be rendered at the root level with proper particles
+ */
+function ForgeBackground() {
+  const particlesRef = useRef<HTMLDivElement>(null);
+  const [particles, setParticles] = useState<Array<{
+    id: number;
+    x0: string;
+    x1: string;
+    x2: string;
+    x3: string;
+    x4: string;
+    size: string;
+    duration: string;
+    delay: string;
+  }>>([]);
+
+  useEffect(() => {
+    // Generate particles on mount
+    const particleCount = window.innerWidth <= 768 ? 6 : 12;
+    const newParticles = Array.from({ length: particleCount }, (_, i) => ({
+      id: i + 1,
+      x0: `${20 + Math.random() * 60}vw`,
+      x1: `${-20 + Math.random() * 40}px`,
+      x2: `${-30 + Math.random() * 60}px`,
+      x3: `${-10 + Math.random() * 20}px`,
+      x4: `${-5 + Math.random() * 10}px`,
+      size: `${2 + Math.random() * 1.5}px`,
+      duration: `${20 + Math.random() * 15}s`,
+      delay: `${Math.random() * -20}s`,
+    }));
+    setParticles(newParticles);
+  }, []);
+
+  return (
+    <>
+      {/* Background gradient */}
+      <div className="bg-twinforge-visionos" />
+
+      {/* Particles container */}
+      <div className="cosmic-forge-particles" ref={particlesRef}>
+        {particles.map((particle) => (
+          <div
+            key={particle.id}
+            className={`forge-particle forge-particle--${particle.id}`}
+            style={{
+              '--x0': particle.x0,
+              '--x1': particle.x1,
+              '--x2': particle.x2,
+              '--x3': particle.x3,
+              '--x4': particle.x4,
+              '--size': particle.size,
+              '--duration': particle.duration,
+              '--delay': particle.delay,
+            } as React.CSSProperties}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
+
 export function AppProviders({ children }: { children: React.ReactNode }) {
   // Initialize cache persistence on mount
   React.useEffect(() => {
@@ -196,6 +259,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
               <ToastProvider>
                 <PerformanceInitializer>
                   <AutoSyncInitializer>
+                    <ForgeBackground />
                     {children}
                   </AutoSyncInitializer>
                 </PerformanceInitializer>
