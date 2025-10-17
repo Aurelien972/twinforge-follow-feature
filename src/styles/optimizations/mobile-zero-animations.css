@@ -73,13 +73,15 @@
   display: none !important;
 }
 
-/* Hide corner squares in all glass cards */
-.mobile-device .glass-card [class*="corner"],
+/* Hide corner squares in all glass cards - SAFE SELECTORS ONLY */
+.mobile-device .glass-card [class*="corner-square"],
+.mobile-device .glass-card [class*="corner-particle"],
 .mobile-device [data-corner],
 .mobile-device [class*="corner-square"] {
   animation: none !important;
+  /* DO NOT use display: none - it's too aggressive */
   opacity: 0 !important;
-  display: none !important;
+  pointer-events: none !important;
 }
 
 /* =========================================
@@ -189,24 +191,22 @@
    FREEZE SHIMMER EFFECTS ON BUTTONS - STRICT
    ========================================= */
 
-/* CRITICAL: Hide ALL shimmer and sweep effects */
+/* CRITICAL: Hide shimmer effects - SAFE, not content */
 .mobile-device button [class*="shimmer"],
 .mobile-device [class*="shimmer-effect"],
-.mobile-device [class*="shimmer"],
 .mobile-device [data-shimmer],
 .mobile-device .shimmer {
   animation: none !important;
   animation-duration: 0s !important;
   animation-play-state: paused !important;
   opacity: 0 !important;
-  visibility: hidden !important;
-  display: none !important;
+  pointer-events: none !important;
+  /* DO NOT use display: none globally */
 }
 
-/* CRITICAL: Freeze gradient sweep animations in buttons */
+/* CRITICAL: Freeze gradient sweep animations in buttons - SAFE */
 .mobile-device button > div[class*="absolute"][class*="inset"],
-.mobile-device button > div[class*="absolute"],
-.mobile-device button > motion\.div[class*="absolute"],
+.mobile-device button > motion\.div[class*="absolute"][class*="shimmer"],
 .mobile-device button::before,
 .mobile-device button::after {
   animation: none !important;
@@ -214,6 +214,8 @@
   animation-play-state: paused !important;
   transform: translateX(0) !important;
 }
+
+/* CRITICAL: DO NOT hide all absolute divs in buttons - too dangerous */
 
 /* CRITICAL: Freeze ALL button pseudo-elements */
 .mobile-device .glass-card button::before,
@@ -229,7 +231,7 @@
    FREEZE BUBBLE AND PARTICLE ANIMATIONS - STRICT
    ========================================= */
 
-/* CRITICAL: Hide ALL bubbles and particles completely */
+/* CRITICAL: Hide bubbles and particles - SAFE */
 .mobile-device [class*="bubble"],
 .mobile-device [class*="particle"],
 .mobile-device [data-bubble],
@@ -240,22 +242,21 @@
   animation-duration: 0s !important;
   animation-play-state: paused !important;
   opacity: 0 !important;
-  visibility: hidden !important;
-  display: none !important;
+  pointer-events: none !important;
+  /* display: none removed - use opacity instead */
 }
 
-/* CRITICAL: Freeze pulsating rings and halos */
+/* CRITICAL: Freeze pulsating rings and halos - SAFE SELECTORS */
 .mobile-device [class*="pulse-ring"],
 .mobile-device [class*="halo"],
-.mobile-device [class*="ring"],
 .mobile-device div[class*="absolute"][class*="inset-0"][class*="rounded-full"][class*="border"],
-.mobile-device div[class*="absolute"][class*="rounded-full"]:not([class*="icon"]) {
+.mobile-device div[class*="absolute"][class*="rounded-full"][class*="pulse"] {
   animation: none !important;
   animation-duration: 0s !important;
   animation-play-state: paused !important;
   opacity: 0 !important;
-  visibility: hidden !important;
-  display: none !important;
+  pointer-events: none !important;
+  /* display: none removed - [class*="ring"] was too broad */
 }
 
 /* =========================================
