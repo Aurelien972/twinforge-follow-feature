@@ -184,13 +184,14 @@ function AppContent() {
         zIndex: 10,
         pointerEvents: 'auto',
         background: 'transparent',
+        backgroundColor: 'transparent',
         minHeight: '100dvh'
       }}
     >
       <Header />
 
       {/* Parent flex : on autorise la contraction des enfants */}
-      <div className="flex-1 flex min-w-0" style={{ background: 'transparent' }}>
+      <div className="flex-1 flex min-w-0" style={{ background: 'transparent', backgroundColor: 'transparent' }}>
         {/* Sidebar (hidden on mobile) */}
         <div className="hidden lg:flex lg:flex-col lg:w-[240px] xl:w-[260px] shrink-0 ml-6 mr-3 pt-20">
           <Sidebar />

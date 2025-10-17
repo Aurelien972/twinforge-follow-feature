@@ -289,54 +289,9 @@ function ForgeBackground() {
 
   console.log('🎨 ForgeBackground: Rendering with', particles.length, 'particles');
 
-  return (
-    <>
-      {/* Background gradient - CRITICAL: Must be visible on all devices */}
-      <div className="bg-twinforge-visionos" style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: -10,
-        pointerEvents: 'none',
-        background: 'radial-gradient(circle at 50% 50%, #1A1F2E 0%, #0F1419 60%, #0B0E17 100%)',
-        display: 'block',
-        visibility: 'visible'
-      }} />
-
-      {/* Particles container - CRITICAL: Must be visible on all devices */}
-      <div className="cosmic-forge-particles" ref={particlesRef} style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: -5,
-        pointerEvents: 'none',
-        opacity: 0.4,
-        display: 'block',
-        visibility: 'visible'
-      }}>
-        {particles.map((particle) => (
-          <div
-            key={particle.id}
-            className={`forge-particle forge-particle--${particle.id}`}
-            style={{
-              '--x0': particle.x0,
-              '--x1': particle.x1,
-              '--x2': particle.x2,
-              '--x3': particle.x3,
-              '--x4': particle.x4,
-              '--size': particle.size,
-              '--duration': particle.duration,
-              '--delay': particle.delay,
-              position: 'absolute',
-              width: particle.size,
-              height: particle.size,
-              borderRadius: '50%',
-              background: '#FF6B35',
-              opacity: 0.6
-            } as React.CSSProperties}
-          />
-        ))}
-      </div>
-    </>
-  );
+  // CRITICAL: The HTML already has a background system in index.html
+  // We don't need to duplicate it here - just return null
+  return null;
 }
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
