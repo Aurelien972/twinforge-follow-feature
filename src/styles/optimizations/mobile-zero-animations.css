@@ -13,17 +13,15 @@
    Keep visual appearance, remove ALL movement
    ========================================= */
 
-/* FREEZE: All decorative animations - NO MOVEMENT */
+/* FREEZE: Decorative animations - SAFE SELECTORS ONLY */
 .mobile-device [class*="breathing"],
 .mobile-device [class*="pulse"]:not(.new-bottom-bar-icon-container):not(.glass-orb-button),
 .mobile-device [class*="glow"]:not(.floating-chat-button):not(.floating-voice-coach-button),
 .mobile-device [class*="shimmer"],
 .mobile-device [class*="float"],
 .mobile-device [class*="bounce"],
-.mobile-device [class*="particle"],
 .mobile-device [class*="spark"],
 .mobile-device [class*="circuit"],
-.mobile-device [class*="ember"],
 .mobile-device [class*="ripple"],
 .mobile-device [class*="wave"] {
   animation: none !important;
@@ -31,6 +29,20 @@
   animation-play-state: paused !important;
   filter: none !important;
   transform: none !important;
+}
+
+/* CRITICAL: REMOVED [class*="particle"] and [class*="ember"] */
+/* These were hiding .forge-particle and background elements! */
+/* Background must remain visible on mobile */
+
+/* MOBILE: Freeze forge particles animation but keep them visible */
+.mobile-device .forge-particle {
+  animation: none !important;
+  animation-play-state: paused !important;
+  /* Keep opacity to show particles */
+  opacity: 0.3 !important;
+  /* Freeze at initial position */
+  transform: translate3d(var(--x0, 50vw), 50vh, 0) !important;
 }
 
 /* =========================================
@@ -206,38 +218,25 @@
 
 /* CRITICAL: Freeze gradient sweep animations in buttons - SAFE */
 .mobile-device button > div[class*="absolute"][class*="inset"],
-.mobile-device button > motion\.div[class*="absolute"][class*="shimmer"],
-.mobile-device button::before,
-.mobile-device button::after {
+.mobile-device button > motion\.div[class*="absolute"][class*="shimmer"] {
   animation: none !important;
   animation-duration: 0s !important;
   animation-play-state: paused !important;
   transform: translateX(0) !important;
 }
 
-/* CRITICAL: DO NOT hide all absolute divs in buttons - too dangerous */
-
-/* CRITICAL: Freeze ALL button pseudo-elements */
-.mobile-device .glass-card button::before,
-.mobile-device .glass-card button::after,
-.mobile-device [class*="btn"]::before,
-.mobile-device [class*="btn"]::after {
-  animation: none !important;
-  animation-duration: 0s !important;
-  animation-play-state: paused !important;
-}
+/* CRITICAL: REMOVED button::before and button::after - TOO DANGEROUS */
+/* These global selectors can break essential button content */
 
 /* =========================================
    FREEZE BUBBLE AND PARTICLE ANIMATIONS - STRICT
    ========================================= */
 
-/* CRITICAL: Hide bubbles and particles - SAFE */
+/* CRITICAL: Hide decorative bubbles and particles - DO NOT hide forge-particle! */
 .mobile-device [class*="bubble"],
-.mobile-device [class*="particle"],
 .mobile-device [data-bubble],
 .mobile-device [data-particle],
-.mobile-device .bubble,
-.mobile-device .particle {
+.mobile-device .bubble {
   animation: none !important;
   animation-duration: 0s !important;
   animation-play-state: paused !important;
@@ -245,6 +244,9 @@
   pointer-events: none !important;
   /* display: none removed - use opacity instead */
 }
+
+/* CRITICAL: REMOVED .particle selector - it was hiding .forge-particle background! */
+/* Background particles (.forge-particle) must remain visible */
 
 /* CRITICAL: Freeze pulsating rings and halos - SAFE SELECTORS */
 .mobile-device [class*="pulse-ring"],
