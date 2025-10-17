@@ -53,7 +53,7 @@ const FridgeScanMainCTA: React.FC = () => {
 
   const handleScanClick = () => {
     click();
-    navigate('/fridge-scan');
+    navigate('/fridge/scan');
   };
 
   return (
