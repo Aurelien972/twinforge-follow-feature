@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '../../../../system/device/DeviceProvider';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -15,6 +16,7 @@ import logger from '../../../../lib/utils/logger';
 const FridgeScanMainCTA: React.FC = () => {
   const navigate = useNavigate();
   const { click } = useFeedback();
+  const isMobile = useIsMobile();
   const [stats, setStats] = useState({ scans: 0, items: 0, recipes: 0 });
 
   // Charger les vraies statistiques depuis Supabase
@@ -78,47 +80,48 @@ const FridgeScanMainCTA: React.FC = () => {
         WebkitBackdropFilter: 'blur(32px) saturate(170%)'
       }}
     >
-      {/* Carrés Animés aux 4 Coins - Optimisés */}
-      <div className="training-hero-corners" aria-hidden="true">
-        {[0, 1, 2, 3].map((i) => (
-          <motion.div
-            key={i}
-            className="corner-particle"
-            style={{
-              position: 'absolute',
-              width: '12px',
-              height: '12px',
-              borderRadius: '2px',
-              background: 'linear-gradient(135deg, #EC4899, rgba(244, 114, 182, 0.8))',
-              boxShadow: '0 0 20px #EC4899',
-              top: i < 2 ? '12px' : 'auto',
-              bottom: i >= 2 ? '12px' : 'auto',
-              left: i % 2 === 0 ? '12px' : 'auto',
-              right: i % 2 === 1 ? '12px' : 'auto',
-              willChange: 'transform, opacity'
-            }}
-            initial={{
-              rotate: i % 2 === 0 ? 45 : -45
-            }}
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.6, 0.9, 0.6],
-              rotate: i % 2 === 0 ? [45, 55, 45] : [-45, -55, -45]
-            }}
-            transition={{
-              duration: 3.5,
-              repeat: Infinity,
-              delay: i * 0.25,
-              ease: [0.45, 0.05, 0.55, 0.95]
-            }}
-          />
-        ))}
-      </div>
+      {/* Carrés Animés aux 4 Coins - Désactivés sur mobile */}
+      {!isMobile && (
+        <div className="training-hero-corners" aria-hidden="true">
+          {[0, 1, 2, 3].map((i) => (
+            <motion.div
+              key={i}
+              className="corner-particle"
+              style={{
+                position: 'absolute',
+                width: '12px',
+                height: '12px',
+                borderRadius: '2px',
+                background: 'linear-gradient(135deg, #EC4899, rgba(244, 114, 182, 0.8))',
+                boxShadow: '0 0 20px #EC4899',
+                top: i < 2 ? '12px' : 'auto',
+                bottom: i >= 2 ? '12px' : 'auto',
+                left: i % 2 === 0 ? '12px' : 'auto',
+                right: i % 2 === 1 ? '12px' : 'auto'
+              }}
+              initial={{
+                rotate: i % 2 === 0 ? 45 : -45
+              }}
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.6, 0.9, 0.6],
+                rotate: i % 2 === 0 ? [45, 55, 45] : [-45, -55, -45]
+              }}
+              transition={{
+                duration: 3.5,
+                repeat: Infinity,
+                delay: i * 0.25,
+                ease: [0.45, 0.05, 0.55, 0.95]
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="relative z-10 space-y-8">
         {/* Conteneur Icône Principale avec Bulles */}
         <div className="relative inline-block">
-          {/* Icône Principale avec Animation de Respiration - Optimisée */}
+          {/* Icône Principale - Animation désactivée sur mobile */}
           <motion.div
             className="w-28 h-28 mx-auto rounded-full flex items-center justify-center relative"
             style={{
@@ -132,10 +135,9 @@ const FridgeScanMainCTA: React.FC = () => {
                 0 0 50px color-mix(in srgb, #EC4899 70%, transparent),
                 0 0 100px color-mix(in srgb, #F472B6 50%, transparent),
                 inset 0 4px 0 rgba(255,255,255,0.5)
-              `,
-              willChange: 'transform'
+              `
             }}
-            animate={{
+            animate={isMobile ? {} : {
               scale: [1, 1.06, 1],
               boxShadow: [
                 '0 0 50px color-mix(in srgb, #EC4899 70%, transparent), 0 0 100px color-mix(in srgb, #F472B6 50%, transparent)',
@@ -143,7 +145,7 @@ const FridgeScanMainCTA: React.FC = () => {
                 '0 0 50px color-mix(in srgb, #EC4899 70%, transparent), 0 0 100px color-mix(in srgb, #F472B6 50%, transparent)'
               ]
             }}
-            transition={{ duration: 3, repeat: Infinity, ease: [0.45, 0.05, 0.55, 0.95] }}
+            transition={isMobile ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: [0.45, 0.05, 0.55, 0.95] }}
           >
             <SpatialIcon
               Icon={ICONS.Refrigerator}
@@ -152,26 +154,27 @@ const FridgeScanMainCTA: React.FC = () => {
               variant="pure"
             />
 
-            {/* Anneau de Pulsation - Optimisé */}
-            <motion.div
-              className="absolute inset-0 rounded-full border-3"
-              style={{
-                borderColor: 'color-mix(in srgb, #EC4899 70%, transparent)',
-                willChange: 'transform, opacity'
-              }}
-              animate={{
-                scale: [1, 1.5, 1.5],
-                opacity: [0.7, 0, 0]
-              }}
-              transition={{
-                duration: 2.5,
-                repeat: Infinity,
-                ease: 'easeOut'
-              }}
-            />
+            {/* Anneau de Pulsation - Désactivé sur mobile */}
+            {!isMobile && (
+              <motion.div
+                className="absolute inset-0 rounded-full border-3"
+                style={{
+                  borderColor: 'color-mix(in srgb, #EC4899 70%, transparent)'
+                }}
+                animate={{
+                  scale: [1, 1.5, 1.5],
+                  opacity: [0.7, 0, 0]
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: 'easeOut'
+                }}
+              />
+            )}
 
-            {/* Bulles Animées jaillissant de l'Icône - Optimisées */}
-            {[
+            {/* Bulles Animées - Désactivées sur mobile */}
+            {!isMobile && [
               { size: 16, distance: 70, angle: 45, delay: 0 },
               { size: 20, distance: 80, angle: 135, delay: 0.4 },
               { size: 14, distance: 75, angle: 225, delay: 0.8 },
@@ -198,8 +201,7 @@ const FridgeScanMainCTA: React.FC = () => {
                   boxShadow: `
                     0 0 20px color-mix(in srgb, #EC4899 60%, transparent),
                     inset 0 2px 4px rgba(255,255,255,0.4)
-                  `,
-                  willChange: 'transform, opacity'
+                  `
                 }}
                 animate={{
                   x: [
@@ -290,15 +292,17 @@ const FridgeScanMainCTA: React.FC = () => {
               }
             }}
           >
-            {/* Shimmer Effect */}
-            <motion.div
-              className="absolute inset-0 rounded-2xl pointer-events-none"
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)'
-              }}
-              animate={{ x: ['-200%', '200%'] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-            />
+            {/* Shimmer Effect - Désactivé sur mobile */}
+            {!isMobile && (
+              <motion.div
+                className="absolute inset-0 rounded-2xl pointer-events-none"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)'
+                }}
+                animate={{ x: ['-200%', '200%'] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            )}
 
             <div className="flex items-center gap-3 relative z-10">
               <SpatialIcon Icon={ICONS.ScanLine} size={24} color="white" variant="pure" />

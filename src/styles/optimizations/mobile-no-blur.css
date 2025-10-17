@@ -1,80 +1,96 @@
 /**
- * MOBILE SELECTIVE BLUR - BALANCED
+ * MOBILE NO BLUR - TOTAL ELIMINATION
  *
- * Replace SOME backdrop-blur with solid backgrounds on mobile
- * Keep blur for navigation elements (header, bottom bar, chat)
+ * Remove ALL backdrop-blur on mobile for maximum performance
+ * Replace with solid backgrounds optimized for iPhone 14 Pro Max
  *
- * Goal: Performance + Brand Identity
+ * Goal: 60fps scroll with zero GPU overhead
  */
 
 /* =========================================
-   GLASS CARDS - Solid backgrounds (performance)
+   GLASS CARDS - Solid backgrounds (zero blur)
    ========================================= */
 
 .mobile-device .glass-card,
 .mobile-device .glass-base,
-.mobile-device .glass-card-cta {
-  /* Replace transparent glass with solid dark background */
+.mobile-device .glass-card-cta,
+.mobile-device [class*="glass-"] {
+  /* Solid dark background - no transparency, no blur */
   background: #0F1927 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 
-  /* Keep simple border */
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  /* Simple border - reduced complexity */
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 
-  /* Simple shadow instead of complex glows */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  /* Minimal shadow - single layer only */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* Remove pseudo-element effects that create square shadows */
+/* Remove ALL pseudo-elements that create effects */
 .mobile-device .glass-card::before,
 .mobile-device .glass-card::after,
 .mobile-device .glass-card-cta::before,
-.mobile-device .glass-card-cta::after {
+.mobile-device .glass-card-cta::after,
+.mobile-device [class*="glass-"]::before,
+.mobile-device [class*="glass-"]::after {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* =========================================
+   HEADER - SOLID (no blur)
+   ========================================= */
+
+.mobile-device .header-liquid-glass {
+  /* Solid background - no blur for performance */
+  background: rgba(15, 25, 39, 0.98) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Simple single-layer shadow */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+.mobile-device .header-liquid-glass::before,
+.mobile-device .header-liquid-glass::after {
   display: none !important;
 }
 
 /* =========================================
-   HEADER - LIGHT BLUR (preserve identity)
-   ========================================= */
-
-.mobile-device .header-liquid-glass {
-  /* Semi-transparent with light blur */
-  background: rgba(15, 25, 39, 0.92) !important;
-  backdrop-filter: blur(8px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
-
-  /* Simple shadow */
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* =========================================
-   BOTTOM BAR - LIGHT BLUR (preserve identity)
+   BOTTOM BAR - SOLID (no blur)
    ========================================= */
 
 .mobile-device .new-mobile-bottom-bar-container {
-  /* Semi-transparent with light blur */
-  background: rgba(15, 25, 39, 0.92) !important;
-  backdrop-filter: blur(8px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+  /* Solid background - no blur for performance */
+  background: rgba(15, 25, 39, 0.98) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* Bottom bar icon containers keep their glass effect */
+.mobile-device .new-mobile-bottom-bar-container::before,
+.mobile-device .new-mobile-bottom-bar-container::after {
+  display: none !important;
+}
+
+/* Bottom bar icon containers - solid backgrounds */
 .mobile-device .new-bottom-bar-icon-container {
-  backdrop-filter: blur(8px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* =========================================
-   HEADER BUTTONS - LIGHT BLUR
+   HEADER BUTTONS - SOLID (no blur)
    ========================================= */
 
 .mobile-device .header-liquid-glass .glass-orb-button,
 .mobile-device .header-liquid-glass button {
-  backdrop-filter: blur(8px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* =========================================
@@ -88,6 +104,56 @@
   background: rgba(15, 25, 39, 0.98) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   GRADIENT OPTIMIZATION - iPhone 14 Pro Max
+   Simplify complex gradients that cause performance issues
+   ========================================= */
+
+.mobile-device [style*="radial-gradient"] {
+  /* Force simpler backgrounds instead of complex gradients */
+  background-image: none !important;
+}
+
+/* Simplify box-shadows - max 2 layers on mobile */
+.mobile-device * {
+  /* Limit to max 2 box-shadows for performance */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Exception: keep minimal shadow on floating elements */
+.mobile-device .unified-floating-button,
+.mobile-device .floating-chat-button,
+.mobile-device [class*="floating-"] {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* =========================================
+   SIMPLIFY COLOR-MIX FOR MOBILE
+   Replace complex color-mix with solid colors
+   ========================================= */
+
+.mobile-device [style*="color-mix"] {
+  /* Browser will handle color-mix but avoid in critical paths */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* =========================================
+   DISABLE WILL-CHANGE ON STATIC ELEMENTS
+   Only use on actively animating elements
+   ========================================= */
+
+.mobile-device * {
+  will-change: auto !important;
+}
+
+/* Exception: Keep will-change on scrollable containers */
+.mobile-device .overflow-y-auto,
+.mobile-device .overflow-auto,
+.mobile-device [class*="scroll"] {
+  will-change: scroll-position !important;
 }
 
 /* =========================================

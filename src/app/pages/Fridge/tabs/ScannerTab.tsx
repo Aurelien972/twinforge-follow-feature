@@ -4,12 +4,14 @@ import FridgeScanMainCTA from '../components/FridgeScanMainCTA';
 import RecentScansCard from '../components/RecentScansCard';
 import ScannerStatsCard from '../components/ScannerStatsCard';
 import { useFridgeScanPipeline } from '../../../../system/store/fridgeScan';
+import { useIsMobile } from '../../../../system/device/DeviceProvider';
 
 /**
  * ScannerTab - Premier onglet de la Forge Culinaire
  * Affiche le CTA principal pour scanner un frigo et les composants illustratifs
  */
 const ScannerTab: React.FC = () => {
+  const isMobile = useIsMobile();
   const { loadRecentSessions } = useFridgeScanPipeline();
 
   // Charger les sessions récentes au montage du composant
@@ -19,9 +21,9 @@ const ScannerTab: React.FC = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={isMobile ? {} : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+      transition={isMobile ? { duration: 0 } : { duration: 0.5, ease: 'easeOut' }}
       className="space-y-6"
     >
       {/* CTA Principal de Scanner */}

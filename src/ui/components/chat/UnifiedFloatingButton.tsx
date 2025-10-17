@@ -7,6 +7,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
+import { useIsMobile } from '../../../system/device/DeviceProvider';
 import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
 import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
@@ -26,6 +27,7 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
   ({ className = '' }, ref) => {
     const location = useLocation();
     const { click } = useFeedback();
+    const isMobile = useIsMobile();
     const [isDesktop, setIsDesktop] = useState(
       typeof window !== 'undefined' ? window.innerWidth >= 1025 : false
     );
@@ -118,30 +120,35 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
           padding: '0',
           width: isDesktop ? '60px' : '68px',
           height: isDesktop ? '60px' : '68px',
-          background: isVoiceMode
-            ? `
-                radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 40%, transparent) 0%, transparent 50%),
-                radial-gradient(circle at 70% 70%, rgba(255,255,255,0.30) 0%, transparent 60%),
-                var(--liquid-pill-bg)
-              `
-            : hasUnreadMessages
-            ? `
-                radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 30%, transparent) 0%, transparent 50%),
-                radial-gradient(circle at 70% 70%, rgba(255,255,255,0.25) 0%, transparent 60%),
-                var(--liquid-pill-bg)
-              `
-            : `
-                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.20) 0%, transparent 50%),
-                var(--liquid-pill-bg)
-              `,
+          background: isMobile
+            ? (isVoiceMode
+              ? `linear-gradient(135deg, ${modeColor} 0%, color-mix(in srgb, ${modeColor} 80%, #000) 100%)`
+              : hasUnreadMessages
+              ? `linear-gradient(135deg, ${modeColor} 0%, color-mix(in srgb, ${modeColor} 80%, #000) 100%)`
+              : 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.10) 100%)')
+            : (isVoiceMode
+              ? `
+                  radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 40%, transparent) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 70%, rgba(255,255,255,0.30) 0%, transparent 60%),
+                  var(--liquid-pill-bg)
+                `
+              : hasUnreadMessages
+              ? `
+                  radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 30%, transparent) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 70%, rgba(255,255,255,0.25) 0%, transparent 60%),
+                  var(--liquid-pill-bg)
+                `
+              : `
+                  radial-gradient(circle at 30% 30%, rgba(255,255,255,0.20) 0%, transparent 50%),
+                  var(--liquid-pill-bg)
+                `),
           border: isVoiceMode
             ? `2px solid color-mix(in srgb, ${modeColor} 50%, transparent)`
             : hasUnreadMessages
             ? `1.5px solid color-mix(in srgb, ${modeColor} 40%, transparent)`
             : '1.5px solid rgba(255,255,255,0.22)',
-          backdropFilter: 'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
-          WebkitBackdropFilter:
-            'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
+          backdropFilter: isMobile ? 'none' : 'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
+          WebkitBackdropFilter: isMobile ? 'none' : 'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
           boxShadow: isVoiceMode
             ? `
                 var(--liquid-pill-shadow),
@@ -166,7 +173,7 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
         }}
         initial={false}
         animate={
-          isVoiceMode && !isPanelOpen
+          isMobile ? {} : (isVoiceMode && !isPanelOpen
             ? {
                 scale: [1, 1.06, 1],
                 boxShadow: [
@@ -175,18 +182,18 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
                   `var(--liquid-pill-shadow), 0 0 48px color-mix(in srgb, ${modeColor} 40%, transparent), 0 0 72px color-mix(in srgb, ${modeColor} 20%, transparent)`,
                 ],
               }
-            : {}
+            : {})
         }
         transition={
-          isVoiceMode && !isPanelOpen
+          isMobile ? { duration: 0 } : (isVoiceMode && !isPanelOpen
             ? {
                 duration: 2.5,
                 repeat: Infinity,
                 ease: 'easeInOut',
               }
-            : {}
+            : {})
         }
-        whileHover={{
+        whileHover={isMobile ? {} : {
           scale: 1.12,
           boxShadow: `
             var(--liquid-pill-shadow),
@@ -198,16 +205,16 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
             ease: [0.16, 1, 0.3, 1]
           }
         }}
-        whileTap={{
+        whileTap={isMobile ? {} : {
           scale: 0.92,
           transition: { duration: 0.15 }
         }}
         aria-label={isPanelOpen ? 'Fermer le coach' : 'Ouvrir le coach'}
         aria-expanded={isPanelOpen}
       >
-        {/* Pulse Ring Effect for Voice Mode */}
+        {/* Pulse Ring Effect for Voice Mode - Désactivé sur mobile */}
         <AnimatePresence>
-          {isVoiceMode && !isPanelOpen && (
+          {!isMobile && isVoiceMode && !isPanelOpen && (
             <>
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -271,13 +278,15 @@ const UnifiedFloatingButton = React.forwardRef<HTMLButtonElement, UnifiedFloatin
           }}
         />
 
-        {/* Icon with mode-specific color and animation */}
+        {/* Icon with mode-specific color and animation - Désactivé sur mobile */}
         <motion.div
-          animate={{
+          animate={isMobile ? { rotate: isPanelOpen ? 180 : 0 } : {
             rotate: isPanelOpen ? 180 : 0,
             scale: isVoiceMode ? [1, 1.1, 1] : 1
           }}
-          transition={{
+          transition={isMobile ? {
+            rotate: { duration: 0.3 }
+          } : {
             rotate: { duration: 0.3 },
             scale: isVoiceMode
               ? {

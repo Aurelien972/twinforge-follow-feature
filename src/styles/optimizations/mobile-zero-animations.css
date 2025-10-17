@@ -1,30 +1,110 @@
 /**
- * MOBILE SIMPLIFIED ANIMATIONS - BALANCED
+ * MOBILE ZERO ANIMATIONS - TOTAL ELIMINATION
  *
- * This file REDUCES animations on mobile devices while preserving visual identity
+ * This file REMOVES ALL decorative animations on mobile devices
  * Applied via .mobile-device class added by DeviceProvider
  *
- * Goal: 60fps scroll while maintaining brand coherence
+ * Goal: 60fps scroll on iPhone 14 Pro Max with instant interactions
  */
 
 /* =========================================
-   TARGETED ANIMATION REDUCTION
-   Only kill decorative animations, not functional ones
+   TOTAL ANIMATION ELIMINATION
+   All decorative animations are disabled on mobile
    ========================================= */
 
-/* KILL decorative animations only */
+/* KILL ALL decorative animations */
 .mobile-device [class*="breathing"],
-.mobile-device [class*="pulse"]:not(.new-bottom-bar-icon-container):not(.glass-orb-button),
-.mobile-device [class*="glow"]:not(.floating-chat-button):not(.floating-voice-coach-button),
+.mobile-device [class*="pulse"],
+.mobile-device [class*="glow"],
 .mobile-device [class*="shimmer"],
 .mobile-device [class*="float"],
 .mobile-device [class*="bounce"],
 .mobile-device [class*="particle"],
 .mobile-device [class*="spark"],
 .mobile-device [class*="circuit"],
-.mobile-device [class*="ember"] {
+.mobile-device [class*="ember"],
+.mobile-device [class*="animate-"],
+.mobile-device [class*="corner-"],
+.mobile-device [class*="ring"],
+.mobile-device [class*="bubble"] {
   animation: none !important;
   filter: none !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+/* KILL Glass Card animations and effects */
+.mobile-device .glass-card,
+.mobile-device [class*="glass-card"] {
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+.mobile-device .glass-card::before,
+.mobile-device .glass-card::after,
+.mobile-device [class*="glass-card"]::before,
+.mobile-device [class*="glass-card"]::after {
+  display: none !important;
+  animation: none !important;
+  opacity: 0 !important;
+}
+
+/* KILL Sidebar animations */
+.mobile-device .sidebar-item,
+.mobile-device .sidebar-item-icon-container,
+.mobile-device .sidebar-item-icon {
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+.mobile-device .sidebar-item::before,
+.mobile-device .sidebar-item::after,
+.mobile-device .sidebar-item-icon-container::before,
+.mobile-device .sidebar-item-icon-container::after {
+  display: none !important;
+  animation: none !important;
+}
+
+/* KILL Button animations */
+.mobile-device button,
+.mobile-device [role="button"],
+.mobile-device .btn {
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+.mobile-device button::before,
+.mobile-device button::after,
+.mobile-device [role="button"]::before,
+.mobile-device [role="button"]::after {
+  display: none !important;
+  animation: none !important;
+}
+
+/* KILL Framer Motion animations on mobile */
+.mobile-device [data-framer-motion] {
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+/* KILL Floating button animations */
+.mobile-device .unified-floating-button,
+.mobile-device .floating-chat-button,
+.mobile-device .floating-voice-coach-button {
+  animation: none !important;
+  will-change: auto !important;
+}
+
+.mobile-device .unified-floating-button::before,
+.mobile-device .unified-floating-button::after,
+.mobile-device .floating-chat-button::before,
+.mobile-device .floating-chat-button::after {
+  display: none !important;
+  animation: none !important;
 }
 
 /* =========================================
@@ -131,25 +211,75 @@
 }
 
 /* =========================================
-   FALLBACK: Media query based
+   MEDIA QUERY FALLBACK (if DeviceProvider not loaded)
    ========================================= */
 
 @media (max-width: 768px), (hover: none), (pointer: coarse) {
-  /* Reduce animation duration by default */
-  * {
-    animation-duration: 0.15s !important;
-    transition-duration: 0.15s !important;
+  /* KILL ALL decorative animations */
+  [class*="breathing"],
+  [class*="pulse"],
+  [class*="glow"],
+  [class*="shimmer"],
+  [class*="float"],
+  [class*="bounce"],
+  [class*="particle"],
+  [class*="spark"],
+  [class*="circuit"],
+  [class*="ember"],
+  [class*="animate-"],
+  [class*="corner-"],
+  [class*="ring"],
+  [class*="bubble"] {
+    animation: none !important;
+    filter: none !important;
+    transition: none !important;
+    will-change: auto !important;
   }
 
-  /* Keep tap feedback */
+  /* KILL Glass Card pseudo-elements */
+  .glass-card::before,
+  .glass-card::after,
+  [class*="glass-card"]::before,
+  [class*="glass-card"]::after {
+    display: none !important;
+    animation: none !important;
+  }
+
+  /* KILL Sidebar animations */
+  .sidebar-item,
+  .sidebar-item-icon-container,
+  .sidebar-item-icon {
+    animation: none !important;
+    transition: none !important;
+    will-change: auto !important;
+  }
+
+  .sidebar-item::before,
+  .sidebar-item::after,
+  .sidebar-item-icon-container::before,
+  .sidebar-item-icon-container::after {
+    display: none !important;
+  }
+
+  /* KILL Button pseudo-elements */
+  button::before,
+  button::after,
+  [role="button"]::before,
+  [role="button"]::after {
+    display: none !important;
+    animation: none !important;
+  }
+
+  /* Instant tap feedback only */
   button:active,
   [role="button"]:active {
     transform: scale(0.98) translateZ(0) !important;
-    transition: transform 0.08s ease-out !important;
+    transition: transform 0.05s ease-out !important;
   }
 
-  /* Keep essential loaders */
-  .loader-essential {
+  /* Keep essential loaders only */
+  .loader-essential,
+  [aria-busy="true"] [class*="spin"] {
     animation: spin-simple 2s linear infinite !important;
   }
 }

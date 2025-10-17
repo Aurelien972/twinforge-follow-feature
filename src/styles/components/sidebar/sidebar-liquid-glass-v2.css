@@ -582,6 +582,69 @@
     animation: none !important;
     opacity: 0.4 !important;
   }
+
+  /* Simplify backdrop-filter for mobile */
+  .sidebar-glass-enhanced {
+    backdrop-filter: blur(8px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+  }
+}
+
+/* Mobile device class - Complete animation freeze */
+.mobile-device .sidebar-glass-enhanced,
+.mobile-device .sidebar-glass-enhanced::before,
+.mobile-device .sidebar-glass-enhanced::after,
+.mobile-device .sidebar-item,
+.mobile-device .sidebar-item::before,
+.mobile-device .sidebar-item::after,
+.mobile-device .sidebar-item-icon-container,
+.mobile-device .sidebar-item-icon,
+.mobile-device .sidebar-item-label,
+.mobile-device .sidebar-item-subtitle,
+.mobile-device .sidebar-submenu,
+.mobile-device .sidebar-submenu-item,
+.mobile-device .sidebar-submenu-item-icon-container,
+.mobile-device .sidebar-expand-button,
+.mobile-device .sidebar-expand-icon {
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+  transform: none !important;
+}
+
+/* Disable hover/active effects via mobile-device class */
+.mobile-device .sidebar-item:hover,
+.mobile-device .sidebar-item:active,
+.mobile-device .sidebar-item:hover .sidebar-item-icon-container,
+.mobile-device .sidebar-item:active .sidebar-item-icon-container,
+.mobile-device .sidebar-submenu-item:hover,
+.mobile-device .sidebar-submenu-item:active,
+.mobile-device .sidebar-expand-button:hover,
+.mobile-device .sidebar-expand-button:active {
+  transform: none !important;
+  box-shadow: none !important;
+  background: initial !important;
+  scale: 1 !important;
+}
+
+/* Disable pseudo-element animations via mobile-device class */
+.mobile-device .sidebar-glass-enhanced::before {
+  animation: none !important;
+  opacity: 0.5 !important;
+  background-size: 100% 100% !important;
+}
+
+.mobile-device .sidebar-glass-enhanced::after {
+  animation: none !important;
+  opacity: 0.3 !important;
+  filter: none !important;
+}
+
+/* Solid backdrop for mobile-device */
+.mobile-device .sidebar-glass-enhanced {
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  background: rgba(11, 14, 23, 0.95) !important;
 }
 
 /* Responsive adjustments - CORRECTIONS MOBILES */
