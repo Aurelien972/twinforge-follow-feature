@@ -37,7 +37,18 @@
   background: rgba(11, 14, 23, 0.95) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: var(--shadow-elevated) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+
+  /* FORCER POSITION FIXED POUR LE HEADER */
+  position: fixed !important;
+  top: 8px !important;
+  left: 24px !important;
+  right: 24px !important;
+  z-index: 9999 !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
 }
 
 .glassmorphism-disabled .header-liquid-glass::before,
@@ -50,7 +61,9 @@
   background: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: var(--shadow-simple) !important;
+  /* PAS D'OMBRE SUR LES BOUTONS DU HEADER */
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 .glassmorphism-disabled .header-liquid-glass .glass-orb-button::before {
@@ -59,8 +72,18 @@
 
 .glassmorphism-disabled .header-liquid-glass .glass-orb-button:hover {
   background: rgba(255, 255, 255, 0.12) !important;
-  box-shadow: var(--shadow-simple) !important;
+  box-shadow: none !important;
+  filter: none !important;
   transform: scale(1.05) translateZ(0) !important;
+}
+
+/* Mobile header adjustments */
+@media (max-width: 768px) {
+  .glassmorphism-disabled .header-liquid-glass {
+    left: 8px !important;
+    right: 8px !important;
+    top: 6px !important;
+  }
 }
 
 /* =========================================
@@ -71,7 +94,14 @@
   background: rgba(11, 14, 23, 0.95) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: var(--shadow-elevated) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+
+  /* FORCER POSITION FIXED POUR LA SIDEBAR */
+  position: fixed !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
 }
 
 .glassmorphism-disabled .sidebar-glass-container::before,
@@ -83,26 +113,46 @@
   background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  /* PAS D'OMBRE SUR LES ITEMS DE NAVIGATION */
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 .glassmorphism-disabled .sidebar-nav-item:hover {
   background: rgba(255, 255, 255, 0.08) !important;
   transform: translateX(4px) translateZ(0) !important;
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 .glassmorphism-disabled .sidebar-nav-item.active {
   background: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 /* =========================================
    MOBILE BOTTOM BAR SIMPLIFICATIONS
    ========================================= */
 
+.glassmorphism-disabled .new-mobile-bottom-bar {
+  /* FORCER POSITION FIXED POUR LA BOTTOM BAR */
+  position: fixed !important;
+  bottom: var(--new-bottom-bar-bottom-offset) !important;
+  left: 8px !important;
+  right: 8px !important;
+  z-index: 9996 !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+
 .glassmorphism-disabled .new-mobile-bottom-bar-container {
   background: rgba(11, 14, 23, 0.95) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: var(--shadow-elevated) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
 .glassmorphism-disabled .new-mobile-bottom-bar-container::before,
@@ -114,7 +164,9 @@
   background: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: var(--shadow-simple) !important;
+  /* PAS D'OMBRE SUR LES ICÔNES DE LA BOTTOM BAR */
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 .glassmorphism-disabled .new-bottom-bar-icon-container::before {
@@ -125,13 +177,15 @@
   background: linear-gradient(135deg,
     color-mix(in srgb, var(--button-color) 25%, rgba(255, 255, 255, 0.15)),
     color-mix(in srgb, var(--button-color) 15%, rgba(255, 255, 255, 0.08))) !important;
-  box-shadow: var(--shadow-simple) !important;
+  box-shadow: none !important;
+  filter: none !important;
   border: 1.5px solid color-mix(in srgb, var(--button-color) 50%, transparent) !important;
 }
 
 .glassmorphism-disabled .new-bottom-bar-button--central .new-bottom-bar-icon-container {
   background: rgba(247, 147, 30, 0.15) !important;
-  box-shadow: var(--shadow-simple) !important;
+  box-shadow: none !important;
+  filter: none !important;
   border: 1.5px solid rgba(247, 147, 30, 0.4) !important;
 }
 
@@ -139,7 +193,8 @@
   background: linear-gradient(135deg,
     rgba(255, 107, 53, 0.25),
     rgba(253, 200, 48, 0.15)) !important;
-  box-shadow: var(--shadow-elevated) !important;
+  box-shadow: none !important;
+  filter: none !important;
   border: 2px solid rgba(247, 147, 30, 0.6) !important;
 }
 
@@ -169,7 +224,8 @@
   background: rgba(255, 255, 255, 0.05) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: var(--shadow-simple) !important;
+  /* GARDER UNIQUEMENT LES OMBRES DES CARTES PRINCIPALES */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
 }
 
 .glassmorphism-disabled .glass-card::before,
@@ -182,7 +238,7 @@
 .glassmorphism-disabled .glass-card:hover,
 .glassmorphism-disabled .glass-card-base:hover {
   background: rgba(255, 255, 255, 0.08) !important;
-  box-shadow: var(--shadow-simple) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
   transform: translateY(-2px) translateZ(0) !important;
 }
 
@@ -218,7 +274,14 @@
   background: rgba(11, 14, 23, 0.98) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: var(--shadow-elevated) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+
+  /* FORCER POSITION FIXED POUR LES DRAWERS */
+  position: fixed !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
 }
 
 .glassmorphism-disabled .mobile-drawer-glass::before,
@@ -236,7 +299,14 @@
   background: rgba(11, 14, 23, 0.95) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: var(--shadow-elevated) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+
+  /* FORCER POSITION FIXED POUR LE MENU CENTRAL */
+  position: fixed !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
 }
 
 .glassmorphism-disabled .central-actions-menu::before,
@@ -254,12 +324,54 @@
   background: rgba(255, 255, 255, 0.10) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: var(--shadow-elevated) !important;
+  /* PAS D'OMBRE SUR LES BOUTONS FLOTTANTS */
+  box-shadow: none !important;
+  filter: none !important;
+
+  /* FORCER POSITION FIXED POUR LES BOUTONS FLOTTANTS */
+  position: fixed !important;
+  transform: translateZ(0) !important;
+  will-change: transform, right !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
 }
 
 .glassmorphism-disabled .floating-chat-button::before,
 .glassmorphism-disabled .floating-chat-button::after {
   display: none !important;
+}
+
+/* =========================================
+   SUPPRIMER TOUTES LES OMBRES NON-ESSENTIELLES
+   ========================================= */
+
+/* Supprimer les drop-shadow sur tous les icônes */
+.glassmorphism-disabled svg,
+.glassmorphism-disabled [class*="icon"],
+.glassmorphism-disabled [class*="Icon"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* Supprimer les text-shadow sur tous les textes */
+.glassmorphism-disabled span,
+.glassmorphism-disabled p,
+.glassmorphism-disabled h1,
+.glassmorphism-disabled h2,
+.glassmorphism-disabled h3,
+.glassmorphism-disabled h4,
+.glassmorphism-disabled h5,
+.glassmorphism-disabled h6,
+.glassmorphism-disabled label,
+.glassmorphism-disabled div[class*="label"],
+.glassmorphism-disabled div[class*="title"] {
+  text-shadow: none !important;
+}
+
+/* Supprimer les ombres sur tous les boutons sauf glass-card */
+.glassmorphism-disabled button:not(.glass-card):not([class*="glass-card"]) {
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 /* =========================================
@@ -275,6 +387,74 @@
 /* Conserver uniquement les transitions de couleur essentielles */
 .glassmorphism-disabled * {
   transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease !important;
+}
+
+/* =========================================
+   LOGO FORGE - VISIBILITÉ EN MODE PERFORMANCE
+   ========================================= */
+
+/* Forcer la visibilité du logo avec couleurs comme le marteau */
+.glassmorphism-disabled svg[viewBox="0 0 85 70"],
+.glassmorphism-disabled [class*="ForgeHammer"],
+.glassmorphism-disabled [class*="forge-hammer"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Forcer les couleurs du gradient du logo */
+.glassmorphism-disabled svg[viewBox="0 0 85 70"] path {
+  fill: #F7931E !important;
+  stroke: rgba(15, 23, 42, 0.8) !important;
+  opacity: 1 !important;
+}
+
+/* Les cercles animés du logo restent visibles mais sans animation */
+.glassmorphism-disabled svg[viewBox="0 0 85 70"] circle {
+  opacity: 0.8 !important;
+  animation: none !important;
+}
+
+.glassmorphism-disabled svg[viewBox="0 0 85 70"] circle animate {
+  display: none !important;
+}
+
+/* Le texte TWINFØRGE reste visible avec couleurs */
+.glassmorphism-disabled [class*="TwinForgeLogo"] span {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Forcer le gradient orangé sur FØRGE en mode performance */
+.glassmorphism-disabled [class*="TwinForgeLogo"] span[style*="gradient"] {
+  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  filter: none !important;
+}
+
+/* =========================================
+   FOND AVEC EFFETS RADIAUX - POSITION FIXE
+   ========================================= */
+
+/* Le fond cosmique doit rester fixe pendant le scroll */
+.glassmorphism-disabled .bg-twinforge-visionos {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -10 !important;
+  transform: translateZ(0) !important;
+  will-change: auto !important;
+}
+
+/* Les effets radiaux restent en arrière-plan fixe */
+.glassmorphism-disabled .cosmic-forge-particles {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+  transform: translateZ(0) !important;
+  will-change: auto !important;
 }
 
 /* =========================================
@@ -338,9 +518,16 @@
   background-image: none !important;
 }
 
-/* Remove all box-shadows except simple drop shadows */
-.glassmorphism-disabled * {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+/* Remove all box-shadows except on glass-card */
+.glassmorphism-disabled *:not(.glass-card):not([class*="glass-card"]) {
+  box-shadow: none !important;
+}
+
+/* GARDER les ombres uniquement sur glass-card */
+.glassmorphism-disabled .glass-card,
+.glassmorphism-disabled .glass-card-base,
+.glassmorphism-disabled [class*="glass-card"] {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Keep essential focus shadows */
