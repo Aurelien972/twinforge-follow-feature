@@ -144,8 +144,13 @@ const NewMobileBottomBar: React.FC = () => {
           left: '8px',
           right: '8px',
           zIndex: 9996,
-          transform: 'translate3d(0, 0, 0)', // CRITICAL: Force GPU layer
-          willChange: 'transform', // CRITICAL: Optimize for fixed positioning
+          transform: 'translate3d(0, 0, 0)',
+          willChange: 'transform',
+          WebkitTransform: 'translate3d(0, 0, 0)',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          isolation: 'isolate',
+          contain: 'layout style paint',
         }}
       >
         <div className="new-mobile-bottom-bar-container">

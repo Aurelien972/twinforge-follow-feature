@@ -18,13 +18,14 @@
   box-shadow: var(--liquid-shadow-elevated) !important;
 
   transition: all var(--liquid-transition-medium);
-  position: relative;
+  position: fixed !important;
   overflow: visible !important;
   isolation: isolate !important;
-  transform: translateZ(0);
-  will-change: transform, filter;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  transform: translateZ(0) !important;
+  will-change: transform, filter !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  contain: layout style paint !important;
 
   /* Safari rounded fix */
   -webkit-mask-image: -webkit-radial-gradient(white, black);
@@ -105,10 +106,12 @@
   overflow-y: auto;
   overflow-x: hidden;
   max-height: calc(100vh - 120px);
+  height: 100%;
   padding: 0.5rem 0.25rem 0.375rem 1rem;
   scrollbar-width: none; /* Firefox - Scrollbar invisible */
   position: relative;
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 
   /* Effet de fade aux extrémités */
   -webkit-mask-image: linear-gradient(

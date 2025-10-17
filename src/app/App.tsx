@@ -176,12 +176,13 @@ function AppContent() {
     >
       <Header />
 
+      {/* Fixed Sidebar - Rendered outside of flex layout */}
+      <Sidebar />
+
       {/* Parent flex : on autorise la contraction des enfants */}
       <div className="flex-1 flex min-w-0 position-static-important overflow-visible-important transform-none-important filter-none-important perspective-none-important contain-none-important isolation-auto-important z-auto-important">
-        {/* Sidebar (hidden on mobile) */}
-        <div className="hidden lg:flex lg:flex-col lg:w-[240px] xl:w-[260px] shrink-0 ml-6 mr-3 pt-20">
-          <Sidebar />
-        </div>
+        {/* Sidebar spacer (hidden on mobile) - maintains layout spacing */}
+        <div className="hidden lg:block lg:w-[240px] xl:w-[260px] shrink-0" aria-hidden="true" />
 
         {/* MAIN — fix mobile: min-w-0 pour éviter le rognage à droite */}
         <main
@@ -191,10 +192,11 @@ function AppContent() {
           }`}
           style={{
             position: 'relative',
-            overflow: 'visible',          // laisse passer les glows
+            overflow: 'visible',
             minHeight: '100dvh',
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
+            marginLeft: 0,
           }}
           role="main"
           aria-label="Contenu principal de l'application"
