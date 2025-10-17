@@ -1,18 +1,19 @@
 /**
- * MOBILE SIMPLIFIED ANIMATIONS - BALANCED
+ * MOBILE ZERO ANIMATIONS - STRICT
  *
- * This file REDUCES animations on mobile devices while preserving visual identity
+ * This file FREEZES all decorative animations on mobile devices
  * Applied via .mobile-device class added by DeviceProvider
  *
- * Goal: 60fps scroll while maintaining brand coherence
+ * Goal: 60fps scroll + reduced battery consumption
+ * Strategy: Keep colors and appearance, remove ALL movement
  */
 
 /* =========================================
-   TARGETED ANIMATION REDUCTION
-   Only kill decorative animations, not functional ones
+   CRITICAL: FREEZE ALL DECORATIVE ANIMATIONS
+   Keep visual appearance, remove ALL movement
    ========================================= */
 
-/* KILL decorative animations only */
+/* FREEZE: All decorative animations - NO MOVEMENT */
 .mobile-device [class*="breathing"],
 .mobile-device [class*="pulse"]:not(.new-bottom-bar-icon-container):not(.glass-orb-button),
 .mobile-device [class*="glow"]:not(.floating-chat-button):not(.floating-voice-coach-button),
@@ -22,9 +23,14 @@
 .mobile-device [class*="particle"],
 .mobile-device [class*="spark"],
 .mobile-device [class*="circuit"],
-.mobile-device [class*="ember"] {
+.mobile-device [class*="ember"],
+.mobile-device [class*="ripple"],
+.mobile-device [class*="wave"] {
   animation: none !important;
+  animation-duration: 0s !important;
+  animation-play-state: paused !important;
   filter: none !important;
+  transform: none !important;
 }
 
 /* =========================================
@@ -135,13 +141,23 @@
 }
 
 /* =========================================
-   SIMPLIFY FRAMER MOTION
+   FREEZE FRAMER MOTION - STRICT
    ========================================= */
 
-.mobile-device [data-framer-motion] {
-  /* Reduce Framer Motion animation duration */
-  animation-duration: 0.15s !important;
-  transition-duration: 0.15s !important;
+/* CRITICAL: Freeze ALL Framer Motion decorative animations */
+.mobile-device [data-framer-motion],
+.mobile-device motion\.div,
+.mobile-device motion\.span,
+.mobile-device motion\.button {
+  /* Keep only instant transitions for layout changes */
+  animation-duration: 0s !important;
+  transition-duration: 0.08s !important;
+}
+
+/* Exception: Keep tap feedback on interactive elements */
+.mobile-device button[data-framer-motion],
+.mobile-device [role="button"][data-framer-motion] {
+  transition-duration: 0.08s !important;
 }
 
 /* =========================================
@@ -170,43 +186,75 @@
 }
 
 /* =========================================
-   DISABLE SHIMMER EFFECTS ON BUTTONS
+   FREEZE SHIMMER EFFECTS ON BUTTONS - STRICT
    ========================================= */
 
+/* CRITICAL: Hide ALL shimmer and sweep effects */
 .mobile-device button [class*="shimmer"],
 .mobile-device [class*="shimmer-effect"],
-.mobile-device [data-shimmer] {
+.mobile-device [class*="shimmer"],
+.mobile-device [data-shimmer],
+.mobile-device .shimmer {
   animation: none !important;
+  animation-duration: 0s !important;
+  animation-play-state: paused !important;
   opacity: 0 !important;
+  visibility: hidden !important;
   display: none !important;
 }
 
-/* Disable gradient sweep animations in buttons */
+/* CRITICAL: Freeze gradient sweep animations in buttons */
 .mobile-device button > div[class*="absolute"][class*="inset"],
-.mobile-device button > motion\.div[class*="absolute"] {
+.mobile-device button > div[class*="absolute"],
+.mobile-device button > motion\.div[class*="absolute"],
+.mobile-device button::before,
+.mobile-device button::after {
   animation: none !important;
+  animation-duration: 0s !important;
+  animation-play-state: paused !important;
   transform: translateX(0) !important;
 }
 
+/* CRITICAL: Freeze ALL button pseudo-elements */
+.mobile-device .glass-card button::before,
+.mobile-device .glass-card button::after,
+.mobile-device [class*="btn"]::before,
+.mobile-device [class*="btn"]::after {
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-play-state: paused !important;
+}
+
 /* =========================================
-   DISABLE BUBBLE AND PARTICLE ANIMATIONS
+   FREEZE BUBBLE AND PARTICLE ANIMATIONS - STRICT
    ========================================= */
 
+/* CRITICAL: Hide ALL bubbles and particles completely */
 .mobile-device [class*="bubble"],
 .mobile-device [class*="particle"],
 .mobile-device [data-bubble],
-.mobile-device [data-particle] {
+.mobile-device [data-particle],
+.mobile-device .bubble,
+.mobile-device .particle {
   animation: none !important;
+  animation-duration: 0s !important;
+  animation-play-state: paused !important;
   opacity: 0 !important;
+  visibility: hidden !important;
   display: none !important;
 }
 
-/* Disable pulsating rings and halos */
+/* CRITICAL: Freeze pulsating rings and halos */
 .mobile-device [class*="pulse-ring"],
 .mobile-device [class*="halo"],
-.mobile-device div[class*="absolute"][class*="inset-0"][class*="rounded-full"][class*="border"] {
+.mobile-device [class*="ring"],
+.mobile-device div[class*="absolute"][class*="inset-0"][class*="rounded-full"][class*="border"],
+.mobile-device div[class*="absolute"][class*="rounded-full"]:not([class*="icon"]) {
   animation: none !important;
+  animation-duration: 0s !important;
+  animation-play-state: paused !important;
   opacity: 0 !important;
+  visibility: hidden !important;
   display: none !important;
 }
 
@@ -309,11 +357,8 @@
    ========================================= */
 
 @media (max-width: 768px), (hover: none), (pointer: coarse) {
-  /* Reduce animation duration by default */
-  * {
-    animation-duration: 0.15s !important;
-    transition-duration: 0.15s !important;
-  }
+  /* CRITICAL: Don't use * selector - it breaks rendering */
+  /* Instead target specific animation classes */
 
   /* Keep tap feedback */
   button:active,
@@ -333,7 +378,10 @@
    ========================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  * {
+  /* Disable animations when user prefers reduced motion */
+  [class*="animate"],
+  [class*="transition"],
+  [data-animate] {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
