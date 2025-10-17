@@ -12,12 +12,12 @@
   }
 
   body {
-    @apply bg-black text-white antialiased;
+    @apply text-white antialiased;
     font-feature-settings: "kern", "liga";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    background: var(--color-obsidian) !important;
+    background: transparent !important;
     font-family: inherit;
     touch-action: manipulation;
     min-height: 100vh;
