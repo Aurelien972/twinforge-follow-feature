@@ -152,12 +152,21 @@
   }
 }
 
-/* Mobile device class enforcement */
+/* Mobile device class enforcement - MATCH BOTTOMBAR EXACTLY */
 .mobile-device .header-liquid-glass {
-  background: rgba(15, 25, 39, 0.92) !important;
-  backdrop-filter: blur(12px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(130%) !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+  /* EXACT MATCH WITH BOTTOMBAR - Ultra-transparent Liquid Glass */
+  background:
+    var(--liquid-reflections-multi),
+    var(--liquid-highlight-ambient),
+    var(--liquid-glass-bg-base) !important;
+
+  /* EXACT MATCH WITH BOTTOMBAR */
+  backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
+
+  /* EXACT MATCH WITH BOTTOMBAR */
+  box-shadow: var(--liquid-bottombar-shadow), var(--liquid-bottombar-glow) !important;
+
   transition: none !important;
 }
 

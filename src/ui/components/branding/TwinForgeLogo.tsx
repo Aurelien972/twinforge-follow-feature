@@ -123,14 +123,14 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
             lineHeight: 1,
-            textTransform: 'lowercase',
+            textTransform: 'uppercase',
             filter: isHovered
               ? 'drop-shadow(0 0 8px rgba(253, 200, 48, 0.4))'
               : 'drop-shadow(0 0 4px rgba(247, 147, 30, 0.25))',
             transition: 'filter 300ms ease'
           }}
         >
-          forge
+          FORGE
         </span>
       </div>
     </div>
