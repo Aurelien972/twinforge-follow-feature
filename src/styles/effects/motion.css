@@ -281,8 +281,17 @@
     animation: icon-spin-css 3s linear infinite !important;
   }
   
-  /* Override all transition durations */
-  * {
+  /* Override transition durations for motion elements only */
+  .spatial-icon,
+  .icon-container,
+  .breathing-icon,
+  .icon-pulse-css,
+  .icon-breathing-css,
+  .glass-shimmer,
+  .hover-lift,
+  .glass-card,
+  button,
+  [role="button"] {
     transition-duration: 0.1s !important;
   }
 }

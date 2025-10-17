@@ -1,279 +1,70 @@
 /**
- * Mobile Performance Strict Mode
- * CRITICAL: Comprehensive mobile optimizations to eliminate flickering and improve performance
- * This file enforces strict performance rules for mobile and touch devices
+ * Mobile Performance Optimizations
+ * IMPORTANT: Targeted fixes for flickering without breaking core functionality
+ * This file uses SPECIFIC selectors only - NO universal selectors (*)
  */
 
 /* =========================================
-   GLOBAL MOBILE ANIMATION SUPPRESSION
+   MOBILE ANIMATIONS - TARGETED APPROACH
    ========================================= */
 
 @media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  /* Disable ALL animations globally on mobile */
-  * {
-    animation-duration: 0s !important;
-    animation-delay: 0s !important;
-    transition-duration: 0s !important;
-    transition-delay: 0s !important;
-  }
-
-  /* Disable all will-change properties */
-  * {
-    will-change: auto !important;
-  }
-
-  /* Disable all transforms except essential ones */
-  *:not(.loader-essential):not([class*="spinner"]):not([class*="loading"]) {
-    transform: none !important;
-  }
-
-  /* Disable all pseudo-element animations */
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-    will-change: auto !important;
-  }
 
   /* =========================================
-     BUTTON AND INTERACTIVE ELEMENTS
+     SIDEBAR FLICKERING FIX
      ========================================= */
 
-  button,
-  [role="button"],
-  a,
-  input,
-  select,
-  textarea {
+  .sidebar-glass-enhanced,
+  .sidebar-glass-enhanced::before,
+  .sidebar-glass-enhanced::after,
+  .sidebar-item,
+  .sidebar-item-icon-container,
+  .sidebar-submenu,
+  .sidebar-submenu-item {
     animation: none !important;
-    transition: none !important;
-    transform: none !important;
-    will-change: auto !important;
-  }
-
-  button:hover,
-  button:active,
-  button:focus,
-  [role="button"]:hover,
-  [role="button"]:active,
-  [role="button"]:focus {
-    transform: none !important;
-    scale: 1 !important;
-    filter: none !important;
-  }
-
-  /* =========================================
-     GLASS EFFECTS OPTIMIZATION
-     ========================================= */
-
-  [class*="glass"],
-  [class*="liquid"] {
-    backdrop-filter: blur(8px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
-  }
-
-  [class*="glass"]::before,
-  [class*="glass"]::after,
-  [class*="liquid"]::before,
-  [class*="liquid"]::after {
-    animation: none !important;
-    opacity: 0.4 !important;
-  }
-
-  /* =========================================
-     SCROLLING PERFORMANCE
-     ========================================= */
-
-  body,
-  html,
-  #root,
-  main,
-  [class*="container"],
-  [class*="scroll"],
-  [class*="overflow"] {
-    will-change: auto !important;
-    transform: none !important;
     transition: none !important;
   }
 
-  /* Disable scroll-linked effects */
-  [style*="position: fixed"],
-  [style*="position: sticky"] {
-    will-change: auto !important;
-  }
-
   /* =========================================
-     SIDEBAR AND NAVIGATION
+     BUTTON ANIMATIONS
      ========================================= */
 
-  [class*="sidebar"],
-  [class*="nav"],
-  [class*="menu"] {
-    animation: none !important;
-    transition: none !important;
-    transform: none !important;
-    will-change: auto !important;
+  .glass-card::before,
+  .glass-card::after {
+    display: none !important;
   }
 
-  [class*="sidebar"]::before,
-  [class*="sidebar"]::after {
+  .spatial-icon,
+  .icon-container {
     animation: none !important;
   }
 
   /* =========================================
-     ICONS AND SPATIAL EFFECTS
-     ========================================= */
-
-  [class*="icon"],
-  [class*="spatial"],
-  svg {
-    animation: none !important;
-    transition: none !important;
-    transform: none !important;
-    will-change: auto !important;
-  }
-
-  [class*="icon"]:hover,
-  [class*="icon"]:active {
-    transform: none !important;
-    filter: none !important;
-  }
-
-  /* =========================================
-     CARDS AND CONTAINERS
-     ========================================= */
-
-  [class*="card"],
-  [class*="panel"],
-  [class*="modal"],
-  [class*="drawer"] {
-    animation: none !important;
-    transition: none !important;
-    will-change: auto !important;
-  }
-
-  [class*="card"]:hover,
-  [class*="card"]:active {
-    transform: none !important;
-    box-shadow: none !important;
-    scale: 1 !important;
-  }
-
-  /* =========================================
-     PARTICLES AND DECORATIVE ELEMENTS
+     PARTICLE EFFECTS
      ========================================= */
 
   [class*="particle"],
   [class*="spark"],
-  [class*="glow"],
-  [class*="shimmer"] {
+  .breathing-glow {
     display: none !important;
-    opacity: 0 !important;
-    animation: none !important;
   }
 
   /* =========================================
-     FRAMER MOTION OVERRIDES
+     CHAT NOTIFICATION
      ========================================= */
 
-  [class*="motion"],
-  [class*="animate"],
-  [class*="framer"] {
-    animation: none !important;
+  .chat-notification-bubble {
     transition: none !important;
-    transform: none !important;
-  }
-
-  /* =========================================
-     LOADER EXCEPTIONS
-     ========================================= */
-
-  /* Only allow essential loaders to animate */
-  .loader-essential,
-  [class*="spinner"],
-  [class*="loading"][class*="indicator"] {
-    animation-duration: 2s !important;
-    animation-play-state: running !important;
-  }
-
-  /* =========================================
-     HAPTIC FEEDBACK REPLACEMENT
-     ========================================= */
-
-  /* Since we disabled visual feedback, ensure touch target sizes are adequate */
-  button,
-  [role="button"],
-  a[href] {
-    min-width: 44px !important;
-    min-height: 44px !important;
-  }
-
-  /* =========================================
-     FORCED LAYOUT STABILITY
-     ========================================= */
-
-  /* Prevent layout shifts during interactions */
-  * {
-    contain: layout style !important;
-  }
-
-  /* Exceptions for containers that need to flow */
-  body,
-  html,
-  #root,
-  main,
-  [class*="container"],
-  [class*="grid"],
-  [class*="flex"] {
-    contain: none !important;
   }
 }
 
 /* =========================================
-   EXTRA STRICT MODE FOR LOW-END DEVICES
-   ========================================= */
-
-@media (max-width: 768px) and (hover: none) and (pointer: coarse) {
-  /* Even stricter rules for small mobile devices */
-
-  /* Completely disable backdrop-filter on very small screens */
-  [class*="glass"],
-  [class*="liquid"],
-  [class*="blur"] {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(11, 14, 23, 0.85) !important;
-  }
-
-  /* Simplify shadows */
-  * {
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-
-  /* Exceptions for critical UI elements */
-  [class*="modal"],
-  [class*="drawer"],
-  [class*="bottom-bar"] {
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2) !important;
-  }
-}
-
-/* =========================================
-   ACCESSIBILITY PRESERVATION
+   ACCESSIBILITY - KEEP FOCUS VISIBLE
    ========================================= */
 
 @media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  /* Ensure focus states remain visible despite disabled animations */
   *:focus-visible {
     outline: 3px solid rgba(24, 227, 255, 0.8) !important;
     outline-offset: 2px !important;
-  }
-
-  /* Ensure disabled elements are clearly marked */
-  button:disabled,
-  [role="button"][aria-disabled="true"] {
-    opacity: 0.5 !important;
-    cursor: not-allowed !important;
   }
 }

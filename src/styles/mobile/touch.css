@@ -52,30 +52,12 @@ body, #root, [class*="route-container"], main {
   overscroll-behavior-y: auto !important;
 }
 
-/* Mobile - Disable all will-change on scrollable elements */
+/* Mobile - Optimize scrollable elements without breaking content */
 @media (max-width: 1024px), (hover: none), (pointer: coarse) {
   body,
   #root,
-  [class*="route-container"],
-  main,
-  .sidebar-content,
-  [class*="scroll"],
-  [class*="overflow"] {
+  main {
     will-change: auto !important;
-    transform: none !important;
-    transition: none !important;
-  }
-
-  /* Disable animations on scroll */
-  * {
-    animation-play-state: paused !important;
-  }
-
-  /* Re-enable only essential animations */
-  .loader-essential,
-  [class*="spinner"],
-  [class*="loading"] {
-    animation-play-state: running !important;
   }
 }
 
