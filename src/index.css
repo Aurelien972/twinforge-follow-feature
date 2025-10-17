@@ -10,3 +10,6 @@
 
 @import './styles/components/loader-animations.css';
 @import './styles/components/endurance-map.css';
+
+/* Performance Mode - iPhone 10 Optimization */
+@import './styles/optimizations/performance-mode.css';

@@ -235,6 +235,32 @@
 }
 
 /* =========================================
+   PERFORMANCE MODE - iPhone 10 Optimization
+   Disable all animations, particles, and movement
+   ========================================= */
+.performance-mode .bg-twinforge-visionos {
+  /* Static background - no animation */
+  background: radial-gradient(circle at 50% 50%, var(--forge-medium) 0%, var(--forge-deep) 60%, var(--forge-void) 100%) !important;
+  animation: none !important;
+}
+
+.performance-mode .bg-twinforge-visionos::before {
+  /* Disable thermal distortion */
+  display: none !important;
+}
+
+.performance-mode .cosmic-forge-particles {
+  /* Hide all particles completely */
+  display: none !important;
+}
+
+.performance-mode .forge-particle {
+  /* Ensure particles are completely hidden */
+  display: none !important;
+  animation: none !important;
+}
+
+/* =========================================
    DISTORSION THERMIQUE — Desktop
    ========================================= */
 @media (min-width: 1025px) {

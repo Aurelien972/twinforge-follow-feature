@@ -1,0 +1,226 @@
+/* =========================================
+   PERFORMANCE MODE - iPhone 10 Optimization
+   Global CSS overrides for performance mode
+   ========================================= */
+
+/* =========================================
+   GLASS EFFECTS - Solid backgrounds
+   ========================================= */
+
+.performance-mode .glass-card,
+.performance-mode .glass-base,
+.performance-mode .glass-card-cta {
+  /* Replace transparency with solid dark blue */
+  background: #0F1927 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Keep only simple box-shadow, remove all glows */
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+
+  /* Remove border transparency */
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Remove pseudo-element glows and highlights */
+.performance-mode .glass-card::before,
+.performance-mode .glass-card::after,
+.performance-mode .glass-card-cta::before,
+.performance-mode .glass-card-cta::after {
+  display: none !important;
+}
+
+/* Disable sheen completely */
+.performance-mode .glass-sheen {
+  display: none !important;
+}
+
+/* =========================================
+   HOVER EFFECTS - Disabled
+   ========================================= */
+
+.performance-mode .glass-card:hover,
+.performance-mode .glass-card-cta:hover {
+  transform: none !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: none !important;
+}
+
+/* =========================================
+   ICONS - No glows or halos
+   ========================================= */
+
+.performance-mode .spatial-icon,
+.performance-mode .icon-container {
+  /* Remove all glows and filters */
+  filter: none !important;
+
+  /* Solid background for interactive icons */
+  background: #1A2332 !important;
+}
+
+.performance-mode .spatial-icon:hover {
+  filter: none !important;
+}
+
+/* Remove icon halos */
+.performance-mode .spatial-icon > div[class*="absolute"] {
+  display: none !important;
+}
+
+/* =========================================
+   ANIMATIONS - All disabled
+   ========================================= */
+
+.performance-mode * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Exception: keep tap feedback for better UX */
+.performance-mode .glass-card:active,
+.performance-mode .glass-card-cta:active,
+.performance-mode .spatial-icon:active {
+  transform: scale(0.98) !important;
+  transition: transform 0.08s ease-out !important;
+}
+
+/* =========================================
+   FRAMER MOTION - Disable animations
+   ========================================= */
+
+.performance-mode [data-framer-motion] {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* =========================================
+   CIRCUITS AND EFFECTS - Disabled
+   ========================================= */
+
+.performance-mode [class*="breathing"],
+.performance-mode [class*="pulse"],
+.performance-mode [class*="glow"],
+.performance-mode [class*="shimmer"],
+.performance-mode [class*="float"] {
+  animation: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* =========================================
+   SHADOWS - Simplified
+   ========================================= */
+
+.performance-mode [class*="shadow"] {
+  /* Remove all colored shadows and glows */
+  filter: none !important;
+}
+
+.performance-mode [style*="box-shadow"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* =========================================
+   LOADERS - Essential only
+   ========================================= */
+
+.performance-mode .loader-essential {
+  /* Keep essential loaders but simplify */
+  animation: icon-spin-css 2s linear infinite !important;
+}
+
+/* =========================================
+   GRADIENTS - Simplified
+   ========================================= */
+
+.performance-mode [style*="radial-gradient"],
+.performance-mode [style*="linear-gradient"] {
+  /* Simplify gradients to solid colors */
+  background-image: none !important;
+}
+
+/* =========================================
+   WILL-CHANGE - Remove all
+   ========================================= */
+
+.performance-mode * {
+  will-change: auto !important;
+}
+
+/* =========================================
+   SCROLL REVEAL - Disabled
+   ========================================= */
+
+.performance-mode .glass-card-scroll-reveal,
+.performance-mode [data-scroll-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* =========================================
+   PAGE HEADER AND NAVIGATION - Keep intact
+   Do NOT apply performance mode to navigation elements
+   ========================================= */
+
+/* These remain unchanged and are excluded from performance mode */
+.performance-mode header,
+.performance-mode .sidebar,
+.performance-mode .mobile-drawer,
+.performance-mode .bottom-bar,
+.performance-mode .floating-chat-button {
+  /* Navigation elements keep their original styles */
+  all: revert;
+}
+
+/* =========================================
+   BACKDROP EFFECTS - Disabled
+   ========================================= */
+
+.performance-mode [style*="backdrop-filter"],
+.performance-mode [style*="-webkit-backdrop-filter"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================
+   FILTERS - All removed
+   ========================================= */
+
+.performance-mode [style*="filter:"],
+.performance-mode [class*="blur"],
+.performance-mode [class*="saturate"] {
+  filter: none !important;
+}
+
+/* =========================================
+   OPACITY ANIMATIONS - Static
+   ========================================= */
+
+.performance-mode [style*="opacity"] {
+  /* Keep opacity but remove transitions */
+  transition: none !important;
+}
+
+/* =========================================
+   TRANSFORMS - Static except tap feedback
+   ========================================= */
+
+.performance-mode [style*="transform"]:not(:active) {
+  transform: none !important;
+}
+
+/* =========================================
+   Z-INDEX - Simplified stacking
+   ========================================= */
+
+.performance-mode * {
+  /* Reset complex z-index stacks */
+  isolation: auto !important;
+  contain: none !important;
+}

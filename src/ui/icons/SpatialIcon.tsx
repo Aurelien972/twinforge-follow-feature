@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Divide as LucideIcon } from 'lucide-react';
 import { useOptimizedWillChange } from '../../lib/motion/useOptimizedWillChange';
 import { usePreferredMotion, useHasTouch } from '../../system/device/DeviceProvider';
+import { usePerformanceMode } from '../../system/context/PerformanceModeContext';
 import { designKernel } from '../../styles/designKernel';
 import { visionCurves } from '../../lib/motion/gpuVariants';
 
@@ -70,10 +71,11 @@ const SpatialIcon: React.FC<SpatialIconProps> = ({
 }) => {
   const preferredMotion = usePreferredMotion();
   const hasTouch = useHasTouch();
+  const { isPerformanceMode } = usePerformanceMode();
   const iconRef = useRef<HTMLDivElement>(null);
 
-  // CRITICAL: Désactiver les animations sur mobile
-  const shouldAnimate = !preferredMotion && animateProp && window.innerWidth > 768;
+  // CRITICAL: Désactiver les animations sur mobile et en mode performance
+  const shouldAnimate = !preferredMotion && animateProp && window.innerWidth > 768 && !isPerformanceMode;
   
   // TwinForge color system
   const iconColor = color ?? 'var(--text-icon-idle)'; // Default to TwinForge idle color
@@ -103,7 +105,7 @@ const SpatialIcon: React.FC<SpatialIconProps> = ({
   
   // TwinForge hover handlers with cyan glow
   const handleMouseEnter = () => {
-    if (!shouldAnimate || hasTouch || variant === 'pure') return;
+    if (!shouldAnimate || hasTouch || variant === 'pure' || isPerformanceMode) return;
     
     if (iconRef.current) {
       // TwinForge cyan glow effect - subtle and precise
@@ -114,7 +116,7 @@ const SpatialIcon: React.FC<SpatialIconProps> = ({
   };
   
   const handleMouseLeave = () => {
-    if (!shouldAnimate || hasTouch || variant === 'pure') return;
+    if (!shouldAnimate || hasTouch || variant === 'pure' || isPerformanceMode) return;
     
     if (iconRef.current) {
       iconRef.current.style.filter = '';

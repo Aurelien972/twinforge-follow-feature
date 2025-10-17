@@ -7,6 +7,7 @@ import { ToastProvider } from '../../ui/components/ToastProvider';
 import { DeviceProvider } from '../../system/device/DeviceProvider';
 import { ErrorBoundary } from './ErrorBoundary';
 import { IllustrationCacheProvider } from '../../system/context/IllustrationCacheContext';
+import { PerformanceModeProvider } from '../../system/context/PerformanceModeContext';
 import { useDevicePerformance } from '../../hooks/useDevicePerformance';
 import { useAutoSync } from '../../hooks/useAutoSync';
 import { useUserStore } from '../../system/store/userStore';
@@ -192,15 +193,17 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <DataProvider>
           <DeviceProvider>
-            <IllustrationCacheProvider>
-              <ToastProvider>
-                <PerformanceInitializer>
-                  <AutoSyncInitializer>
-                    {children}
-                  </AutoSyncInitializer>
-                </PerformanceInitializer>
-              </ToastProvider>
-            </IllustrationCacheProvider>
+            <PerformanceModeProvider>
+              <IllustrationCacheProvider>
+                <ToastProvider>
+                  <PerformanceInitializer>
+                    <AutoSyncInitializer>
+                      {children}
+                    </AutoSyncInitializer>
+                  </PerformanceInitializer>
+                </ToastProvider>
+              </IllustrationCacheProvider>
+            </PerformanceModeProvider>
           </DeviceProvider>
         </DataProvider>
       </QueryClientProvider>

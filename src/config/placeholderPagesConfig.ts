@@ -204,8 +204,9 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         value: 'general',
         label: 'Général',
         icon: 'Settings',
-        description: 'Thème, langue et unités',
+        description: 'Thème, langue, unités et mode performance',
         features: [
+          'Mode Performance pour iPhone 10',
           'Préférences utilisateur',
           'Thème et apparence',
           'Langue et région',
