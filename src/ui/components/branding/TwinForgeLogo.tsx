@@ -30,6 +30,23 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               fontSize: '25px',
               fontWeight: 800,
               letterSpacing: '1.2px',
+              color: '#E5E7EB',
+              lineHeight: 1,
+              textTransform: 'uppercase',
+              filter: isHovered
+                ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.3))'
+                : 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.15))',
+              transition: 'filter 300ms ease'
+            }}
+          >
+            TWIN
+          </span>
+          <span
+            style={{
+              fontFamily: "'Montserrat', sans-serif",
+              fontSize: '25px',
+              fontWeight: 800,
+              letterSpacing: '1.2px',
               background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -42,7 +59,7 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               transition: 'filter 300ms ease'
             }}
           >
-            TWINFORGE
+            FØRGE
           </span>
         </div>
       </div>
@@ -54,7 +71,7 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
       className={`flex items-center ${className}`}
       style={{
         transition: 'all 300ms ease-out',
-        gap: '6px',
+        gap: '8px',
         position: 'relative'
       }}
     >
@@ -64,32 +81,58 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
         alignItems: 'center'
       }}>
         <ForgeHammerIcon
-          width={32}
-          height={38}
+          width={42}
+          height={50}
           isHovered={isHovered}
         />
       </div>
 
-      <span
-        style={{
-          fontFamily: "'Montserrat', sans-serif",
-          fontSize: '20px',
-          fontWeight: 800,
-          letterSpacing: '1px',
-          background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          lineHeight: 1,
-          textTransform: 'uppercase',
-          filter: isHovered
-            ? 'drop-shadow(0 0 10px rgba(253, 200, 48, 0.4))'
-            : 'drop-shadow(0 0 5px rgba(247, 147, 30, 0.25))',
-          transition: 'filter 300ms ease'
-        }}
-      >
-        T
-      </span>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2px',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        transform: 'translateY(2px)'
+      }}>
+        <span
+          style={{
+            fontFamily: "'Montserrat', sans-serif",
+            fontSize: '15px',
+            fontWeight: 800,
+            letterSpacing: '0.8px',
+            color: '#E5E7EB',
+            lineHeight: 1,
+            textTransform: 'uppercase',
+            filter: isHovered
+              ? 'drop-shadow(0 0 6px rgba(255, 255, 255, 0.3))'
+              : 'drop-shadow(0 0 3px rgba(255, 255, 255, 0.15))',
+            transition: 'filter 300ms ease'
+          }}
+        >
+          TWIN
+        </span>
+        <span
+          style={{
+            fontFamily: "'Montserrat', sans-serif",
+            fontSize: '15px',
+            fontWeight: 800,
+            letterSpacing: '0.8px',
+            background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            lineHeight: 1,
+            textTransform: 'uppercase',
+            filter: isHovered
+              ? 'drop-shadow(0 0 10px rgba(253, 200, 48, 0.4))'
+              : 'drop-shadow(0 0 5px rgba(247, 147, 30, 0.25))',
+            transition: 'filter 300ms ease'
+          }}
+        >
+          FØRGE
+        </span>
+      </div>
     </div>
   );
 };

@@ -175,11 +175,11 @@ const SpatialIcon: React.FC<SpatialIconProps> = ({
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        // No background on icon containers - let parent handle styling
-        background: 'transparent',
+        // TwinForge icon container - subtle indigo background
+        background: isInteractive ? 'color-mix(in srgb, var(--brand-primary) 8%, transparent)' : 'transparent',
         borderRadius: getBorderRadius(),
         padding: `${Math.max(4, size * 0.15)}px`,
-        border: 'none',
+        border: isInteractive ? '1px solid color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent)' : 'none',
       };
   return (
     <motion.div
