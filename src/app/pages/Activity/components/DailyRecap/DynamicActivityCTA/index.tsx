@@ -82,27 +82,24 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
     navigate('/activity#insights');
   };
 
-  // Utiliser la couleur bleue principale comme dans le header
-  const primaryBlue = '#3B82F6';
-
   const cardStyles = {
     background: `
-      radial-gradient(circle at 30% 20%, color-mix(in srgb, ${primaryBlue} 12%, transparent) 0%, transparent 60%),
-      radial-gradient(circle at 70% 80%, color-mix(in srgb, ${primaryBlue} 8%, transparent) 0%, transparent 50%),
+      radial-gradient(circle at 30% 20%, color-mix(in srgb, ${urgencyConfig.color} 12%, transparent) 0%, transparent 60%),
+      radial-gradient(circle at 70% 80%, color-mix(in srgb, ${urgencyConfig.color} 8%, transparent) 0%, transparent 50%),
       var(--glass-opacity)
     `,
-    borderColor: `color-mix(in srgb, ${primaryBlue} 25%, transparent)`,
-    '--glow-color': `color-mix(in srgb, ${primaryBlue} 30%, transparent)`
+    borderColor: `color-mix(in srgb, ${urgencyConfig.color} 25%, transparent)`,
+    '--glow-color': `color-mix(in srgb, ${urgencyConfig.color} 30%, transparent)`
   } as React.CSSProperties;
 
   const iconStyles = {
     background: `
       radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
-      linear-gradient(135deg, color-mix(in srgb, ${primaryBlue} 40%, transparent), color-mix(in srgb, ${primaryBlue} 28%, transparent))
+      linear-gradient(135deg, color-mix(in srgb, ${urgencyConfig.color} 40%, transparent), color-mix(in srgb, ${urgencyConfig.color} 28%, transparent))
     `,
-    border: `2px solid color-mix(in srgb, ${primaryBlue} 55%, transparent)`,
-    boxShadow: `0 0 30px color-mix(in srgb, ${primaryBlue} 40%, transparent)`,
-    '--icon-color': primaryBlue
+    border: `2px solid color-mix(in srgb, ${urgencyConfig.color} 55%, transparent)`,
+    boxShadow: `0 0 30px color-mix(in srgb, ${urgencyConfig.color} 40%, transparent)`,
+    '--icon-color': urgencyConfig.color
   } as React.CSSProperties;
 
   return (
@@ -124,8 +121,8 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                 width: '8px',
                 height: '8px',
                 borderRadius: '2px',
-                background: `linear-gradient(135deg, ${primaryBlue}, rgba(255, 255, 255, 0.8))`,
-                boxShadow: `0 0 20px ${primaryBlue}`,
+                background: `linear-gradient(135deg, ${urgencyConfig.color}, rgba(255, 255, 255, 0.8))`,
+                boxShadow: `0 0 20px ${urgencyConfig.color}`,
                 top: i < 2 ? '12px' : 'auto',
                 bottom: i >= 2 ? '12px' : 'auto',
                 left: i % 2 === 0 ? '12px' : 'auto',
@@ -153,7 +150,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
           <div
             className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
             style={{
-              background: `radial-gradient(circle at center, color-mix(in srgb, ${primaryBlue} 8%, transparent) 0%, transparent 70%)`,
+              background: `radial-gradient(circle at center, color-mix(in srgb, ${urgencyConfig.color} 8%, transparent) 0%, transparent 70%)`,
               filter: 'blur(20px)',
               transform: 'scale(1.2)',
               zIndex: -1
@@ -172,7 +169,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
             <SpatialIcon
               Icon={ICONS[urgencyConfig.icon as keyof typeof ICONS]}
               size={(urgencyConfig.priority === 'high' || urgencyConfig.priority === 'critical') ? 64 : 56}
-              style={{ color: primaryBlue }}
+              style={{ color: urgencyConfig.color }}
             />
 
             {shouldShowParticles(urgencyConfig) && !reduceMotion &&
@@ -187,8 +184,8 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                     key={i}
                     className={`absolute w-2 h-2 rounded-full dynamic-particle-css dynamic-particle-css--${i + 1}`}
                     style={{
-                      background: primaryBlue,
-                      boxShadow: `0 0 12px color-mix(in srgb, ${primaryBlue} 70%, transparent)`,
+                      background: urgencyConfig.color,
+                      boxShadow: `0 0 12px color-mix(in srgb, ${urgencyConfig.color} 70%, transparent)`,
                       '--particle-x': `${x * 0.4}px`,
                       '--particle-y': `${y * 0.4}px`,
                       '--particle-x-end': `${x}px`,
@@ -222,9 +219,9 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                   key={index}
                   className="px-3 py-1.5 rounded-full metric-badge-enter"
                   style={{
-                    background: `color-mix(in srgb, ${primaryBlue} 15%, transparent)`,
-                    border: `1px solid color-mix(in srgb, ${primaryBlue} 25%, transparent)`,
-                    color: primaryBlue,
+                    background: `color-mix(in srgb, ${urgencyConfig.color} 15%, transparent)`,
+                    border: `1px solid color-mix(in srgb, ${urgencyConfig.color} 25%, transparent)`,
+                    color: urgencyConfig.color,
                     backdropFilter: 'blur(8px) saturate(120%)',
                     animationDelay: `${index * 0.1}s`
                   }}
@@ -248,14 +245,14 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
               style={{
                 background: `
                   linear-gradient(135deg,
-                    color-mix(in srgb, ${primaryBlue} 85%, transparent),
-                    color-mix(in srgb, ${primaryBlue} 70%, transparent)
+                    color-mix(in srgb, ${urgencyConfig.color} 85%, transparent),
+                    color-mix(in srgb, ${urgencyConfig.color} 70%, transparent)
                   )
                 `,
-                border: `2px solid ${primaryBlue}`,
+                border: `2px solid ${urgencyConfig.color}`,
                 boxShadow: `
-                  0 12px 40px color-mix(in srgb, ${primaryBlue} 40%, transparent),
-                  0 0 60px color-mix(in srgb, ${primaryBlue} 30%, transparent),
+                  0 12px 40px color-mix(in srgb, ${urgencyConfig.color} 40%, transparent),
+                  0 0 60px color-mix(in srgb, ${urgencyConfig.color} 30%, transparent),
                   inset 0 3px 0 rgba(255, 255, 255, 0.4)
                 `,
                 backdropFilter: 'blur(20px) saturate(160%)'
@@ -264,8 +261,8 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                 scale: 1.02,
                 y: -2,
                 boxShadow: `
-                  0 16px 50px color-mix(in srgb, ${primaryBlue} 50%, transparent),
-                  0 0 80px color-mix(in srgb, ${primaryBlue} 40%, transparent),
+                  0 16px 50px color-mix(in srgb, ${urgencyConfig.color} 50%, transparent),
+                  0 0 80px color-mix(in srgb, ${urgencyConfig.color} 40%, transparent),
                   inset 0 3px 0 rgba(255, 255, 255, 0.5)
                 `
               }}
@@ -303,18 +300,18 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                 onClick={handleViewInsights}
                 className="px-6 py-4 rounded-full font-medium text-white/90 transition-all duration-200 min-h-[64px]"
                 style={{
-                  background: `color-mix(in srgb, ${primaryBlue} 8%, transparent)`,
-                  border: `1px solid color-mix(in srgb, ${primaryBlue} 20%, transparent)`,
+                  background: `color-mix(in srgb, ${urgencyConfig.color} 8%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${urgencyConfig.color} 20%, transparent)`,
                   backdropFilter: 'blur(12px) saturate(130%)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = `color-mix(in srgb, ${primaryBlue} 12%, transparent)`;
-                  e.currentTarget.style.borderColor = `color-mix(in srgb, ${primaryBlue} 30%, transparent)`;
+                  e.currentTarget.style.background = `color-mix(in srgb, ${urgencyConfig.color} 12%, transparent)`;
+                  e.currentTarget.style.borderColor = `color-mix(in srgb, ${urgencyConfig.color} 30%, transparent)`;
                   e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = `color-mix(in srgb, ${primaryBlue} 8%, transparent)`;
-                  e.currentTarget.style.borderColor = `color-mix(in srgb, ${primaryBlue} 20%, transparent)`;
+                  e.currentTarget.style.background = `color-mix(in srgb, ${urgencyConfig.color} 8%, transparent)`;
+                  e.currentTarget.style.borderColor = `color-mix(in srgb, ${urgencyConfig.color} 20%, transparent)`;
                   e.currentTarget.style.transform = 'translateY(0) scale(1)';
                 }}
                 whileHover={{ scale: 1.02, y: -1 }}

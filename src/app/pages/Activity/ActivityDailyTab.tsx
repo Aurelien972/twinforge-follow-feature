@@ -9,6 +9,7 @@ import { useFeedback } from '../../../hooks/useFeedback';
 import logger from '../../../lib/utils/logger';
 import ProfileCompletenessAlert from './components/DailyRecap/ProfileCompletenessAlert';
 import DynamicActivityCTA from './components/DailyRecap/DynamicActivityCTA';
+import TrainingWorkshopCTACard from './components/DailyRecap/TrainingWorkshopCTACard';
 import DailyStatsGrid from './components/DailyRecap/DailyStatsGrid';
 import CalorieProgressCard from './components/DailyRecap/CalorieProgressCard';
 import ActivitySummaryCard from './components/DailyRecap/ActivitySummaryCard';
@@ -150,6 +151,8 @@ const ActivityDailyTab: React.FC = () => {
         profile={profile}
       />
 
+      <TrainingWorkshopCTACard />
+
       <DailyStatsGrid
         todayStats={todayStats}
       />
@@ -158,6 +161,11 @@ const ActivityDailyTab: React.FC = () => {
         todayStats={todayStats}
         profile={profile}
         todayActivities={todayActivities}
+      />
+
+      <ActivitySummaryCard
+        todayStats={todayStats}
+        profile={profile}
       />
 
       <RecentActivitiesCard

@@ -59,8 +59,8 @@ function getIntensityColor(intensity: string): string {
 }
 
 /**
- * Recent Activities Card - Dernière activité enregistrée
- * Affiche uniquement la dernière activité de l'historique
+ * Recent Activities Card - Dernières activités enregistrées
+ * Affiche la liste des dernières activités (pas uniquement aujourd'hui)
  */
 const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({
   todayActivities = [],
@@ -76,9 +76,6 @@ const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({
     }
   };
 
-  // Prendre uniquement la première activité (la plus récente)
-  const lastActivity = todayActivities.length > 0 ? todayActivities[0] : null;
-
   return (
     <GlassCard className="recent-activities-card">
       <div className="flex items-center gap-3 mb-6">
@@ -86,12 +83,12 @@ const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({
           <SpatialIcon Icon={ICONS.History} size={20} style={{ color: 'var(--color-activity-primary)' }} />
         </div>
         <div>
-          <h3 className="activity-summary-title">Dernière Activité</h3>
-          <p className="activity-summary-subtitle">Heure de la dernière forge</p>
+          <h3 className="activity-summary-title">Dernières Activités</h3>
+          <p className="activity-summary-subtitle">Historique de vos dernières sessions</p>
         </div>
       </div>
 
-      {!lastActivity ? (
+      {todayActivities.length === 0 ? (
         <div className="text-center py-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/20 flex items-center justify-center">
             <SpatialIcon Icon={ICONS.Activity} size={32} className="text-blue-400" />
@@ -105,7 +102,7 @@ const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({
         </div>
       ) : (
         <div className="recent-activities-list">
-          {[lastActivity].map((activity, index) => (
+          {todayActivities.map((activity, index) => (
             <div key={activity.id} className="group relative">
               <div
                 className="recent-activity-item activity-item-enter"
