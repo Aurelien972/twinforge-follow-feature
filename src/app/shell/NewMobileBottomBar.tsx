@@ -68,12 +68,14 @@ function BarButton({
   button,
   active,
   onClick,
+  isMobile,
   hasUnread,
   unreadCount,
 }: {
   button: typeof BOTTOM_BAR_BUTTONS[0];
   active: boolean;
   onClick: () => void;
+  isMobile: boolean;
   hasUnread?: boolean;
   unreadCount?: number;
 }) {
@@ -169,6 +171,7 @@ const NewMobileBottomBar: React.FC = () => {
                 button={button}
                 active={isButtonActive(button)}
                 onClick={() => handleButtonClick(button)}
+                isMobile={isMobile}
               />
             ))}
           </div>
