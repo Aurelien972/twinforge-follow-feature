@@ -33,14 +33,12 @@
 }
 
 /* =========================================
-   FRAMER MOTION - COMPLETE DISABLE
+   FRAMER MOTION - DISABLE ANIMATIONS ONLY
    ========================================= */
 
 .mobile-device [data-framer-motion],
 .mobile-device [data-framer-component-type] {
   animation: none !important;
-  transition: none !important;
-  transform: none !important;
   will-change: auto !important;
 }
 
@@ -48,7 +46,6 @@
   [data-framer-motion],
   [data-framer-component-type] {
     animation: none !important;
-    transition: none !important;
   }
 }
 
@@ -174,16 +171,14 @@
 }
 
 /* =========================================
-   GLASS CARD EFFECTS - REMOVE PSEUDO-ELEMENTS
+   GLASS CARD EFFECTS - DISABLE ANIMATIONS ONLY
    ========================================= */
 
 .mobile-device .glass-card::before,
 .mobile-device .glass-card::after,
 .mobile-device [class*="glass-card"]::before,
 .mobile-device [class*="glass-card"]::after {
-  display: none !important;
   animation: none !important;
-  opacity: 0 !important;
 }
 
 @media (max-width: 1024px), (hover: none), (pointer: coarse) {
@@ -191,7 +186,6 @@
   .glass-card::after,
   [class*="glass-card"]::before,
   [class*="glass-card"]::after {
-    display: none !important;
     animation: none !important;
   }
 }
@@ -200,26 +194,15 @@
    HOVER STATES - DISABLE ON MOBILE
    ========================================= */
 
-.mobile-device *:hover {
-  transform: none !important;
-  scale: 1 !important;
-  filter: none !important;
-  box-shadow: initial !important;
-}
-
-@media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  *:hover {
-    transform: none !important;
-    scale: 1 !important;
-  }
-}
+/* Remove aggressive hover blocking - let CSS handle naturally */
 
 /* =========================================
-   TRANSITIONS - INSTANT ON MOBILE
+   TRANSITIONS - REDUCE ON MOBILE (NOT REMOVE)
    ========================================= */
 
+/* Don't kill all transitions - just reduce them */
 .mobile-device * {
-  transition-duration: 0s !important;
+  transition-duration: 0.1s !important;
   transition-delay: 0s !important;
 }
 
@@ -227,12 +210,18 @@
 .mobile-device [role="dialog"],
 .mobile-device [class*="modal"],
 .mobile-device [class*="drawer"] {
-  transition-duration: 0.15s !important;
+  transition-duration: 0.2s !important;
 }
 
 @media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  *:not([role="dialog"]):not([class*="modal"]):not([class*="drawer"]) {
-    transition-duration: 0s !important;
+  * {
+    transition-duration: 0.1s !important;
+  }
+
+  [role="dialog"],
+  [class*="modal"],
+  [class*="drawer"] {
+    transition-duration: 0.2s !important;
   }
 }
 
@@ -258,18 +247,10 @@
 }
 
 /* =========================================
-   TRANSFORMS - STATIC ON MOBILE
+   TRANSFORMS - DISABLE ANIMATED TRANSFORMS ONLY
    ========================================= */
 
-.mobile-device *:not([class*="fixed"]):not(.header-liquid-glass):not(.new-mobile-bottom-bar) {
-  transform: none !important;
-}
-
-@media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  *:not([class*="fixed"]):not(.header-liquid-glass):not(.new-mobile-bottom-bar):not([class*="modal"]):not([class*="drawer"]) {
-    transform: none !important;
-  }
-}
+/* Remove this section completely - transforms are needed for layout */
 
 /* =========================================
    TAP FEEDBACK - INSTANT ONLY
