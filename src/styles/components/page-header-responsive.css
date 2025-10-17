@@ -53,3 +53,29 @@
 .page-header-subtitle {
   min-width: 0; /* Allow flex shrinking */
 }
+
+/* =========================================
+   MOBILE ICON SIZE OPTIMIZATIONS
+   ========================================= */
+
+/* Small mobile screens: Slightly smaller icons */
+@media (max-width: 480px) {
+  .page-header-title {
+    font-size: 1.5rem !important; /* 24px */
+  }
+
+  .page-header-subtitle {
+    font-size: 1rem !important; /* 16px */
+  }
+}
+
+/* Very small screens: Further adjustments */
+@media (max-width: 360px) {
+  .page-header-title {
+    font-size: 1.375rem !important; /* 22px */
+  }
+
+  .page-header-subtitle {
+    font-size: 0.9375rem !important; /* 15px */
+  }
+}

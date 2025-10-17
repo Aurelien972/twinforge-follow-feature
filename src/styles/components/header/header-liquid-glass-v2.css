@@ -121,13 +121,18 @@
     right: 8px !important;
     top: 6px !important;
 
-    /* Solid blur like bottombar - no transparency */
-    background: rgba(15, 25, 39, 0.92) !important;
-    backdrop-filter: blur(12px) saturate(130%) !important;
-    -webkit-backdrop-filter: blur(12px) saturate(130%) !important;
+    /* EXACT MATCH WITH BOTTOMBAR - Ultra-transparent Liquid Glass */
+    background:
+      var(--liquid-reflections-multi),
+      var(--liquid-highlight-ambient),
+      var(--liquid-glass-bg-base) !important;
 
-    /* Simplified shadow - single layer */
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+    /* EXACT MATCH WITH BOTTOMBAR */
+    backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
+    -webkit-backdrop-filter: blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate)) !important;
+
+    /* EXACT MATCH WITH BOTTOMBAR */
+    box-shadow: var(--liquid-bottombar-shadow), var(--liquid-bottombar-glow) !important;
 
     /* Disable animations */
     transition: none !important;
@@ -215,7 +220,9 @@
    ========================================= */
 
 /* All glass-orb-button in header should match bottom bar style */
-.header-liquid-glass .glass-orb-button {
+.header-liquid-glass .glass-orb-button,
+.header-liquid-glass button.user-panel-toggle,
+.header-liquid-glass button.central-action-button {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -246,6 +253,13 @@
   will-change: transform, filter;
 }
 
+/* Mobile: Disable transitions on header buttons */
+@media (max-width: 768px) {
+  .header-liquid-glass button {
+    transition: none !important;
+  }
+}
+
 /* Corner highlight effect on header button pills */
 .header-liquid-glass .glass-orb-button::before {
   content: '';
@@ -266,7 +280,9 @@
 
 /* Hover state matching bottom bar */
 @media (hover: hover) and (pointer: fine) {
-  .header-liquid-glass .glass-orb-button:hover {
+  .header-liquid-glass .glass-orb-button:hover,
+  .header-liquid-glass button.user-panel-toggle:hover,
+  .header-liquid-glass button.central-action-button:hover {
     transform: scale(1.08) translateZ(0) !important;
     background:
       radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),

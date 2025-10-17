@@ -40,14 +40,14 @@ export default function PageHeader({
     >
       <div className="flex flex-row items-center gap-6 mb-8">
         {/* Icône avec effet de glow renforcé */}
-        <div 
+        <div
           className="breathing-icon flex-shrink-0"
           style={{
             '--animation-duration-slower': '5s'
           }}
         >
           <div
-            className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-lg"
+            className="w-24 h-24 md:w-28 md:h-28 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-lg"
             style={{
               '--header-icon-radius': '24px',
               borderRadius: 'var(--header-icon-radius)',
@@ -77,7 +77,7 @@ export default function PageHeader({
           >
             <SpatialIcon
               Icon={finalIcon}
-              size={48}
+              size={56}
               variant="pure"
               className="text-white relative z-10"
               style={{

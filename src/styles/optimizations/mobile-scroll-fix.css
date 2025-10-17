@@ -63,20 +63,24 @@
     -webkit-backface-visibility: hidden !important;
     contain: layout style paint !important;
     isolation: isolate !important;
+    /* CRITICAL: Force compositing layer */
+    pointer-events: auto !important;
   }
 
   /* Header must stay at top */
   .header-liquid-glass {
-    top: 8px !important;
-    left: 24px !important;
-    right: 24px !important;
+    top: 6px !important;
+    left: 8px !important;
+    right: 8px !important;
+    z-index: 9999 !important;
   }
 
   /* Bottom bar must stay at bottom */
   .new-mobile-bottom-bar {
-    bottom: var(--new-bottom-bar-bottom-offset, 8px) !important;
+    bottom: var(--new-bottom-bar-bottom-offset, 4px) !important;
     left: 8px !important;
     right: 8px !important;
+    z-index: 9996 !important;
   }
 }
 
@@ -129,6 +133,11 @@
   .new-mobile-bottom-bar {
     -webkit-overflow-scrolling: auto !important;
     overscroll-behavior: contain !important;
+    /* iOS specific optimizations for sticky positioning */
+    -webkit-perspective: 1000 !important;
+    perspective: 1000 !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
   }
 }
 

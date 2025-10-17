@@ -1,10 +1,11 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../../../system/supabase/client';
 import { useUserStore } from '../../../../system/store/userStore';
 import { useFeedback } from '../../../../hooks/useFeedback';
+import { useIsMobile } from '../../../../system/device/DeviceProvider';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -104,6 +105,11 @@ const ScanCTA: React.FC = () => {
   const navigate = useNavigate();
   const { profile } = useUserStore();
   const { click, success } = useFeedback();
+  const isMobile = useIsMobile();
+  const reduceMotion = useReducedMotion();
+
+  // Disable animations on mobile for performance
+  const shouldAnimate = !isMobile && !reduceMotion;
 
   // Fetch latest body scan
   const { data: latestScan, isLoading, error } = useQuery({
@@ -199,79 +205,90 @@ const ScanCTA: React.FC = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={shouldAnimate ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+      transition={shouldAnimate ? { duration: 0.5, ease: 'easeOut' } : { duration: 0 }}
       className="space-y-6 w-full"
     >
       {/* Main CTA Card */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={shouldAnimate ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={shouldAnimate ? { duration: 0.6 } : { duration: 0 }}
       >
         <GlassCard
           className="p-8 text-center relative overflow-visible"
+          scrollReveal={shouldAnimate}
           style={{
-            background: `
+            background: isMobile ? `
+              radial-gradient(circle at 30% 20%, color-mix(in srgb, ${scanStatus.color} 8%, transparent) 0%, transparent 60%),
+              var(--glass-opacity-base)
+            ` : `
               radial-gradient(circle at 30% 20%, color-mix(in srgb, ${scanStatus.color} 12%, transparent) 0%, transparent 60%),
               radial-gradient(circle at 70% 80%, color-mix(in srgb, ${scanStatus.color} 8%, transparent) 0%, transparent 50%),
               var(--glass-opacity-base)
             `,
             borderColor: `color-mix(in srgb, ${scanStatus.color} 30%, transparent)`,
-            boxShadow: `
+            boxShadow: isMobile ? `
+              0 4px 16px rgba(0, 0, 0, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1)
+            ` : `
               0 12px 40px rgba(0, 0, 0, 0.25),
               0 0 30px color-mix(in srgb, ${scanStatus.color} 20%, transparent),
               inset 0 2px 0 rgba(255, 255, 255, 0.15)
             `
           }}
         >
-          {/* 4 Carrés décoratifs aux coins */}
-          <div className="training-hero-corners" aria-hidden="true">
-            {[0, 1, 2, 3].map((i) => (
-              <motion.div
-                key={i}
-                className="corner-particle"
-                style={{
-                  position: 'absolute',
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '2px',
-                  background: `linear-gradient(135deg, ${scanStatus.color}, rgba(255, 255, 255, 0.8))`,
-                  boxShadow: `0 0 20px ${scanStatus.color}`,
-                  top: i < 2 ? '12px' : 'auto',
-                  bottom: i >= 2 ? '12px' : 'auto',
-                  left: i % 2 === 0 ? '12px' : 'auto',
-                  right: i % 2 === 1 ? '12px' : 'auto'
-                }}
-                initial={{
-                  rotate: i % 2 === 0 ? 45 : -45
-                }}
-                animate={{
-                  scale: [1, 1.3, 1],
-                  opacity: [0.6, 1, 0.6],
-                  rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  delay: i * 0.2,
-                  ease: [0.4, 0, 0.2, 1]
-                }}
-              />
-            ))}
-          </div>
+          {/* 4 Carrés décoratifs aux coins - Desktop only */}
+          {!isMobile && (
+            <div className="training-hero-corners" aria-hidden="true">
+              {[0, 1, 2, 3].map((i) => (
+                <motion.div
+                  key={i}
+                  className="corner-particle"
+                  style={{
+                    position: 'absolute',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '2px',
+                    background: `linear-gradient(135deg, ${scanStatus.color}, rgba(255, 255, 255, 0.8))`,
+                    boxShadow: `0 0 20px ${scanStatus.color}`,
+                    top: i < 2 ? '12px' : 'auto',
+                    bottom: i >= 2 ? '12px' : 'auto',
+                    left: i % 2 === 0 ? '12px' : 'auto',
+                    right: i % 2 === 1 ? '12px' : 'auto'
+                  }}
+                  initial={{
+                    rotate: i % 2 === 0 ? 45 : -45
+                  }}
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.6, 1, 0.6],
+                    rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                    ease: [0.4, 0, 0.2, 1]
+                  }}
+                />
+              ))}
+            </div>
+          )}
 
-          {/* Halo de Forge Corporelle - Animation Pulse Permanente */}
-          <div
-            className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
-            style={{
-              background: `radial-gradient(circle at center, color-mix(in srgb, ${scanStatus.color} 8%, transparent) 0%, transparent 70%)`,
-              filter: 'blur(20px)',
-              transform: 'scale(1.2)',
-              zIndex: -1
-            }}
-          />
+          {/* Halo de Forge Corporelle - Desktop only */}
+          {!isMobile && (
+            <div
+              className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
+              style={{
+                background: `radial-gradient(circle at center, color-mix(in srgb, ${scanStatus.color} 8%, transparent) 0%, transparent 70%)`,
+                filter: 'blur(20px)',
+                transform: 'scale(1.2)',
+                zIndex: -1
+              }}
+            />
+          )}
 
           {/* Status Icon */}
           <motion.div
@@ -282,11 +299,11 @@ const ScanCTA: React.FC = () => {
                 linear-gradient(135deg, color-mix(in srgb, ${scanStatus.color} 35%, transparent), color-mix(in srgb, ${scanStatus.color} 25%, transparent))
               `,
               border: `2px solid color-mix(in srgb, ${scanStatus.color} 50%, transparent)`,
-              boxShadow: `0 0 40px color-mix(in srgb, ${scanStatus.color} 40%, transparent)`
+              boxShadow: isMobile ? 'none' : `0 0 40px color-mix(in srgb, ${scanStatus.color} 40%, transparent)`
             }}
-            initial={{ scale: 0 }}
+            initial={shouldAnimate ? { scale: 0 } : { scale: 1 }}
             animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 0.2 }}
+            transition={shouldAnimate ? { type: 'spring', stiffness: 300, damping: 25, delay: 0.2 } : { duration: 0 }}
           >
             <SpatialIcon
               Icon={scanStatus.status === 'never_scanned' ? ICONS.Scan :

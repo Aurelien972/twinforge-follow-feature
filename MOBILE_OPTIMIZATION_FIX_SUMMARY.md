@@ -208,6 +208,53 @@ These are acceptable tradeoffs for:
 4. Fine-tune based on actual device testing
 5. Consider A/B testing glass effects on high-end devices
 
+## Latest Updates (2025-10-17 - Second Pass)
+
+### Additional Fixes Implemented
+
+#### 1. Mobile Logo Simplification
+- Reduced ForgeHammerIcon from 42x50px to 32x38px
+- Text size reduced from 15px to 11px
+- Changed to lowercase for compact appearance
+- Reduced gap from 8px to 6px
+- Font weight reduced from 800 to 700
+
+**File**: `/src/ui/components/branding/TwinForgeLogo.tsx`
+
+#### 2. Header and BottomBar Style Harmonization
+- Unified header background with bottom bar using exact same CSS variables
+- Applied identical backdrop-filter values
+- Removed double background effect on buttons
+- Extended glass-pill styles to header buttons
+- Disabled transitions on mobile
+
+**File**: `/src/styles/components/header/header-liquid-glass-v2.css`
+
+#### 3. Enhanced Sticky Positioning
+- Added explicit z-index (header: 9999, bottombar: 9996)
+- iOS Safari specific fixes with `-webkit-perspective`
+- Adjusted positioning: header top 6px, bottombar bottom 4px
+- Reinforced GPU acceleration
+
+**File**: `/src/styles/optimizations/mobile-scroll-fix.css`
+
+#### 4. PageHeader Icon Size Increase
+- Container increased from 80x80px to 96x96px (w-24 h-24)
+- Icon size increased from 48px to 56px
+- Added responsive breakpoints for small screens
+
+**Files**:
+- `/src/ui/page/PageHeader.tsx`
+- `/src/styles/components/page-header-responsive.css`
+
+#### 5. ScanCTA Animation Simplification
+- All framer-motion animations disabled on mobile
+- Decorative elements (corners, glow) desktop-only
+- Simplified gradients and shadows on mobile
+- Used `shouldAnimate` flag based on device detection
+
+**File**: `/src/app/pages/Avatar/tabs/ScanCTA.tsx`
+
 ## References
 
 - CSS `overflow: clip` spec: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
