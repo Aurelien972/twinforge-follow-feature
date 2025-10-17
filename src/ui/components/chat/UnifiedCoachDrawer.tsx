@@ -1,0 +1,926 @@
+/**
+ * Unified Coach Drawer
+ * Interface unifiée pour chat texte et mode vocal
+ * Fusionne GlobalChatDrawer et VoiceCoachPanel
+ */
+
+import React, { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
+import SpatialIcon from '../../icons/SpatialIcon';
+import { ICONS } from '../../icons/registry';
+import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
+import { Z_INDEX } from '../../../system/store/overlayStore';
+import { useFeedback } from '../../../hooks/useFeedback';
+import { Haptics } from '../../../utils/haptics';
+import logger from '../../../lib/utils/logger';
+import { chatAIService } from '../../../system/services/chatAiService';
+import { chatConversationService } from '../../../system/services/chatConversationService';
+import { textChatService } from '../../../system/services/textChatService';
+import { voiceCoachOrchestrator } from '../../../system/services/voiceCoachOrchestrator';
+import { environmentDetectionService } from '../../../system/services/environmentDetectionService';
+import CoachChatInterface from '../coach/CoachChatInterface';
+import AudioWaveform from './AudioWaveform';
+import TextChatInput from './TextChatInput';
+import VoiceReadyPrompt from './VoiceReadyPrompt';
+import '../../../styles/components/unified-coach-drawer.css';
+
+interface UnifiedCoachDrawerProps {
+  chatButtonRef?: React.RefObject<HTMLButtonElement>;
+}
+
+const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }) => {
+  const location = useLocation();
+  const { navClose } = useFeedback();
+  const previousPathRef = useRef(location.pathname);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [environmentChecked, setEnvironmentChecked] = useState(false);
+
+  const {
+    isPanelOpen,
+    communicationMode,
+    currentMode,
+    modeConfigs,
+    messages,
+    conversationId,
+    currentTranscription,
+    voiceState,
+    isTyping,
+    isProcessing,
+    isSpeaking,
+    showTranscript,
+    showReadyPrompt,
+    visualization,
+    hasUnreadMessages,
+    closeOnNavigation,
+    errorMessage,
+    closePanel,
+    setCommunicationMode,
+    toggleCommunicationMode,
+    setMode,
+    addMessage,
+    setTyping,
+    incrementUnread,
+    markAsRead,
+    hideNotification,
+    setCurrentTranscription,
+    setVoiceState,
+    setProcessing,
+    setSpeaking,
+    toggleTranscript,
+    setShowReadyPrompt,
+    stopListening,
+    setError,
+    clearError,
+    updateVisualization
+  } = useUnifiedCoachStore();
+
+  const set = useUnifiedCoachStore.setState;
+  const modeConfig = modeConfigs[currentMode];
+  const modeColor = modeConfig.color;
+  const isTextMode = communicationMode === 'text';
+  const caps = environmentDetectionService.getCapabilities();
+
+  // Détection d'environnement au premier rendu
+  useEffect(() => {
+    if (!environmentChecked) {
+      const caps = environmentDetectionService.detect();
+
+      logger.info('UNIFIED_COACH_DRAWER', 'Environment detected', {
+        environment: caps.environmentName,
+        canUseVoice: caps.canUseVoiceMode,
+        isStackBlitz: caps.isStackBlitz
+      });
+
+      // Si on ne peut pas utiliser le mode vocal, forcer le mode texte
+      if (!caps.canUseVoiceMode && communicationMode === 'voice') {
+        logger.warn('UNIFIED_COACH_DRAWER', 'Forcing text mode due to environment limitations');
+        setCommunicationMode('text');
+      }
+
+      setEnvironmentChecked(true);
+    }
+  }, [environmentChecked, communicationMode, setCommunicationMode]);
+
+  // Initialiser le service de chat texte quand le mode change
+  useEffect(() => {
+    if (communicationMode === 'text' && currentMode) {
+      const config = modeConfigs[currentMode];
+
+      textChatService.initialize({
+        mode: currentMode,
+        systemPrompt: config.systemPrompt
+      });
+
+      logger.info('UNIFIED_COACH_DRAWER', 'Text chat service initialized', { mode: currentMode });
+    }
+  }, [communicationMode, currentMode, modeConfigs]);
+
+  // Setup handlers pour le service de chat texte
+  useEffect(() => {
+    if (communicationMode !== 'text') return;
+
+    const unsubscribeMessage = textChatService.onMessage((chunk, isDelta) => {
+      if (isDelta && chunk) {
+        const lastMessage = messages[messages.length - 1];
+
+        if (lastMessage && lastMessage.role === 'coach') {
+          lastMessage.content += chunk;
+        } else {
+          addMessage({
+            role: 'coach',
+            content: chunk
+          });
+        }
+      } else if (!isDelta) {
+        setProcessing(false);
+      }
+    });
+
+    const unsubscribeError = textChatService.onError((error) => {
+      logger.error('UNIFIED_COACH_DRAWER', 'Text chat error', { error: error.message });
+      setError(error.message);
+      setProcessing(false);
+    });
+
+    return () => {
+      unsubscribeMessage();
+      unsubscribeError();
+    };
+  }, [communicationMode, messages, addMessage, setError, setProcessing]);
+
+  const handleClose = () => {
+    const lastMessage = messages[messages.length - 1];
+    const isCoachMessage = lastMessage && lastMessage.role === 'coach';
+
+    if (isTyping || isCoachMessage) {
+      incrementUnread();
+      logger.debug('UNIFIED_COACH_DRAWER', 'Closing with unread messages', {
+        mode: currentMode,
+        isTyping,
+        hasUnreadCoachMessage: isCoachMessage,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    navClose();
+    Haptics.tap();
+    closePanel();
+
+    if (voiceState === 'listening') {
+      stopListening();
+    }
+
+    if (communicationMode === 'text') {
+      textChatService.cleanup();
+    }
+  };
+
+  // Fermer le chat lors de la navigation si l'option est activée
+  useEffect(() => {
+    if (previousPathRef.current !== location.pathname) {
+      if (isPanelOpen && closeOnNavigation) {
+        logger.debug('UNIFIED_COACH_DRAWER', 'Closing on navigation', {
+          from: previousPathRef.current,
+          to: location.pathname,
+          timestamp: new Date().toISOString()
+        });
+        navClose();
+        Haptics.tap();
+        handleClose();
+      }
+      previousPathRef.current = location.pathname;
+    }
+  }, [location.pathname, isPanelOpen, closeOnNavigation, navClose]);
+
+  // Détection automatique du mode selon la route
+  useEffect(() => {
+    if (!isPanelOpen) return;
+
+    let detectedMode = currentMode;
+
+    if (location.pathname.startsWith('/training') || location.pathname.includes('/pipeline')) {
+      detectedMode = 'training';
+    } else if (location.pathname.startsWith('/meals') || location.pathname.startsWith('/fridge')) {
+      detectedMode = 'nutrition';
+    } else if (location.pathname.startsWith('/fasting')) {
+      detectedMode = 'fasting';
+    } else if (location.pathname.startsWith('/body-scan') || location.pathname.startsWith('/avatar')) {
+      detectedMode = 'body-scan';
+    } else {
+      detectedMode = 'general';
+    }
+
+    if (detectedMode !== currentMode) {
+      logger.debug('UNIFIED_COACH_DRAWER', 'Auto-switching mode based on route', {
+        route: location.pathname,
+        from: currentMode,
+        to: detectedMode,
+        timestamp: new Date().toISOString()
+      });
+      setMode(detectedMode);
+
+      addMessage({
+        role: 'system',
+        type: 'system',
+        content: `Passage en mode ${modeConfigs[detectedMode].displayName}`
+      });
+    }
+  }, [location.pathname, isPanelOpen]);
+
+  // Charger l'historique des messages au changement de mode
+  useEffect(() => {
+    if (!isPanelOpen) return;
+
+    const loadConversationHistory = async () => {
+      try {
+        const convId = await chatConversationService.getActiveConversationByMode(currentMode);
+
+        if (convId) {
+          const history = await chatConversationService.getConversationMessages(convId);
+
+          if (history.length > 0) {
+            set({ conversationId: convId, messages: history });
+            logger.debug('UNIFIED_COACH_DRAWER', 'Loaded conversation history', {
+              conversationId: convId,
+              messageCount: history.length,
+              mode: currentMode
+            });
+          }
+        }
+      } catch (error) {
+        logger.error('UNIFIED_COACH_DRAWER', 'Error loading conversation history', { error });
+      }
+    };
+
+    loadConversationHistory();
+  }, [currentMode, isPanelOpen]);
+
+  // Fermer le drawer avec ESC
+  useEffect(() => {
+    if (!isPanelOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        navClose();
+        Haptics.tap();
+        handleClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isPanelOpen, navClose, handleClose]);
+
+  // Auto-scroll vers le bas quand nouveaux messages
+  useEffect(() => {
+    if (showTranscript || communicationMode === 'text') {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, currentTranscription, showTranscript, communicationMode]);
+
+  const handleSendMessage = async (message: string) => {
+    if (isTextMode) {
+      // Mode texte
+      try {
+        logger.info('UNIFIED_COACH_DRAWER', 'Sending text message', {
+          mode: currentMode,
+          messageLength: message.length
+        });
+
+        addMessage({
+          role: 'user',
+          content: message
+        });
+
+        setProcessing(true);
+
+        addMessage({
+          role: 'coach',
+          content: ''
+        });
+
+        await textChatService.sendMessage(message, true);
+
+      } catch (error) {
+        logger.error('UNIFIED_COACH_DRAWER', 'Error sending text message', { error });
+        setProcessing(false);
+
+        const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
+        setError(errorMessage);
+      }
+    } else {
+      // Mode chat classique pour compatibilité
+      const userMessage = {
+        role: 'user' as const,
+        type: 'text' as const,
+        content: message
+      };
+
+      addMessage(userMessage);
+      setTyping(true);
+
+      try {
+        const convId = conversationId || await chatConversationService.getOrCreateConversation(currentMode);
+
+        if (!convId) {
+          throw new Error('Failed to get or create conversation');
+        }
+
+        if (!conversationId) {
+          set({ conversationId: convId });
+        }
+
+        await chatConversationService.saveMessage(convId, userMessage);
+
+        let systemPrompt = modeConfig.systemPrompt;
+
+        const conversationMessages = messages.slice(-10);
+
+        const apiMessages = [
+          { role: 'system' as const, content: systemPrompt },
+          ...chatAIService.convertMessagesToAPI(conversationMessages),
+          { role: 'user' as const, content: message }
+        ];
+
+        const response = await chatAIService.sendMessage({
+          messages: apiMessages,
+          mode: currentMode
+        });
+
+        const assistantMessage = {
+          role: 'coach' as const,
+          type: 'text' as const,
+          content: response.message.content
+        };
+
+        addMessage(assistantMessage);
+        await chatConversationService.saveMessage(convId, assistantMessage);
+
+      } catch (error) {
+        logger.error('UNIFIED_COACH_DRAWER', 'Error sending message', { error });
+
+        addMessage({
+          role: 'system' as const,
+          type: 'system' as const,
+          content: 'Désolé, une erreur est survenue. Veuillez réessayer.'
+        });
+      } finally {
+        setTyping(false);
+      }
+    }
+  };
+
+  const handleStartVoiceSession = async () => {
+    if (!caps.canUseVoiceMode) {
+      logger.error('UNIFIED_COACH_DRAWER', 'Voice mode not available in this environment');
+
+      const errorMessage = environmentDetectionService.getVoiceModeUnavailableMessage();
+      setError(errorMessage);
+      setVoiceState('error');
+
+      setTimeout(() => {
+        setCommunicationMode('text');
+        setVoiceState('idle');
+        setShowReadyPrompt(false);
+      }, 3000);
+
+      return;
+    }
+
+    try {
+      setVoiceState('connecting');
+      setShowReadyPrompt(false);
+
+      if (!voiceCoachOrchestrator.initialized) {
+        await voiceCoachOrchestrator.initialize();
+      }
+
+      await voiceCoachOrchestrator.startVoiceSession(currentMode);
+
+      logger.info('UNIFIED_COACH_DRAWER', 'Voice session started successfully');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to start voice session';
+      logger.error('UNIFIED_COACH_DRAWER', 'Failed to start voice session', { error: errorMessage });
+
+      setVoiceState('error');
+      setError(errorMessage);
+      setShowReadyPrompt(true);
+
+      if (errorMessage.includes('StackBlitz') || errorMessage.includes('WebContainer') || errorMessage.includes('WebSocket')) {
+        logger.warn('UNIFIED_COACH_DRAWER', 'Suggesting text mode as fallback');
+
+        setTimeout(() => {
+          setCommunicationMode('text');
+          setVoiceState('idle');
+          setShowReadyPrompt(false);
+        }, 3000);
+      }
+    }
+  };
+
+  const handleCancelReadyPrompt = () => {
+    setShowReadyPrompt(false);
+    setVoiceState('idle');
+    closePanel();
+  };
+
+  const handleToggleCommunicationMode = () => {
+    if (communicationMode === 'text' && !caps.canUseVoiceMode) {
+      logger.warn('UNIFIED_COACH_DRAWER', 'Voice mode not available, staying in text mode');
+      setError(environmentDetectionService.getVoiceModeUnavailableMessage());
+
+      setTimeout(() => {
+        clearError();
+      }, 5000);
+
+      return;
+    }
+
+    toggleCommunicationMode();
+  };
+
+  const scrollToBottom = (smooth = true) => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {isPanelOpen && (
+        <>
+          {/* Overlay - Mobile only */}
+          <motion.div
+            key="unified-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            onClick={handleClose}
+            className="lg:hidden"
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(4px)',
+              zIndex: Z_INDEX.CHAT_DRAWER - 1
+            }}
+          />
+
+          {/* Drawer */}
+          <motion.div
+            key="unified-drawer"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{
+              type: 'spring',
+              stiffness: 300,
+              damping: 30,
+              mass: 0.8
+            }}
+            className="unified-coach-drawer"
+            style={{
+              position: 'fixed',
+              top: 'calc(64px + 12px)',
+              right: '8px',
+              bottom: 'calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 12px)',
+              width: 'min(420px, calc(100vw - 16px))',
+              zIndex: Z_INDEX.CHAT_DRAWER,
+              borderRadius: '20px',
+              background: `
+                var(--liquid-reflections-multi),
+                var(--liquid-highlight-ambient),
+                var(--liquid-glass-bg-elevated)
+              `,
+              backdropFilter: 'blur(var(--liquid-panel-blur)) saturate(var(--liquid-panel-saturate))',
+              WebkitBackdropFilter: 'blur(var(--liquid-panel-blur)) saturate(var(--liquid-panel-saturate))',
+              boxShadow: 'var(--liquid-panel-shadow)',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              isolation: 'isolate',
+              transform: 'translateZ(0)',
+              willChange: 'transform, filter'
+            }}
+          >
+            {/* Border gradient */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: '-2px',
+                borderRadius: 'inherit',
+                padding: '2px',
+                background: 'var(--liquid-border-gradient-tricolor)',
+                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                WebkitMaskComposite: 'xor',
+                maskComposite: 'exclude',
+                pointerEvents: 'none',
+                opacity: 1,
+                zIndex: 1,
+                animation: 'borderPulse 4s ease-in-out infinite'
+              }}
+            />
+
+            {/* Ambient glow */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: '-8px',
+                borderRadius: 'calc(20px + 4px)',
+                background: `radial-gradient(
+                  ellipse at 80% 50%,
+                  color-mix(in srgb, ${modeColor} 15%, transparent) 0%,
+                  rgba(61, 19, 179, 0.1) 40%,
+                  transparent 70%
+                )`,
+                opacity: 0.8,
+                zIndex: -1,
+                pointerEvents: 'none',
+                animation: 'glowPulse 3s ease-in-out infinite alternate'
+              }}
+            />
+
+            {/* Environment Warning Banner (StackBlitz) */}
+            {caps.isStackBlitz && (
+              <div
+                style={{
+                  padding: '8px 16px',
+                  background: 'rgba(251, 191, 36, 0.15)',
+                  borderBottom: '1px solid rgba(251, 191, 36, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <SpatialIcon Icon={ICONS.AlertTriangle} size={14} style={{ color: '#fbbf24' }} />
+                <p style={{ fontSize: '11px', color: '#fbbf24', margin: 0 }}>
+                  Mode vocal indisponible en {caps.environmentName}
+                </p>
+              </div>
+            )}
+
+            {/* Header */}
+            <div
+              className="drawer-header"
+              style={{
+                padding: '16px 20px',
+                borderBottom: `1px solid color-mix(in srgb, ${modeColor} 20%, transparent)`,
+                background: `
+                  linear-gradient(180deg,
+                    rgba(11, 14, 23, 0.6) 0%,
+                    rgba(11, 14, 23, 0.3) 100%
+                  )
+                `,
+                backdropFilter: 'blur(16px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '12px',
+                flexShrink: 0
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="mode-icon-container"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: `
+                      radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 30%, transparent), transparent 70%),
+                      rgba(255, 255, 255, 0.1)
+                    `,
+                    border: `2px solid color-mix(in srgb, ${modeColor} 40%, transparent)`,
+                    boxShadow: `0 0 20px color-mix(in srgb, ${modeColor} 25%, transparent)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <SpatialIcon
+                    Icon={ICONS[modeConfig.icon as keyof typeof ICONS] || ICONS.MessageSquare}
+                    size={20}
+                    style={{ color: modeColor }}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg">
+                    {modeConfig.displayName}
+                  </h3>
+                  <p className="text-white/60 text-xs">
+                    {isTextMode
+                      ? isProcessing ? 'Traitement...' : 'Mode texte'
+                      : voiceState === 'listening'
+                      ? 'En écoute...'
+                      : voiceState === 'speaking'
+                      ? 'En train de parler...'
+                      : voiceState === 'processing'
+                      ? 'Traitement...'
+                      : voiceState === 'error'
+                      ? 'Erreur de connexion'
+                      : 'Prêt à écouter'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Toggle communication mode (voice/text) */}
+                <motion.button
+                  onClick={handleToggleCommunicationMode}
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: isTextMode
+                      ? 'rgba(255, 255, 255, 0.08)'
+                      : `rgba(255, 255, 255, 0.15)`,
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    opacity: !caps.canUseVoiceMode && !isTextMode ? 0.5 : 1
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  title={
+                    !caps.canUseVoiceMode && !isTextMode
+                      ? 'Mode vocal indisponible dans cet environnement'
+                      : isTextMode
+                      ? 'Passer en mode vocal'
+                      : 'Passer en mode texte'
+                  }
+                >
+                  <SpatialIcon
+                    Icon={isTextMode ? ICONS.Mic : ICONS.MessageSquare}
+                    size={16}
+                    style={{
+                      color: isTextMode ? 'rgba(255, 255, 255, 0.7)' : modeColor,
+                      filter: isTextMode ? 'none' : `drop-shadow(0 0 8px ${modeColor})`
+                    }}
+                  />
+                </motion.button>
+
+                {/* Toggle transcript (only in voice mode) */}
+                {!isTextMode && (
+                  <motion.button
+                    onClick={toggleTranscript}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      background: showTranscript
+                        ? `rgba(255, 255, 255, 0.15)`
+                        : 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer'
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    title="Afficher/masquer la transcription"
+                  >
+                    <SpatialIcon
+                      Icon={ICONS.FileText}
+                      size={16}
+                      style={{
+                        color: showTranscript ? modeColor : 'rgba(255, 255, 255, 0.7)',
+                        filter: showTranscript ? `drop-shadow(0 0 8px ${modeColor})` : 'none'
+                      }}
+                    />
+                  </motion.button>
+                )}
+
+                {/* Scroll to Bottom Button */}
+                <AnimatePresence>
+                  {showScrollButton && isTextMode && (
+                    <motion.button
+                      className="scroll-to-bottom"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      onClick={() => scrollToBottom(true)}
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '50%',
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                      whileHover={{ scale: 1.05, background: 'rgba(255, 255, 255, 0.12)' }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <SpatialIcon
+                        Icon={ICONS.ArrowDown}
+                        size={16}
+                        style={{
+                          color: modeColor,
+                          filter: `drop-shadow(0 0 8px color-mix(in srgb, ${modeColor} 40%, transparent))`
+                        }}
+                      />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+
+                {/* Close Button */}
+                <motion.button
+                  className="header-button"
+                  onClick={handleClose}
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer'
+                  }}
+                  whileHover={{ scale: 1.05, background: 'rgba(255, 255, 255, 0.12)' }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <SpatialIcon
+                    Icon={ICONS.X}
+                    size={18}
+                    className="text-white/70"
+                  />
+                </motion.button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="drawer-content flex-1 overflow-hidden flex flex-col">
+              {/* Voice Ready Prompt */}
+              {showReadyPrompt && !isTextMode && (
+                <VoiceReadyPrompt
+                  modeColor={modeColor}
+                  modeName={modeConfig.displayName}
+                  onStartSession={handleStartVoiceSession}
+                  onCancel={handleCancelReadyPrompt}
+                />
+              )}
+
+              {/* Visualisation audio (only in voice mode) */}
+              {!showReadyPrompt && !isTextMode && (
+                <div
+                  className="audio-visualization-container"
+                  style={{
+                    padding: '20px',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+                  }}
+                >
+                  <AudioWaveform
+                    frequencies={visualization.frequencies}
+                    color={modeColor}
+                    isActive={voiceState === 'listening' || voiceState === 'speaking'}
+                    height={80}
+                  />
+                </div>
+              )}
+
+              {/* Messages / Chat Interface */}
+              {!showReadyPrompt && (
+                <div className="chat-interface-wrapper" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', minHeight: 0 }}>
+                  {isTextMode ? (
+                    <CoachChatInterface
+                      stepColor={modeColor}
+                      onSendMessage={handleSendMessage}
+                      isTyping={isTyping}
+                      className="flex-1"
+                      messagesContainerRef={messagesContainerRef}
+                      onScrollChange={setShowScrollButton}
+                    />
+                  ) : (
+                    <>
+                      {/* Transcription (voice mode) */}
+                      {showTranscript && (
+                        <div
+                          className="messages-container flex-1 overflow-y-auto px-4 py-3"
+                          style={{
+                            overscrollBehavior: 'contain',
+                            minHeight: 0
+                          }}
+                        >
+                          {messages.length === 0 && !currentTranscription ? (
+                            <div className="flex flex-col items-center justify-center h-full text-center py-4">
+                              <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="max-w-md"
+                              >
+                                <div
+                                  className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center"
+                                  style={{
+                                    background: `radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 35%, transparent) 0%, transparent 70%), rgba(255, 255, 255, 0.1)`,
+                                    border: `2px solid color-mix(in srgb, ${modeColor} 40%, transparent)`,
+                                    boxShadow: `0 0 20px color-mix(in srgb, ${modeColor} 25%, transparent)`
+                                  }}
+                                >
+                                  <SpatialIcon
+                                    Icon={ICONS.Mic}
+                                    size={20}
+                                    style={{ color: modeColor }}
+                                  />
+                                </div>
+                                <p className="text-sm text-white/70">
+                                  Parlez pour commencer la conversation
+                                </p>
+                              </motion.div>
+                            </div>
+                          ) : (
+                            <>
+                              {messages.map((message) => (
+                                <motion.div
+                                  key={message.id}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className={`message-item mb-3 ${
+                                    message.role === 'user' ? 'text-right' : 'text-left'
+                                  }`}
+                                >
+                                  <div
+                                    className={`inline-block px-4 py-2 rounded-2xl max-w-[80%] ${
+                                      message.role === 'user'
+                                        ? 'bg-white/10 text-white'
+                                        : 'bg-gradient-to-br from-white/15 to-white/5 text-white'
+                                    }`}
+                                    style={{
+                                      backdropFilter: 'blur(8px)',
+                                      border:
+                                        message.role === 'coach'
+                                          ? `1px solid color-mix(in srgb, ${modeColor} 30%, transparent)`
+                                          : '1px solid rgba(255, 255, 255, 0.1)'
+                                    }}
+                                  >
+                                    <p className="text-sm leading-relaxed">{message.content}</p>
+                                  </div>
+                                </motion.div>
+                              ))}
+
+                              {currentTranscription && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="message-item mb-3 text-right"
+                                >
+                                  <div
+                                    className="inline-block px-4 py-2 rounded-2xl max-w-[80%] bg-white/10 text-white"
+                                    style={{
+                                      backdropFilter: 'blur(8px)',
+                                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                                    }}
+                                  >
+                                    <p className="text-sm leading-relaxed">{currentTranscription}</p>
+                                    <motion.span
+                                      className="inline-block ml-1"
+                                      animate={{ opacity: [1, 0] }}
+                                      transition={{ duration: 0.8, repeat: Infinity }}
+                                    >
+                                      |
+                                    </motion.span>
+                                  </div>
+                                </motion.div>
+                              )}
+
+                              <div ref={messagesEndRef} />
+                            </>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Text Chat Input (only in voice mode with transcript) */}
+                      {showTranscript && (
+                        <TextChatInput
+                          onSendMessage={handleSendMessage}
+                          disabled={isProcessing}
+                          placeholder="Tapez votre message..."
+                          color={modeColor}
+                        />
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
+export default UnifiedCoachDrawer;

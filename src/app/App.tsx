@@ -19,8 +19,8 @@ import Sidebar from './shell/Sidebar';
 import NewMobileBottomBar from './shell/NewMobileBottomBar';
 import GlobalExitModal from '../ui/components/GlobalExitModal';
 import CentralActionsMenu from './shell/CentralActionsMenu';
-import FloatingVoiceCoachButton from '../ui/components/chat/FloatingVoiceCoachButton';
-import VoiceCoachPanel from '../ui/components/chat/VoiceCoachPanel';
+import UnifiedFloatingButton from '../ui/components/chat/UnifiedFloatingButton';
+import UnifiedCoachDrawer from '../ui/components/chat/UnifiedCoachDrawer';
 import { ChatButtonProvider, useChatButtonRef } from '../system/context/ChatButtonContext';
 import { useVoiceCoachInitialization } from '../hooks/useVoiceCoachInitialization';
 
@@ -265,9 +265,9 @@ function AppContent() {
         onClose={close}
       />
 
-      {/* Voice Coach System */}
-      <FloatingVoiceCoachButton ref={chatButtonRef} />
-      <VoiceCoachPanel />
+      {/* Unified Coach System */}
+      <UnifiedFloatingButton ref={chatButtonRef} />
+      <UnifiedCoachDrawer chatButtonRef={chatButtonRef} />
     </div>
   );
 }
