@@ -32,16 +32,17 @@ class VoiceCoachOrchestrator {
     try {
       logger.info('VOICE_ORCHESTRATOR', 'Initializing voice coach orchestrator');
 
-      // Récupérer la clé API depuis l'environnement
-      logger.debug('VOICE_ORCHESTRATOR', 'Checking for OpenAI API key');
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+      // Vérifier la configuration Supabase (nécessaire pour l'edge function)
+      logger.debug('VOICE_ORCHESTRATOR', 'Checking Supabase configuration');
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-      if (!apiKey) {
-        logger.error('VOICE_ORCHESTRATOR', 'OpenAI API key not found in environment variables');
-        throw new Error('OpenAI API key not found');
+      if (!supabaseUrl || !supabaseAnonKey) {
+        logger.error('VOICE_ORCHESTRATOR', 'Supabase configuration missing');
+        throw new Error('Supabase configuration missing');
       }
 
-      logger.debug('VOICE_ORCHESTRATOR', 'API key found, setting up handlers');
+      logger.debug('VOICE_ORCHESTRATOR', 'Supabase configuration OK, setting up handlers');
 
       // Setup event handlers pour l'API Realtime
       logger.debug('VOICE_ORCHESTRATOR', 'Setting up Realtime handlers');
@@ -95,11 +96,8 @@ class VoiceCoachOrchestrator {
         });
       }
 
-      // Connecter à l'API Realtime
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-
+      // Connexion à l'API Realtime via notre edge function
       await openaiRealtimeService.connect({
-        apiKey,
         model: 'gpt-4o-realtime-preview-2024-10-01',
         voice: store.preferences.preferredVoice,
         temperature: 0.8,

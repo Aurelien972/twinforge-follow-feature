@@ -9,7 +9,6 @@ import type { ChatMode } from '../store/globalChatStore';
 import type { VoiceType } from '../store/voiceCoachStore';
 
 interface RealtimeConfig {
-  apiKey: string;
   model: string;
   voice: VoiceType;
   temperature?: number;
@@ -40,7 +39,7 @@ class OpenAIRealtimeService {
   private isProcessingQueue = false;
 
   /**
-   * Initialiser la connexion à l'API Realtime
+   * Initialiser la connexion à l'API Realtime via notre edge function
    */
   async connect(config: RealtimeConfig): Promise<void> {
     if (this.isConnected && this.ws) {
@@ -51,19 +50,28 @@ class OpenAIRealtimeService {
     this.config = config;
 
     try {
-      logger.info('REALTIME_API', 'Initiating connection', {
+      logger.info('REALTIME_API', 'Initiating connection via edge function', {
         model: config.model,
         voice: config.voice
       });
 
-      // URL de l'API Realtime d'OpenAI
-      const wsUrl = 'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-10-01';
+      // Récupérer le token Supabase pour l'authentification
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-      this.ws = new WebSocket(wsUrl, [
-        'realtime',
-        `openai-insecure-api-key.${config.apiKey}`,
-        'openai-beta.realtime-v1'
-      ]);
+      if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error('Supabase configuration missing');
+      }
+
+      // URL de notre edge function proxy
+      // Convertir https:// en wss:// pour WebSocket
+      const edgeFunctionUrl = supabaseUrl.replace('https://', 'wss://') +
+        `/functions/v1/voice-coach-realtime?model=${encodeURIComponent(config.model)}`;
+
+      logger.debug('REALTIME_API', 'Connecting to edge function', { url: edgeFunctionUrl });
+
+      // Créer la connexion WebSocket via notre edge function
+      this.ws = new WebSocket(edgeFunctionUrl);
 
       this.ws.binaryType = 'arraybuffer';
 
@@ -88,7 +96,9 @@ class OpenAIRealtimeService {
       });
 
     } catch (error) {
-      logger.error('REALTIME_API', 'Connection failed', { error });
+      logger.error('REALTIME_API', 'Connection failed', {
+        error: error instanceof Error ? error.message : String(error)
+      });
       throw error;
     }
   }
