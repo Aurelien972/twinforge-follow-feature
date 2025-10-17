@@ -100,8 +100,8 @@ const BodyScanCelebrationStep: React.FC = () => {
       return {
         title: '🚀 Scan Réussi avec Brio !',
         subtitle: 'Votre avatar est prêt avec des optimisations intelligentes',
-        celebrationMessage: 'IA d\'Optimisation Activée',
-        motivationalQuote: 'Notre intelligence artificielle a perfectionné votre scan',
+        celebrationMessage: 'Analyse Avancée Activée',
+        motivationalQuote: 'Votre scan a été optimisé avec précision',
         color: '#F59E0B',
         icon: ICONS.Zap,
         particleCount: 6,

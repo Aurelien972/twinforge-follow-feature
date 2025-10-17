@@ -79,7 +79,7 @@ export function useGenerationProgress() {
       return {
         progress: Math.floor(phaseProgress),
         phase: 'starting',
-        message: 'Connexion au coach IA...'
+        message: 'Votre coach se prépare...'
       };
     }
 
@@ -133,7 +133,7 @@ export function useGenerationProgress() {
     setProgress({
       phase: 'starting',
       progress: 0,
-      message: 'Connexion au coach IA...',
+      message: 'Votre coach se prépare...',
       elapsedTime: 0,
       estimatedTimeRemaining: 120,
       isReady: true

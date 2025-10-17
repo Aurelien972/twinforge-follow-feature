@@ -239,7 +239,7 @@ const FridgeScanMainCTA: React.FC = () => {
             Scanner Votre Frigo
           </h2>
           <p className="text-white/85 text-lg leading-relaxed max-w-2xl mx-auto">
-            Capturez l'intérieur de votre réfrigérateur pour une analyse IA instantanée.
+            Capturez l'intérieur de votre réfrigérateur pour une analyse instantanée.
             Générez des recettes personnalisées et des plans repas adaptés à vos ingrédients.
           </p>
         </motion.div>

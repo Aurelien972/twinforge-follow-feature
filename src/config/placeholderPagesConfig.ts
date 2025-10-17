@@ -97,7 +97,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
           'Protocoles personnalisés',
           'Templates pré-configurés',
           'Objectifs adaptatifs',
-          'Recommandations IA'
+          'Recommandations personnalisées'
         ]
       }
     ]
@@ -127,7 +127,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         value: 'conseils',
         label: 'Conseils',
         icon: 'Lightbulb',
-        description: 'Coach IA personnel analysant vos données pour des recommandations ultra-personnalisées.',
+        description: 'Coach personnel analysant vos données pour des recommandations ultra-personnalisées.',
         features: [],
         pageHeader: {
           icon: 'Lightbulb',
@@ -140,7 +140,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         value: 'progression',
         label: 'Progression',
         icon: 'TrendingUp',
-        description: 'Visualisez votre évolution détaillée avec insights IA personnalisés.',
+        description: 'Visualisez votre évolution détaillée avec insights personnalisés.',
         features: [
           'Graphiques progression volume et intensité',
           'Évolution de la force par groupe musculaire',

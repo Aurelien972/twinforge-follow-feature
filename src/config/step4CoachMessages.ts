@@ -52,7 +52,7 @@ export const STEP4_COACH_MESSAGES: Record<Step4NotificationId, MessageTemplate> 
   'step4-analysis-started': createMessageTemplate([
     'Je lance l\'analyse de ta séance... Ça va être top !',
     'Analyse en cours... Je regarde tout en détail',
-    'Démarrage de l\'analyse IA... Patience, ça arrive !',
+    'Analyse de ta séance en cours... Patience, ça arrive !',
     'Je traite tes données... Les insights arrivent bientôt',
     'Analyse lancée ! Je calcule tout pour toi'
   ]),

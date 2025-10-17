@@ -79,7 +79,7 @@ const ProfileNutritionTab: React.FC = () => {
       <ProgressBar
         percentage={nutritionCompletionPercentage}
         title="Forge Nutritionnelle"
-        subtitle="Configurez vos préférences alimentaires complètes pour l'IA"
+        subtitle="Configurez vos préférences alimentaires pour une personnalisation optimale"
         color="#10B981"
       />
 

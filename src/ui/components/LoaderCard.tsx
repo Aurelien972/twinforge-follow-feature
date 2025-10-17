@@ -68,7 +68,7 @@ const VARIANT_CONFIG = {
       glow: 'rgba(16, 185, 129, 0.4)'
     },
     icon: 'Activity',
-    defaultTitle: 'Ton Coach IA Prépare Ton Plan...',
+    defaultTitle: 'Ton Coach Prépare Ton Plan...',
     defaultSubtitle: 'Analyse de tes capacités et génération d\'un programme personnalisé'
   },
   default: {

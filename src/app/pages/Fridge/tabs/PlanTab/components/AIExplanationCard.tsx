@@ -54,10 +54,10 @@ const AIExplanationCardSkeleton: React.FC<{ weekNumber: number }> = ({ weekNumbe
               `
             }}
           >
-            <SpatialIcon 
-              Icon={ICONS.Lightbulb} 
-              size={32} 
-              style={{ 
+            <SpatialIcon
+              Icon={ICONS.Lightbulb}
+              size={32}
+              style={{
                 color: '#10B981',
                 filter: `
                   drop-shadow(0 0 16px color-mix(in srgb, #10B981 90%, transparent))
@@ -67,10 +67,10 @@ const AIExplanationCardSkeleton: React.FC<{ weekNumber: number }> = ({ weekNumbe
               variant="pure"
             />
           </div>
-          
+
           <div>
             <h3 className="text-2xl font-bold text-white mb-2">
-              Votre Assistant Nutritionnel de la Forge
+              Votre Guide Nutritionnel de la Forge
             </h3>
             <p className="text-green-200 text-lg">
               Analyse personnalisée de votre plan - Semaine {weekNumber}
@@ -182,10 +182,10 @@ const AIExplanationCard: React.FC<AIExplanationCardProps> = ({
               `
             }}
           >
-            <SpatialIcon 
-              Icon={ICONS.Lightbulb} 
-              size={32} 
-              style={{ 
+            <SpatialIcon
+              Icon={ICONS.Lightbulb}
+              size={32}
+              style={{
                 color: '#10B981',
                 filter: `
                   drop-shadow(0 0 16px color-mix(in srgb, #10B981 90%, transparent))
@@ -195,10 +195,10 @@ const AIExplanationCard: React.FC<AIExplanationCardProps> = ({
               variant="pure"
             />
           </div>
-          
+
           <div>
             <h3 className="text-2xl font-bold text-white mb-2">
-              Votre Assistant Nutritionnel de la Forge
+              Votre Guide Nutritionnel de la Forge
             </h3>
             <p className="text-green-200 text-lg">
               Analyse personnalisée de votre plan - Semaine {weekNumber}
@@ -294,7 +294,7 @@ const AIExplanationCard: React.FC<AIExplanationCardProps> = ({
           <div className="flex items-center justify-between text-xs text-green-200">
             <div className="flex items-center gap-2">
               <SpatialIcon Icon={ICONS.Sparkles} size={12} />
-              <span>Généré par votre Assistant Nutritionnel de la Forge</span>
+              <span>Généré par votre Forge Nutritionnelle</span>
             </div>
             <div className="flex items-center gap-2">
               <SpatialIcon Icon={ICONS.Clock} size={12} />

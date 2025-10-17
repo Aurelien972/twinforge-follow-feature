@@ -25,7 +25,7 @@ type FaceScanStep = 'capture' | 'processing' | 'results';
 // Définition des étapes spécifiques au scan facial
 const FACE_SCAN_STEPS = [
   { id: 'capture', title: 'Capture Photo Faciale', subtitle: 'Photos de face et de profil', icon: 'Camera' as const, color: '#18E3FF' },
-  { id: 'processing', title: 'Analyse IA Faciale', subtitle: 'Traitement avancé de votre visage', icon: 'Scan' as const, color: '#18E3FF' },
+  { id: 'processing', title: 'Analyse Faciale Avancée', subtitle: 'Traitement de votre visage', icon: 'Scan' as const, color: '#18E3FF' },
   { id: 'results', title: 'Avatar Facial Prêt', subtitle: 'Votre reflet numérique est complet', icon: 'Check' as const, color: '#18E3FF' },
 ];
 

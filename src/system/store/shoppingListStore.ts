@@ -43,7 +43,7 @@ const LOADING_TITLES = [
 const LOADING_SUBTITLES = [
   "Examen détaillé de vos repas planifiés",
   "Adaptation selon vos préférences alimentaires",
-  "Intelligence artificielle en action",
+  "Optimisation personnalisée en cours",
   "Organisation par rayons de magasin",
   "Conseils personnalisés basés sur votre profil",
   "Calcul des coûts selon votre région"

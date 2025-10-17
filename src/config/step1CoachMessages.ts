@@ -90,7 +90,7 @@ export const STEP1_COACH_MESSAGES: Record<Step1NotificationId, MessageTemplate> 
 
   'step1-location-photo-mode': createMessageTemplate([
     'Mode photo activé ! La Forge va analyser tes équipements 📸',
-    'Super ! L\'IA va scanner ton environnement automatiquement 🤖',
+    'Super ! Ton environnement sera scanné automatiquement 🤖',
     'Photos enregistrées ! Je vais détecter tout ce qui est dispo ✨',
     'Excellent ! Analyse automatique de ton setup en cours 🔍',
     'Mode intelligent ! Je vais voir ce que tu as sous la main 🎯'
