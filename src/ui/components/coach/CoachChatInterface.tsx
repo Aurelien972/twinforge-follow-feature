@@ -5,8 +5,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCoachChatStore } from '../../../system/store/coachChatStore';
-import { useGlobalChatStore } from '../../../system/store/globalChatStore';
+import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
 import CoachMessage from './CoachMessage';
 import CoachMessageRenderer from './CoachMessageRenderer';
 import TypingIndicator from './TypingIndicator';
@@ -71,17 +70,23 @@ const CoachChatInterface: React.FC<CoachChatInterfaceProps> = ({
   const internalMessagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = externalMessagesContainerRef || internalMessagesContainerRef;
 
-  const {
-    messages: coachMessages,
-    isRecording,
-    isProcessing,
-    isSpeaking,
-    voiceSettings
-  } = useCoachChatStore();
+  // Use UnifiedCoachStore with proper selectors
+  const messages = useUnifiedCoachStore(state => state.messages);
+  const currentMode = useUnifiedCoachStore(state => state.currentMode);
+  const isRecording = useUnifiedCoachStore(state => state.isRecording);
+  const isProcessing = useUnifiedCoachStore(state => state.isProcessing);
+  const isSpeaking = useUnifiedCoachStore(state => state.isSpeaking);
 
-  const { messages: globalMessages, currentMode } = useGlobalChatStore();
+  // Voice settings - default enabled for all modes
+  const voiceSettings = { enabled: true };
 
-  const messages = currentMode === 'training' ? globalMessages : coachMessages;
+  // Debug: Log when messages change to confirm React re-renders
+  useEffect(() => {
+    console.log('🔄 CoachChatInterface RE-RENDERED - Messages updated:', {
+      messageCount: messages.length,
+      lastMessage: messages[messages.length - 1]?.content.substring(0, 50)
+    });
+  }, [messages]);
 
   const scrollToBottom = (smooth = true) => {
     messagesEndRef.current?.scrollIntoView({

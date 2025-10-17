@@ -38,44 +38,45 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [environmentChecked, setEnvironmentChecked] = useState(false);
 
-  const {
-    isPanelOpen,
-    communicationMode,
-    currentMode,
-    modeConfigs,
-    messages,
-    conversationId,
-    currentTranscription,
-    voiceState,
-    isTyping,
-    isProcessing,
-    isSpeaking,
-    showTranscript,
-    showReadyPrompt,
-    visualization,
-    hasUnreadMessages,
-    closeOnNavigation,
-    errorMessage,
-    closePanel,
-    setCommunicationMode,
-    toggleCommunicationMode,
-    setMode,
-    addMessage,
-    setTyping,
-    incrementUnread,
-    markAsRead,
-    hideNotification,
-    setCurrentTranscription,
-    setVoiceState,
-    setProcessing,
-    setSpeaking,
-    toggleTranscript,
-    setShowReadyPrompt,
-    stopListening,
-    setError,
-    clearError,
-    updateVisualization
-  } = useUnifiedCoachStore();
+  // Use shallow selector to ensure React detects array changes
+  const isPanelOpen = useUnifiedCoachStore(state => state.isPanelOpen);
+  const communicationMode = useUnifiedCoachStore(state => state.communicationMode);
+  const currentMode = useUnifiedCoachStore(state => state.currentMode);
+  const modeConfigs = useUnifiedCoachStore(state => state.modeConfigs);
+  const messages = useUnifiedCoachStore(state => state.messages);
+  const conversationId = useUnifiedCoachStore(state => state.conversationId);
+  const currentTranscription = useUnifiedCoachStore(state => state.currentTranscription);
+  const voiceState = useUnifiedCoachStore(state => state.voiceState);
+  const isTyping = useUnifiedCoachStore(state => state.isTyping);
+  const isProcessing = useUnifiedCoachStore(state => state.isProcessing);
+  const isSpeaking = useUnifiedCoachStore(state => state.isSpeaking);
+  const showTranscript = useUnifiedCoachStore(state => state.showTranscript);
+  const showReadyPrompt = useUnifiedCoachStore(state => state.showReadyPrompt);
+  const visualization = useUnifiedCoachStore(state => state.visualization);
+  const hasUnreadMessages = useUnifiedCoachStore(state => state.hasUnreadMessages);
+  const closeOnNavigation = useUnifiedCoachStore(state => state.closeOnNavigation);
+  const errorMessage = useUnifiedCoachStore(state => state.errorMessage);
+
+  // Actions
+  const closePanel = useUnifiedCoachStore(state => state.closePanel);
+  const setCommunicationMode = useUnifiedCoachStore(state => state.setCommunicationMode);
+  const toggleCommunicationMode = useUnifiedCoachStore(state => state.toggleCommunicationMode);
+  const setMode = useUnifiedCoachStore(state => state.setMode);
+  const addMessage = useUnifiedCoachStore(state => state.addMessage);
+  const setTyping = useUnifiedCoachStore(state => state.setTyping);
+  const incrementUnread = useUnifiedCoachStore(state => state.incrementUnread);
+  const markAsRead = useUnifiedCoachStore(state => state.markAsRead);
+  const hideNotification = useUnifiedCoachStore(state => state.hideNotification);
+  const setCurrentTranscription = useUnifiedCoachStore(state => state.setCurrentTranscription);
+  const setVoiceState = useUnifiedCoachStore(state => state.setVoiceState);
+  const setProcessing = useUnifiedCoachStore(state => state.setProcessing);
+  const setSpeaking = useUnifiedCoachStore(state => state.setSpeaking);
+  const toggleTranscript = useUnifiedCoachStore(state => state.toggleTranscript);
+  const setShowReadyPrompt = useUnifiedCoachStore(state => state.setShowReadyPrompt);
+  const stopListening = useUnifiedCoachStore(state => state.stopListening);
+  const setError = useUnifiedCoachStore(state => state.setError);
+  const clearError = useUnifiedCoachStore(state => state.clearError);
+  const updateVisualization = useUnifiedCoachStore(state => state.updateVisualization);
 
   const modeConfig = modeConfigs[currentMode];
   const modeColor = modeConfig.color;
