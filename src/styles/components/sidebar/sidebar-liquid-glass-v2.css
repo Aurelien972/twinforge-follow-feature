@@ -51,7 +51,7 @@
   animation: borderFlow 6s ease-in-out infinite;
 }
 
-/* Ambient glow underneath - violet/purple removed */
+/* Ambient glow underneath */
 .sidebar-glass-enhanced::after {
   content: '';
   position: absolute;
@@ -59,11 +59,11 @@
   border-radius: calc(24px + 4px);
   background: radial-gradient(
     ellipse at 50% 20%,
-    rgba(24, 227, 255, 0.12) 0%,
-    rgba(24, 227, 255, 0.04) 40%,
+    rgba(24, 227, 255, 0.15) 0%,
+    rgba(61, 19, 179, 0.1) 40%,
     transparent 70%
   );
-  opacity: 0.6;
+  opacity: 0.75;
   z-index: -1;
   pointer-events: none;
   animation: sidebarGlow 4s ease-in-out infinite alternate;

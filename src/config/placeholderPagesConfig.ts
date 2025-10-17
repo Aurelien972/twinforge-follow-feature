@@ -202,9 +202,9 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
     tabs: [
       {
         value: 'general',
-        label: 'Performance',
-        icon: 'Gauge',
-        description: 'Thème et optimisation des performances',
+        label: 'Général',
+        icon: 'Settings',
+        description: 'Thème, langue et unités',
         features: [
           'Préférences utilisateur',
           'Thème et apparence',

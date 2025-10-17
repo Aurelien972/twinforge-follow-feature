@@ -61,9 +61,10 @@
 
   --liquid-border-gradient-tricolor: linear-gradient(
     135deg,
-    var(--liquid-border-cyan) 0%,
-    var(--liquid-border-orange) 50%,
-    var(--liquid-border-cyan) 100%
+    var(--liquid-border-indigo) 0%,
+    var(--liquid-border-cyan) 33%,
+    var(--liquid-border-orange) 66%,
+    var(--liquid-border-violet) 100%
   );
 
   /* =========================================
@@ -455,9 +456,21 @@
   transform: scale(1.05) translateZ(0);
 }
 
-/* Primary sidebar item icon container - REMOVED
-   The specific sidebar-liquid-glass-v2.css file handles this with orange gradient
-   This generic cyan style was conflicting with the sidebar-specific design */
+/* Primary sidebar item icon container (e.g., Home) */
+.sidebar-item--primary .sidebar-item-icon-container {
+  width: 44px;
+  height: 44px;
+
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent) 0%, transparent 60%),
+    var(--liquid-pill-bg);
+
+  border: 1.5px solid color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent);
+  box-shadow:
+    var(--liquid-pill-shadow),
+    0 0 20px color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent);
+}
 
 /* =========================================
    GLASS BACK BUTTON UTILITY
