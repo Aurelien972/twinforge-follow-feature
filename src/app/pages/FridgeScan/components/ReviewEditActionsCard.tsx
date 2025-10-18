@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -21,6 +22,7 @@ interface ReviewEditActionsCardProps {
 /**
  * ReviewEditActionsCard - Dynamic CTA Component for ReviewEditStage
  * Manages the progression from inventory validation to recipe/meal plan generation
+ * Optimized with performance mode for mobile
  */
 const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
   userEditedInventory,
@@ -33,9 +35,12 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
   const navigate = useNavigate();
   const { currentSessionId } = useFridgeScanPipeline();
   const { selectInventory, loadAvailableInventories } = useMealPlanStore();
-  
+  const { isPerformanceMode } = usePerformanceMode();
+
   // Local state for inventory validation
   const [isInventoryValidated, setIsInventoryValidated] = useState(false);
+
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
 
   // Handle inventory validation - now calls the prop function
@@ -56,10 +61,10 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
       if (currentSessionId) {
         selectInventory(currentSessionId);
       }
-      
+
       // Navigate to plan tab
       navigate('/fridge#plan');
-      
+
     } catch (error) {
       logger.error('REVIEW_EDIT_ACTIONS', 'Meal plan generation failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -88,10 +93,10 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
       if (currentSessionId) {
         selectInventory(currentSessionId);
       }
-      
+
       // Navigate to recipes tab
       navigate('/fridge#recipes');
-      
+
     } catch (error) {
       logger.error('REVIEW_EDIT_ACTIONS', 'Recipe generation failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -111,12 +116,14 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
   return (
     <AnimatePresence mode="wait">
       {!isInventoryValidated ? (
-        <motion.div
+        <MotionDiv
           key="validation-state"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, y: 20 },
+            animate: { opacity: 1, y: 0 },
+            exit: { opacity: 0, y: -20 },
+            transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
+          })}
           className="space-y-4"
         >
           {/* Validation CTA - Pink Theme */}
@@ -142,13 +149,15 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
           >
             <div className="space-y-6">
               {/* Animated Icon */}
-              <motion.div
+              <MotionDiv
                 className="relative inline-block"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
+                {...(!isPerformanceMode && {
+                  initial: { scale: 0.9, opacity: 0 },
+                  animate: { scale: 1, opacity: 1 },
+                  transition: { duration: 0.5, delay: 0.1 }
+                })}
               >
-                <motion.div
+                <MotionDiv
                   className="w-20 h-20 mx-auto rounded-full flex items-center justify-center relative"
                   style={{
                     background: `
@@ -162,15 +171,17 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                       inset 0 3px 0 rgba(255,255,255,0.5)
                     `
                   }}
-                  animate={{
-                    scale: [1, 1.05, 1],
-                    boxShadow: [
-                      '0 0 40px color-mix(in srgb, #EC4899 60%, transparent)',
-                      '0 0 50px color-mix(in srgb, #EC4899 75%, transparent)',
-                      '0 0 40px color-mix(in srgb, #EC4899 60%, transparent)'
-                    ]
-                  }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                  {...(!isPerformanceMode && {
+                    animate: {
+                      scale: [1, 1.05, 1],
+                      boxShadow: [
+                        '0 0 40px color-mix(in srgb, #EC4899 60%, transparent)',
+                        '0 0 50px color-mix(in srgb, #EC4899 75%, transparent)',
+                        '0 0 40px color-mix(in srgb, #EC4899 60%, transparent)'
+                      ]
+                    },
+                    transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }
+                  })}
                 >
                   <SpatialIcon
                     Icon={ICONS.Check}
@@ -179,30 +190,34 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                     variant="pure"
                   />
 
-                  {/* Pulsing Ring */}
-                  <motion.div
-                    className="absolute inset-0 rounded-full border-2"
-                    style={{
-                      borderColor: 'color-mix(in srgb, #EC4899 65%, transparent)'
-                    }}
-                    animate={{
-                      scale: [1, 1.5, 1.5],
-                      opacity: [0.8, 0, 0]
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeOut'
-                    }}
-                  />
-                </motion.div>
-              </motion.div>
+                  {/* Pulsing Ring - Désactivé en performance mode */}
+                  {!isPerformanceMode && (
+                    <motion.div
+                      className="absolute inset-0 rounded-full border-2"
+                      style={{
+                        borderColor: 'color-mix(in srgb, #EC4899 65%, transparent)'
+                      }}
+                      animate={{
+                        scale: [1, 1.5, 1.5],
+                        opacity: [0.8, 0, 0]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: 'easeOut'
+                      }}
+                    />
+                  )}
+                </MotionDiv>
+              </MotionDiv>
 
               {/* Title and Description */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 }}
+              <MotionDiv
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0, y: 10 },
+                  animate: { opacity: 1, y: 0 },
+                  transition: { duration: 0.4, delay: 0.2 }
+                })}
               >
                 <h4
                   className="text-2xl font-bold text-white mb-3"
@@ -216,13 +231,15 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                   <span className="font-bold text-pink-300">{userEditedInventory.length} ingrédient{userEditedInventory.length > 1 ? 's' : ''}</span> prêt{userEditedInventory.length > 1 ? 's' : ''} à être validé{userEditedInventory.length > 1 ? 's' : ''}.
                   Confirmez pour continuer vers la génération.
                 </p>
-              </motion.div>
+              </MotionDiv>
 
               {/* Validation Button */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.3 }}
+              <MotionDiv
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0, scale: 0.95 },
+                  animate: { opacity: 1, scale: 1 },
+                  transition: { duration: 0.4, delay: 0.3 }
+                })}
               >
                 <button
                   onClick={() => {
@@ -248,7 +265,7 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                     color: 'white'
                   }}
                   onMouseEnter={(e) => {
-                    if (window.matchMedia('(hover: hover)').matches) {
+                    if (!isPerformanceMode && window.matchMedia('(hover: hover)').matches) {
                       e.currentTarget.style.transform = 'translateY(-3px) scale(1.03)';
                       e.currentTarget.style.boxShadow = `
                         0 24px 80px color-mix(in srgb, #EC4899 75%, transparent),
@@ -258,7 +275,7 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (window.matchMedia('(hover: hover)').matches) {
+                    if (!isPerformanceMode && window.matchMedia('(hover: hover)').matches) {
                       e.currentTarget.style.transform = 'translateY(0) scale(1)';
                       e.currentTarget.style.boxShadow = `
                         0 18px 60px color-mix(in srgb, #EC4899 60%, transparent),
@@ -268,28 +285,32 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                     }
                   }}
                 >
-                  {/* Shimmer Effect */}
-                  <motion.div
-                    className="absolute inset-0 rounded-2xl pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%)'
-                    }}
-                    animate={{ x: ['-200%', '200%'] }}
-                    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                  />
+                  {/* Shimmer Effect - Désactivé en performance mode */}
+                  {!isPerformanceMode && (
+                    <motion.div
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      style={{
+                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%)'
+                      }}
+                      animate={{ x: ['-200%', '200%'] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                  )}
 
                   <div className="flex items-center gap-3 relative z-10">
                     <SpatialIcon Icon={ICONS.Check} size={22} color="white" variant="pure" />
                     <span>Valider l'inventaire</span>
                   </div>
                 </button>
-              </motion.div>
+              </MotionDiv>
 
               {/* Stats Badge */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
+              <MotionDiv
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0 },
+                  animate: { opacity: 1 },
+                  transition: { delay: 0.4 }
+                })}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full"
                 style={{
                   background: 'color-mix(in srgb, #EC4899 18%, transparent)',
@@ -301,15 +322,17 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                 <span className="text-pink-200 text-sm font-semibold">
                   {userEditedInventory.length} ingrédient{userEditedInventory.length > 1 ? 's' : ''} en attente
                 </span>
-              </motion.div>
+              </MotionDiv>
             </div>
           </GlassCard>
 
           {/* Navigation Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 }}
+          <MotionDiv
+            {...(!isPerformanceMode && {
+              initial: { opacity: 0, y: 10 },
+              animate: { opacity: 1, y: 0 },
+              transition: { delay: 0.35 }
+            })}
             className="flex flex-col sm:flex-row gap-4 justify-between"
           >
             <button
@@ -376,15 +399,17 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                 <span>Quitter l'Atelier</span>
               </div>
             </button>
-          </motion.div>
-        </motion.div>
+          </MotionDiv>
+        </MotionDiv>
       ) : (
-        <motion.div
+        <MotionDiv
           key="validated-state"
-          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20, scale: 0.95 }}
-          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, y: 20, scale: 0.95 },
+            animate: { opacity: 1, y: 0, scale: 1 },
+            exit: { opacity: 0, y: -20, scale: 0.95 },
+            transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] }
+          })}
         >
           <GlassCard
             className="p-8 text-center w-full"
@@ -409,12 +434,14 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
           >
             <div className="space-y-6">
               {/* Success Icon */}
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+              <MotionDiv
+                {...(!isPerformanceMode && {
+                  initial: { scale: 0, rotate: -180 },
+                  animate: { scale: 1, rotate: 0 },
+                  transition: { type: 'spring', stiffness: 200, damping: 15 }
+                })}
               >
-                <motion.div
+                <MotionDiv
                   className="w-20 h-20 mx-auto rounded-full flex items-center justify-center relative"
                   style={{
                     background: `
@@ -429,15 +456,17 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                       inset 0 3px 0 rgba(255,255,255,0.5)
                     `
                   }}
-                  animate={{
-                    scale: [1, 1.05, 1],
-                    boxShadow: [
-                      '0 0 40px color-mix(in srgb, #EC4899 60%, transparent), 0 0 80px color-mix(in srgb, #8B5CF6 40%, transparent)',
-                      '0 0 50px color-mix(in srgb, #EC4899 75%, transparent), 0 0 100px color-mix(in srgb, #8B5CF6 55%, transparent)',
-                      '0 0 40px color-mix(in srgb, #EC4899 60%, transparent), 0 0 80px color-mix(in srgb, #8B5CF6 40%, transparent)'
-                    ]
-                  }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                  {...(!isPerformanceMode && {
+                    animate: {
+                      scale: [1, 1.05, 1],
+                      boxShadow: [
+                        '0 0 40px color-mix(in srgb, #EC4899 60%, transparent), 0 0 80px color-mix(in srgb, #8B5CF6 40%, transparent)',
+                        '0 0 50px color-mix(in srgb, #EC4899 75%, transparent), 0 0 100px color-mix(in srgb, #8B5CF6 55%, transparent)',
+                        '0 0 40px color-mix(in srgb, #EC4899 60%, transparent), 0 0 80px color-mix(in srgb, #8B5CF6 40%, transparent)'
+                      ]
+                    },
+                    transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }
+                  })}
                 >
                   <SpatialIcon
                     Icon={ICONS.Sparkles}
@@ -445,14 +474,16 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                     color="rgba(255, 255, 255, 0.95)"
                     variant="pure"
                   />
-                </motion.div>
-              </motion.div>
+                </MotionDiv>
+              </MotionDiv>
 
               {/* Title and Description */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+              <MotionDiv
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0, y: 10 },
+                  animate: { opacity: 1, y: 0 },
+                  transition: { delay: 0.2 }
+                })}
               >
                 <h4
                   className="text-2xl font-bold text-white mb-3"
@@ -465,13 +496,15 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                 <p className="text-white/85 text-base leading-relaxed max-w-lg mx-auto">
                   Inventaire validé avec succès ! Choisissez votre prochaine étape pour exploiter vos ingrédients.
                 </p>
-              </motion.div>
+              </MotionDiv>
 
               {/* Action Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+              <MotionDiv
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0, y: 10 },
+                  animate: { opacity: 1, y: 0 },
+                  transition: { delay: 0.3 }
+                })}
                 className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto"
               >
                 <button
@@ -603,10 +636,10 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                     <span>Tableau de bord</span>
                   </div>
                 </button>
-              </motion.div>
+              </MotionDiv>
             </div>
           </GlassCard>
-        </motion.div>
+        </MotionDiv>
       )}
     </AnimatePresence>
   );

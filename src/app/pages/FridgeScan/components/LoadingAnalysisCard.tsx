@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -39,6 +40,8 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
   loadingMessage
 }) => {
   const isMobile = useIsMobile();
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   
   // Étapes de chargement détaillées pour l'Atelier de Recettes
   const loadingSteps = [
@@ -51,10 +54,12 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 30, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }
+      })}
     >
       <GlassCard 
         className="p-8 text-center relative overflow-hidden"
@@ -90,23 +95,25 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
           }}
         />
 
-        {/* Ligne de Scan Verticale */}
-        <motion.div
-          className="absolute top-0 left-0 w-1 h-full pointer-events-none fridge-scan-analysis-line"
-          style={{
-            background: `linear-gradient(180deg, 
-              transparent 0%, 
-              color-mix(in srgb, var(--color-plasma-cyan) 80%, transparent) 30%, 
-              color-mix(in srgb, var(--color-plasma-cyan) 100%, transparent) 50%, 
-              color-mix(in srgb, var(--color-plasma-cyan) 80%, transparent) 70%, 
-              transparent 100%
-            )`,
-            boxShadow: `0 0 20px color-mix(in srgb, var(--color-plasma-cyan) 80%, transparent)`
-          }}
-        />
+        {/* Ligne de Scan Verticale - Désactivée en performance mode */}
+        {!isPerformanceMode && (
+          <motion.div
+            className="absolute top-0 left-0 w-1 h-full pointer-events-none fridge-scan-analysis-line"
+            style={{
+              background: `linear-gradient(180deg,
+                transparent 0%,
+                color-mix(in srgb, var(--color-plasma-cyan) 80%, transparent) 30%,
+                color-mix(in srgb, var(--color-plasma-cyan) 100%, transparent) 50%,
+                color-mix(in srgb, var(--color-plasma-cyan) 80%, transparent) 70%,
+                transparent 100%
+              )`,
+              boxShadow: `0 0 20px color-mix(in srgb, var(--color-plasma-cyan) 80%, transparent)`
+            }}
+          />
+        )}
 
-        {/* Particules de Données Flottantes */}
-        {[...Array(8)].map((_, i) => (
+        {/* Particules de Données Flottantes - Désactivées en performance mode */}
+        {!isPerformanceMode && [...Array(8)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 rounded-full pointer-events-none fridge-data-particle"
@@ -122,7 +129,7 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
         <div className="relative z-10 space-y-8">
           {/* Icône Principale avec Halo Dynamique */}
           <div className="relative">
-            <motion.div
+            <MotionDiv
               className="w-32 h-32 mx-auto rounded-full flex items-center justify-center relative fridge-ai-focus"
               style={{
                 background: `
@@ -135,16 +142,18 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
                 WebkitBackdropFilter: 'blur(24px) saturate(180%)'
               }}
             >
-              <motion.div
-                animate={{ 
-                  rotate: [0, 360],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{ 
-                  duration: isMobile ? 6 : 3, 
-                  repeat: Infinity, 
-                  ease: "linear" 
-                }}
+              <MotionDiv
+                {...(!isPerformanceMode && {
+                  animate: {
+                    rotate: [0, 360],
+                    scale: [1, 1.1, 1]
+                  },
+                  transition: {
+                    duration: isMobile ? 6 : 3,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }
+                })}
               >
                 <SpatialIcon 
                   Icon={ICONS[loadingSteps[simulatedLoadingStep]?.icon as keyof typeof ICONS] || ICONS.Camera}
@@ -159,10 +168,12 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
                   }}
                   variant="pure"
                 />
-              </motion.div>
+              </MotionDiv>
 
-              {/* Anneaux de Pulsation Multiples */}
-              <motion.div
+              {/* Anneaux de Pulsation Multiples - Désactivés en performance mode */}
+              {!isPerformanceMode && (
+                <>
+                  <motion.div
                 className="absolute inset-0 rounded-full border-2"
                 style={{ borderColor: 'color-mix(in srgb, var(--color-fridge-primary) 60%, transparent)' }}
                 animate={{ 
@@ -203,7 +214,9 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
                   delay: 1
                 }}
               />
-            </motion.div>
+                </>
+              )}
+            </MotionDiv>
           </div>
           
           {/* Titre et Message Dynamiques */}
@@ -248,17 +261,19 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
                   animate={{ width: `${simulatedScanProgress}%` }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
                 >
-                  {/* Shimmer Effect */}
-                  <div
-                    className="absolute inset-0 rounded-full fridge-spatial-shimmer"
-                    style={{
-                      background: `linear-gradient(90deg, 
-                        transparent 0%, 
-                        rgba(255,255,255,0.6) 50%, 
-                        transparent 100%
-                      )`
-                    }}
-                  />
+                  {/* Shimmer Effect - Désactivé en performance mode */}
+                  {!isPerformanceMode && (
+                    <div
+                      className="absolute inset-0 rounded-full fridge-spatial-shimmer"
+                      style={{
+                        background: `linear-gradient(90deg,
+                          transparent 0%,
+                          rgba(255,255,255,0.6) 50%,
+                          transparent 100%
+                        )`
+                      }}
+                    />
+                  )}
                 </motion.div>
               </div>
             </div>
@@ -278,7 +293,7 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
                 const isPending = index > simulatedLoadingStep;
                 
                 return (
-                  <motion.div
+                  <MotionDiv
                     key={index}
                     className="flex items-center gap-3 p-3 rounded-xl transition-all duration-300"
                     style={{
@@ -296,9 +311,11 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
                         ? `0 0 20px color-mix(in srgb, var(--color-fridge-primary) 30%, transparent)`
                         : 'none'
                     }}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    {...(!isPerformanceMode && {
+                      initial: { opacity: 0, x: -20 },
+                      animate: { opacity: 1, x: 0 },
+                      transition: { duration: 0.4, delay: index * 0.1 }
+                    })}
                   >
                     {/* Indicateur d'État */}
                     <div 
@@ -323,18 +340,25 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
                           style={{ color: 'var(--color-plasma-cyan)' }} 
                         />
                       ) : isActive ? (
-                        <motion.div
-                          className="w-3 h-3 rounded-full"
-                          style={{ background: 'var(--color-fridge-primary)' }}
-                          animate={{ 
-                            scale: [1, 1.3, 1],
-                            opacity: [0.8, 1, 0.8]
-                          }}
-                          transition={{ 
-                            duration: 1, 
-                            repeat: Infinity 
-                          }}
-                        />
+                        isPerformanceMode ? (
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ background: 'var(--color-fridge-primary)' }}
+                          />
+                        ) : (
+                          <motion.div
+                            className="w-3 h-3 rounded-full"
+                            style={{ background: 'var(--color-fridge-primary)' }}
+                            animate={{
+                              scale: [1, 1.3, 1],
+                              opacity: [0.8, 1, 0.8]
+                            }}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity
+                            }}
+                          />
+                        )
                       ) : (
                         <span 
                           className="text-xs font-bold text-white/60"
@@ -367,50 +391,54 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
                           : isCompleted 
                           ? 'var(--color-plasma-cyan)' 
                           : 'rgba(255, 255, 255, 0.4)'
-                      }} 
+                      }}
                     />
-                  </motion.div>
+                  </MotionDiv>
                 );
               })}
             </div>
           </div>
 
           {/* Indicateur de Temps Estimé */}
-          <motion.div
+          <MotionDiv
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
             style={{
               background: 'color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent)',
               border: '1px solid color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent)',
               backdropFilter: 'blur(12px) saturate(140%)'
             }}
-            animate={{ 
-              scale: [1, 1.02, 1],
-              opacity: [0.8, 1, 0.8]
-            }}
-            transition={{ 
-              duration: 2, 
-              repeat: Infinity 
-            }}
+            {...(!isPerformanceMode && {
+              animate: {
+                scale: [1, 1.02, 1],
+                opacity: [0.8, 1, 0.8]
+              },
+              transition: {
+                duration: 2,
+                repeat: Infinity
+              }
+            })}
           >
-            <motion.div
+            <MotionDiv
               className="w-2 h-2 rounded-full"
               style={{ background: 'var(--color-plasma-cyan)' }}
-              animate={{ 
-                scale: [1, 1.2, 1],
-                opacity: [0.6, 1, 0.6]
-              }}
-              transition={{ 
-                duration: 1, 
-                repeat: Infinity 
-              }}
+              {...(!isPerformanceMode && {
+                animate: {
+                  scale: [1, 1.2, 1],
+                  opacity: [0.6, 1, 0.6]
+                },
+                transition: {
+                  duration: 1,
+                  repeat: Infinity
+                }
+              })}
             />
             <span className="text-cyan-300 text-sm font-medium">
               Analyse de la Forge en cours... (~15-45 secondes)
             </span>
-          </motion.div>
+          </MotionDiv>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

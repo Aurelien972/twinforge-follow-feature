@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -13,6 +14,10 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
   capturedPhotos,
   onRemovePhoto
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+  const MotionButton = isPerformanceMode ? 'button' : motion.button;
+
   if (capturedPhotos.length === 0) return null;
 
   return (
@@ -34,9 +39,9 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
         WebkitBackdropFilter: 'blur(24px) saturate(160%)'
       }}
     >
-      {/* Header de la Section - Amélioré */}
+      {/* Header de la Section */}
       <div className="flex items-center gap-4 mb-6">
-        <motion.div
+        <MotionDiv
           className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 relative"
           style={{
             background: `
@@ -49,18 +54,20 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
               inset 0 2px 0 rgba(255, 255, 255, 0.25)
             `
           }}
-          animate={{
-            boxShadow: [
-              '0 0 24px color-mix(in srgb, #EC4899 35%, transparent)',
-              '0 0 32px color-mix(in srgb, #EC4899 45%, transparent)',
-              '0 0 24px color-mix(in srgb, #EC4899 35%, transparent)'
-            ]
-          }}
-          transition={{
-            duration: 2.5,
-            repeat: Infinity,
-            ease: 'easeInOut'
-          }}
+          {...(!isPerformanceMode && {
+            animate: {
+              boxShadow: [
+                '0 0 24px color-mix(in srgb, #EC4899 35%, transparent)',
+                '0 0 32px color-mix(in srgb, #EC4899 45%, transparent)',
+                '0 0 24px color-mix(in srgb, #EC4899 35%, transparent)'
+              ]
+            },
+            transition: {
+              duration: 2.5,
+              repeat: Infinity,
+              ease: 'easeInOut'
+            }
+          })}
         >
           <SpatialIcon
             Icon={ICONS.Image}
@@ -68,7 +75,7 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
             color="rgba(255, 255, 255, 0.95)"
             variant="pure"
           />
-        </motion.div>
+        </MotionDiv>
 
         <div className="flex-1">
           <h3 className="text-white font-bold text-xl mb-1"
@@ -98,20 +105,13 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
         </div>
       </div>
 
-      {/* Grille des Photos - Améliorée */}
+      {/* Grille des Photos */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <AnimatePresence>
-          {capturedPhotos.map((photo, index) => (
-            <motion.div
+        {isPerformanceMode ? (
+          // Version simplifiée sans AnimatePresence pour performance
+          capturedPhotos.map((photo, index) => (
+            <div
               key={`${photo}-${index}`}
-              initial={{ opacity: 0, scale: 0.85, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.85, y: -20 }}
-              transition={{
-                duration: 0.45,
-                delay: index * 0.08,
-                ease: [0.4, 0, 0.2, 1]
-              }}
               className="group relative"
             >
               <div
@@ -147,16 +147,8 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
                   className="w-full h-full object-cover"
                 />
 
-                {/* Overlay au hover */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(180deg, transparent 0%, rgba(236, 72, 153, 0.15) 100%)'
-                  }}
-                />
-
-                {/* Bouton de Suppression - Ultra Stylisé */}
-                <motion.button
+                {/* Bouton de Suppression */}
+                <button
                   onClick={() => onRemovePhoto(index)}
                   className="absolute top-2 right-2 w-9 h-9 rounded-full flex items-center justify-center z-10"
                   style={{
@@ -166,17 +158,12 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
                     backdropFilter: 'blur(8px)',
                     cursor: 'pointer'
                   }}
-                  whileHover={{
-                    scale: 1.15,
-                    boxShadow: '0 0 30px rgba(239, 68, 68, 0.9), 0 6px 16px rgba(0, 0, 0, 0.4)'
-                  }}
-                  whileTap={{ scale: 0.95 }}
                   aria-label="Supprimer la photo"
                 >
                   <SpatialIcon Icon={ICONS.X} size={16} color="white" variant="pure" />
-                </motion.button>
+                </button>
 
-                {/* Label Photo - Stylisé */}
+                {/* Label Photo */}
                 <div
                   className="absolute bottom-2 left-2 px-3 py-1.5 rounded-full"
                   style={{
@@ -191,17 +178,114 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
                   </span>
                 </div>
               </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+            </div>
+          ))
+        ) : (
+          // Version animée pour desktop/performance normale
+          <AnimatePresence>
+            {capturedPhotos.map((photo, index) => (
+              <motion.div
+                key={`${photo}-${index}`}
+                initial={{ opacity: 0, scale: 0.85, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.85, y: -20 }}
+                transition={{
+                  duration: 0.45,
+                  delay: index * 0.08,
+                  ease: [0.4, 0, 0.2, 1]
+                }}
+                className="group relative"
+              >
+                <div
+                  className="relative aspect-square rounded-2xl overflow-hidden"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '2px solid color-mix(in srgb, #EC4899 25%, transparent)',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (window.matchMedia('(hover: hover)').matches) {
+                      e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
+                      e.currentTarget.style.boxShadow = `
+                        0 8px 24px rgba(0, 0, 0, 0.3),
+                        0 0 24px color-mix(in srgb, #EC4899 35%, transparent)
+                      `;
+                      e.currentTarget.style.borderColor = 'color-mix(in srgb, #EC4899 45%, transparent)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (window.matchMedia('(hover: hover)').matches) {
+                      e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
+                      e.currentTarget.style.borderColor = 'color-mix(in srgb, #EC4899 25%, transparent)';
+                    }
+                  }}
+                >
+                  <img
+                    src={photo}
+                    alt={`Photo du frigo ${index + 1}`}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(180deg, transparent 0%, rgba(236, 72, 153, 0.15) 100%)'
+                    }}
+                  />
+
+                  {/* Bouton de Suppression */}
+                  <motion.button
+                    onClick={() => onRemovePhoto(index)}
+                    className="absolute top-2 right-2 w-9 h-9 rounded-full flex items-center justify-center z-10"
+                    style={{
+                      background: 'radial-gradient(circle at center, rgba(239, 68, 68, 0.95) 0%, rgba(239, 68, 68, 0.85) 100%)',
+                      border: '2.5px solid rgba(255, 255, 255, 0.9)',
+                      boxShadow: '0 0 20px rgba(239, 68, 68, 0.7), 0 4px 12px rgba(0, 0, 0, 0.3)',
+                      backdropFilter: 'blur(8px)',
+                      cursor: 'pointer'
+                    }}
+                    whileHover={{
+                      scale: 1.15,
+                      boxShadow: '0 0 30px rgba(239, 68, 68, 0.9), 0 6px 16px rgba(0, 0, 0, 0.4)'
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    aria-label="Supprimer la photo"
+                  >
+                    <SpatialIcon Icon={ICONS.X} size={16} color="white" variant="pure" />
+                  </motion.button>
+
+                  {/* Label Photo */}
+                  <div
+                    className="absolute bottom-2 left-2 px-3 py-1.5 rounded-full"
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.85)',
+                      border: '1.5px solid rgba(255, 255, 255, 0.35)',
+                      backdropFilter: 'blur(12px)',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+                    }}
+                  >
+                    <span className="text-white text-xs font-semibold">
+                      Photo {index + 1}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        )}
       </div>
 
-      {/* Message d'Information - Amélioré */}
+      {/* Message d'Information */}
       {capturedPhotos.length < 6 && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: capturedPhotos.length * 0.08 + 0.3 }}
+        <MotionDiv
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, y: 10 },
+            animate: { opacity: 1, y: 0 },
+            transition: { delay: capturedPhotos.length * 0.08 + 0.3 }
+          })}
           className="mt-6 p-4 rounded-xl"
           style={{
             background: 'color-mix(in srgb, #EC4899 15%, transparent)',
@@ -223,7 +307,7 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
               Vous pouvez ajouter encore {6 - capturedPhotos.length} photo{6 - capturedPhotos.length > 1 ? 's' : ''} supplémentaire{6 - capturedPhotos.length > 1 ? 's' : ''}
             </span>
           </div>
-        </motion.div>
+        </MotionDiv>
       )}
     </GlassCard>
   );
