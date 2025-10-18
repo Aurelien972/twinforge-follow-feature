@@ -275,17 +275,18 @@
 }
 
 .performance-mode header .breathing-icon > div {
-  /* Keep inline styles but disable expensive effects */
+  /* Keep ALL inline styles for visibility */
+
+  /* Only disable expensive GPU effects */
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 
-  /* Simplify shadow but KEEP background from inline styles */
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  /* IMPORTANT: DO NOT override box-shadow - uses inline styles for colored glow */
+  /* IMPORTANT: DO NOT override background - uses inline styles for gradient */
+  /* IMPORTANT: DO NOT override border - uses inline styles for colored border */
+  /* IMPORTANT: DO NOT override transform - keeps translateZ(0) from inline */
 
-  /* Note: background is NOT overridden - uses inline styles */
-  /* Note: border is NOT overridden - uses inline styles */
+  /* All visual properties come from inline styles in PageHeader.tsx */
 }
 
 /* Page header icon itself - keep colored with reduced glow */
@@ -683,12 +684,12 @@
 }
 
 /* Generic shadow simplification - exclude preserved elements */
-.performance-mode [style*="box-shadow"]:not(header [class*="logo"] *):not(.sidebar-glass-enhanced):not(.sidebar-item-icon-container--active) {
+.performance-mode [style*="box-shadow"]:not(header [class*="logo"] *):not(header .breathing-icon *):not(.sidebar-glass-enhanced):not(.sidebar-item-icon-container--active) {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
 }
 
-/* Remove excessive inset shadows except for inputs */
-.performance-mode *:not(input):not(textarea):not(select) {
+/* Remove excessive inset shadows except for inputs and page header icons */
+.performance-mode *:not(input):not(textarea):not(select):not(header .breathing-icon):not(header .breathing-icon *) {
   /* Remove complex inset shadows */
   box-shadow: none !important;
 }
@@ -813,10 +814,10 @@
 }
 
 /* =========================================
-   TRANSFORMS - Static except tap feedback
+   TRANSFORMS - Static except tap feedback and page header icons
    ========================================= */
 
-.performance-mode [style*="transform"]:not(:active) {
+.performance-mode [style*="transform"]:not(:active):not(header .breathing-icon):not(header .breathing-icon *) {
   transform: none !important;
 }
 
