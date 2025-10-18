@@ -5,7 +5,8 @@
 
 /* Main header container - ultra-transparent liquid glass */
 .header-liquid-glass {
-  position: fixed !important;
+  position: -webkit-sticky !important;
+  position: sticky !important;
   top: 8px !important;
   left: 24px !important;
   right: 24px !important;
@@ -14,7 +15,7 @@
   isolation: isolate !important;
   border-radius: 20px !important;
   overflow: visible !important;
-  will-change: contents !important;
+  margin: 0 24px !important;
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
 

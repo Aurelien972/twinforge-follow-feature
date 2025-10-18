@@ -27,15 +27,14 @@
 }
 
 .new-mobile-bottom-bar {
-  position: fixed !important;
+  position: -webkit-sticky !important;
+  position: sticky !important;
   bottom: var(--new-bottom-bar-bottom-offset) !important;
-  left: 8px !important;
-  right: 8px !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0 8px !important;
   z-index: var(--new-bottom-bar-z-index) !important;
   height: var(--new-bottom-bar-height) !important;
-  /* CRITICAL: NO transforms - they break position:fixed on iOS */
-  will-change: contents !important;
-  contain: layout style paint !important;
   isolation: isolate !important;
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
