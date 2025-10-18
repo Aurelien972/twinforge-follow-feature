@@ -120,6 +120,51 @@
 }
 
 /* =========================================
+   PAGE HEADER ICONS - Keep visible and functional
+   ========================================= */
+
+.performance-mode header .breathing-icon,
+.performance-mode header [class*="breathing"] {
+  /* Keep icon container visible */
+  opacity: 1 !important;
+  display: flex !important;
+}
+
+.performance-mode header .breathing-icon > div {
+  /* Simplified icon background - solid with subtle gradient */
+  background: linear-gradient(135deg, #1A2332 0%, #0F1927 100%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Simple shadow instead of complex glows */
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2) !important;
+
+  /* Keep border visible */
+  border: 2px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Page header icon itself - keep visible with solid color */
+.performance-mode header .spatial-icon {
+  /* Remove filters but keep icon visible */
+  filter: none !important;
+  background: transparent !important;
+
+  /* Ensure icon color is visible */
+  color: currentColor !important;
+  opacity: 0.95 !important;
+}
+
+/* Icon SVG elements - ensure visibility */
+.performance-mode header .spatial-icon svg,
+.performance-mode header .spatial-icon path {
+  opacity: 1 !important;
+  fill: currentColor !important;
+}
+
+/* =========================================
    ANIMATIONS - All disabled
    ========================================= */
 
@@ -208,18 +253,34 @@
 }
 
 /* =========================================
-   PAGE HEADER AND NAVIGATION - Keep intact
-   Do NOT apply performance mode to navigation elements
+   PAGE HEADER AND NAVIGATION - Keep intact but optimized
+   Navigation elements get simplified but functional styling
    ========================================= */
 
-/* These remain unchanged and are excluded from performance mode */
-.performance-mode header,
+/* Header: Keep functional but remove expensive effects */
+.performance-mode header {
+  /* Don't use 'all: revert' - be specific instead */
+  animation: none !important;
+}
+
+/* Header text shadows - keep minimal for readability */
+.performance-mode header h1,
+.performance-mode header .page-header-title {
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+}
+
+.performance-mode header p,
+.performance-mode header .page-header-subtitle {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Navigation elements - keep functional */
 .performance-mode .sidebar,
 .performance-mode .mobile-drawer,
 .performance-mode .bottom-bar,
 .performance-mode .floating-chat-button {
-  /* Navigation elements keep their original styles */
-  all: revert;
+  /* Keep visible and functional, just no animations */
+  animation: none !important;
 }
 
 /* =========================================
