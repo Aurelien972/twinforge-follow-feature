@@ -24,6 +24,52 @@
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
+/* =========================================
+   SKELETON CONTAINERS FIX
+   Conteneurs de squelettes doivent rester semi-transparents
+   ========================================= */
+
+.performance-mode .glass-card.skeleton-container,
+.performance-mode [class*="skeleton-"] .glass-card,
+.performance-mode [class*="Skeleton"] .glass-card {
+  /* Semi-transparent pour ne pas cacher le contenu */
+  background: rgba(15, 25, 39, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Squelettes eux-mêmes restent visibles */
+.performance-mode .skeleton-shimmer {
+  /* Gradient simple pour animation légère */
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  ) !important;
+  background-size: 200% 100%;
+  animation: shimmer-performance 2s ease-in-out infinite !important;
+}
+
+@keyframes shimmer-performance {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.performance-mode .skeleton-glow::after {
+  /* Pas de glow complexe, juste un pulse simple */
+  display: none !important;
+}
+
+.performance-mode .animate-pulse-subtle {
+  /* Pulse très subtil pour ne pas consommer de ressources */
+  animation: pulse-performance 3s ease-in-out infinite !important;
+}
+
+@keyframes pulse-performance {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.92; }
+}
+
 /* Remove pseudo-element glows and highlights */
 .performance-mode .glass-card::before,
 .performance-mode .glass-card::after,
