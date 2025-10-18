@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import type { FastingInsightsSummary } from '../../hooks/useFastingInsightsGenerator';
 
 interface FastingInsightsSummaryCardProps {
@@ -56,13 +57,18 @@ const FastingInsightsSummaryCard: React.FC<FastingInsightsSummaryCardProps> = ({
   cached,
   className = ''
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   const theme = getSentimentTheme(summary.sentiment, summary.overallScore);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }
+      })}
       className={className}
     >
       <GlassCard
@@ -74,12 +80,14 @@ const FastingInsightsSummaryCard: React.FC<FastingInsightsSummaryCardProps> = ({
             var(--glass-opacity)
           `,
           borderColor: `color-mix(in srgb, ${theme.color} 30%, transparent)`,
-          boxShadow: `
-            0 16px 48px rgba(0, 0, 0, 0.3),
-            0 0 40px color-mix(in srgb, ${theme.color} 25%, transparent),
-            inset 0 2px 0 rgba(255, 255, 255, 0.2)
-          `,
-          backdropFilter: 'blur(24px) saturate(170%)'
+          boxShadow: isPerformanceMode
+            ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+            : `
+              0 16px 48px rgba(0, 0, 0, 0.3),
+              0 0 40px color-mix(in srgb, ${theme.color} 25%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.2)
+            `,
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(24px) saturate(170%)'
         }}
       >
         <div className="space-y-6">
@@ -87,14 +95,14 @@ const FastingInsightsSummaryCard: React.FC<FastingInsightsSummaryCardProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div
-                className="w-12 h-12 rounded-full flex items-center justify-center breathing-icon"
+                className={`w-12 h-12 rounded-full flex items-center justify-center ${isPerformanceMode ? '' : 'breathing-icon'}`}
                 style={{
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
                     linear-gradient(135deg, color-mix(in srgb, ${theme.color} 40%, transparent), color-mix(in srgb, ${theme.color} 30%, transparent))
                   `,
                   border: `2px solid color-mix(in srgb, ${theme.color} 60%, transparent)`,
-                  boxShadow: `0 0 25px color-mix(in srgb, ${theme.color} 50%, transparent)`
+                  boxShadow: isPerformanceMode ? 'none' : `0 0 25px color-mix(in srgb, ${theme.color} 50%, transparent)`
                 }}
               >
                 <SpatialIcon
@@ -145,29 +153,31 @@ const FastingInsightsSummaryCard: React.FC<FastingInsightsSummaryCardProps> = ({
             </h4>
             <div className="space-y-2">
               {summary.keyFindings.map((finding, index) => (
-                <motion.div
+                <MotionDiv
                   key={index}
                   className="flex items-center gap-3 p-3 rounded-lg"
                   style={{
                     background: `color-mix(in srgb, ${theme.color} 8%, transparent)`,
                     border: `1px solid color-mix(in srgb, ${theme.color} 20%, transparent)`
                   }}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
+                  {...(!isPerformanceMode && {
+                    initial: { opacity: 0, x: -10 },
+                    animate: { opacity: 1, x: 0 },
+                    transition: { duration: 0.4, delay: 0.2 + index * 0.1 }
+                  })}
                 >
                   <div 
                     className="w-2 h-2 rounded-full flex-shrink-0" 
-                    style={{ background: theme.color }} 
+                    style={{ background: theme.color }}
                   />
                   <span className="text-white/85 text-sm leading-relaxed">{finding}</span>
-                </motion.div>
+                </MotionDiv>
               ))}
             </div>
           </div>
 
           {/* Recommandation Principale */}
-          <motion.div 
+          <MotionDiv
             className="p-5 rounded-xl"
             style={{
               background: `
@@ -175,15 +185,19 @@ const FastingInsightsSummaryCard: React.FC<FastingInsightsSummaryCardProps> = ({
                 color-mix(in srgb, ${theme.color} 6%, transparent)
               `,
               border: `2px solid color-mix(in srgb, ${theme.color} 25%, transparent)`,
-              boxShadow: `
-                0 8px 32px rgba(0, 0, 0, 0.2),
-                0 0 20px color-mix(in srgb, ${theme.color} 20%, transparent),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15)
-              `
+              boxShadow: isPerformanceMode
+                ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+                : `
+                  0 8px 32px rgba(0, 0, 0, 0.2),
+                  0 0 20px color-mix(in srgb, ${theme.color} 20%, transparent),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.15)
+                `
             }}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            {...(!isPerformanceMode && {
+              initial: { opacity: 0, scale: 0.95 },
+              animate: { opacity: 1, scale: 1 },
+              transition: { duration: 0.6, delay: 0.5 }
+            })}
           >
             <div className="flex items-start gap-3">
               <div 
@@ -204,7 +218,7 @@ const FastingInsightsSummaryCard: React.FC<FastingInsightsSummaryCardProps> = ({
                 </p>
               </div>
             </div>
-          </motion.div>
+          </MotionDiv>
 
           {/* Métadonnées de l'Analyse */}
           <div className="flex items-center justify-center gap-4 text-xs text-white/50 pt-2 border-t border-white/10">
@@ -237,7 +251,7 @@ const FastingInsightsSummaryCard: React.FC<FastingInsightsSummaryCardProps> = ({
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

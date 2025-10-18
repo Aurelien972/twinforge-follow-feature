@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 
 interface FastingInsightsLoadingSkeletonProps {
   className?: string;
@@ -15,15 +16,20 @@ interface FastingInsightsLoadingSkeletonProps {
 const FastingInsightsLoadingSkeleton: React.FC<FastingInsightsLoadingSkeletonProps> = ({
   className = ''
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   return (
     <div className={`space-y-6 ${className}`}>
       {/* AI Processing Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+      <MotionDiv
+        {...(!isPerformanceMode && {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.6 }
+        })}
       >
-        <GlassCard 
+        <GlassCard
           className="p-6 text-center"
           style={{
             background: `
@@ -32,16 +38,18 @@ const FastingInsightsLoadingSkeleton: React.FC<FastingInsightsLoadingSkeletonPro
               var(--glass-opacity)
             `,
             borderColor: 'color-mix(in srgb, #8B5CF6 30%, transparent)',
-            boxShadow: `
-              0 16px 48px rgba(0, 0, 0, 0.3),
-              0 0 40px color-mix(in srgb, #8B5CF6 25%, transparent),
-              inset 0 2px 0 rgba(255, 255, 255, 0.2)
-            `,
-            backdropFilter: 'blur(24px) saturate(170%)'
+            boxShadow: isPerformanceMode
+              ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+              : `
+                0 16px 48px rgba(0, 0, 0, 0.3),
+                0 0 40px color-mix(in srgb, #8B5CF6 25%, transparent),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2)
+              `,
+            backdropFilter: isPerformanceMode ? 'none' : 'blur(24px) saturate(170%)'
           }}
         >
           <div className="space-y-4">
-            <motion.div
+            <MotionDiv
               className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
               style={{
                 background: `
@@ -49,32 +57,29 @@ const FastingInsightsLoadingSkeleton: React.FC<FastingInsightsLoadingSkeletonPro
                   linear-gradient(135deg, color-mix(in srgb, #8B5CF6 40%, transparent), color-mix(in srgb, #A855F7 30%, transparent))
                 `,
                 border: '3px solid color-mix(in srgb, #8B5CF6 60%, transparent)',
-                boxShadow: `
-                  0 0 40px color-mix(in srgb, #8B5CF6 60%, transparent),
-                  0 0 80px color-mix(in srgb, #8B5CF6 40%, transparent)
-                `
+                boxShadow: isPerformanceMode
+                  ? 'none'
+                  : '0 0 40px color-mix(in srgb, #8B5CF6 60%, transparent)'
               }}
-              animate={{ 
-                scale: [1, 1.05, 1],
-                boxShadow: [
-                  '0 0 40px color-mix(in srgb, #8B5CF6 60%, transparent)',
-                  '0 0 60px color-mix(in srgb, #8B5CF6 80%, transparent)',
-                  '0 0 40px color-mix(in srgb, #8B5CF6 60%, transparent)'
-                ]
-              }}
-              transition={{ 
-                duration: 2, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
-              }}
+              {...(!isPerformanceMode && {
+                animate: {
+                  scale: [1, 1.05, 1],
+                  boxShadow: [
+                    '0 0 40px color-mix(in srgb, #8B5CF6 60%, transparent)',
+                    '0 0 60px color-mix(in srgb, #8B5CF6 80%, transparent)',
+                    '0 0 40px color-mix(in srgb, #8B5CF6 60%, transparent)'
+                  ]
+                },
+                transition: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+              })}
             >
               <SpatialIcon 
                 Icon={ICONS.Lightbulb} 
                 size={40} 
                 style={{ color: '#8B5CF6' }}
-                className="animate-pulse"
+                className={isPerformanceMode ? '' : 'animate-pulse'}
               />
-            </motion.div>
+            </MotionDiv>
             
             <div>
               <h3 className="text-2xl font-bold text-white mb-2">
@@ -93,40 +98,42 @@ const FastingInsightsLoadingSkeleton: React.FC<FastingInsightsLoadingSkeletonPro
                 'Génération d\'insights personnalisés',
                 'Mise en cache pour optimisation'
               ].map((step, index) => (
-                <motion.div
+                <MotionDiv
                   key={index}
                   className="flex items-center gap-3 p-2 rounded-lg bg-white/5"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.2 }}
+                  {...(!isPerformanceMode && {
+                    initial: { opacity: 0, x: -20 },
+                    animate: { opacity: 1, x: 0 },
+                    transition: { duration: 0.4, delay: index * 0.2 }
+                  })}
                 >
-                  <motion.div
+                  <MotionDiv
                     className="w-2 h-2 rounded-full bg-purple-400"
-                    animate={{ 
-                      scale: [1, 1.2, 1],
-                      opacity: [0.6, 1, 0.6]
-                    }}
-                    transition={{ 
-                      duration: 1.5, 
-                      repeat: Infinity, 
-                      delay: index * 0.3 
-                    }}
+                    {...(!isPerformanceMode && {
+                      animate: {
+                        scale: [1, 1.2, 1],
+                        opacity: [0.6, 1, 0.6]
+                      },
+                      transition: { duration: 1.5, repeat: Infinity, delay: index * 0.3 }
+                    })}
                   />
                   <span className="text-white/70 text-sm">{step}</span>
-                </motion.div>
+                </MotionDiv>
               ))}
             </div>
           </div>
         </GlassCard>
-      </motion.div>
+      </MotionDiv>
 
       {/* Skeleton Cards */}
       <div className="space-y-4">
         {/* Summary Skeleton */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+        <MotionDiv
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, y: 20 },
+            animate: { opacity: 1, y: 0 },
+            transition: { duration: 0.6, delay: 0.2 }
+          })}
         >
           <GlassCard className="p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -142,15 +149,17 @@ const FastingInsightsLoadingSkeleton: React.FC<FastingInsightsLoadingSkeletonPro
               <div className="h-3 bg-white/10 rounded w-1/2 animate-pulse" />
             </div>
           </GlassCard>
-        </motion.div>
+        </MotionDiv>
 
         {/* Insight Cards Skeletons */}
         {[1, 2, 3].map((index) => (
-          <motion.div
+          <MotionDiv
             key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
+            {...(!isPerformanceMode && {
+              initial: { opacity: 0, y: 20 },
+              animate: { opacity: 1, y: 0 },
+              transition: { duration: 0.6, delay: 0.3 + index * 0.1 }
+            })}
           >
             <GlassCard className="p-5">
               <div className="flex items-start gap-3">
@@ -165,34 +174,35 @@ const FastingInsightsLoadingSkeleton: React.FC<FastingInsightsLoadingSkeletonPro
                 </div>
               </div>
             </GlassCard>
-          </motion.div>
+          </MotionDiv>
         ))}
       </div>
 
       {/* Processing Time Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 1 }}
+      <MotionDiv
+        {...(!isPerformanceMode && {
+          initial: { opacity: 0 },
+          animate: { opacity: 1 },
+          transition: { duration: 0.6, delay: 1 }
+        })}
         className="text-center"
       >
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-400/20">
-          <motion.div
+          <MotionDiv
             className="w-2 h-2 rounded-full bg-purple-400"
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.6, 1, 0.6]
-            }}
-            transition={{ 
-              duration: 1, 
-              repeat: Infinity 
-            }}
+            {...(!isPerformanceMode && {
+              animate: {
+                scale: [1, 1.2, 1],
+                opacity: [0.6, 1, 0.6]
+              },
+              transition: { duration: 1, repeat: Infinity }
+            })}
           />
           <span className="text-purple-300 text-sm font-medium">
             Génération IA en cours... (~15-45 secondes)
           </span>
         </div>
-      </motion.div>
+      </MotionDiv>
     </div>
   );
 };
