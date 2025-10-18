@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { usePreferredMotion } from '../../../../../system/device/DeviceProvider';
+import { ConditionalMotion } from '../../../../../lib/motion/ConditionalMotion';
+import { useBodyScanPerformance } from '../../../../../hooks/useBodyScanPerformance';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
@@ -29,8 +29,8 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
   currentMessage,
   currentSubMessage,
 }) => {
-  const preferredMotion = usePreferredMotion();
-  const shouldAnimate = preferredMotion === 'full';
+  const performanceConfig = useBodyScanPerformance();
+  const shouldAnimate = performanceConfig.enableCSSAnimations;
 
   // Photos
   const frontPhoto = useMemo(
@@ -77,17 +77,18 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
     []
   );
 
-  // Zones d’analyse dynamiques (légères, mises à jour toutes les 2s uniquement si animations)
+  // Zones d'analyse dynamiques - DÉSACTIVÉES en mode performance
   const [analysisZones, setAnalysisZones] = useState<
     Array<{ x: number; y: number; intensity: number; id: string }>
   >([]);
 
   useEffect(() => {
-    if (!shouldAnimate) return;
+    // OPTIMIZATION: Désactiver complètement les zones en mode performance
+    if (!shouldAnimate || !performanceConfig.enableParticleEffects) return;
 
     const generateZones = () => {
       const zones = Array.from({ length: 3 }, (_, i) => ({
-        x: Math.random() * 80 + 10, // 10–90%
+        x: Math.random() * 80 + 10,
         y: Math.random() * 80 + 10,
         intensity: Math.random() * 0.8 + 0.2,
         id: `zone-${Date.now()}-${i}`,
@@ -98,7 +99,7 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
     generateZones();
     const interval = setInterval(generateZones, 2000);
     return () => clearInterval(interval);
-  }, [shouldAnimate]);
+  }, [shouldAnimate, performanceConfig.enableParticleEffects]);
 
   // Particules de flux de données (positions fixes par montage)
   type Particle = {
@@ -126,8 +127,8 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
     });
   }, []);
 
-  // Animation basique (utilise tes tokens via CSS)
-  const cardEnter = { opacity: 0, scale: 0.94 };
+  // Animation basique - conditionnelle selon mode performance
+  const cardEnter = performanceConfig.enableInitialAnimations ? { opacity: 0, scale: 0.94 } : false;
   const cardShow  = { opacity: 1, scale: 1 };
   const ease      = [0.25, 0.1, 0.25, 1];
 
@@ -167,7 +168,11 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
       {/* Photos d'analyse */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Face */}
-        <motion.div initial={cardEnter} animate={cardShow} transition={{ duration: 0.7, ease }}>
+        <ConditionalMotion
+          initial={cardEnter}
+          animate={cardShow}
+          transition={performanceConfig.enableFramerMotion ? { duration: 0.7, ease } : undefined}
+        >
           <GlassCard className="glass-card analysis-photo-card analysis-photo-card--front p-4 relative overflow-hidden rounded-2xl border-0">
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-white font-semibold flex items-center gap-2">
@@ -215,8 +220,8 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
                 fetchpriority="high"
               />
 
-              {/* Overlays d’analyse — uniquement si animations autorisées */}
-              {shouldAnimate && (
+              {/* Overlays d'analyse — DÉSACTIVÉS en mode performance */}
+              {shouldAnimate && performanceConfig.enableScanLineOverlays && (
                 <>
                   <div className="scan-line-vertical" aria-hidden="true" />
 
@@ -268,10 +273,14 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
               <figcaption className="sr-only">Repérage des articulations et analyse de surface</figcaption>
             </figure>
           </GlassCard>
-        </motion.div>
+        </ConditionalMotion>
 
         {/* Profil */}
-        <motion.div initial={cardEnter} animate={cardShow} transition={{ duration: 0.7, delay: 0.15, ease }}>
+        <ConditionalMotion
+          initial={cardEnter}
+          animate={cardShow}
+          transition={performanceConfig.enableFramerMotion ? { duration: 0.7, delay: 0.15, ease } : undefined}
+        >
           <GlassCard className="glass-card analysis-photo-card analysis-photo-card--profile p-4 relative overflow-hidden rounded-2xl border-0">
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-white font-semibold flex items-center gap-2">
@@ -314,11 +323,11 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
                 src={profilePhoto.url}
                 alt="Photo de profil en cours d’analyse"
                 className="w-full h-full object-contain analysis-photo"
-                loading="lazy"
+                loading={performanceConfig.imageLoadingStrategy}
                 decoding="async"
               />
 
-              {shouldAnimate && (
+              {shouldAnimate && performanceConfig.enableScanLineOverlays && (
                 <>
                   <div className="scan-line-horizontal" aria-hidden="true" />
 
@@ -370,7 +379,7 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
               <figcaption className="sr-only">Analyse latérale et maillage de contrôle</figcaption>
             </figure>
           </GlassCard>
-        </motion.div>
+        </ConditionalMotion>
       </div>
 
       {/* Analysis Insights Grid */}
@@ -382,8 +391,8 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
         className="mt-8"
       />
 
-      {/* Flux de données (particules) */}
-      {shouldAnimate && (
+      {/* Flux de données (particules) - DÉSACTIVÉ en mode performance */}
+      {shouldAnimate && performanceConfig.enableDataParticles && (
         <div className="data-flow-container" aria-hidden="true">
           {dataParticles.map((p, i) => (
             <div

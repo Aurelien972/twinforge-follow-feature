@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { ConditionalMotion } from '../../../lib/motion/ConditionalMotion';
+import { useBodyScanPerformance } from '../../../hooks/useBodyScanPerformance';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import { getGuideImageUrl, type UserGender } from './constants';
@@ -11,6 +12,7 @@ interface PhotoGuideOverlayProps {
 }
 
 const PhotoGuideOverlay: React.FC<PhotoGuideOverlayProps> = ({ type, isFaceScan = false, gender }) => {
+  const performanceConfig = useBodyScanPerformance();
   // Get the appropriate guide image URL based on gender and type
   const guideImageUrl = getGuideImageUrl(gender, type);
 
@@ -48,11 +50,11 @@ const PhotoGuideOverlay: React.FC<PhotoGuideOverlayProps> = ({ type, isFaceScan 
           }}
         >
           {/* Guide Image with TwinForge Glass Effects */}
-          <motion.div
+          <ConditionalMotion
             className="absolute inset-2 rounded-2xl overflow-hidden"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+            initial={performanceConfig.enableInitialAnimations ? { opacity: 0, scale: 0.95 } : false}
+            animate={performanceConfig.enableInitialAnimations ? { opacity: 1, scale: 1 } : { opacity: 1 }}
+            transition={performanceConfig.enableFramerMotion ? { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } : undefined}
           >
             <img
               src={guideImageUrl}
@@ -101,7 +103,7 @@ const PhotoGuideOverlay: React.FC<PhotoGuideOverlayProps> = ({ type, isFaceScan 
                 mixBlendMode: 'overlay'
               }}
             />
-          </motion.div>
+          </ConditionalMotion>
           
           {/* Position indicator - Top */}
           <div 
@@ -153,17 +155,19 @@ const PhotoGuideOverlay: React.FC<PhotoGuideOverlayProps> = ({ type, isFaceScan 
             {type === 'front' ? '180°' : '90°'}
           </div> {/* Removed redundant style prop, it's already passed via `style` prop of SpatialIcon */}
           
-          {/* Breathing animation */}
-          <div 
-            className="absolute inset-0 border-2 border-white/20 rounded-3xl pointer-events-none"
-            style={{
-              animation: 'guide-breathing-animation 4s ease-in-out infinite',
-              boxShadow: type === 'front'
-                ? 'inset 0 0 20px color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent)'
-                : 'inset 0 0 20px color-mix(in srgb, #A855F7 10%, transparent)',
-              zIndex: 10
-            }}
-          />
+          {/* Breathing animation - disabled in performance mode */}
+          {performanceConfig.enableBreathingAnimations && (
+            <div
+              className="absolute inset-0 border-2 border-white/20 rounded-3xl pointer-events-none"
+              style={{
+                animation: 'guide-breathing-animation 4s ease-in-out infinite',
+                boxShadow: type === 'front'
+                  ? 'inset 0 0 20px color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent)'
+                  : 'inset 0 0 20px color-mix(in srgb, #A855F7 10%, transparent)',
+                zIndex: 10
+              }}
+            />
+          )}
         </div>
       </div>
       

@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { ConditionalMotion } from '../../../../../lib/motion/ConditionalMotion';
+import { useBodyScanPerformance } from '../../../../../hooks/useBodyScanPerformance';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
@@ -54,6 +55,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
   fileInputRef,
   onFileSelect,
 }) => {
+  const performanceConfig = useBodyScanPerformance();
   const existingPhoto = capturedPhotos.find(p => p.type === photoType);
   const isCurrentStep =
     (photoType === 'front' && step === 'front-photo') ||
@@ -70,15 +72,15 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
   const cardTitle = photoType === 'front' ? 'Photo de face' : 'Photo de profil';
 
   return (
-    <motion.div
+    <ConditionalMotion
       data-photo-type={photoType}
-      initial={{ opacity: 0, x: photoType === 'front' ? -20 : 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{
+      initial={performanceConfig.enableInitialAnimations ? { opacity: 0, x: photoType === 'front' ? -20 : 20 } : false}
+      animate={performanceConfig.enableInitialAnimations ? { opacity: 1, x: 0 } : { opacity: 1 }}
+      transition={performanceConfig.enableFramerMotion ? {
         duration: 0.6,
         delay: photoType === 'front' ? 0 : 0.1,
         ease: [0.25, 0.1, 0.25, 1],
-      }}
+      } : undefined}
       className="w-full max-w-2xl"
     >
       <GlassCard
@@ -160,7 +162,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
           </div>
         )}
       </GlassCard>
-    </motion.div>
+    </ConditionalMotion>
   );
 };
 

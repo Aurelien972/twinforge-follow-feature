@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { ConditionalMotion } from '../../../../../lib/motion/ConditionalMotion';
+import { useBodyScanPerformance } from '../../../../../hooks/useBodyScanPerformance';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
@@ -76,6 +77,7 @@ const MorphAdjustmentControls: React.FC<MorphAdjustmentControlsProps> = React.me
   isViewerReady,
   avatar3DRef
 }) => {
+  const performanceConfig = useBodyScanPerformance();
   const [isExpanded, setIsExpanded] = useState(false);
   const [adjustedMorphs, setAdjustedMorphs] = useState<Set<string>>(new Set());
   const { click, formInput } = useFeedback();
@@ -174,11 +176,11 @@ const MorphAdjustmentControls: React.FC<MorphAdjustmentControlsProps> = React.me
   const otherCategories = Object.entries(morphsByCategory).filter(([category]) => category !== 'Corps');
 
   return (
-    <motion.div
+    <ConditionalMotion
       className="slide-enter"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.4 }}
+      initial={performanceConfig.enableInitialAnimations ? { opacity: 0, y: 20 } : false}
+      animate={performanceConfig.enableInitialAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+      transition={performanceConfig.enableFramerMotion ? { duration: 0.6, delay: 0.4 } : undefined}
     >
       <GlassCard className="morph-adjustment-card">
         <div className="bodyscan-flex-between mb-6">
@@ -251,22 +253,22 @@ const MorphAdjustmentControls: React.FC<MorphAdjustmentControlsProps> = React.me
               {corpsMorphs.slice(0, isExpanded ? corpsMorphs.length : 2).map((morph, index) => {
                 const range = morphPolicy.ranges[morph.key];
                 if (!range) return null;
-                
+
                 const currentValue = currentMorphData[morph.key] !== undefined && currentMorphData[morph.key] !== null
                   ? currentMorphData[morph.key]
                   : 0;
-                
+
                 const canDecrement = currentValue > range.min;
                 const canIncrement = currentValue < range.max;
                 const isAdjusted = adjustedMorphs.has(morph.key);
-                
+
                 return (
-                  <motion.div
+                  <ConditionalMotion
                     key={morph.key}
                     className={`glass-nested-card glass-field-container p-4 ${isAdjusted ? 'ring-2 ring-blue-400/30' : ''}`}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * index, duration: 0.4 }}
+                    initial={performanceConfig.enableStaggerAnimations ? { opacity: 0, x: -20 } : false}
+                    animate={performanceConfig.enableStaggerAnimations ? { opacity: 1, x: 0 } : { opacity: 1 }}
+                    transition={performanceConfig.enableFramerMotion ? { delay: 0.1 * index, duration: 0.4 } : undefined}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
@@ -323,7 +325,7 @@ const MorphAdjustmentControls: React.FC<MorphAdjustmentControlsProps> = React.me
                         </button>
                       </div>
                     </div>
-                  </motion.div>
+                  </ConditionalMotion>
                 );
               })}
             </div>
@@ -363,22 +365,22 @@ const MorphAdjustmentControls: React.FC<MorphAdjustmentControlsProps> = React.me
               {morphs.map((morph, index) => {
                 const range = morphPolicy.ranges[morph.key];
                 if (!range) return null;
-                
+
                 const currentValue = currentMorphData[morph.key] !== undefined && currentMorphData[morph.key] !== null
                   ? currentMorphData[morph.key]
                   : 0;
-                
+
                 const canDecrement = currentValue > range.min;
                 const canIncrement = currentValue < range.max;
                 const isAdjusted = adjustedMorphs.has(morph.key);
-                
+
                 return (
-                  <motion.div
+                  <ConditionalMotion
                     key={morph.key}
                     className={`glass-nested-card glass-field-container p-4 ${isAdjusted ? 'ring-2 ring-blue-400/30' : ''}`}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * index, duration: 0.4 }}
+                    initial={performanceConfig.enableStaggerAnimations ? { opacity: 0, x: -20 } : false}
+                    animate={performanceConfig.enableStaggerAnimations ? { opacity: 1, x: 0 } : { opacity: 1 }}
+                    transition={performanceConfig.enableFramerMotion ? { delay: 0.1 * index, duration: 0.4 } : undefined}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
@@ -435,7 +437,7 @@ const MorphAdjustmentControls: React.FC<MorphAdjustmentControlsProps> = React.me
                         </button>
                       </div>
                     </div>
-                  </motion.div>
+                  </ConditionalMotion>
                 );
               })}
             </div>
@@ -451,7 +453,7 @@ const MorphAdjustmentControls: React.FC<MorphAdjustmentControlsProps> = React.me
           </div>
         )}
       </GlassCard>
-    </motion.div>
+    </ConditionalMotion>
   );
 });
 

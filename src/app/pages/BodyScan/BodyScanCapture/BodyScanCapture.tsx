@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { nanoid } from 'nanoid';
+import { ConditionalMotion, ConditionalAnimatePresence } from '../../../../lib/motion/ConditionalMotion';
+import { useBodyScanPerformance } from '../../../../hooks/useBodyScanPerformance';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -19,6 +20,7 @@ import BodyScanProgressHeader from '../BodyScanProgressHeader';
 const BodyScanCapture: React.FC = () => {
   const navigate = useNavigate();
   const { startProgress, progress, message, subMessage, isActive, steps, currentStep: progressCurrentStep } = useProgressStore();
+  const performanceConfig = useBodyScanPerformance();
 
   // Stable scan id
   const scanIdRef = useRef<string | null>(null);
@@ -44,8 +46,8 @@ const BodyScanCapture: React.FC = () => {
     scanId: scanIdRef.current ?? undefined,
   });
 
-  // Smooth scroll on step changes
-  React.useEffect(() => { // MODIFIED: Changed scroll behavior to instant
+  // Smooth scroll on step changes - Always instant for performance
+  React.useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
     const mainContent = document.getElementById('main-content');
     if (mainContent) {
@@ -310,18 +312,18 @@ const BodyScanCapture: React.FC = () => {
         />
       )}
 
-      {/* Main Content with AnimatePresence */}
-      <AnimatePresence mode="wait">
-        <motion.div
+      {/* Main Content with Conditional AnimatePresence */}
+      <ConditionalAnimatePresence mode="wait">
+        <ConditionalMotion
           key={getStepKey()}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
+          initial={performanceConfig.enableInitialAnimations ? { opacity: 0, y: 20 } : false}
+          animate={performanceConfig.enableInitialAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+          exit={performanceConfig.enableExitAnimations ? { opacity: 0, y: -20 } : undefined}
+          transition={performanceConfig.enableFramerMotion ? { duration: 0.3 } : undefined}
         >
           {renderCurrentStep(progress, message, subMessage)}
-        </motion.div>
-      </AnimatePresence>
+        </ConditionalMotion>
+      </ConditionalAnimatePresence>
     </div>
   );
 };

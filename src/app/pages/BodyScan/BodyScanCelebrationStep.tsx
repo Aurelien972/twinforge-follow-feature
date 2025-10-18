@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ConditionalMotion } from '../../../lib/motion/ConditionalMotion';
+import { useBodyScanPerformance } from '../../../hooks/useBodyScanPerformance';
 import { useLocation, useNavigate } from 'react-router-dom';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
@@ -18,6 +19,7 @@ import logger from '../../../lib/utils/logger';
  * Affiche une célébration avec confettis après le traitement réussi
  */
 const BodyScanCelebrationStep: React.FC = () => {
+  const performanceConfig = useBodyScanPerformance();
   const location = useLocation();
   const navigate = useNavigate();
   const { successMajor, success } = useFeedback();
@@ -135,8 +137,9 @@ const BodyScanCelebrationStep: React.FC = () => {
 
   return (
     <div className="relative overflow-visible pt-4 pb-6 md:pb-8">
-      {/* Celebration Background Effects */}
-      <div className="celebration-background-effects absolute inset-0 pointer-events-none overflow-visible">
+      {/* Celebration Background Effects - disabled in performance mode */}
+      {performanceConfig.enableParticleEffects && (
+        <div className="celebration-background-effects absolute inset-0 pointer-events-none overflow-visible">
         {/* Ambient Glow Background */}
         <div
           className="celebration-ambient-glow absolute inset-0 rounded-3xl"
@@ -176,21 +179,22 @@ const BodyScanCelebrationStep: React.FC = () => {
             }}
           />
         ))}
-      </div>
+        </div>
+      )}
 
       {/* Main Celebration Content */}
       <div className="celebration-main-content relative text-center py-8 md:py-12 z-10">
         {/* Central Celebration Icon with Multi-Layer Effects */}
-        <motion.div
+        <ConditionalMotion
           className="relative w-32 h-32 mx-auto mb-8"
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ 
-            type: 'spring', 
-            stiffness: 200, 
+          initial={performanceConfig.enableInitialAnimations ? { scale: 0, rotate: -180 } : false}
+          animate={performanceConfig.enableInitialAnimations ? { scale: 1, rotate: 0 } : { scale: 1 }}
+          transition={performanceConfig.enableFramerMotion ? {
+            type: 'spring',
+            stiffness: 200,
             damping: 15,
             duration: 1.2
-          }}
+          } : undefined}
         >
           {/* Outer Glow Ring */}
           <div
@@ -215,55 +219,58 @@ const BodyScanCelebrationStep: React.FC = () => {
             <SpatialIcon Icon={celebration.icon} size={48} color={celebration.color} />
           </div>
 
-          {/* Pulse Rings */}
-          {[...Array(3)].map((_, i) => (
+          {/* Pulse Rings - disabled in performance mode */}
+          {performanceConfig.enablePulseAnimations && [...Array(3)].map((_, i) => (
             <div
               key={`pulse-${i}`}
               className={`celebration-icon-pulse-ring celebration-icon-pulse-ring--${i + 1} absolute inset-0 rounded-full border-2`}
-              style={{ 
+              style={{
                 borderColor: `${celebration.color}40`,
                 '--celebration-color': celebration.color
               }}
             />
           ))}
-        </motion.div>
+        </ConditionalMotion>
         
         {/* Celebration Text - Optimized for Above the Fold */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
+        <ConditionalMotion
+          initial={performanceConfig.enableInitialAnimations ? { opacity: 0, y: 30 } : false}
+          animate={performanceConfig.enableInitialAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+          transition={performanceConfig.enableFramerMotion ? { delay: 0.6, duration: 0.8 } : undefined}
         >
-          <motion.h3
+          <ConditionalMotion
+            as="h3"
             className="celebration-title-glow text-4xl md:text-5xl font-bold text-white mb-4"
             style={{ color: celebration.color }}
           >
             {celebration.title}
-          </motion.h3>
-          
-          <motion.p
+          </ConditionalMotion>
+
+          <ConditionalMotion
+            as="p"
             className="text-xl text-white/90 mb-6 leading-relaxed max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
+            initial={performanceConfig.enableStaggerAnimations ? { opacity: 0, y: 20 } : false}
+            animate={performanceConfig.enableStaggerAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+            transition={performanceConfig.enableFramerMotion ? { delay: 0.8, duration: 0.6 } : undefined}
           >
             {celebration.subtitle}
-          </motion.p>
-        </motion.div>
+          </ConditionalMotion>
+        </ConditionalMotion>
       </div>
 
       {/* Call to Action */}
-      <motion.div
+      <ConditionalMotion
         className="flex justify-center relative z-10 mt-4"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.0, duration: 0.8 }}
+        initial={performanceConfig.enableInitialAnimations ? { opacity: 0, y: 40 } : false}
+        animate={performanceConfig.enableInitialAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+        transition={performanceConfig.enableFramerMotion ? { delay: 1.0, duration: 0.8 } : undefined}
       >
-        <motion.button
+        <ConditionalMotion
+          as="button"
           onClick={handleDiscoverAvatar}
           className="btn-glass--primary px-12 py-6 text-xl font-bold relative overflow-hidden"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
+          whileHover={performanceConfig.enableWhileHover ? { scale: 1.03 } : undefined}
+          whileTap={performanceConfig.enableWhileTap ? { scale: 0.97 } : undefined}
           style={{
             background: `linear-gradient(135deg, ${celebration.color}80, ${celebration.color}60)`,
             boxShadow: `0 12px 40px ${celebration.color}40, 0 0 60px ${celebration.color}30`,
@@ -271,13 +278,15 @@ const BodyScanCelebrationStep: React.FC = () => {
             color: '#0B0F1A'
           }}
         >
-          {/* Shimmer Effect */}
-          <div
-            className="celebration-cta-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-          />
-          
-          {/* Celebration Sparkles */}
-          {[...Array(4)].map((_, i) => (
+          {/* Shimmer Effect - disabled in performance mode */}
+          {performanceConfig.enableShimmerEffects && (
+            <div
+              className="celebration-cta-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+            />
+          )}
+
+          {/* Celebration Sparkles - disabled in performance mode */}
+          {performanceConfig.enableParticleEffects && [...Array(4)].map((_, i) => (
             <div
               key={i}
               className={`celebration-cta-sparkle celebration-cta-sparkle--${i + 1} absolute w-2 h-2 rounded-full bg-white`}
@@ -292,24 +301,26 @@ const BodyScanCelebrationStep: React.FC = () => {
             <SpatialIcon Icon={ICONS.Eye} size={28} color="#0B0F1A" />
             <span>Mon Avatar 3D</span>
           </div>
-        </motion.button>
-      </motion.div>
+        </ConditionalMotion>
+      </ConditionalMotion>
 
-      {/* Celebration Confetti Effect */}
-      <div className="absolute inset-0 pointer-events-none overflow-visible">
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={`confetti-${i}`}
-            className={`celebration-confetti celebration-confetti--${i + 1} absolute w-2 h-6 rounded-full`}
-            style={{
-              background: `linear-gradient(180deg, ${celebration.color}, ${celebration.color}60)`,
-              left: `${10 + i * 10}%`,
-              top: '-10%',
-              '--celebration-color': celebration.color
-            }}
-          />
-        ))}
-      </div>
+      {/* Celebration Confetti Effect - disabled in performance mode */}
+      {performanceConfig.enableParticleEffects && (
+        <div className="absolute inset-0 pointer-events-none overflow-visible">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={`confetti-${i}`}
+              className={`celebration-confetti celebration-confetti--${i + 1} absolute w-2 h-6 rounded-full`}
+              style={{
+                background: `linear-gradient(180deg, ${celebration.color}, ${celebration.color}60)`,
+                left: `${10 + i * 10}%`,
+                top: '-10%',
+                '--celebration-color': celebration.color
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
