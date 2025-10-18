@@ -110,7 +110,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
         interactive
         style={cardStyles}
       >
-        {/* Carrés tournants aux coins - Désactivés en mode low/medium */}
+        {/* Carrés tournants aux coins - Désactivés en mode low/medium/balanced */}
         {perf.enableComplexEffects && (
           <div className="training-hero-corners" aria-hidden="true">
             {[0, 1, 2, 3].map((i) => (
@@ -137,7 +137,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
           </div>
         )}
 
-        {(urgencyConfig.priority === 'high' || urgencyConfig.priority === 'critical') && perf.enableComplexEffects && (
+        {(urgencyConfig.priority === 'high' || urgencyConfig.priority === 'critical') && perf.enableGlows && (
           <div
             className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
             style={{
@@ -151,11 +151,16 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
 
         <div className="relative z-10 space-y-4 md:space-y-6">
           <div
-            className={`activity-icon-enhanced mx-auto rounded-full flex items-center justify-center relative ${
-              urgencyConfig.animation === 'pulse' && perf.enableAnimations ? 'icon-pulse-css' :
+            className={`activity-icon-enhanced activity-icon-container activity-icon-primary mx-auto ${
+              urgencyConfig.animation === 'pulse' && perf.enablePulseEffects ? 'icon-pulse-css' :
               urgencyConfig.animation === 'breathing' && perf.enableAnimations ? 'icon-breathing-css' : ''
             }`}
-            style={iconStyles}
+            style={{
+              ...iconStyles,
+              width: '120px',
+              height: '120px',
+              '--icon-glow-color': '#3B82F6'
+            } as React.CSSProperties}
           >
             <SpatialIcon
               Icon={ICONS[urgencyConfig.icon as keyof typeof ICONS]}
@@ -163,29 +168,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
               style={{ color: '#3B82F6' }}
             />
 
-            {shouldShowParticles(urgencyConfig) && perf.enableParticles &&
-              [...Array(getParticleCount(urgencyConfig))].map((_, i) => {
-                const angle = (i * 360) / getParticleCount(urgencyConfig);
-                const radius = 60;
-                const x = Math.cos((angle * Math.PI) / 180) * radius;
-                const y = Math.sin((angle * Math.PI) / 180) * radius;
-
-                return (
-                  <div
-                    key={i}
-                    className={`absolute w-2 h-2 rounded-full dynamic-particle-css dynamic-particle-css--${i + 1}`}
-                    style={{
-                      background: '#3B82F6',
-                      boxShadow: `0 0 12px color-mix(in srgb, #3B82F6 70%, transparent)`,
-                      '--particle-x': `${x * 0.4}px`,
-                      '--particle-y': `${y * 0.4}px`,
-                      '--particle-x-end': `${x}px`,
-                      '--particle-y-end': `${y}px`
-                    } as React.CSSProperties}
-                  />
-                );
-              })
-            }
+            {/* Pas de particules en mode balanced */}
           </div>
 
           <div className="space-y-2 md:space-y-3">
@@ -224,15 +207,10 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                 backdropFilter: 'blur(20px) saturate(160%)'
               }}
             >
-              {/* Shimmer Effect - Désactivé en mode low/medium */}
+              {/* Shimmer Effect - Désactivé en mode low/balanced */}
               {perf.enableShimmers && (
                 <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-                    animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
-                    borderRadius: 'inherit'
-                  }}
+                  className="absolute inset-0 pointer-events-none dynamic-cta-shimmer"
                 />
               )}
 
@@ -256,14 +234,15 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
             {hasActivities && (
               <button
                 onClick={handleViewInsights}
-                className="px-6 py-4 rounded-full font-medium text-white/90 transition-all duration-200 min-h-[64px]"
+                className="px-6 py-4 rounded-full font-medium text-white/90 min-h-[64px]"
                 style={{
                   background: `color-mix(in srgb, #3B82F6 8%, transparent)`,
                   border: `1px solid color-mix(in srgb, #3B82F6 20%, transparent)`,
-                  backdropFilter: 'blur(12px) saturate(130%)'
+                  backdropFilter: 'blur(12px) saturate(130%)',
+                  transition: perf.enableAnimations ? 'all 0.2s ease' : 'none'
                 }}
                 onMouseEnter={(e) => {
-                  if (perf.mode !== 'low') {
+                  if (perf.enableAnimations) {
                     e.currentTarget.style.background = `color-mix(in srgb, #3B82F6 12%, transparent)`;
                     e.currentTarget.style.borderColor = `color-mix(in srgb, #3B82F6 30%, transparent)`;
                     e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)';

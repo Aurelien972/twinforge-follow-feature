@@ -1,6 +1,7 @@
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { useActivityPerformance } from '../../hooks/useActivityPerformance';
 import React from 'react';
 
 interface ActivitySummaryCardProps {
@@ -19,6 +20,8 @@ interface ActivitySummaryCardProps {
  * Affiche un aperçu des types d'activités et de leurs caractéristiques
  */
 const ActivitySummaryCard: React.FC<ActivitySummaryCardProps> = ({ todayStats, profile }) => {
+  const perf = useActivityPerformance();
+
   const summaryMetrics = [
     {
       color: '#3B82F6',
@@ -71,11 +74,14 @@ const ActivitySummaryCard: React.FC<ActivitySummaryCardProps> = ({ todayStats, p
           >
             <div className="flex items-center justify-center gap-1 mb-2">
               <div
-                className="w-6 h-6 rounded-full flex items-center justify-center"
+                className={`activity-icon-container activity-icon-container-sm ${
+                  index === 0 ? 'activity-icon-primary' :
+                  index === 1 ? 'activity-icon-secondary' :
+                  index === 2 ? 'activity-icon-accent' : 'activity-icon-primary'
+                }`}
                 style={{
-                  background: `color-mix(in srgb, ${metric.color} 15%, transparent)`,
-                  border: `1px solid color-mix(in srgb, ${metric.color} 25%, transparent)`
-                }}
+                  '--icon-glow-color': metric.color
+                } as React.CSSProperties}
               >
                 <SpatialIcon
                   Icon={ICONS[metric.icon as keyof typeof ICONS]}

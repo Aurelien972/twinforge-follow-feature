@@ -142,6 +142,84 @@
 }
 
 /* =========================================
+   ICON PERFORMANCE MODES
+   Mode Normal: Glow lumineux et animations breathing
+   Mode Performance: Fond noir sans glow
+   ========================================= */
+
+/* Mode Normal - Icônes avec glow lumineux et breathing */
+body:not(.mode-high-performance) .activity-icon-primary,
+body:not(.mode-high-performance) .activity-icon-secondary,
+body:not(.mode-high-performance) .activity-icon-accent {
+  animation: icon-breathing 3s ease-in-out infinite;
+}
+
+@keyframes icon-breathing {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: inherit;
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow:
+      0 0 40px color-mix(in srgb, var(--icon-glow-color, #3B82F6) 60%, transparent),
+      0 0 20px color-mix(in srgb, var(--icon-glow-color, #3B82F6) 40%, transparent);
+  }
+}
+
+/* Mode Performance - Fond noir sans glow */
+.mode-high-performance .activity-icon-primary,
+.mode-high-performance .activity-icon-secondary,
+.mode-high-performance .activity-icon-accent {
+  background: #000000 !important;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+/* Variables de couleur pour le glow */
+.activity-icon-primary {
+  --icon-glow-color: var(--color-activity-primary);
+}
+
+.activity-icon-secondary {
+  --icon-glow-color: var(--color-activity-secondary);
+}
+
+.activity-icon-accent {
+  --icon-glow-color: var(--color-activity-accent);
+}
+
+/* =========================================
+   RESPONSIVE & ACCESSIBILITY
+   ========================================= */
+
+/* Mode Mobile - D\u00e9sactiver animations sur mobile */
+@media (max-width: 768px) {
+  .activity-icon-primary,
+  .activity-icon-secondary,
+  .activity-icon-accent {
+    animation: none !important;
+  }
+
+  /* R\u00e9duire les glows sur mobile */
+  body:not(.mode-high-performance) .activity-icon-primary,
+  body:not(.mode-high-performance) .activity-icon-secondary,
+  body:not(.mode-high-performance) .activity-icon-accent {
+    box-shadow: 0 0 20px color-mix(in srgb, var(--icon-glow-color, #3B82F6) 30%, transparent) !important;
+  }
+}
+
+/* Accessibility - prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .activity-icon-primary,
+  .activity-icon-secondary,
+  .activity-icon-accent {
+    animation: none !important;
+  }
+}
+
+/* =========================================
    PROGRESS BARS
    ========================================= */
 
@@ -156,7 +234,6 @@
 }
 
 .activity-progress-fill {
-  height: 100%;
   border-radius: 9999px;
   position: relative;
   overflow: hidden;

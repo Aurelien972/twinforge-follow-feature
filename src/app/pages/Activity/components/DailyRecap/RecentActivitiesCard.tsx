@@ -3,6 +3,7 @@ import { fr } from 'date-fns/locale';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { useActivityPerformance } from '../../hooks/useActivityPerformance';
 import React from 'react';
 
 interface Activity {
@@ -70,6 +71,8 @@ const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({
   deletingActivityId,
   onDeleteActivity
 }) => {
+  const perf = useActivityPerformance();
+
   const handleDeleteActivity = (activityId: string) => {
     if (onDeleteActivity) {
       onDeleteActivity(activityId);
@@ -112,15 +115,15 @@ const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({
                 <div className="recent-activity-item-header">
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      className={`activity-icon-container activity-icon-container-md ${
+                        activity.intensity === 'low' ? 'activity-icon-primary' :
+                        activity.intensity === 'medium' ? 'activity-icon-secondary' :
+                        activity.intensity === 'high' || activity.intensity === 'very_high' ? 'activity-icon-accent' :
+                        'activity-icon-primary'
+                      }`}
                       style={{
-                        background: `
-                          radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12) 0%, transparent 60%),
-                          linear-gradient(135deg, color-mix(in srgb, ${getIntensityColor(activity.intensity)} 25%, transparent), color-mix(in srgb, ${getIntensityColor(activity.intensity)} 15%, transparent))
-                        `,
-                        border: `1px solid color-mix(in srgb, ${getIntensityColor(activity.intensity)} 30%, transparent)`,
-                        boxShadow: `0 0 12px color-mix(in srgb, ${getIntensityColor(activity.intensity)} 20%, transparent)`
-                      }}
+                        '--icon-glow-color': getIntensityColor(activity.intensity)
+                      } as React.CSSProperties}
                     >
                       <SpatialIcon
                         Icon={ICONS[getActivityIcon(activity.type)]}
