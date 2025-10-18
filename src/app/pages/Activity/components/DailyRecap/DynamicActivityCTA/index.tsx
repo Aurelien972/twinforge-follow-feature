@@ -93,12 +93,18 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
   } as React.CSSProperties;
 
   const iconStyles = {
-    background: `
-      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
-      linear-gradient(135deg, color-mix(in srgb, #3B82F6 40%, transparent), color-mix(in srgb, #3B82F6 28%, transparent))
-    `,
-    border: `2px solid color-mix(in srgb, #3B82F6 55%, transparent)`,
-    boxShadow: `0 0 30px color-mix(in srgb, #3B82F6 40%, transparent)`,
+    background: perf.mode === 'low' || perf.mode === 'medium'
+      ? '#000000'
+      : `
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
+        linear-gradient(135deg, color-mix(in srgb, #3B82F6 40%, transparent), color-mix(in srgb, #3B82F6 28%, transparent))
+      `,
+    border: perf.mode === 'low' || perf.mode === 'medium'
+      ? `3px solid #3B82F6`
+      : `2px solid color-mix(in srgb, #3B82F6 55%, transparent)`,
+    boxShadow: perf.mode === 'low' || perf.mode === 'medium'
+      ? 'none'
+      : `0 0 30px color-mix(in srgb, #3B82F6 40%, transparent)`,
     '--icon-color': '#3B82F6'
   } as React.CSSProperties;
 
