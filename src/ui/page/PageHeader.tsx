@@ -44,18 +44,37 @@ export default function PageHeader({
       <div className="flex flex-row items-center gap-6 mb-8">
         {/* Icône avec rendu optimisé selon le mode */}
         {isPerformanceMode ? (
-          // MODE PERFORMANCE: Rendu simplifié et optimisé
+          // MODE PERFORMANCE: Rendu simplifié mais attrayant
           <div className="flex-shrink-0">
             <div
-              className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center relative"
+              className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center relative overflow-hidden"
               style={{
-                background: `rgba(255, 255, 255, 0.12)`,
-                border: `2px solid ${finalCircuitColor}`,
-                boxShadow: `0 4px 16px rgba(0, 0, 0, 0.3)`,
+                background: `linear-gradient(145deg,
+                  color-mix(in srgb, ${finalCircuitColor} 25%, #1e293b),
+                  color-mix(in srgb, ${finalCircuitColor} 12%, #0f172a)
+                )`,
+                border: `2px solid color-mix(in srgb, ${finalCircuitColor} 50%, transparent)`,
+                boxShadow: `
+                  0 8px 24px rgba(0, 0, 0, 0.4),
+                  0 2px 8px color-mix(in srgb, ${finalCircuitColor} 20%, transparent),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.15),
+                  inset 0 -2px 0 rgba(0, 0, 0, 0.2)
+                `,
               }}
               role="img"
               aria-label={`Icône de la page ${title}`}
             >
+              {/* Subtle accent bar on top */}
+              <div
+                className="absolute top-0 left-0 right-0 h-1"
+                style={{
+                  background: `linear-gradient(90deg,
+                    transparent,
+                    color-mix(in srgb, ${finalCircuitColor} 60%, transparent),
+                    transparent
+                  )`,
+                }}
+              />
               <SpatialIcon
                 Icon={finalIcon}
                 size={48}
@@ -63,7 +82,7 @@ export default function PageHeader({
                 className="text-white relative z-10"
                 style={{
                   color: finalCircuitColor,
-                  filter: 'none',
+                  filter: `drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))`,
                   opacity: 1
                 }}
                 aria-hidden="true"

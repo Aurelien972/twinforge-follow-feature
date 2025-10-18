@@ -4,6 +4,7 @@ import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
 import { useFeedback } from '../../../../../../hooks/useFeedback';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 import type { Recipe } from '../../../../../../domain/recipe';
 
 interface RecipeCardProps {
@@ -26,14 +27,19 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   onView
 }) => {
   const { click } = useFeedback();
+  const { isPerformanceMode } = usePerformanceMode();
+
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   // Skeleton loading state
   if (isLoading) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.1 }}
+      <MotionDiv
+        {...(!isPerformanceMode && {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { delay: index * 0.1 }
+        })}
         className="h-full"
       >
         <GlassCard className="p-6 h-full flex flex-col">
@@ -75,7 +81,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
             </div>
           </div>
         </GlassCard>
-      </motion.div>
+      </MotionDiv>
     );
   }
 
@@ -119,65 +125,98 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: index * 0.1 }
+      })}
       className="relative"
     >
-      <GlassCard 
-        className={`p-6 transition-all duration-300 cursor-pointer ${
-          isNewlyGenerated 
-            ? 'ring-1 ring-yellow-400 bg-yellow-500/10' 
+      <GlassCard
+        className={`p-6 ${isPerformanceMode ? '' : 'transition-all duration-300'} cursor-pointer ${
+          isNewlyGenerated
+            ? 'ring-1 ring-yellow-400'
             : isSaved
-            ? 'ring-1 ring-green-400/50 bg-green-500/5'
-            : 'hover:bg-white/5'
+            ? 'ring-1 ring-green-400/50'
+            : isPerformanceMode ? '' : 'hover:bg-white/5'
         }`}
+        style={isPerformanceMode ? (
+          isNewlyGenerated ? {
+            background: 'linear-gradient(145deg, color-mix(in srgb, #eab308 20%, #1e293b), color-mix(in srgb, #eab308 10%, #0f172a))'
+          } : isSaved ? {
+            background: 'linear-gradient(145deg, color-mix(in srgb, #22c55e 15%, #1e293b), color-mix(in srgb, #22c55e 8%, #0f172a))'
+          } : {
+            background: 'linear-gradient(145deg, #1e293b, #0f172a)'
+          }
+        ) : (
+          isNewlyGenerated ? { background: 'rgba(234, 179, 8, 0.1)' } :
+          isSaved ? { background: 'rgba(34, 197, 94, 0.05)' } : {}
+        )}
         onClick={handleCardClick}
       >
         {/* Badge Nouveau */}
         {isNewlyGenerated && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+          <MotionDiv
+            {...(!isPerformanceMode && {
+              initial: { scale: 0 },
+              animate: { scale: 1 }
+            })}
             className="absolute top-4 left-4 z-10"
           >
-            <div 
-              className="px-3 py-1 text-xs font-bold rounded-full backdrop-blur-md border"
-              style={{
+            <div
+              className="px-3 py-1 text-xs font-bold rounded-full border"
+              style={isPerformanceMode ? {
+                background: 'color-mix(in srgb, #eab308 30%, #1e293b)',
+                borderColor: 'color-mix(in srgb, #eab308 60%, transparent)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                color: '#fbbf24'
+              } : {
                 background: 'color-mix(in srgb, #eab308 20%, rgba(255,255,255,0.1))',
                 borderColor: 'color-mix(in srgb, #eab308 40%, transparent)',
                 boxShadow: '0 4px 12px rgba(234, 179, 8, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+                backdropFilter: 'blur(12px)',
                 color: '#fbbf24'
               }}
             >
               NOUVEAU
             </div>
-          </motion.div>
+          </MotionDiv>
         )}
 
         {/* Bouton Sauvegarder/Supprimer */}
         <div className="absolute top-4 right-4 z-10">
-          <motion.div
+          <MotionDiv
             onClick={handleToggleSaveStatus}
-            className="w-14 h-14 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 backdrop-blur-md border hover:scale-110"
-            style={{
-              background: isSaved 
+            className={`w-14 h-14 rounded-full flex items-center justify-center cursor-pointer border ${isPerformanceMode ? '' : 'transition-all duration-300 hover:scale-110'}`}
+            style={isPerformanceMode ? {
+              background: isSaved
+                ? 'color-mix(in srgb, #ef4444 30%, #1e293b)'
+                : 'color-mix(in srgb, #22c55e 30%, #1e293b)',
+              borderColor: isSaved
+                ? 'color-mix(in srgb, #ef4444 60%, transparent)'
+                : 'color-mix(in srgb, #22c55e 60%, transparent)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+            } : {
+              background: isSaved
                 ? 'color-mix(in srgb, #ef4444 20%, rgba(255,255,255,0.1))'
                 : 'color-mix(in srgb, #22c55e 20%, rgba(255,255,255,0.1))',
               borderColor: isSaved
                 ? 'color-mix(in srgb, #ef4444 40%, transparent)'
                 : 'color-mix(in srgb, #22c55e 40%, transparent)',
+              backdropFilter: 'blur(12px)'
             }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            {...(!isPerformanceMode && {
+              whileHover: { scale: 1.1 },
+              whileTap: { scale: 0.95 }
+            })}
           >
-            <SpatialIcon 
-              Icon={isSaved ? ICONS.Trash2 : ICONS.Plus} 
-              size={18} 
+            <SpatialIcon
+              Icon={isSaved ? ICONS.Trash2 : ICONS.Plus}
+              size={18}
               className={isSaved ? 'text-red-300' : 'text-green-300'}
             />
-          </motion.div>
+          </MotionDiv>
         </div>
 
         {/* Image de la Recette */}
@@ -351,7 +390,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
           </span>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

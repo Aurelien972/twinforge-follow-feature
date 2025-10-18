@@ -7,6 +7,7 @@ import React from 'react';
 import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 import type { MealPlanData } from '../types';
 
 interface NutritionalSummaryProps {
@@ -17,24 +18,37 @@ interface NutritionalSummaryProps {
 /**
  * Nutritional Summary Component - Résumé Nutritionnel
  */
-const NutritionalSummary: React.FC<NutritionalSummaryProps> = ({ 
-  nutritionalSummary, 
-  estimatedWeeklyCost 
+const NutritionalSummary: React.FC<NutritionalSummaryProps> = ({
+  nutritionalSummary,
+  estimatedWeeklyCost
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
   if (!nutritionalSummary) return null;
 
   return (
-    <GlassCard className="p-6" style={{
-      background: `
-        radial-gradient(circle at 30% 20%, color-mix(in srgb, #10B981 8%, transparent) 0%, transparent 60%),
-        var(--glass-opacity)
-      `,
-      borderColor: 'color-mix(in srgb, #10B981 20%, transparent)'
-    }}>
+    <GlassCard
+      className="p-6"
+      style={isPerformanceMode ? {
+        background: 'linear-gradient(145deg, #1e3a2f, #0f1f1a)',
+        borderColor: 'color-mix(in srgb, #10B981 40%, transparent)',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)'
+      } : {
+        background: `
+          radial-gradient(circle at 30% 20%, color-mix(in srgb, #10B981 8%, transparent) 0%, transparent 60%),
+          var(--glass-opacity)
+        `,
+        borderColor: 'color-mix(in srgb, #10B981 20%, transparent)'
+      }}
+    >
       <div className="flex items-center gap-3 mb-4">
-        <div 
+        <div
           className="w-10 h-10 rounded-full flex items-center justify-center"
-          style={{
+          style={isPerformanceMode ? {
+            background: 'color-mix(in srgb, #10B981 25%, #1e293b)',
+            border: '2px solid color-mix(in srgb, #10B981 50%, transparent)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+          } : {
             background: 'color-mix(in srgb, #10B981 15%, transparent)',
             border: '2px solid color-mix(in srgb, #10B981 25%, transparent)'
           }}
@@ -49,7 +63,16 @@ const NutritionalSummary: React.FC<NutritionalSummaryProps> = ({
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Calories */}
-        <div className="text-center p-4 rounded-xl bg-orange-500/10 border border-orange-400/20">
+        <div
+          className="text-center p-4 rounded-xl border"
+          style={isPerformanceMode ? {
+            background: 'color-mix(in srgb, #f97316 20%, #1e293b)',
+            borderColor: 'color-mix(in srgb, #f97316 40%, transparent)'
+          } : {
+            background: 'rgba(249, 115, 22, 0.1)',
+            borderColor: 'rgba(251, 146, 60, 0.2)'
+          }}
+        >
           <div className="text-2xl font-bold text-orange-400 mb-1">
             {nutritionalSummary.avgCaloriesPerDay}
           </div>
@@ -57,7 +80,16 @@ const NutritionalSummary: React.FC<NutritionalSummaryProps> = ({
         </div>
 
         {/* Protéines */}
-        <div className="text-center p-4 rounded-xl bg-red-500/10 border border-red-400/20">
+        <div
+          className="text-center p-4 rounded-xl border"
+          style={isPerformanceMode ? {
+            background: 'color-mix(in srgb, #ef4444 20%, #1e293b)',
+            borderColor: 'color-mix(in srgb, #ef4444 40%, transparent)'
+          } : {
+            background: 'rgba(239, 68, 68, 0.1)',
+            borderColor: 'rgba(248, 113, 113, 0.2)'
+          }}
+        >
           <div className="text-2xl font-bold text-red-400 mb-1">
             {nutritionalSummary.avgProteinPerDay}g
           </div>
@@ -65,7 +97,16 @@ const NutritionalSummary: React.FC<NutritionalSummaryProps> = ({
         </div>
 
         {/* Glucides */}
-        <div className="text-center p-4 rounded-xl bg-blue-500/10 border border-blue-400/20">
+        <div
+          className="text-center p-4 rounded-xl border"
+          style={isPerformanceMode ? {
+            background: 'color-mix(in srgb, #3b82f6 20%, #1e293b)',
+            borderColor: 'color-mix(in srgb, #3b82f6 40%, transparent)'
+          } : {
+            background: 'rgba(59, 130, 246, 0.1)',
+            borderColor: 'rgba(96, 165, 250, 0.2)'
+          }}
+        >
           <div className="text-2xl font-bold text-blue-400 mb-1">
             {nutritionalSummary.avgCarbsPerDay}g
           </div>
@@ -73,7 +114,16 @@ const NutritionalSummary: React.FC<NutritionalSummaryProps> = ({
         </div>
 
         {/* Lipides */}
-        <div className="text-center p-4 rounded-xl bg-purple-500/10 border border-purple-400/20">
+        <div
+          className="text-center p-4 rounded-xl border"
+          style={isPerformanceMode ? {
+            background: 'color-mix(in srgb, #a855f7 20%, #1e293b)',
+            borderColor: 'color-mix(in srgb, #a855f7 40%, transparent)'
+          } : {
+            background: 'rgba(168, 85, 247, 0.1)',
+            borderColor: 'rgba(192, 132, 252, 0.2)'
+          }}
+        >
           <div className="text-2xl font-bold text-purple-400 mb-1">
             {nutritionalSummary.avgFatPerDay}g
           </div>
@@ -83,7 +133,16 @@ const NutritionalSummary: React.FC<NutritionalSummaryProps> = ({
 
       {/* Coût Estimé */}
       {estimatedWeeklyCost && (
-        <div className="mt-4 p-4 rounded-xl bg-green-500/10 border border-green-400/20 text-center">
+        <div
+          className="mt-4 p-4 rounded-xl border text-center"
+          style={isPerformanceMode ? {
+            background: 'color-mix(in srgb, #10B981 20%, #1e293b)',
+            borderColor: 'color-mix(in srgb, #10B981 40%, transparent)'
+          } : {
+            background: 'rgba(16, 185, 129, 0.1)',
+            borderColor: 'rgba(52, 211, 153, 0.2)'
+          }}
+        >
           <div className="text-xl font-bold text-green-400 mb-1">
             {estimatedWeeklyCost.toFixed(2)}€
           </div>

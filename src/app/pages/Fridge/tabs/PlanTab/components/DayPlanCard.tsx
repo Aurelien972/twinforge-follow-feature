@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 import type { MealPlanDay } from '../types';
 
 interface DayPlanCardProps {
@@ -20,11 +21,17 @@ interface DayPlanCardProps {
 }
 
 // Skeleton component for loading state
-const DayPlanSkeleton: React.FC<{ dayName: string; date: string; index: number }> = ({ dayName, date, index }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20, scale: 0.95 }}
-    animate={{ opacity: 1, y: 0, scale: 1 }}
-    transition={{ duration: 0.4, delay: index * 0.05 }}
+const DayPlanSkeleton: React.FC<{ dayName: string; date: string; index: number }> = ({ dayName, date, index }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
+  return (
+  <MotionDiv
+    {...(!isPerformanceMode && {
+      initial: { opacity: 0, y: 20, scale: 0.95 },
+      animate: { opacity: 1, y: 0, scale: 1 },
+      transition: { duration: 0.4, delay: index * 0.05 }
+    })}
   >
     <GlassCard
       className="p-5"
@@ -78,8 +85,9 @@ const DayPlanSkeleton: React.FC<{ dayName: string; date: string; index: number }
         ))}
       </div>
     </GlassCard>
-  </motion.div>
-);
+  </MotionDiv>
+  );
+};
 
 /**
  * Meal Skeleton Component
