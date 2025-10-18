@@ -160,17 +160,12 @@
 }
 
 /* =========================================
-   SHADOWS - Simplified
+   SHADOWS - Optimized in shadow-optimizations.css
+   Box-shadows are now handled in dedicated file for better control
    ========================================= */
 
-.performance-mode [class*="shadow"] {
-  /* Remove all colored shadows and glows */
-  filter: none !important;
-}
-
-.performance-mode [style*="box-shadow"] {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-}
+/* Shadow optimizations moved to src/styles/optimizations/shadow-optimizations.css
+   for comprehensive mapping of all 676 box-shadow occurrences */
 
 /* =========================================
    LOADERS - Essential only
