@@ -28,30 +28,32 @@ export const BackgroundManager: React.FC = () => {
     const html = document.documentElement;
 
     // Remove all mode classes first
-    body.classList.remove('performance-mode', 'mobile-performance-mode', 'mode-quality', 'mode-balanced');
-    html.classList.remove('performance-mode');
+    body.classList.remove('performance-mode', 'mobile-performance-mode', 'mode-quality', 'mode-balanced', 'mode-high-performance');
+    html.classList.remove('performance-mode', 'mode-high-performance', 'mode-balanced', 'mode-quality');
 
     // Apply appropriate classes based on current mode
     if (isPerformanceMode) {
-      body.classList.add('performance-mode', 'mobile-performance-mode');
+      body.classList.add('performance-mode', 'mobile-performance-mode', 'mode-high-performance');
       body.setAttribute('data-performance-mode', 'true');
-      html.classList.add('performance-mode');
+      html.classList.add('performance-mode', 'mode-high-performance');
     } else {
       body.removeAttribute('data-performance-mode');
 
       // Apply the specific mode class
       if (mode === 'quality') {
         body.classList.add('mode-quality');
+        html.classList.add('mode-quality');
       } else if (mode === 'balanced') {
         body.classList.add('mode-balanced');
+        html.classList.add('mode-balanced');
       }
     }
 
     return () => {
       // Cleanup on unmount
-      body.classList.remove('performance-mode', 'mobile-performance-mode', 'mode-quality', 'mode-balanced');
+      body.classList.remove('performance-mode', 'mobile-performance-mode', 'mode-quality', 'mode-balanced', 'mode-high-performance');
       body.removeAttribute('data-performance-mode');
-      html.classList.remove('performance-mode');
+      html.classList.remove('performance-mode', 'mode-high-performance', 'mode-balanced', 'mode-quality');
     };
   }, [isPerformanceMode, mode]);
 

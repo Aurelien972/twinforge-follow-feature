@@ -272,8 +272,11 @@ html.mode-balanced .forge-particle {
 @media (max-width: 768px) {
   /* Sélecteurs renforcés pour mobile performance */
   body.performance-mode .bg-twinforge-visionos,
+  body.mode-high-performance .bg-twinforge-visionos,
   .performance-mode .bg-twinforge-visionos,
+  .mode-high-performance .bg-twinforge-visionos,
   html.performance-mode .bg-twinforge-visionos,
+  html.mode-high-performance .bg-twinforge-visionos,
   [data-performance-mode="true"] .bg-twinforge-visionos,
   .mobile-performance-mode .bg-twinforge-visionos {
     /* Background ULTRA-SIMPLIFIÉ - COULEUR SOLIDE UNIQUEMENT */
@@ -304,10 +307,16 @@ html.mode-balanced .forge-particle {
   /* Pseudo-elements complètement désactivés sur mobile performance */
   body.performance-mode .bg-twinforge-visionos::before,
   body.performance-mode .bg-twinforge-visionos::after,
+  body.mode-high-performance .bg-twinforge-visionos::before,
+  body.mode-high-performance .bg-twinforge-visionos::after,
   .performance-mode .bg-twinforge-visionos::before,
   .performance-mode .bg-twinforge-visionos::after,
+  .mode-high-performance .bg-twinforge-visionos::before,
+  .mode-high-performance .bg-twinforge-visionos::after,
   html.performance-mode .bg-twinforge-visionos::before,
   html.performance-mode .bg-twinforge-visionos::after,
+  html.mode-high-performance .bg-twinforge-visionos::before,
+  html.mode-high-performance .bg-twinforge-visionos::after,
   [data-performance-mode="true"] .bg-twinforge-visionos::before,
   [data-performance-mode="true"] .bg-twinforge-visionos::after,
   .mobile-performance-mode .bg-twinforge-visionos::before,
@@ -320,8 +329,11 @@ html.mode-balanced .forge-particle {
 
   /* Particules COMPLÈTEMENT retirées sur mobile performance */
   body.performance-mode .cosmic-forge-particles,
+  body.mode-high-performance .cosmic-forge-particles,
   .performance-mode .cosmic-forge-particles,
+  .mode-high-performance .cosmic-forge-particles,
   html.performance-mode .cosmic-forge-particles,
+  html.mode-high-performance .cosmic-forge-particles,
   [data-performance-mode="true"] .cosmic-forge-particles,
   .mobile-performance-mode .cosmic-forge-particles {
     display: none !important;
@@ -335,8 +347,11 @@ html.mode-balanced .forge-particle {
   }
 
   body.performance-mode .forge-particle,
+  body.mode-high-performance .forge-particle,
   .performance-mode .forge-particle,
+  .mode-high-performance .forge-particle,
   html.performance-mode .forge-particle,
+  html.mode-high-performance .forge-particle,
   [data-performance-mode="true"] .forge-particle,
   .mobile-performance-mode .forge-particle {
     display: none !important;
@@ -388,8 +403,11 @@ html.mode-balanced .forge-particle {
 /* PRIORITÉ ABSOLUE : Désactiver cosmic-forge-pulse en mode performance */
 /* Sélecteurs multiples pour garantir l'application même sans classe body */
 body.performance-mode .bg-twinforge-visionos,
+body.mode-high-performance .bg-twinforge-visionos,
 .performance-mode .bg-twinforge-visionos,
+.mode-high-performance .bg-twinforge-visionos,
 html.performance-mode .bg-twinforge-visionos,
+html.mode-high-performance .bg-twinforge-visionos,
 .bg-twinforge-visionos.performance-mode,
 [data-performance-mode="true"] .bg-twinforge-visionos,
 .mobile-performance-mode .bg-twinforge-visionos {
@@ -415,8 +433,11 @@ html.performance-mode .bg-twinforge-visionos,
 
 /* Texture de bruit DÉSACTIVÉE en mode performance pour économie maximale */
 body.performance-mode .bg-twinforge-visionos::after,
+body.mode-high-performance .bg-twinforge-visionos::after,
 .performance-mode .bg-twinforge-visionos::after,
+.mode-high-performance .bg-twinforge-visionos::after,
 html.performance-mode .bg-twinforge-visionos::after,
+html.mode-high-performance .bg-twinforge-visionos::after,
 [data-performance-mode="true"] .bg-twinforge-visionos::after,
 .mobile-performance-mode .bg-twinforge-visionos::after {
   /* Complètement désactivé - pas de texture coûteuse */
@@ -427,8 +448,11 @@ html.performance-mode .bg-twinforge-visionos::after,
 
 /* Désactiver la distorsion thermique - thermal-distortion - Sélecteurs renforcés */
 body.performance-mode .bg-twinforge-visionos::before,
+body.mode-high-performance .bg-twinforge-visionos::before,
 .performance-mode .bg-twinforge-visionos::before,
+.mode-high-performance .bg-twinforge-visionos::before,
 html.performance-mode .bg-twinforge-visionos::before,
+html.mode-high-performance .bg-twinforge-visionos::before,
 [data-performance-mode="true"] .bg-twinforge-visionos::before,
 .mobile-performance-mode .bg-twinforge-visionos::before {
   display: none !important;
@@ -448,8 +472,11 @@ html.performance-mode .bg-twinforge-visionos::before,
 
 /* Conteneur particules - COMPLÈTEMENT CACHÉ - Sélecteurs multiples */
 body.performance-mode .cosmic-forge-particles,
+body.mode-high-performance .cosmic-forge-particles,
 .performance-mode .cosmic-forge-particles,
+.mode-high-performance .cosmic-forge-particles,
 html.performance-mode .cosmic-forge-particles,
+html.mode-high-performance .cosmic-forge-particles,
 [data-performance-mode="true"] .cosmic-forge-particles,
 .mobile-performance-mode .cosmic-forge-particles,
 .cosmic-forge-particles.performance-mode {
@@ -467,8 +494,11 @@ html.performance-mode .cosmic-forge-particles,
 
 /* Chaque particule - COMPLÈTEMENT DÉSACTIVÉE - Sélecteurs multiples */
 body.performance-mode .forge-particle,
+body.mode-high-performance .forge-particle,
 .performance-mode .forge-particle,
+.mode-high-performance .forge-particle,
 html.performance-mode .forge-particle,
+html.mode-high-performance .forge-particle,
 [data-performance-mode="true"] .forge-particle,
 .mobile-performance-mode .forge-particle,
 .forge-particle.performance-mode {
