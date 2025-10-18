@@ -6,7 +6,8 @@
  */
 
 import React, { useRef, useCallback, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ConditionalMotion, ConditionalAnimatePresence } from '../../../../lib/motion/ConditionalMotion';
+import { useBodyScanPerformance } from '../../../../hooks/useBodyScanPerformance';
 
 import PhotoCard from './components/PhotoCard';
 import GlassCard from '../../../../ui/cards/GlassCard';
@@ -15,8 +16,6 @@ import { ICONS } from '../../../../ui/icons/registry';
 
 import { useFeedback } from '../../../../hooks/useFeedback';
 import { useToast } from '../../../../ui/components/ToastProvider';
-import { usePreferredMotion } from '../../../../system/device/DeviceProvider';
-import { getAnimationConfig } from '../../../../lib/utils/animationUtils';
 
 import {
   validateImageFormat,
@@ -79,8 +78,7 @@ const BodyScanPhotoCaptureStep: React.FC<BodyScanPhotoCaptureStepProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { click, success, error: errorSound, glassClick } = useFeedback();
   const { showToast } = useToast();
-  const preferredMotion = usePreferredMotion();
-  const animConfig = getAnimationConfig('medium');
+  const performanceConfig = useBodyScanPerformance();
 
   const photoType = step === 'front-photo' ? 'front' : 'profile';
   const frontPhoto = capturedPhotos.find(p => p.type === 'front');

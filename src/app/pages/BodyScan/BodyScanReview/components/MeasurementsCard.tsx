@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { ConditionalMotion } from '../../../../../lib/motion/ConditionalMotion';
+import { useBodyScanPerformance } from '../../../../../hooks/useBodyScanPerformance';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
@@ -144,6 +145,7 @@ export const MeasurementsCard: React.FC<MeasurementsCardProps> = ({
   userProfile,
   skinTone
 }) => {
+  const performanceConfig = useBodyScanPerformance();
   const { click } = useFeedback();
 
   // Extract data from scanResults
@@ -253,11 +255,11 @@ export const MeasurementsCard: React.FC<MeasurementsCardProps> = ({
   });
 
   return (
-    <motion.div
+    <ConditionalMotion
       className="measurements-card"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      initial={performanceConfig.enableInitialAnimations ? { opacity: 0, y: 20 } : false}
+      animate={performanceConfig.enableInitialAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+      transition={performanceConfig.enableFramerMotion ? { duration: 0.6, ease: "easeOut" } : undefined}
     >
       <GlassCard 
         className="p-6 relative overflow-visible"
@@ -316,13 +318,13 @@ export const MeasurementsCard: React.FC<MeasurementsCardProps> = ({
         <div className="measurements-grid mb-8">
           {/* BMI Card */}
           {calculatedBMI && bmiInfo && (
-            <motion.div
+            <ConditionalMotion
               className="measurement-summary-card"
               style={{ '--measurement-color': bmiInfo.color }}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-              whileHover={{ scale: 1.02, y: -2 }}
+              initial={performanceConfig.enableInitialAnimations ? { opacity: 0, y: 15 } : false}
+              animate={performanceConfig.enableInitialAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+              transition={performanceConfig.enableFramerMotion ? { duration: 0.4, delay: 0.1 } : undefined}
+              whileHover={performanceConfig.enableWhileHover ? { scale: 1.02, y: -2 } : undefined}
               onClick={() => click()}
             >
               <div className="measurement-value measurement-value--large">
@@ -334,17 +336,17 @@ export const MeasurementsCard: React.FC<MeasurementsCardProps> = ({
               <div className="measurement-description">
                 {bmiInfo.description}
               </div>
-            </motion.div>
+            </ConditionalMotion>
           )}
 
           {/* Body Age Card */}
           {bodyAge && (
-            <motion.div
+            <ConditionalMotion
               className="measurement-detail-item"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              whileHover={{ scale: 1.02, y: -2 }}
+              initial={performanceConfig.enableInitialAnimations ? { opacity: 0, y: 15 } : false}
+              animate={performanceConfig.enableInitialAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+              transition={performanceConfig.enableFramerMotion ? { duration: 0.4, delay: 0.2 } : undefined}
+              whileHover={performanceConfig.enableWhileHover ? { scale: 1.02, y: -2 } : undefined}
               onClick={() => click()}
             >
               <div className="measurement-value">
@@ -353,16 +355,16 @@ export const MeasurementsCard: React.FC<MeasurementsCardProps> = ({
               <div className="measurement-label">
                 Âge Corporel
               </div>
-            </motion.div>
+            </ConditionalMotion>
           )}
 
           {/* Ideal Weight Card */}
-          <motion.div
+          <ConditionalMotion
             className="measurement-detail-item"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-            whileHover={{ scale: 1.02, y: -2 }}
+            initial={performanceConfig.enableInitialAnimations ? { opacity: 0, y: 15 } : false}
+            animate={performanceConfig.enableInitialAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+            transition={performanceConfig.enableFramerMotion ? { duration: 0.4, delay: 0.3 } : undefined}
+            whileHover={performanceConfig.enableWhileHover ? { scale: 1.02, y: -2 } : undefined}
             onClick={() => click()}
           >
             <div className="measurement-value">
@@ -371,22 +373,22 @@ export const MeasurementsCard: React.FC<MeasurementsCardProps> = ({
             <div className="measurement-label">
               Poids Idéal
             </div>
-          </motion.div>
+          </ConditionalMotion>
         </div>
 
         {/* Skin Tone Preview Card */}
         {effectiveSkinTone && effectiveSkinTone.hex && (
-          <motion.div
+          <ConditionalMotion
             className="measurement-detail-item"
             style={{
               '--icon-bg-color': `${effectiveSkinTone.hex}20`,
               '--icon-border-color': `${effectiveSkinTone.hex}50`,
               '--icon-text-color': effectiveSkinTone.hex,
             } as React.CSSProperties}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
-            whileHover={{ scale: 1.02, y: -2 }}
+            initial={performanceConfig.enableInitialAnimations ? { opacity: 0, y: 15 } : false}
+            animate={performanceConfig.enableInitialAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+            transition={performanceConfig.enableFramerMotion ? { duration: 0.4, delay: 0.4 } : undefined}
+            whileHover={performanceConfig.enableWhileHover ? { scale: 1.02, y: -2 } : undefined}
             onClick={() => click()}
           >
             <div className="flex items-center gap-3">
@@ -412,13 +414,13 @@ export const MeasurementsCard: React.FC<MeasurementsCardProps> = ({
                 </div>
               </div>
             </div>
-          </motion.div>
+          </ConditionalMotion>
         )}
 
         {/* Detailed Measurements */}
         <div className="measurements-grid">
           {measurementItems.map((item, index) => (
-            <motion.div
+            <ConditionalMotion
               key={item.key}
               className={`measurement-detail-item ${getMeasurementItemClass(item.key)}`}
               style={{
@@ -426,22 +428,22 @@ export const MeasurementsCard: React.FC<MeasurementsCardProps> = ({
                 '--icon-border-color': `color-mix(in srgb, ${item.color} 30%, transparent)`,
                 '--icon-text-color': item.color,
               } as React.CSSProperties}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ 
-                duration: 0.4, 
+              initial={performanceConfig.enableStaggerAnimations ? { opacity: 0, y: 20 } : false}
+              animate={performanceConfig.enableStaggerAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+              transition={performanceConfig.enableFramerMotion ? {
+                duration: 0.4,
                 delay: index * 0.1,
-                ease: "easeOut" 
-              }}
-              whileHover={{ scale: 1.02, y: -2 }}
+                ease: "easeOut"
+              } : undefined}
+              whileHover={performanceConfig.enableWhileHover ? { scale: 1.02, y: -2 } : undefined}
               onClick={() => click()}
             >
               <div className="measurement-detail-icon-container">
-                <SpatialIcon 
-                  Icon={ICONS[item.icon]} 
-                  size={12} 
+                <SpatialIcon
+                  Icon={ICONS[item.icon]}
+                  size={12}
                   style={{ color: item.color }}
-                  variant="pure" 
+                  variant="pure"
                 />
               </div>
               <div className="measurement-value">
@@ -450,11 +452,11 @@ export const MeasurementsCard: React.FC<MeasurementsCardProps> = ({
               <div className="measurement-label">
                 {item.label}
               </div>
-            </motion.div>
+            </ConditionalMotion>
           ))}
         </div>
       </GlassCard>
-    </motion.div>
+    </ConditionalMotion>
   );
 };
 

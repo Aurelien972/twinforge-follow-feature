@@ -5,6 +5,7 @@
 
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useBodyScanPerformance } from '../../../hooks/useBodyScanPerformance';
 import Avatar3DViewer from '../../../components/3d/Avatar3DViewer';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
@@ -22,6 +23,7 @@ import logger from '../../../lib/utils/logger';
  * Body Scan Review Page - Modularized Implementation
  */
 const BodyScanReview: React.FC = () => {
+  const performanceConfig = useBodyScanPerformance();
   const navigate = useNavigate();
   const { updateProfile } = useUserStore();
   const { success } = useFeedback();

@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { ConditionalMotion } from '../../../../../lib/motion/ConditionalMotion';
+import { useBodyScanPerformance } from '../../../../../hooks/useBodyScanPerformance';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
 import logger from '../../../../../lib/utils/logger';
@@ -24,6 +25,7 @@ const PhotoCaptureControls: React.FC<PhotoCaptureControlsProps> = ({
   fileInputRef,
   onFileSelect,
 }) => {
+  const performanceConfig = useBodyScanPerformance();
   const buttonColor =
     photoType === 'front' ? 'var(--color-plasma-cyan)' : '#A855F7';
 
@@ -48,17 +50,18 @@ const PhotoCaptureControls: React.FC<PhotoCaptureControlsProps> = ({
     <>
       <div className="flex items-center justify-center gap-4">
         {/* Camera */}
-        <motion.button
+        <ConditionalMotion
+          as="button"
           type="button"
           onClick={onCameraCapture}
           disabled={disabled}
           aria-busy={isValidating}
           className="px-6 py-3 rounded-full font-semibold text-white transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-          whileHover={!disabled ? { scale: 1.02, y: -2 } : {}}
-          whileTap={!disabled ? { scale: 0.98 } : {}}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
+          whileHover={performanceConfig.enableWhileHover && !disabled ? { scale: 1.02, y: -2 } : undefined}
+          whileTap={performanceConfig.enableWhileTap && !disabled ? { scale: 0.98 } : undefined}
+          initial={performanceConfig.enableInitialAnimations ? { opacity: 0, y: 12 } : false}
+          animate={performanceConfig.enableInitialAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+          transition={performanceConfig.enableFramerMotion ? { duration: 0.25 } : undefined}
           style={{
             background: `
               linear-gradient(135deg,
@@ -78,9 +81,9 @@ const PhotoCaptureControls: React.FC<PhotoCaptureControlsProps> = ({
           } as React.CSSProperties}
         >
           <div className="flex items-center gap-2">
-            <motion.div
-              animate={isValidating ? { rotate: 360 } : {}}
-              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            <ConditionalMotion
+              animate={performanceConfig.enableLoadingAnimations && isValidating ? { rotate: 360 } : undefined}
+              transition={performanceConfig.enableFramerMotion ? { duration: 2, repeat: Infinity, ease: 'linear' } : undefined}
             >
               <SpatialIcon
                 Icon={isValidating ? ICONS.Loader2 ?? ICONS.Camera : ICONS.Camera}
@@ -89,22 +92,23 @@ const PhotoCaptureControls: React.FC<PhotoCaptureControlsProps> = ({
                 glowColor={buttonColor}
                 variant="pure"
               />
-            </motion.div>
+            </ConditionalMotion>
             <span>{isValidating ? 'Validation…' : 'Caméra'}</span>
           </div>
-        </motion.button>
+        </ConditionalMotion>
 
         {/* Gallery */}
-        <motion.button
+        <ConditionalMotion
+          as="button"
           type="button"
           onClick={handleGallery}
           disabled={disabled}
           className="px-6 py-3 rounded-full font-medium text-white/90 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-          whileHover={!disabled ? { scale: 1.02, y: -1 } : {}}
-          whileTap={!disabled ? { scale: 0.98 } : {}}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, delay: 0.05 }}
+          whileHover={performanceConfig.enableWhileHover && !disabled ? { scale: 1.02, y: -1 } : undefined}
+          whileTap={performanceConfig.enableWhileTap && !disabled ? { scale: 0.98 } : undefined}
+          initial={performanceConfig.enableInitialAnimations ? { opacity: 0, y: 12 } : false}
+          animate={performanceConfig.enableInitialAnimations ? { opacity: 1, y: 0 } : { opacity: 1 }}
+          transition={performanceConfig.enableFramerMotion ? { duration: 0.25, delay: 0.05 } : undefined}
           style={{
             background: `color-mix(in srgb, ${buttonColor} 8%, transparent)`,
             border: `1px solid color-mix(in srgb, ${buttonColor} 20%, transparent)`,
@@ -123,7 +127,7 @@ const PhotoCaptureControls: React.FC<PhotoCaptureControlsProps> = ({
             />
             <span>Galerie</span>
           </div>
-        </motion.button>
+        </ConditionalMotion>
       </div>
 
       {/* File Input (optionnel) */}

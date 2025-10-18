@@ -4,7 +4,8 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { ConditionalMotion } from '../../../../../lib/motion/ConditionalMotion';
+import { useBodyScanPerformance } from '../../../../../hooks/useBodyScanPerformance';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
@@ -23,6 +24,7 @@ export const SkinToneControl: React.FC<SkinToneControlProps> = ({
   onSkinToneChange,
   isLocked = false
 }) => {
+  const performanceConfig = useBodyScanPerformance();
   const [isEditing, setIsEditing] = useState(false);
   const [hue, setHue] = useState(0);
   const [saturation, setSaturation] = useState(100);
@@ -219,10 +221,10 @@ export const SkinToneControl: React.FC<SkinToneControlProps> = ({
 
       {/* Editing Controls */}
       {isEditing && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
+        <ConditionalMotion
+          initial={performanceConfig.enableInitialAnimations ? { opacity: 0, height: 0 } : false}
+          animate={performanceConfig.enableInitialAnimations ? { opacity: 1, height: 'auto' } : { opacity: 1 }}
+          exit={performanceConfig.enableInitialAnimations ? { opacity: 0, height: 0 } : undefined}
           className="space-y-4 mb-4"
         >
           {/* Hue Slider */}
@@ -296,7 +298,7 @@ export const SkinToneControl: React.FC<SkinToneControlProps> = ({
               }}
             />
           </div>
-        </motion.div>
+        </ConditionalMotion>
       )}
 
       {/* Action Buttons */}
