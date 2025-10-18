@@ -149,14 +149,12 @@ const NewMobileBottomBar: React.FC = () => {
         className="new-mobile-bottom-bar"
         aria-label="Navigation principale mobile"
         style={{
+          // CRITICAL: NO transforms - they break position:fixed on iOS
           position: 'fixed',
           bottom: 'var(--new-bottom-bar-bottom-offset)',
           left: '8px',
           right: '8px',
           zIndex: 9996,
-          transform: 'translate3d(0, 0, 0)',
-          willChange: 'transform',
-          WebkitTransform: 'translate3d(0, 0, 0)',
           backfaceVisibility: 'hidden',
           WebkitBackfaceVisibility: 'hidden',
           isolation: 'isolate',

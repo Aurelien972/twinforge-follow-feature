@@ -64,9 +64,14 @@ html.mobile-device .header-liquid-glass,
   right: 8px !important;
   z-index: 9999 !important;
 
-  /* GPU acceleration WITHOUT creating new stacking context */
-  transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
+  /* CRITICAL: NO TRANSFORMS - They break position:fixed on iOS */
+  transform: none !important;
+  -webkit-transform: none !important;
+
+  /* GPU acceleration via will-change ONLY */
+  will-change: contents !important;
+
+  /* Lock positioning */
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
 
@@ -86,9 +91,14 @@ html.mobile-device .new-mobile-bottom-bar,
   right: 8px !important;
   z-index: 9996 !important;
 
-  /* GPU acceleration WITHOUT creating new stacking context */
-  transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
+  /* CRITICAL: NO TRANSFORMS - They break position:fixed on iOS */
+  transform: none !important;
+  -webkit-transform: none !important;
+
+  /* GPU acceleration via will-change ONLY */
+  will-change: contents !important;
+
+  /* Lock positioning */
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
 
@@ -106,7 +116,10 @@ html.mobile-device .new-mobile-bottom-bar,
     left: 8px !important;
     right: 8px !important;
     z-index: 9999 !important;
-    transform: translate3d(0, 0, 0) !important;
+    /* CRITICAL: NO TRANSFORMS */
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: contents !important;
     isolation: isolate !important;
   }
 
@@ -116,7 +129,10 @@ html.mobile-device .new-mobile-bottom-bar,
     left: 8px !important;
     right: 8px !important;
     z-index: 9996 !important;
-    transform: translate3d(0, 0, 0) !important;
+    /* CRITICAL: NO TRANSFORMS */
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: contents !important;
     isolation: isolate !important;
   }
 }
@@ -289,7 +305,9 @@ body.mobile-device *:not(.header-liquid-glass):not(.new-mobile-bottom-bar) {
 /* Only header and bottom bar keep will-change for scroll performance */
 .mobile-device .header-liquid-glass,
 .mobile-device .new-mobile-bottom-bar {
-  will-change: transform !important;
+  will-change: contents !important;
+  transform: none !important;
+  -webkit-transform: none !important;
 }
 
 /* =========================================
@@ -336,11 +354,13 @@ body.mobile-device * {
   -webkit-perspective: none !important;
 }
 
-/* Exceptions: Only fixed elements use 3D transforms for position lock */
+/* Exceptions: Fixed elements must use flat transform style to preserve position:fixed */
 .mobile-device .header-liquid-glass,
 .mobile-device .new-mobile-bottom-bar {
-  transform-style: preserve-3d !important;
-  -webkit-transform-style: preserve-3d !important;
+  transform-style: flat !important;
+  -webkit-transform-style: flat !important;
+  transform: none !important;
+  -webkit-transform: none !important;
 }
 
 /* =========================================

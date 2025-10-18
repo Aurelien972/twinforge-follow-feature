@@ -26,6 +26,7 @@ export const Header = React.memo(() => {
         style={{
           ...(isMobile ? {
             // Mobile: Minimal styles, position fixed enforced by CSS
+            // CRITICAL: NO transforms - they break position:fixed on iOS
             position: 'fixed',
             top: '4px',
             left: '8px',
@@ -33,8 +34,6 @@ export const Header = React.memo(() => {
             zIndex: 9999,
             height: '64px',
             borderRadius: '20px',
-            transform: 'translate3d(0, 0, 0)',
-            WebkitTransform: 'translate3d(0, 0, 0)',
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
             isolation: 'isolate',

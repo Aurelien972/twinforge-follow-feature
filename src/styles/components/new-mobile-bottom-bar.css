@@ -33,9 +33,8 @@
   right: 8px !important;
   z-index: var(--new-bottom-bar-z-index) !important;
   height: var(--new-bottom-bar-height) !important;
-  transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
-  will-change: transform !important;
+  /* CRITICAL: NO transforms - they break position:fixed on iOS */
+  will-change: contents !important;
   contain: layout style paint !important;
   isolation: isolate !important;
   backface-visibility: hidden !important;
@@ -46,8 +45,9 @@
 /* Ensure position fixed is never overridden */
 .new-mobile-bottom-bar,
 .new-mobile-bottom-bar * {
-  -webkit-transform-style: preserve-3d !important;
-  transform-style: preserve-3d !important;
+  /* CRITICAL: flat transform style to preserve position:fixed on iOS */
+  -webkit-transform-style: flat !important;
+  transform-style: flat !important;
 }
 
 .new-mobile-bottom-bar-container {
@@ -75,8 +75,7 @@
   -webkit-mask-image: -webkit-radial-gradient(white, black);
           mask-image: radial-gradient(white, black);
 
-  transform: translateZ(0);
-  will-change: transform, filter;
+  will-change: contents;
   backface-visibility: hidden;
 }
 

@@ -64,19 +64,17 @@ button,[role="button"],.glass-card[data-interactive]{touch-action:manipulation;}
     min-height:100dvh !important;
   }
   .header-liquid-glass,
+  .new-mobile-bottom-bar,
   .fab-nexus-forge,
   .quick-action-menu,
   .user-action-panel{
     position:fixed !important;
-    transform:translate3d(0,0,0) !important;
-    -webkit-transform:translate3d(0,0,0) !important;
-    will-change:transform !important;
+    /* CRITICAL: NO transforms - they break position:fixed on iOS */
+    will-change:contents !important;
     backface-visibility:hidden !important;
     -webkit-backface-visibility:hidden !important;
-    -webkit-transform-style:preserve-3d !important;
-    transform-style:preserve-3d !important;
-    -webkit-perspective:1000px !important;
-    perspective:1000px !important;
+    -webkit-transform-style:flat !important;
+    transform-style:flat !important;
     contain:layout style paint !important;
     isolation:isolate !important;
   }

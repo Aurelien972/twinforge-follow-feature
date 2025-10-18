@@ -84,8 +84,7 @@
     right: 8px !important;
     bottom: calc(var(--new-bottom-bar-height) + var(--new-bottom-bar-bottom-offset) + 8px) !important;
 
-    /* Optimisation GPU pour mobile */
-    transform: translateZ(0) !important;
+    /* CRITICAL: NO transforms on mobile */
     backface-visibility: hidden;
     -webkit-font-smoothing: antialiased;
   }
