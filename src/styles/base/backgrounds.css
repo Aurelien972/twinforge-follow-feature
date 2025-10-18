@@ -64,7 +64,7 @@
     radial-gradient(circle at 50% 50%, var(--forge-medium) 0%, var(--forge-deep) 40%, var(--forge-void) 100%);
 
   /* Animation subtile de respiration cosmique - Desktop & Quality mode uniquement */
-  animation: cosmic-forge-pulse 8s ease-in-out infinite;
+  animation: cosmic-forge-pulse 16s ease-in-out infinite;
 
   /* Optimisation GPU pour modes qualité */
   transform: translateZ(0);
@@ -74,7 +74,9 @@
 
 @keyframes cosmic-forge-pulse {
   0%, 100% { background-size: 400% 300%, 350% 250%, 100% 100%; }
-  50%      { background-size: 420% 320%, 370% 270%, 105% 105%; }
+  25%      { background-size: 405% 305%, 355% 255%, 101% 101%; }
+  50%      { background-size: 410% 310%, 360% 260%, 102% 102%; }
+  75%      { background-size: 405% 305%, 355% 255%, 101% 101%; }
 }
 
 /* =========================================
@@ -274,13 +276,9 @@ html.mode-balanced .forge-particle {
   html.performance-mode .bg-twinforge-visionos,
   [data-performance-mode="true"] .bg-twinforge-visionos,
   .mobile-performance-mode .bg-twinforge-visionos {
-    /* Background ultra-simplifié - UNE SEULE COUCHE */
-    background: radial-gradient(
-      circle at 50% 50%,
-      var(--bg-performance-gradient-start) 0%,
-      var(--bg-performance-gradient-end) 60%,
-      var(--bg-performance-mobile-dark) 100%
-    ) !important;
+    /* Background ULTRA-SIMPLIFIÉ - COULEUR SOLIDE UNIQUEMENT */
+    /* Pas de radial-gradient pour économie GPU maximale */
+    background: var(--bg-performance-mobile) !important;
 
     /* Background FIXE - pas de scroll attachment coûteux */
     background-attachment: scroll !important;
@@ -395,11 +393,9 @@ html.performance-mode .bg-twinforge-visionos,
 .bg-twinforge-visionos.performance-mode,
 [data-performance-mode="true"] .bg-twinforge-visionos,
 .mobile-performance-mode .bg-twinforge-visionos {
-  /* Background UNI simplifié - PERFORMANCE MAXIMALE - PAS de radiaux cyan/orange */
-  background: radial-gradient(circle at 50% 50%,
-    var(--forge-medium) 0%,
-    var(--forge-deep) 50%,
-    var(--forge-void) 100%) !important;
+  /* Background COULEUR SOLIDE - ZÉRO GPU COST */
+  /* Pas de radial-gradient, juste une couleur unie pour desktop aussi */
+  background: var(--forge-deep) !important;
 
   /* Background size FIXE - pas d'animation */
   background-size: 100% 100% !important;

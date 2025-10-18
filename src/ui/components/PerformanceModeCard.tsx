@@ -208,11 +208,11 @@ const PerformanceModeCard: React.FC<PerformanceModeCardProps> = ({
       </div>
 
       {isSelected && mode !== 'high-performance' && (
-        <motion.div
-          layoutId="selected-indicator"
+        <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background: `radial-gradient(circle at 50% 0%, ${config.color}15, transparent 70%)`,
+            zIndex: 0,
           }}
         />
       )}

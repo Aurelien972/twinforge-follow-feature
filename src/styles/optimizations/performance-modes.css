@@ -380,23 +380,6 @@ body {
 }
 
 /* =========================================
-   DEBUG HELPER
+   DEBUG HELPER - REMOVED
+   Pseudo-elements removed to prevent overlay issues
    ========================================= */
-
-/* Afficher le mode actif en dev */
-.mode-high-performance::before,
-.mode-balanced::before,
-.mode-quality::before {
-  content: 'Mode: ' attr(class);
-  position: fixed;
-  bottom: 100px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  z-index: 99999;
-  pointer-events: none;
-  display: none; /* Activer en dev avec display: block */
-}
