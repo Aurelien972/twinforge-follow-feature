@@ -236,11 +236,29 @@
 
 /* =========================================
    PERFORMANCE MODE - iPhone 10 Optimization
-   Disable all animations, particles, and movement
+   Fond figé avec profondeur visuelle préservée
    ========================================= */
 .performance-mode .bg-twinforge-visionos {
-  /* Static background - no animation */
-  background: radial-gradient(circle at 50% 50%, var(--forge-medium) 0%, var(--forge-deep) 60%, var(--forge-void) 100%) !important;
+  /* Fond statique avec nébuleuses figées à leur position optimale */
+  background:
+    /* Nébuleuse chaude (bas-gauche) - position fixe */
+    radial-gradient(ellipse 400% 300% at 20% 80%,
+      color-mix(in srgb, var(--nebula-hot-core) 2.5%, transparent) 0%,
+      color-mix(in srgb, var(--nebula-hot-edge) 1.5%, transparent) 40%,
+      transparent 70%),
+    /* Nébuleuse froide (haut-droit) - position fixe */
+    radial-gradient(ellipse 350% 250% at 80% 20%,
+      color-mix(in srgb, var(--nebula-cold-core) 2%, transparent) 0%,
+      color-mix(in srgb, var(--nebula-cold-edge) 1.5%, transparent) 35%,
+      transparent 65%),
+    /* Gradient cosmique - taille fixe */
+    radial-gradient(circle at 50% 50%, var(--forge-medium) 0%, var(--forge-deep) 40%, var(--forge-void) 100%) !important;
+
+  /* Tailles figées - pas de respiration */
+  background-size: 400% 300%, 350% 250%, 100% 100% !important;
+  background-position: 20% 80%, 80% 20%, 50% 50% !important;
+
+  /* Désactiver toute animation */
   animation: none !important;
 }
 
@@ -258,6 +276,19 @@
   /* Ensure particles are completely hidden */
   display: none !important;
   animation: none !important;
+}
+
+/* Alternative: Fond simplifié élégant (optionnel) */
+.performance-mode.simplified-background .bg-twinforge-visionos {
+  background:
+    /* Version simplifiée avec dégradé élégant */
+    linear-gradient(135deg,
+      var(--forge-void) 0%,
+      var(--forge-deep) 30%,
+      var(--forge-medium) 50%,
+      var(--forge-deep) 70%,
+      var(--forge-void) 100%) !important;
+  background-size: 100% 100% !important;
 }
 
 /* =========================================
