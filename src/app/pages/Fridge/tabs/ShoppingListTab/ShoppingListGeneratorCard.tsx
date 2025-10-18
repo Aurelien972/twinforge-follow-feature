@@ -6,6 +6,7 @@ import { useShoppingListStore } from '../../../../../system/store/shoppingListSt
 import { useMealPlanStore } from '../../../../../system/store/mealPlanStore';
 import CustomDropdown from '../RecipesTab/components/CustomDropdown';
 import logger from '../../../../../lib/utils/logger';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 /**
  * Shopping List Generator Card - Header-style layout inspired by Plan tab
@@ -22,6 +23,7 @@ const ShoppingListGeneratorCard: React.FC = () => {
   const { allMealPlans, loadAllMealPlans } = useMealPlanStore();
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const { isPerformanceMode } = usePerformanceMode();
 
   // Load data when component mounts
   useEffect(() => {
@@ -64,7 +66,11 @@ const ShoppingListGeneratorCard: React.FC = () => {
   return (
     <GlassCard
       className="p-6"
-      style={{
+      style={isPerformanceMode ? {
+        background: 'linear-gradient(145deg, color-mix(in srgb, #fb923c 20%, #1e293b), color-mix(in srgb, #fb923c 10%, #0f172a))',
+        border: '1px solid color-mix(in srgb, #fb923c 40%, transparent)',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)'
+      } : {
         background: `
           radial-gradient(circle at 30% 20%, rgba(251, 146, 60, 0.25) 0%, transparent 50%),
           linear-gradient(135deg, rgba(251, 146, 60, 0.20) 0%, rgba(249, 115, 22, 0.12) 50%, rgba(234, 88, 12, 0.08) 100%)
@@ -85,9 +91,13 @@ const ShoppingListGeneratorCard: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="relative">
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400/50 to-orange-600/30 blur-xl"></div>
-            <div 
+            <div
               className="relative w-16 h-16 rounded-full flex items-center justify-center shadow-2xl"
-              style={{
+              style={isPerformanceMode ? {
+                background: 'linear-gradient(135deg, color-mix(in srgb, #fb923c 60%, #1e293b), color-mix(in srgb, #fb923c 40%, #0f172a))',
+                border: '1px solid color-mix(in srgb, #fb923c 60%, transparent)',
+                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.4)'
+              } : {
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(251, 146, 60, 0.6) 0%, rgba(249, 115, 22, 0.4) 40%, rgba(234, 88, 12, 0.2) 100%)
                 `,
@@ -145,9 +155,13 @@ const ShoppingListGeneratorCard: React.FC = () => {
                 {generationMode === 'user_only' && (
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400/40 to-orange-600/20 blur-md"></div>
                 )}
-                <div 
+                <div
                   className="relative w-10 h-10 rounded-full flex items-center justify-center"
-                  style={generationMode === 'user_only' ? {
+                  style={generationMode === 'user_only' ? (isPerformanceMode ? {
+                    background: 'linear-gradient(135deg, color-mix(in srgb, #fb923c 50%, #1e293b), color-mix(in srgb, #fb923c 30%, #0f172a))',
+                    border: '1px solid color-mix(in srgb, #fb923c 50%, transparent)',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+                  } : {
                     background: `
                       radial-gradient(circle at 30% 30%, rgba(251, 146, 60, 0.5) 0%, rgba(249, 115, 22, 0.3) 40%, rgba(234, 88, 12, 0.15) 100%)
                     `,
@@ -158,7 +172,7 @@ const ShoppingListGeneratorCard: React.FC = () => {
                       inset 0 1px 0 rgba(255, 255, 255, 0.15),
                       inset 0 -1px 0 rgba(0, 0, 0, 0.15)
                     `
-                  } : {
+                  }) : {
                     background: 'rgba(255, 255, 255, 0.1)',
                     border: '1px solid rgba(255, 255, 255, 0.2)'
                   }}
@@ -189,9 +203,13 @@ const ShoppingListGeneratorCard: React.FC = () => {
                 {generationMode === 'user_and_family' && (
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400/40 to-orange-600/20 blur-md"></div>
                 )}
-                <div 
+                <div
                   className="relative w-10 h-10 rounded-full flex items-center justify-center"
-                  style={generationMode === 'user_and_family' ? {
+                  style={generationMode === 'user_and_family' ? (isPerformanceMode ? {
+                    background: 'linear-gradient(135deg, color-mix(in srgb, #fb923c 50%, #1e293b), color-mix(in srgb, #fb923c 30%, #0f172a))',
+                    border: '1px solid color-mix(in srgb, #fb923c 50%, transparent)',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+                  } : {
                     background: `
                       radial-gradient(circle at 30% 30%, rgba(251, 146, 60, 0.5) 0%, rgba(249, 115, 22, 0.3) 40%, rgba(234, 88, 12, 0.15) 100%)
                     `,
@@ -202,7 +220,7 @@ const ShoppingListGeneratorCard: React.FC = () => {
                       inset 0 1px 0 rgba(255, 255, 255, 0.15),
                       inset 0 -1px 0 rgba(0, 0, 0, 0.15)
                     `
-                  } : {
+                  }) : {
                     background: 'rgba(255, 255, 255, 0.1)',
                     border: '1px solid rgba(255, 255, 255, 0.2)'
                   }}

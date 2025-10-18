@@ -4,6 +4,7 @@ import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
 import { useFeedback } from '../../../../../../hooks/useFeedback';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 import type { Recipe } from '../../../../../domain/recipe';
 
 interface RecipeValidationCTAProps {
@@ -21,6 +22,8 @@ const RecipeValidationCTA: React.FC<RecipeValidationCTAProps> = ({
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { click } = useFeedback();
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   // Calculate average time from recipes
   const averageTime = useMemo(() => {
@@ -53,9 +56,11 @@ const RecipeValidationCTA: React.FC<RecipeValidationCTAProps> = ({
   // Skeleton loading state
   if (isGenerating) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+      <MotionDiv
+        {...(!isPerformanceMode && {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 }
+        })}
         className="mb-6"
       >
         <GlassCard className="p-6 border-2 border-pink-400/30">
@@ -92,7 +97,7 @@ const RecipeValidationCTA: React.FC<RecipeValidationCTAProps> = ({
             </div>
           </div>
         </GlassCard>
-      </motion.div>
+      </MotionDiv>
     );
   }
 
@@ -101,9 +106,11 @@ const RecipeValidationCTA: React.FC<RecipeValidationCTAProps> = ({
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 }
+      })}
       className="mb-6"
     >
       <GlassCard className="p-6 border-2 border-pink-400/30">
@@ -189,7 +196,7 @@ const RecipeValidationCTA: React.FC<RecipeValidationCTAProps> = ({
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

@@ -4,6 +4,7 @@ import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
 import { cssSupports } from './shoppingListUtils';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 
 export interface ShoppingListHeaderProps {
   shoppingList: any;
@@ -20,10 +21,17 @@ const ShoppingListHeader: React.FC<ShoppingListHeaderProps> = ({
   progressPercentage,
   onReset
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   return (
     <GlassCard
       className="border-cyan-500/30 p-1"
-      style={{
+      style={isPerformanceMode ? {
+        background: 'linear-gradient(145deg, color-mix(in srgb, #06b6d4 20%, #1e293b), color-mix(in srgb, #06b6d4 10%, #0f172a))',
+        border: '1px solid color-mix(in srgb, #06b6d4 40%, transparent)',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)'
+      } : {
         background: `
           radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 60%),
           radial-gradient(circle at 70% 80%, rgba(8, 145, 178, 0.10) 0%, transparent 50%),
@@ -47,7 +55,11 @@ const ShoppingListHeader: React.FC<ShoppingListHeaderProps> = ({
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400/40 to-cyan-600/25 blur-2xl"></div>
               <div
                 className="relative w-16 h-16 rounded-full flex items-center justify-center shadow-2xl breathing-icon"
-                style={{
+                style={isPerformanceMode ? {
+                  background: 'linear-gradient(135deg, color-mix(in srgb, #06b6d4 35%, #1e293b), color-mix(in srgb, #06b6d4 25%, #0f172a))',
+                  border: '2px solid color-mix(in srgb, #06b6d4 50%, transparent)',
+                  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.4)'
+                } : {
                   background: `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
                     radial-gradient(circle at 70% 70%, rgba(6, 182, 212, 0.4) 0%, rgba(8, 145, 178, 0.3) 50%, rgba(14, 116, 144, 0.2) 100%)
@@ -84,14 +96,17 @@ const ShoppingListHeader: React.FC<ShoppingListHeaderProps> = ({
             <span className="text-cyan-200 font-semibold">{completedCount}/{totalCount} articles</span>
           </div>
           <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-            <motion.div
+            <MotionDiv
               className="h-full rounded-full shadow-lg"
               style={{
-                background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.95) 100%)'
+                background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.95) 100%)',
+                width: isPerformanceMode ? `${progressPercentage}%` : undefined
               }}
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPercentage}%` }}
-              transition={{ duration: 0.5 }}
+              {...(!isPerformanceMode && {
+                initial: { width: 0 },
+                animate: { width: `${progressPercentage}%` },
+                transition: { duration: 0.5 }
+              })}
             />
           </div>
         </div>
@@ -99,7 +114,12 @@ const ShoppingListHeader: React.FC<ShoppingListHeaderProps> = ({
         <button
           onClick={onReset}
           className="w-full mt-4 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 btn-glass"
-          style={{
+          style={isPerformanceMode ? {
+            background: 'linear-gradient(145deg, color-mix(in srgb, #06b6d4 80%, #1e293b), color-mix(in srgb, #0891b2 75%, #0f172a))',
+            border: '2px solid color-mix(in srgb, #06b6d4 60%, transparent)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
+            color: 'white'
+          } : {
             background: `
               linear-gradient(135deg,
                 color-mix(in srgb, #06b6d4 80%, transparent),

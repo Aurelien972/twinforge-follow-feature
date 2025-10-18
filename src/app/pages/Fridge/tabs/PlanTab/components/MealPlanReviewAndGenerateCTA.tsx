@@ -4,6 +4,7 @@ import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
 import { useFeedback } from '../../../../../../hooks/useFeedback';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 
 interface MealPlanReviewAndGenerateCTAProps {
   currentPlan: any;
@@ -25,6 +26,8 @@ const MealPlanReviewAndGenerateCTA: React.FC<MealPlanReviewAndGenerateCTAProps> 
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const { click } = useFeedback();
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   // Calculate meal and recipe statistics
   const mealStats = useMemo(() => {
@@ -115,9 +118,11 @@ const MealPlanReviewAndGenerateCTA: React.FC<MealPlanReviewAndGenerateCTAProps> 
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 }
+      })}
       className="mb-6"
     >
       <GlassCard className="p-6 border-2 border-purple-400/30">
@@ -184,7 +189,11 @@ const MealPlanReviewAndGenerateCTA: React.FC<MealPlanReviewAndGenerateCTAProps> 
                 onClick={handleGenerateAllRecipes}
                 disabled={isProcessing}
                 className="w-full text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={!isProcessing ? {
+                style={!isProcessing ? (isPerformanceMode ? {
+                  background: 'linear-gradient(145deg, color-mix(in srgb, #A855F7 90%, #1e293b), color-mix(in srgb, #9333EA 85%, #0f172a))',
+                  border: '2px solid color-mix(in srgb, #A855F7 60%, transparent)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)'
+                } : {
                   background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.9) 0%, rgba(147, 51, 234, 0.85) 100%)',
                   backdropFilter: 'blur(20px) saturate(160%)',
                   border: '2px solid color-mix(in srgb, #A855F7 60%, transparent)',
@@ -198,7 +207,7 @@ const MealPlanReviewAndGenerateCTA: React.FC<MealPlanReviewAndGenerateCTAProps> 
                   `,
                   transform: 'translateZ(0)',
                   WebkitBackdropFilter: 'blur(20px) saturate(160%)'
-                } : undefined}
+                }) : undefined}
               >
                 {isProcessing ? (
                   <>
@@ -269,7 +278,7 @@ const MealPlanReviewAndGenerateCTA: React.FC<MealPlanReviewAndGenerateCTAProps> 
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

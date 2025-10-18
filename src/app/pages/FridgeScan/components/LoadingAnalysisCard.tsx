@@ -61,9 +61,14 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
         transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }
       })}
     >
-      <GlassCard 
+      <GlassCard
         className="p-8 text-center relative overflow-hidden"
-        style={{
+        style={isPerformanceMode ? {
+          background: 'linear-gradient(145deg, color-mix(in srgb, var(--color-fridge-primary) 20%, #1e293b), color-mix(in srgb, var(--color-fridge-primary) 10%, #0f172a))',
+          borderColor: 'color-mix(in srgb, var(--color-fridge-primary) 40%, transparent)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+          minHeight: '400px'
+        } : {
           background: `
             radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-fridge-primary) 18%, transparent) 0%, transparent 60%),
             radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent) 0%, transparent 50%),
@@ -131,7 +136,11 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
           <div className="relative">
             <MotionDiv
               className="w-32 h-32 mx-auto rounded-full flex items-center justify-center relative fridge-ai-focus"
-              style={{
+              style={isPerformanceMode ? {
+                background: 'linear-gradient(135deg, color-mix(in srgb, var(--color-fridge-primary) 45%, #1e293b), color-mix(in srgb, var(--color-plasma-cyan) 30%, #0f172a))',
+                border: `4px solid color-mix(in srgb, var(--color-fridge-primary) 80%, transparent)`,
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)'
+              } : {
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, transparent 60%),
                   radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--color-fridge-primary) 25%, transparent) 0%, transparent 50%),
@@ -402,7 +411,10 @@ const LoadingAnalysisCard: React.FC<LoadingAnalysisCardProps> = ({
           {/* Indicateur de Temps Estimé */}
           <MotionDiv
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-            style={{
+            style={isPerformanceMode ? {
+              background: 'color-mix(in srgb, var(--color-plasma-cyan) 15%, #1e293b)',
+              border: '1px solid color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent)'
+            } : {
               background: 'color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent)',
               border: '1px solid color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent)',
               backdropFilter: 'blur(12px) saturate(140%)'

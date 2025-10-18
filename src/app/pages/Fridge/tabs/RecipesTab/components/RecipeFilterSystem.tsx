@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 
 interface RecipeFiltersProps {
   searchFilter: string;
@@ -36,6 +37,9 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
   setMinServings
 }) => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+  const MotionButton = isPerformanceMode ? 'button' : motion.button;
 
   const availableFilters = [
     'végétarien',
@@ -72,9 +76,13 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
   };
 
   return (
-    <GlassCard 
+    <GlassCard
       className="p-4 space-y-6"
-      style={{
+      style={isPerformanceMode ? {
+        background: 'linear-gradient(145deg, color-mix(in srgb, #10B981 20%, #1e293b), color-mix(in srgb, #10B981 10%, #0f172a))',
+        borderColor: 'color-mix(in srgb, #10B981 40%, transparent)',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)'
+      } : {
         background: `
           radial-gradient(circle at 30% 20%, color-mix(in srgb, #10B981 12%, transparent) 0%, transparent 60%),
           radial-gradient(circle at 70% 80%, color-mix(in srgb, #34D399 8%, transparent) 0%, transparent 50%),
@@ -92,9 +100,13 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
       {/* En-tête du Filtre */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div 
+          <div
             className="w-12 h-12 rounded-full flex items-center justify-center breathing-icon"
-            style={{
+            style={isPerformanceMode ? {
+              background: 'linear-gradient(135deg, color-mix(in srgb, #10B981 35%, #1e293b), color-mix(in srgb, #10B981 25%, #0f172a))',
+              border: '2px solid color-mix(in srgb, #10B981 50%, transparent)',
+              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.4)'
+            } : {
               background: `
                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
                 linear-gradient(135deg, color-mix(in srgb, #10B981 35%, transparent), color-mix(in srgb, #10B981 25%, transparent))
@@ -145,11 +157,13 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
       {/* Panneau de Filtres Avancés */}
       <AnimatePresence>
         {showAdvancedFilters && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
+          <MotionDiv
+            {...(!isPerformanceMode && {
+              initial: { opacity: 0, height: 0 },
+              animate: { opacity: 1, height: 'auto' },
+              exit: { opacity: 0, height: 0 },
+              transition: { duration: 0.3 }
+            })}
             className="space-y-4 overflow-hidden"
           >
             {/* Barre de recherche */}
@@ -241,7 +255,7 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
                 {availableFilters.map((filter) => {
                   const isSelected = selectedFilters.includes(filter);
                   return (
-                    <motion.button
+                    <MotionButton
                       key={filter}
                       onClick={() => toggleFilter(filter)}
                       disabled={isGenerating}
@@ -250,16 +264,18 @@ const RecipeFilters: React.FC<RecipeFiltersProps> = ({
                           ? 'bg-green-500 text-white shadow-lg'
                           : 'bg-white/10 text-white/70 hover:bg-white/20'
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
-                      whileHover={!isGenerating ? { scale: 1.05 } : {}}
-                      whileTap={!isGenerating ? { scale: 0.95 } : {}}
+                      {...(!isPerformanceMode && {
+                        whileHover: !isGenerating ? { scale: 1.05 } : {},
+                        whileTap: !isGenerating ? { scale: 0.95 } : {}
+                      })}
                     >
                       {filter}
-                    </motion.button>
+                    </MotionButton>
                   );
                 })}
               </div>
             </div>
-          </motion.div>
+          </MotionDiv>
         )}
       </AnimatePresence>
 

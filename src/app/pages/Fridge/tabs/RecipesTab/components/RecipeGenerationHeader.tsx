@@ -5,6 +5,7 @@ import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
 import CustomDropdown from '../../RecipesTab/components/CustomDropdown';
 import { useFeedback } from '../../../../../../hooks/useFeedback';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 
 interface InventoryOption {
   id: string;
@@ -28,6 +29,8 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
   isGenerating
 }) => {
   const { click } = useFeedback();
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   const selectedInventory = availableInventories.find(inv => inv.id === selectedInventoryId);
   const hasValidInventory = selectedInventory && selectedInventory.inventory_final.length > 0;
@@ -57,14 +60,20 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: -20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5 }
+      })}
     >
       <GlassCard
         className="p-5"
-        style={{
+        style={isPerformanceMode ? {
+          background: 'linear-gradient(145deg, color-mix(in srgb, #10B981 20%, #1e293b), color-mix(in srgb, #10B981 10%, #0f172a))',
+          borderColor: 'color-mix(in srgb, #10B981 40%, transparent)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)'
+        } : {
           background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
           borderColor: 'rgba(16, 185, 129, 0.2)',
           boxShadow: '0 8px 32px rgba(16, 185, 129, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
@@ -74,9 +83,13 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
         <div className="flex items-center gap-4 mb-5">
           {/* Section Titre et Description */}
           <div className="flex items-center gap-4 flex-1">
-            <div 
+            <div
               className="w-16 h-16 rounded-full flex items-center justify-center breathing-icon flex-shrink-0"
-              style={{
+              style={isPerformanceMode ? {
+                background: 'linear-gradient(135deg, color-mix(in srgb, #10B981 35%, #1e293b), color-mix(in srgb, #10B981 25%, #0f172a))',
+                border: '2px solid color-mix(in srgb, #10B981 50%, transparent)',
+                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.4)'
+              } : {
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
                   linear-gradient(135deg, color-mix(in srgb, #10B981 35%, transparent), color-mix(in srgb, #10B981 25%, transparent))
@@ -116,9 +129,11 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
 
         {/* Message d'aide si aucun inventaire */}
         {availableInventories.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+          <MotionDiv
+            {...(!isPerformanceMode && {
+              initial: { opacity: 0 },
+              animate: { opacity: 1 }
+            })}
             className="pt-4 border-t border-white/10 mt-4"
           >
             <div className="flex items-center gap-2 text-sm text-amber-400">
@@ -130,22 +145,29 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
                 Aucun inventaire disponible. Scannez votre frigo pour commencer !
               </span>
             </div>
-          </motion.div>
+          </MotionDiv>
         )}
       </GlassCard>
 
       {/* Generate Recipes Button - Full width below */}
-      <motion.div
+      <MotionDiv
         className="w-full mt-4"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
+        {...(!isPerformanceMode && {
+          initial: { opacity: 0, y: 10 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.3, delay: 0.1 }
+        })}
       >
         <button
           onClick={handleGenerateClick}
           disabled={!hasValidInventory || isGenerating}
           className={`btn-glass btn-glass--primary w-full px-8 py-4 text-lg font-bold transition-all duration-200 flex items-center justify-center gap-2 ${!hasValidInventory || isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={hasValidInventory && !isGenerating ? {
+          style={hasValidInventory && !isGenerating ? (isPerformanceMode ? {
+            background: 'linear-gradient(145deg, color-mix(in srgb, #10B981 80%, #1e293b), color-mix(in srgb, #22C55E 70%, #0f172a))',
+            border: '2px solid color-mix(in srgb, #10B981 60%, transparent)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
+            color: 'white'
+          } : {
             background: `
               linear-gradient(135deg,
                 color-mix(in srgb, #10B981 80%, transparent),
@@ -162,7 +184,7 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
             backdropFilter: 'blur(20px) saturate(160%)',
             WebkitBackdropFilter: 'blur(20px) saturate(160%)',
             color: 'white'
-          } : undefined}
+          }) : undefined}
         >
           {isGenerating ? (
             <>
@@ -185,8 +207,8 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
             </>
           )}
         </button>
-      </motion.div>
-    </motion.div>
+      </MotionDiv>
+    </MotionDiv>
   );
 };
 

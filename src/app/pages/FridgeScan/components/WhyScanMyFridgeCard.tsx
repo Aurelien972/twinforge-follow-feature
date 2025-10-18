@@ -3,12 +3,17 @@ import { motion } from 'framer-motion';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
 
 /**
  * Why Scan My Fridge Card
  * Composant éducatif expliquant les bénéfices du scan de frigo
+ * Optimisé pour performance mode mobile
  */
 const WhyScanMyFridgeCard: React.FC = () => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   const benefits = [
     {
       icon: 'ChefHat',
@@ -49,14 +54,20 @@ const WhyScanMyFridgeCard: React.FC = () => {
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 30 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.6, ease: "easeOut" }
+      })}
     >
       <GlassCard
         className="p-6"
-        style={{
+        style={isPerformanceMode ? {
+          background: 'linear-gradient(145deg, color-mix(in srgb, var(--brand-primary) 15%, #1e293b), color-mix(in srgb, var(--brand-primary) 8%, #0f172a))',
+          borderColor: 'color-mix(in srgb, var(--brand-primary) 30%, transparent)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)'
+        } : {
           background: `
             radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--brand-primary) 10%, transparent) 0%, transparent 60%),
             radial-gradient(circle at 80% 70%, color-mix(in srgb, var(--color-plasma-cyan) 8%, transparent) 0%, transparent 50%),
@@ -72,15 +83,21 @@ const WhyScanMyFridgeCard: React.FC = () => {
         }}
       >
         {/* Icône centrale au-dessus du titre */}
-        <motion.div
+        <MotionDiv
           className="flex justify-center mb-6"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
+          {...(!isPerformanceMode && {
+            initial: { scale: 0.8, opacity: 0 },
+            animate: { scale: 1, opacity: 1 },
+            transition: { delay: 0.2, duration: 0.6 }
+          })}
         >
           <div
             className="w-20 h-20 rounded-full flex items-center justify-center"
-            style={{
+            style={isPerformanceMode ? {
+              background: 'linear-gradient(135deg, color-mix(in srgb, var(--brand-primary) 30%, #1e293b), color-mix(in srgb, var(--brand-primary) 15%, #0f172a))',
+              border: '3px solid color-mix(in srgb, var(--brand-primary) 40%, transparent)',
+              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.4)'
+            } : {
               background: `
                 radial-gradient(circle, color-mix(in srgb, var(--brand-primary) 25%, transparent) 0%,
                 color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent) 70%)
@@ -101,61 +118,73 @@ const WhyScanMyFridgeCard: React.FC = () => {
               }}
             />
           </div>
-        </motion.div>
+        </MotionDiv>
 
         {/* En-tête de la section */}
         <div className="text-center mb-6">
-          <motion.h4
+          <MotionDiv
             className="text-xl font-bold mb-3 text-white"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
+            {...(!isPerformanceMode && {
+              initial: { opacity: 0, y: -10 },
+              animate: { opacity: 1, y: 0 },
+              transition: { delay: 0.3, duration: 0.5 }
+            })}
           >
             Pourquoi Scanner Mon Frigo ?
-          </motion.h4>
-          <motion.p
+          </MotionDiv>
+          <MotionDiv
             className="text-sm text-white/70 max-w-md mx-auto"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
+            {...(!isPerformanceMode && {
+              initial: { opacity: 0, y: -10 },
+              animate: { opacity: 1, y: 0 },
+              transition: { delay: 0.4, duration: 0.5 }
+            })}
           >
             Transformez votre inventaire en opportunités culinaires et économies intelligentes
-          </motion.p>
+          </MotionDiv>
         </div>
 
         {/* Liste des bénéfices */}
-        <motion.div
+        <MotionDiv
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.5
+          {...(!isPerformanceMode && {
+            initial: "hidden",
+            animate: "visible",
+            variants: {
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1,
+                  delayChildren: 0.5
+                }
               }
             }
-          }}
+          })}
         >
           {benefits.map((benefit, index) => (
-            <motion.div
+            <MotionDiv
               key={index}
               className="flex items-start gap-4 p-4 rounded-lg"
               style={{
                 background: 'color-mix(in srgb, var(--glass-opacity) 60%, transparent)',
                 border: '1px solid color-mix(in srgb, white 12%, transparent)'
               }}
-              variants={{
-                hidden: { opacity: 0, scale: 0.9 },
-                visible: { opacity: 1, scale: 1 }
-              }}
-              transition={{ duration: 0.5 }}
+              {...(!isPerformanceMode && {
+                variants: {
+                  hidden: { opacity: 0, scale: 0.9 },
+                  visible: { opacity: 1, scale: 1 }
+                },
+                transition: { duration: 0.5 }
+              })}
             >
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{
+                style={isPerformanceMode ? {
+                  background: `linear-gradient(135deg, color-mix(in srgb, ${benefit.color} 25%, #1e293b), color-mix(in srgb, ${benefit.color} 12%, #0f172a))`,
+                  border: `2px solid color-mix(in srgb, ${benefit.color} 30%, transparent)`,
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+                } : {
                   background: `
                     radial-gradient(circle, color-mix(in srgb, ${benefit.color} 20%, transparent) 0%,
                     color-mix(in srgb, ${benefit.color} 5%, transparent) 70%)
@@ -181,16 +210,18 @@ const WhyScanMyFridgeCard: React.FC = () => {
                   {benefit.description}
                 </p>
               </div>
-            </motion.div>
+            </MotionDiv>
           ))}
-        </motion.div>
+        </MotionDiv>
 
         {/* Section supplémentaire avec statistiques */}
-        <motion.div
+        <MotionDiv
           className="mt-6 pt-6 border-t border-white/10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 0.5 }}
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0 },
+            animate: { opacity: 1 },
+            transition: { delay: 1, duration: 0.5 }
+          })}
         >
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
@@ -206,9 +237,9 @@ const WhyScanMyFridgeCard: React.FC = () => {
               <div className="text-xs text-white/60">Temps gagné/semaine</div>
             </div>
           </div>
-        </motion.div>
+        </MotionDiv>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 
