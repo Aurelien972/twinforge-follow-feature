@@ -1,16 +1,26 @@
 import React, { createContext, useContext, useEffect } from 'react';
-import { usePerformanceModeStore } from '../store/performanceModeStore';
+import { usePerformanceModeStore, PerformanceMode } from '../store/performanceModeStore';
 import { useUserStore } from '../store/userStore';
+import { useDeviceCapabilities } from '../../hooks/useDeviceCapabilities';
 
 interface PerformanceModeContextType {
-  isPerformanceMode: boolean;
+  // New 3-mode system
+  mode: PerformanceMode;
+  recommendedMode: PerformanceMode | null;
   isLoading: boolean;
+  setMode: (mode: PerformanceMode) => Promise<void>;
+
+  // Legacy support
+  isPerformanceMode: boolean;
   togglePerformanceMode: () => Promise<void>;
 }
 
 const PerformanceModeContext = createContext<PerformanceModeContextType>({
+  mode: 'balanced',
+  recommendedMode: null,
   isPerformanceMode: false,
   isLoading: true,
+  setMode: async () => {},
   togglePerformanceMode: async () => {},
 });
 
@@ -21,21 +31,38 @@ interface PerformanceModeProviderProps {
 }
 
 export const PerformanceModeProvider: React.FC<PerformanceModeProviderProps> = ({ children }) => {
-  const { isPerformanceMode, isLoading, setPerformanceMode, loadPerformanceMode } = usePerformanceModeStore();
-  const { profile } = useUserStore();
+  const {
+    mode,
+    recommendedMode,
+    isPerformanceMode,
+    isLoading,
+    setMode: setModeStore,
+    loadMode,
+  } = usePerformanceModeStore();
 
-  // Load performance mode on mount
+  const { profile } = useUserStore();
+  const capabilities = useDeviceCapabilities();
+
+  // Load performance mode on mount with device recommendation
   useEffect(() => {
-    loadPerformanceMode(profile?.id);
-  }, [profile?.id, loadPerformanceMode]);
+    loadMode(profile?.id, capabilities.recommendedMode);
+  }, [profile?.id, capabilities.recommendedMode, loadMode]);
+
+  const setMode = async (newMode: PerformanceMode) => {
+    await setModeStore(newMode, profile?.id);
+  };
 
   const togglePerformanceMode = async () => {
-    await setPerformanceMode(!isPerformanceMode, profile?.id);
+    const newMode: PerformanceMode = isPerformanceMode ? 'balanced' : 'high-performance';
+    await setMode(newMode);
   };
 
   const value: PerformanceModeContextType = {
+    mode,
+    recommendedMode,
     isPerformanceMode,
     isLoading,
+    setMode,
     togglePerformanceMode,
   };
 

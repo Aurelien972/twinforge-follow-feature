@@ -94,6 +94,7 @@
 /* =========================================
    PHASE 7: OPTIMISATIONS CONSOLIDÉES
    ========================================= */
+@import './optimizations/performance-modes.css';
 @import './optimizations/responsive.css';
 @import './optimizations/performance.css';
 @import './optimizations/pipeline-animations.css';
