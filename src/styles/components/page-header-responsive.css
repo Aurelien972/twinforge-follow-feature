@@ -53,3 +53,72 @@
 .page-header-subtitle {
   min-width: 0; /* Allow flex shrinking */
 }
+
+/* =========================================
+   MODE PERFORMANCE - ICÔNE OPTIMISÉE
+   ========================================= */
+
+/* Mode Performance: Icône avec fond opaque et contraste maximal */
+.mode-high-performance .breathing-icon > div {
+  background: linear-gradient(145deg,
+    rgba(26, 35, 50, 0.95),
+    rgba(15, 25, 39, 0.98)
+  ) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 2px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Mode Performance: Icône SVG plus visible */
+.mode-high-performance .breathing-icon svg {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)) !important;
+  opacity: 1 !important;
+}
+
+/* Mode Performance: Annuler l'animation breathing */
+.mode-high-performance .breathing-icon {
+  animation: none !important;
+}
+
+/* Mobile: Fond encore plus opaque pour maximiser le contraste */
+@media (max-width: 768px) {
+  .breathing-icon > div {
+    background: linear-gradient(145deg,
+      rgba(26, 35, 50, 0.95),
+      rgba(15, 25, 39, 0.98)
+    ) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 2px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .breathing-icon svg {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)) !important;
+  }
+
+  .breathing-icon {
+    animation: none !important;
+  }
+}
+
+/* Mode Balanced: Effets légers */
+.mode-balanced .breathing-icon > div {
+  backdrop-filter: blur(8px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+  background: linear-gradient(145deg,
+    rgba(26, 35, 50, 0.75),
+    rgba(15, 25, 39, 0.85)
+  ) !important;
+}
+
+/* Mode Quality: Effets complets (défaut du composant) */
+.mode-quality .breathing-icon > div {
+  /* Utilise les styles par défaut du composant */
+}
