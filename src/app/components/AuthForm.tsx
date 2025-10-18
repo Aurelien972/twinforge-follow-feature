@@ -153,35 +153,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
         `
       }}
     >
-      {/* Particules de l'Enclume Cosmique pour l'Auth - Enhanced */}
-      <div className="cosmic-forge-particles" style={{ opacity: 0.8 }}>
-        <div className="forge-particle forge-particle--1"></div>
-        <div className="forge-particle forge-particle--2"></div>
-        <div className="forge-particle forge-particle--3"></div>
-        <div className="forge-particle forge-particle--4"></div>
-        <div className="forge-particle forge-particle--5" style={{
-          position: 'absolute',
-          top: '15%',
-          left: '25%',
-          width: '3px',
-          height: '3px',
-          background: 'radial-gradient(circle, rgba(24, 227, 255, 0.8), transparent)',
-          borderRadius: '50%',
-          animation: 'floatParticle 8s ease-in-out infinite',
-          animationDelay: '1s'
-        }}></div>
-        <div className="forge-particle forge-particle--6" style={{
-          position: 'absolute',
-          top: '75%',
-          right: '20%',
-          width: '4px',
-          height: '4px',
-          background: 'radial-gradient(circle, rgba(255, 107, 53, 0.6), transparent)',
-          borderRadius: '50%',
-          animation: 'floatParticle 10s ease-in-out infinite',
-          animationDelay: '2s'
-        }}></div>
-      </div>
+      {/* Particules désactivées - maintenant gérées par BackgroundManager */}
 
       {/* Conteneur Principal - Centré */}
       <div

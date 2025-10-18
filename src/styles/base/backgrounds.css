@@ -28,6 +28,15 @@
   --animation-speed-desktop: 22s;
   --animation-speed-tablet: 28s;
   --animation-speed-mobile: 35s;
+
+  /* Variables Performance Mode Mobile */
+  --bg-performance-mobile: #0F1927;
+  --bg-performance-mobile-dark: #0B0E17;
+  --bg-performance-gradient-start: #1A1F2E;
+  --bg-performance-gradient-end: #0F1419;
+  --nebula-performance-opacity: 0.008;
+  --nebula-performance-hot: rgba(255, 107, 53, 0.008);
+  --nebula-performance-cold: rgba(24, 227, 255, 0.006);
 }
 
 /* =========================================
@@ -196,7 +205,7 @@
 }
 
 /* =========================================
-   MOBILE
+   MOBILE - Optimisations générales
    ========================================= */
 @media (max-width: 768px) {
   .cosmic-forge-particles { opacity: 0.5 !important; }
@@ -212,6 +221,94 @@
   }
   /* Garder 6 particules (1..6) pour performances optimales */
   .cosmic-forge-particles .forge-particle:nth-child(n+7) { display: none !important; }
+}
+
+/* =========================================
+   MOBILE + PERFORMANCE MODE - OPTIMISATION MAXIMALE
+   iPhone 10, iPhone 8, Android anciens
+   ========================================= */
+@media (max-width: 768px) {
+  /* Sélecteurs renforcés pour mobile performance */
+  body.performance-mode .bg-twinforge-visionos,
+  .performance-mode .bg-twinforge-visionos,
+  html.performance-mode .bg-twinforge-visionos,
+  [data-performance-mode="true"] .bg-twinforge-visionos,
+  .mobile-performance-mode .bg-twinforge-visionos {
+    /* Background ultra-simplifié - UNE SEULE COUCHE */
+    background: radial-gradient(
+      circle at 50% 50%,
+      var(--bg-performance-gradient-start) 0%,
+      var(--bg-performance-gradient-end) 60%,
+      var(--bg-performance-mobile-dark) 100%
+    ) !important;
+
+    /* Background FIXE - pas de scroll attachment coûteux */
+    background-attachment: scroll !important;
+    background-size: 100% 100% !important;
+    background-position: center center !important;
+
+    /* AUCUNE animation */
+    animation: none !important;
+    animation-name: none !important;
+    animation-play-state: paused !important;
+    animation-duration: 0s !important;
+
+    /* Supprimer TOUTES les optimisations GPU coûteuses */
+    transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    perspective: none !important;
+
+    /* Pas de contain pour éviter bugs iOS */
+    contain: none !important;
+  }
+
+  /* Pseudo-elements complètement désactivés sur mobile performance */
+  body.performance-mode .bg-twinforge-visionos::before,
+  body.performance-mode .bg-twinforge-visionos::after,
+  .performance-mode .bg-twinforge-visionos::before,
+  .performance-mode .bg-twinforge-visionos::after,
+  html.performance-mode .bg-twinforge-visionos::before,
+  html.performance-mode .bg-twinforge-visionos::after,
+  [data-performance-mode="true"] .bg-twinforge-visionos::before,
+  [data-performance-mode="true"] .bg-twinforge-visionos::after,
+  .mobile-performance-mode .bg-twinforge-visionos::before,
+  .mobile-performance-mode .bg-twinforge-visionos::after {
+    display: none !important;
+    content: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* Particules COMPLÈTEMENT retirées sur mobile performance */
+  body.performance-mode .cosmic-forge-particles,
+  .performance-mode .cosmic-forge-particles,
+  html.performance-mode .cosmic-forge-particles,
+  [data-performance-mode="true"] .cosmic-forge-particles,
+  .mobile-performance-mode .cosmic-forge-particles {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    position: absolute !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+  }
+
+  body.performance-mode .forge-particle,
+  .performance-mode .forge-particle,
+  html.performance-mode .forge-particle,
+  [data-performance-mode="true"] .forge-particle,
+  .mobile-performance-mode .forge-particle {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    animation: none !important;
+    position: absolute !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
 }
 
 /* =========================================
@@ -241,30 +338,31 @@
 /* =========================================
    PERFORMANCE MODE - iPhone 10 Optimization
    Alternative professionnelle au système de particules
+   OPTIMISATION COMPLETE - v4.0
    ========================================= */
 
 /* =========================================
    FOND STATIQUE PROFESSIONNEL
    Conserve l'identité visuelle sans coût GPU
+   Sélecteurs renforcés pour garantie d'application
    ========================================= */
 
 /* PRIORITÉ ABSOLUE : Désactiver cosmic-forge-pulse en mode performance */
+/* Sélecteurs multiples pour garantir l'application même sans classe body */
 body.performance-mode .bg-twinforge-visionos,
-.performance-mode .bg-twinforge-visionos {
-  /* Multi-couches statiques avec nébuleuses subtiles - FIXE */
+.performance-mode .bg-twinforge-visionos,
+html.performance-mode .bg-twinforge-visionos,
+.bg-twinforge-visionos.performance-mode,
+[data-performance-mode="true"] .bg-twinforge-visionos,
+.mobile-performance-mode .bg-twinforge-visionos {
+  /* Background simplifié 2 couches - PERFORMANCE MAXIMALE */
   background:
-    /* Nébuleuse chaude statique (opacité réduite pour profondeur) */
+    /* Nébuleuse chaude statique ultra-réduite */
     radial-gradient(ellipse 400% 300% at 20% 80%,
-      color-mix(in srgb, var(--nebula-hot-core) 1.8%, transparent) 0%,
-      color-mix(in srgb, var(--nebula-hot-edge) 1.2%, transparent) 40%,
-      transparent 70%),
-    /* Nébuleuse froide statique (opacité réduite) */
-    radial-gradient(ellipse 350% 250% at 80% 20%,
-      color-mix(in srgb, var(--nebula-cold-core) 1.5%, transparent) 0%,
-      color-mix(in srgb, var(--nebula-cold-edge) 1.2%, transparent) 35%,
-      transparent 65%),
-    /* Gradient cosmique de base */
-    radial-gradient(circle at 50% 50%, var(--forge-medium) 0%, var(--forge-deep) 40%, var(--forge-void) 100%) !important;
+      var(--nebula-performance-hot) 0%,
+      transparent 50%),
+    /* Gradient cosmique de base simplifié */
+    radial-gradient(circle at 50% 50%, var(--bg-performance-gradient-start) 0%, var(--bg-performance-gradient-end) 50%, var(--bg-performance-mobile-dark) 100%) !important;
 
   /* Background size FIXE - pas d'animation */
   background-size: 400% 300%, 350% 250%, 100% 100% !important;
@@ -280,59 +378,65 @@ body.performance-mode .bg-twinforge-visionos,
   backface-visibility: visible !important;
 }
 
-/* Texture de bruit subtile pour richesse visuelle sans animation */
-.performance-mode .bg-twinforge-visionos::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(255, 255, 255, 0.01) 2px,
-      rgba(255, 255, 255, 0.01) 4px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 2px,
-      rgba(255, 255, 255, 0.01) 2px,
-      rgba(255, 255, 255, 0.01) 4px
-    );
-  opacity: 0.3;
-  pointer-events: none;
-  mix-blend-mode: overlay;
+/* Texture de bruit DÉSACTIVÉE en mode performance pour économie maximale */
+body.performance-mode .bg-twinforge-visionos::after,
+.performance-mode .bg-twinforge-visionos::after,
+html.performance-mode .bg-twinforge-visionos::after,
+[data-performance-mode="true"] .bg-twinforge-visionos::after,
+.mobile-performance-mode .bg-twinforge-visionos::after {
+  /* Complètement désactivé - pas de texture coûteuse */
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
 }
 
-/* Désactiver la distorsion thermique - thermal-distortion */
+/* Désactiver la distorsion thermique - thermal-distortion - Sélecteurs renforcés */
 body.performance-mode .bg-twinforge-visionos::before,
-.performance-mode .bg-twinforge-visionos::before {
+.performance-mode .bg-twinforge-visionos::before,
+html.performance-mode .bg-twinforge-visionos::before,
+[data-performance-mode="true"] .bg-twinforge-visionos::before,
+.mobile-performance-mode .bg-twinforge-visionos::before {
   display: none !important;
+  content: none !important;
   animation: none !important;
   animation-name: none !important;
   animation-play-state: paused !important;
   opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 /* =========================================
    DÉSACTIVATION COMPLÈTE DES PARTICULES
    Ember-rise animation must be stopped
+   Sélecteurs renforcés pour suppression garantie
    ========================================= */
 
-/* Conteneur particules - COMPLÈTEMENT CACHÉ */
+/* Conteneur particules - COMPLÈTEMENT CACHÉ - Sélecteurs multiples */
 body.performance-mode .cosmic-forge-particles,
-.performance-mode .cosmic-forge-particles {
+.performance-mode .cosmic-forge-particles,
+html.performance-mode .cosmic-forge-particles,
+[data-performance-mode="true"] .cosmic-forge-particles,
+.mobile-performance-mode .cosmic-forge-particles,
+.cosmic-forge-particles.performance-mode {
   /* Cacher complètement le conteneur */
   display: none !important;
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
+  /* Retirer du layout flow */
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
 }
 
-/* Chaque particule - COMPLÈTEMENT DÉSACTIVÉE */
+/* Chaque particule - COMPLÈTEMENT DÉSACTIVÉE - Sélecteurs multiples */
 body.performance-mode .forge-particle,
-.performance-mode .forge-particle {
+.performance-mode .forge-particle,
+html.performance-mode .forge-particle,
+[data-performance-mode="true"] .forge-particle,
+.mobile-performance-mode .forge-particle,
+.forge-particle.performance-mode {
   /* S'assurer que les particules sont complètement désactivées */
   display: none !important;
   opacity: 0 !important;
@@ -342,11 +446,17 @@ body.performance-mode .forge-particle,
   animation: none !important;
   animation-name: none !important;
   animation-play-state: paused !important;
+  animation-duration: 0s !important;
 
   /* Supprimer toute transformation */
   transform: none !important;
   will-change: auto !important;
   pointer-events: none !important;
+
+  /* Supprimer du layout */
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 /* =========================================

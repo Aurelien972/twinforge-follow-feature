@@ -12,6 +12,7 @@ import { useDevicePerformance } from '../../hooks/useDevicePerformance';
 import { useAutoSync } from '../../hooks/useAutoSync';
 import { useUserStore } from '../../system/store/userStore';
 import logger from '../../lib/utils/logger';
+import { BackgroundManager } from '../../ui/components/BackgroundManager';
 
 // Create QueryClient with enhanced cache configuration for persistence
 const queryClient = new QueryClient({
@@ -194,6 +195,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         <DataProvider>
           <DeviceProvider>
             <PerformanceModeProvider>
+              {/* Background Manager - Gère le fond selon le mode performance */}
+              <BackgroundManager />
               <IllustrationCacheProvider>
                 <ToastProvider>
                   <PerformanceInitializer>
