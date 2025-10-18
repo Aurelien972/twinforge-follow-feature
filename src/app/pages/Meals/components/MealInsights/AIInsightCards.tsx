@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 interface TrendAnalysis {
   trends: Array<{
@@ -46,6 +47,8 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
   weekMeals,
   monthMeals,
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   // Transformer l'analyse IA en cartes d'insights
   const trendCards = React.useMemo((): TrendCard[] => {
     if (!trendAnalysis) return [];
@@ -138,11 +141,13 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
       {/* Cartes d'insights - Patterns et Conseils */}
       <div className="space-y-4">
       {trendCards.map((card, index) => (
-        <motion.div
+        <MotionDiv
           key={index}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: index * 0.1 }}
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, y: 20 },
+            animate: { opacity: 1, y: 0 },
+            transition: { duration: 0.6, delay: index * 0.1 }
+          })}
         >
           <GlassCard 
             className="p-5"
@@ -192,7 +197,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
               </div>
             </div>
           </GlassCard>
-        </motion.div>
+        </MotionDiv>
       ))}
       </div>
     </div>

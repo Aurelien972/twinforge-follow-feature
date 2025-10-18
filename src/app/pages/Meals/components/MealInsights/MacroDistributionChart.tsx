@@ -4,6 +4,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 interface MacroData {
   name: string;
@@ -59,17 +60,22 @@ const CustomTooltip = ({ active, payload }: any) => {
  * Custom Legend Component - VisionOS 26 Style
  */
 const CustomLegend = ({ payload }: any) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   if (!payload || payload.length === 0) return null;
 
   return (
     <div className="flex justify-center gap-6 mt-4">
       {payload.map((entry: any, index: number) => (
-        <motion.div
+        <MotionDiv
           key={index}
           className="flex items-center gap-2"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: index * 0.1 }}
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, scale: 0.8 },
+            animate: { opacity: 1, scale: 1 },
+            transition: { duration: 0.4, delay: index * 0.1 }
+          })}
         >
           <div 
             className="w-3 h-3 rounded-full"
@@ -79,7 +85,7 @@ const CustomLegend = ({ payload }: any) => {
             }}
           />
           <span className="text-white/80 text-sm font-medium">{entry.value}</span>
-        </motion.div>
+        </MotionDiv>
       ))}
     </div>
   );
