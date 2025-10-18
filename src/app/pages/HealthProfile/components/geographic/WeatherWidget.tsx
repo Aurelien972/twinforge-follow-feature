@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 import type { WeatherData } from '../../../../../domain/health';
 
 interface WeatherWidgetProps {
@@ -16,30 +17,42 @@ interface WeatherWidgetProps {
 }
 
 export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ weather, city }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5, delay: 0.1 }
+      })}
     >
-      <GlassCard className="p-6" style={{
+      <GlassCard className="p-6" style={isPerformanceMode ? {
+        background: 'linear-gradient(145deg, color-mix(in srgb, #3B82F6 10%, #1e293b), color-mix(in srgb, #3B82F6 5%, #0f172a))',
+        borderColor: 'rgba(59, 130, 246, 0.2)'
+      } : {
         background: `
           radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
           var(--glass-opacity)
         `,
-        borderColor: 'rgba(59, 130, 246, 0.2)',
+        borderColor: 'rgba(59, 130, 246, 0.2)'
       }}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center"
-              style={{
+              style={isPerformanceMode ? {
+                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, 0.2))',
+                border: '2px solid rgba(59, 130, 246, 0.5)',
+                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.4)'
+              } : {
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
                   linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, 0.2))
                 `,
                 border: '2px solid rgba(59, 130, 246, 0.5)',
-                boxShadow: '0 0 30px rgba(59, 130, 246, 0.4)',
+                boxShadow: '0 0 30px rgba(59, 130, 246, 0.4)'
               }}
             >
               <SpatialIcon Icon={ICONS.Cloud} size={24} style={{ color: '#3B82F6' }} variant="pure" />
@@ -148,6 +161,6 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ weather, city }) =
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };

@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 import type { HydrationRecommendation } from '../../../../../domain/health';
 
 interface HydrationWidgetProps {
@@ -15,30 +16,42 @@ interface HydrationWidgetProps {
 }
 
 export const HydrationWidget: React.FC<HydrationWidgetProps> = ({ hydration }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5, delay: 0.2 }
+      })}
     >
-      <GlassCard className="p-6" style={{
+      <GlassCard className="p-6" style={isPerformanceMode ? {
+        background: 'linear-gradient(145deg, color-mix(in srgb, #06B6D4 10%, #1e293b), color-mix(in srgb, #06B6D4 5%, #0f172a))',
+        borderColor: 'rgba(6, 182, 212, 0.2)'
+      } : {
         background: `
           radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 60%),
           var(--glass-opacity)
         `,
-        borderColor: 'rgba(6, 182, 212, 0.2)',
+        borderColor: 'rgba(6, 182, 212, 0.2)'
       }}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center"
-              style={{
+              style={isPerformanceMode ? {
+                background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))',
+                border: '2px solid rgba(6, 182, 212, 0.5)',
+                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.4)'
+              } : {
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
                   linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.2))
                 `,
                 border: '2px solid rgba(6, 182, 212, 0.5)',
-                boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)',
+                boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)'
               }}
             >
               <SpatialIcon Icon={ICONS.Droplet} size={24} style={{ color: '#06B6D4' }} variant="pure" />
@@ -151,6 +164,6 @@ export const HydrationWidget: React.FC<HydrationWidgetProps> = ({ hydration }) =
           </div>
         )}
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };

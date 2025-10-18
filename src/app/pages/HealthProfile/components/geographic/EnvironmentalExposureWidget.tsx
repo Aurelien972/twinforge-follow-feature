@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 import type { EnvironmentalExposure } from '../../../../../domain/health';
 
 interface EnvironmentalExposureWidgetProps {
@@ -23,28 +24,39 @@ const EXPOSURE_COLORS = {
 
 export const EnvironmentalExposureWidget: React.FC<EnvironmentalExposureWidgetProps> = ({ exposure }) => {
   const colors = EXPOSURE_COLORS[exposure.exposure_level];
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5, delay: 0.3 }
+      })}
     >
-      <GlassCard className="p-6" style={{
+      <GlassCard className="p-6" style={isPerformanceMode ? {
+        background: `linear-gradient(145deg, ${colors.bg}, transparent)`,
+        borderColor: colors.border
+      } : {
         background: `radial-gradient(circle at 30% 20%, ${colors.bg} 0%, transparent 60%), var(--glass-opacity)`,
-        borderColor: colors.border,
+        borderColor: colors.border
       }}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center"
-              style={{
+              style={isPerformanceMode ? {
+                background: `linear-gradient(135deg, ${colors.text}66, ${colors.text}33)`,
+                border: `2px solid ${colors.text}80`,
+                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.4)'
+              } : {
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
                   linear-gradient(135deg, ${colors.text}66, ${colors.text}33)
                 `,
                 border: `2px solid ${colors.text}80`,
-                boxShadow: `0 0 30px ${colors.text}66`,
+                boxShadow: `0 0 30px ${colors.text}66`
               }}
             >
               <SpatialIcon Icon={ICONS.Shield} size={24} style={{ color: colors.text }} variant="pure" />
@@ -149,6 +161,6 @@ export const EnvironmentalExposureWidget: React.FC<EnvironmentalExposureWidgetPr
           </div>
         )}
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
