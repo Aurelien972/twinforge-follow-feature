@@ -136,6 +136,8 @@
 /* =========================================
    PHASE 10: EFFETS ET UTILITAIRES
    ========================================= */
+@import './utilities/keyframes.css';
+@import './utilities/gradients.css';
 @import './effects/circuits.css';
 @import './effects/motion.css';
 @import './utilities/inline-style-overrides.css';
