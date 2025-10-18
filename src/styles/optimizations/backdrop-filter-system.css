@@ -1,0 +1,412 @@
+/**
+ * BACKDROP-FILTER REPLACEMENT SYSTEM
+ * Système complet de remplacement avec variables CSS
+ * Gère les 3 modes: high-performance, balanced, quality
+ */
+
+/* =========================================
+   VARIABLES CSS - COULEURS DE REMPLACEMENT SOLIDES
+   Pour mode high-performance
+   ========================================= */
+
+:root {
+  /* =========================================
+     HIGH-PERFORMANCE MODE - Backgrounds Opaques
+     ========================================= */
+
+  /* Navigation Elements - Très opaques pour clarté */
+  --perf-bg-header: rgba(10, 15, 25, 0.98);
+  --perf-bg-sidebar: rgba(10, 15, 25, 0.98);
+  --perf-bg-bottom-bar: rgba(10, 15, 25, 0.98);
+
+  /* Content Containers - Opaques avec légère transparence */
+  --perf-bg-card-light: rgba(15, 25, 39, 0.90);
+  --perf-bg-card-medium: rgba(15, 25, 39, 0.93);
+  --perf-bg-card-heavy: rgba(15, 25, 39, 0.96);
+
+  /* Overlays - Très opaques pour lisibilité */
+  --perf-bg-modal: rgba(10, 15, 25, 0.98);
+  --perf-bg-drawer: rgba(10, 15, 25, 0.96);
+  --perf-bg-dropdown: rgba(15, 25, 39, 0.95);
+  --perf-bg-tooltip: rgba(20, 30, 45, 0.97);
+
+  /* Pipeline Stages */
+  --perf-bg-pipeline-analysis: rgba(15, 25, 39, 0.94);
+  --perf-bg-pipeline-capture: rgba(15, 25, 39, 0.92);
+  --perf-bg-pipeline-review: rgba(15, 25, 39, 0.94);
+
+  /* Special Contexts */
+  --perf-bg-skeleton: rgba(26, 35, 50, 0.90);
+  --perf-bg-loading: rgba(10, 15, 25, 0.95);
+  --perf-bg-error: rgba(30, 15, 15, 0.94);
+  --perf-bg-success: rgba(15, 30, 20, 0.94);
+
+  /* =========================================
+     BALANCED MODE - Légère transparence + blur
+     ========================================= */
+
+  /* Navigation - Blur léger 6px */
+  --balanced-bg-header: rgba(10, 15, 25, 0.80);
+  --balanced-blur-header: blur(6px) saturate(110%);
+
+  --balanced-bg-sidebar: rgba(10, 15, 25, 0.80);
+  --balanced-blur-sidebar: blur(6px) saturate(110%);
+
+  --balanced-bg-bottom-bar: rgba(10, 15, 25, 0.80);
+  --balanced-blur-bottom-bar: blur(6px) saturate(110%);
+
+  /* Content - Blur moyen 6-8px */
+  --balanced-bg-card: rgba(15, 25, 39, 0.70);
+  --balanced-blur-card: blur(6px) saturate(105%);
+
+  /* Overlays - Blur plus fort 8-10px */
+  --balanced-bg-modal: rgba(10, 15, 25, 0.85);
+  --balanced-blur-modal: blur(10px) saturate(120%);
+
+  --balanced-bg-drawer: rgba(10, 15, 25, 0.82);
+  --balanced-blur-drawer: blur(8px) saturate(115%);
+
+  /* Pipeline */
+  --balanced-bg-pipeline: rgba(15, 25, 39, 0.75);
+  --balanced-blur-pipeline: blur(8px) saturate(110%);
+
+  /* =========================================
+     QUALITY MODE - Transparence maximum + blur fort
+     ========================================= */
+
+  /* Navigation - Blur fort 24px */
+  --quality-bg-header: rgba(10, 15, 25, 0.45);
+  --quality-blur-header: blur(24px) saturate(160%);
+
+  --quality-bg-sidebar: rgba(10, 15, 25, 0.45);
+  --quality-blur-sidebar: blur(24px) saturate(160%);
+
+  --quality-bg-bottom-bar: rgba(10, 15, 25, 0.45);
+  --quality-blur-bottom-bar: blur(24px) saturate(160%);
+
+  /* Content - Blur moyen 16px */
+  --quality-bg-card: rgba(15, 25, 39, 0.35);
+  --quality-blur-card: blur(16px) saturate(150%);
+
+  /* Overlays - Blur très fort 32px */
+  --quality-bg-modal: rgba(10, 15, 25, 0.55);
+  --quality-blur-modal: blur(32px) saturate(180%);
+
+  --quality-bg-drawer: rgba(10, 15, 25, 0.50);
+  --quality-blur-drawer: blur(28px) saturate(170%);
+
+  /* Pipeline - Blur variable selon contexte */
+  --quality-bg-pipeline: rgba(15, 25, 39, 0.40);
+  --quality-blur-pipeline: blur(20px) saturate(155%);
+}
+
+/* =========================================
+   HIGH-PERFORMANCE MODE - APPLICATION
+   Tous les backdrop-filter → none + background opaque
+   ========================================= */
+
+.mode-high-performance .glass-card,
+.mode-high-performance .glass-base,
+.mode-high-performance .glass-card-cta,
+.mode-high-performance [class*="glass-"],
+.mode-high-performance [class*="immersive-"],
+.mode-high-performance [class*="forge-pipeline"],
+.mode-high-performance [class*="fridge-scan"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-card-medium) !important;
+}
+
+/* Navigation Elements */
+.mode-high-performance header,
+.mode-high-performance .header-liquid-glass,
+.mode-high-performance [class*="header-"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-header) !important;
+}
+
+.mode-high-performance .sidebar,
+.mode-high-performance .sidebar-liquid-glass,
+.mode-high-performance [class*="sidebar-"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-sidebar) !important;
+}
+
+.mode-high-performance .bottom-bar,
+.mode-high-performance .mobile-bottom-bar,
+.mode-high-performance [class*="bottom-bar"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-bottom-bar) !important;
+}
+
+/* Overlays */
+.mode-high-performance .modal,
+.mode-high-performance [role="dialog"],
+.mode-high-performance [class*="modal-"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-modal) !important;
+}
+
+.mode-high-performance .drawer,
+.mode-high-performance .mobile-drawer,
+.mode-high-performance [class*="drawer-"],
+.mode-high-performance .unified-coach-drawer,
+.mode-high-performance .global-chat-drawer {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-drawer) !important;
+}
+
+.mode-high-performance .dropdown,
+.mode-high-performance [class*="dropdown-"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-dropdown) !important;
+}
+
+/* Pipeline Stages */
+.mode-high-performance [class*="analysis-stage"],
+.mode-high-performance [class*="immersive-analysis"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-pipeline-analysis) !important;
+}
+
+.mode-high-performance [class*="capture-stage"],
+.mode-high-performance [class*="photo-capture"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-pipeline-capture) !important;
+}
+
+.mode-high-performance [class*="review-stage"],
+.mode-high-performance [class*="results-display"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-pipeline-review) !important;
+}
+
+/* Skeletons - CRITICAL FIX */
+.mode-high-performance [class*="skeleton-"],
+.mode-high-performance .skeleton-shimmer,
+.mode-high-performance .skeleton-glow {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-skeleton) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Special States */
+.mode-high-performance [class*="loading-"],
+.mode-high-performance .loading-screen {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--perf-bg-loading) !important;
+}
+
+/* =========================================
+   BALANCED MODE - APPLICATION
+   Blur léger + backgrounds semi-transparents
+   ========================================= */
+
+.mode-balanced .glass-card,
+.mode-balanced .glass-base,
+.mode-balanced .glass-card-cta {
+  backdrop-filter: var(--balanced-blur-card) !important;
+  -webkit-backdrop-filter: var(--balanced-blur-card) !important;
+  background: var(--balanced-bg-card) !important;
+}
+
+.mode-balanced header,
+.mode-balanced .header-liquid-glass {
+  backdrop-filter: var(--balanced-blur-header) !important;
+  -webkit-backdrop-filter: var(--balanced-blur-header) !important;
+  background: var(--balanced-bg-header) !important;
+}
+
+.mode-balanced .sidebar,
+.mode-balanced .sidebar-liquid-glass {
+  backdrop-filter: var(--balanced-blur-sidebar) !important;
+  -webkit-backdrop-filter: var(--balanced-blur-sidebar) !important;
+  background: var(--balanced-bg-sidebar) !important;
+}
+
+.mode-balanced .bottom-bar,
+.mode-balanced .mobile-bottom-bar {
+  backdrop-filter: var(--balanced-blur-bottom-bar) !important;
+  -webkit-backdrop-filter: var(--balanced-blur-bottom-bar) !important;
+  background: var(--balanced-bg-bottom-bar) !important;
+}
+
+.mode-balanced .modal,
+.mode-balanced [role="dialog"] {
+  backdrop-filter: var(--balanced-blur-modal) !important;
+  -webkit-backdrop-filter: var(--balanced-blur-modal) !important;
+  background: var(--balanced-bg-modal) !important;
+}
+
+.mode-balanced .drawer,
+.mode-balanced .mobile-drawer {
+  backdrop-filter: var(--balanced-blur-drawer) !important;
+  -webkit-backdrop-filter: var(--balanced-blur-drawer) !important;
+  background: var(--balanced-bg-drawer) !important;
+}
+
+.mode-balanced [class*="pipeline"],
+.mode-balanced [class*="immersive-"],
+.mode-balanced [class*="fridge-scan"] {
+  backdrop-filter: var(--balanced-blur-pipeline) !important;
+  -webkit-backdrop-filter: var(--balanced-blur-pipeline) !important;
+  background: var(--balanced-bg-pipeline) !important;
+}
+
+/* =========================================
+   QUALITY MODE - APPLICATION
+   Blur fort + backgrounds très transparents
+   ========================================= */
+
+.mode-quality .glass-card,
+.mode-quality .glass-base,
+.mode-quality .glass-card-cta {
+  backdrop-filter: var(--quality-blur-card) !important;
+  -webkit-backdrop-filter: var(--quality-blur-card) !important;
+  background: var(--quality-bg-card) !important;
+}
+
+.mode-quality header,
+.mode-quality .header-liquid-glass {
+  backdrop-filter: var(--quality-blur-header) !important;
+  -webkit-backdrop-filter: var(--quality-blur-header) !important;
+  background: var(--quality-bg-header) !important;
+}
+
+.mode-quality .sidebar,
+.mode-quality .sidebar-liquid-glass {
+  backdrop-filter: var(--quality-blur-sidebar) !important;
+  -webkit-backdrop-filter: var(--quality-blur-sidebar) !important;
+  background: var(--quality-bg-sidebar) !important;
+}
+
+.mode-quality .bottom-bar,
+.mode-quality .mobile-bottom-bar {
+  backdrop-filter: var(--quality-blur-bottom-bar) !important;
+  -webkit-backdrop-filter: var(--quality-blur-bottom-bar) !important;
+  background: var(--quality-bg-bottom-bar) !important;
+}
+
+.mode-quality .modal,
+.mode-quality [role="dialog"] {
+  backdrop-filter: var(--quality-blur-modal) !important;
+  -webkit-backdrop-filter: var(--quality-blur-modal) !important;
+  background: var(--quality-bg-modal) !important;
+}
+
+.mode-quality .drawer,
+.mode-quality .mobile-drawer {
+  backdrop-filter: var(--quality-blur-drawer) !important;
+  -webkit-backdrop-filter: var(--quality-blur-drawer) !important;
+  background: var(--quality-bg-drawer) !important;
+}
+
+.mode-quality [class*="pipeline"],
+.mode-quality [class*="immersive-"],
+.mode-quality [class*="fridge-scan"] {
+  backdrop-filter: var(--quality-blur-pipeline) !important;
+  -webkit-backdrop-filter: var(--quality-blur-pipeline) !important;
+  background: var(--quality-bg-pipeline) !important;
+}
+
+/* =========================================
+   RESPONSIVE ADJUSTMENTS
+   Forcer high-performance sur petits écrans
+   ========================================= */
+
+@media (max-width: 768px) {
+  /* Forcer mode performance sur mobile */
+  .glass-card,
+  .glass-base,
+  .glass-card-cta,
+  [class*="glass-"],
+  [class*="immersive-"],
+  [class*="pipeline"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--perf-bg-card-medium) !important;
+  }
+
+  header,
+  .header-liquid-glass {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--perf-bg-header) !important;
+  }
+
+  .bottom-bar,
+  .mobile-bottom-bar {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--perf-bg-bottom-bar) !important;
+  }
+}
+
+/* =========================================
+   FALLBACK POUR NAVIGATEURS NON SUPPORTÉS
+   ========================================= */
+
+@supports not (backdrop-filter: blur(1px)) {
+  /* Si backdrop-filter non supporté, utiliser backgrounds opaques */
+  .glass-card,
+  .glass-base,
+  .glass-card-cta,
+  [class*="glass-"] {
+    background: var(--perf-bg-card-heavy) !important;
+  }
+
+  header,
+  .header-liquid-glass {
+    background: var(--perf-bg-header) !important;
+  }
+
+  .modal,
+  [role="dialog"] {
+    background: var(--perf-bg-modal) !important;
+  }
+}
+
+/* =========================================
+   PREFERS-REDUCED-MOTION
+   Forcer high-performance si utilisateur préfère moins de mouvement
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .glass-card {
+    background: var(--perf-bg-card-medium) !important;
+  }
+}
+
+/* =========================================
+   DEBUG HELPERS
+   Visualiser les remplacements en dev
+   ========================================= */
+
+/* Activer en dev pour voir les zones remplacées */
+.debug-backdrop-replacements .mode-high-performance [class*="glass-"] {
+  outline: 2px solid rgba(255, 0, 0, 0.3);
+}
+
+.debug-backdrop-replacements .mode-balanced [class*="glass-"] {
+  outline: 2px solid rgba(255, 165, 0, 0.3);
+}
+
+.debug-backdrop-replacements .mode-quality [class*="glass-"] {
+  outline: 2px solid rgba(0, 255, 0, 0.3);
+}
