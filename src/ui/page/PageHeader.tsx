@@ -42,62 +42,86 @@ export default function PageHeader({
       aria-labelledby="page-title"
     >
       <div className="flex flex-row items-center gap-6 mb-8">
-        {/* Icône avec effet de glow renforcé */}
-        <div 
-          className="breathing-icon flex-shrink-0"
-          style={{
-            '--animation-duration-slower': '5s'
-          }}
-        >
+        {/* Icône avec rendu optimisé selon le mode */}
+        {isPerformanceMode ? (
+          // MODE PERFORMANCE: Rendu simplifié et optimisé
+          <div className="flex-shrink-0">
+            <div
+              className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center relative"
+              style={{
+                background: `rgba(255, 255, 255, 0.12)`,
+                border: `2px solid ${finalCircuitColor}`,
+                boxShadow: `0 4px 16px rgba(0, 0, 0, 0.3)`,
+              }}
+              role="img"
+              aria-label={`Icône de la page ${title}`}
+            >
+              <SpatialIcon
+                Icon={finalIcon}
+                size={48}
+                variant="pure"
+                className="text-white relative z-10"
+                style={{
+                  color: finalCircuitColor,
+                  filter: 'none',
+                  opacity: 1
+                }}
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+        ) : (
+          // MODE QUALITÉ: Rendu avec effets complets
           <div
-            className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-lg"
+            className="breathing-icon flex-shrink-0"
             style={{
-              '--header-icon-radius': '24px',
-              borderRadius: 'var(--header-icon-radius)',
-              WebkitMaskImage: 'radial-gradient(white, black)',
-              maskImage: 'radial-gradient(white, black)',
-              background: `
-                radial-gradient(circle at 30% 30%, color-mix(in srgb, ${finalCircuitColor} 40%, transparent) 0%, transparent 60%),
-                radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--brand-primary) 35%, transparent) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, color-mix(in srgb, ${finalCircuitColor} 25%, transparent) 0%, transparent 70%),
-                rgba(255, 255, 255, 0.15)
-              `,
-              border: `2px solid color-mix(in srgb, ${finalCircuitColor} 60%, transparent)`,
-              boxShadow: isPerformanceMode
-                ? `0 8px 32px color-mix(in srgb, ${finalCircuitColor} 30%, transparent), inset 0 2px 0 rgba(255, 255, 255, 0.2)`
-                : `
+              '--animation-duration-slower': '5s'
+            }}
+          >
+            <div
+              className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-lg"
+              style={{
+                '--header-icon-radius': '24px',
+                borderRadius: 'var(--header-icon-radius)',
+                WebkitMaskImage: 'radial-gradient(white, black)',
+                maskImage: 'radial-gradient(white, black)',
+                background: `
+                  radial-gradient(circle at 30% 30%, color-mix(in srgb, ${finalCircuitColor} 40%, transparent) 0%, transparent 60%),
+                  radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--brand-primary) 35%, transparent) 0%, transparent 50%),
+                  radial-gradient(circle at 50% 50%, color-mix(in srgb, ${finalCircuitColor} 25%, transparent) 0%, transparent 70%),
+                  rgba(255, 255, 255, 0.15)
+                `,
+                border: `2px solid color-mix(in srgb, ${finalCircuitColor} 60%, transparent)`,
+                boxShadow: `
                   0 16px 64px color-mix(in srgb, ${finalCircuitColor} 45%, transparent),
                   0 0 100px color-mix(in srgb, ${finalCircuitColor} 35%, transparent),
                   0 0 160px color-mix(in srgb, var(--brand-primary) 25%, transparent),
                   inset 0 4px 0 rgba(255, 255, 255, 0.3),
                   inset 0 -3px 0 rgba(0, 0, 0, 0.15)
                 `,
-              backdropFilter: isPerformanceMode ? 'none' : 'blur(24px) saturate(200%)',
-              WebkitBackdropFilter: isPerformanceMode ? 'none' : 'blur(24px) saturate(200%)',
-              willChange: 'transform, box-shadow',
-              transform: 'translateZ(0)',
-            }}
-            role="img"
-            aria-label={`Icône de la page ${title}`}
-          >
-            <SpatialIcon
-              Icon={finalIcon}
-              size={48}
-              variant="pure"
-              className="text-white relative z-10"
-              style={{
-                color: finalCircuitColor,
-                filter: isPerformanceMode
-                  ? `drop-shadow(0 0 8px ${finalCircuitColor}60)`
-                  : `drop-shadow(0 0 30px color-mix(in srgb, ${finalCircuitColor} 90%, transparent)) drop-shadow(0 0 60px color-mix(in srgb, ${finalCircuitColor} 60%, transparent))`,
-                textShadow: isPerformanceMode
-                  ? 'none'
-                  : `0 0 40px color-mix(in srgb, ${finalCircuitColor} 80%, transparent), 0 0 80px color-mix(in srgb, var(--brand-primary) 40%, transparent)`
+                backdropFilter: 'blur(24px) saturate(200%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(200%)',
+                willChange: 'transform, box-shadow',
+                transform: 'translateZ(0)',
               }}
-              aria-hidden="true"
-            />
+              role="img"
+              aria-label={`Icône de la page ${title}`}
+            >
+              <SpatialIcon
+                Icon={finalIcon}
+                size={48}
+                variant="pure"
+                className="text-white relative z-10"
+                style={{
+                  color: finalCircuitColor,
+                  filter: `drop-shadow(0 0 30px color-mix(in srgb, ${finalCircuitColor} 90%, transparent)) drop-shadow(0 0 60px color-mix(in srgb, ${finalCircuitColor} 60%, transparent))`,
+                  textShadow: `0 0 40px color-mix(in srgb, ${finalCircuitColor} 80%, transparent), 0 0 80px color-mix(in srgb, var(--brand-primary) 40%, transparent)`
+                }}
+                aria-hidden="true"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Titre et sous-titre alignés à gauche */}
         <div className="space-y-2 text-left flex-1 min-w-0">

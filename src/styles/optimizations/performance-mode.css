@@ -266,44 +266,66 @@
    PAGE HEADER ICONS - Keep visible with simplified effects
    ========================================= */
 
+/* CRITICAL: Force visibility of ALL page header icon elements */
+.performance-mode header .flex-shrink-0,
 .performance-mode header .breathing-icon,
 .performance-mode header [class*="breathing"] {
   /* Keep icon container visible */
   opacity: 1 !important;
   display: flex !important;
+  visibility: visible !important;
   animation: none !important;
 }
 
+/* CRITICAL: Icon container must be fully visible */
+.performance-mode header .flex-shrink-0 > div,
 .performance-mode header .breathing-icon > div {
-  /* Keep ALL inline styles for visibility */
+  /* Force visibility */
+  opacity: 1 !important;
+  display: flex !important;
+  visibility: visible !important;
 
-  /* Only disable expensive GPU effects */
+  /* Disable expensive GPU effects but keep layout */
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 
-  /* IMPORTANT: DO NOT override box-shadow - uses inline styles for colored glow */
-  /* IMPORTANT: DO NOT override background - uses inline styles for gradient */
-  /* IMPORTANT: DO NOT override border - uses inline styles for colored border */
-  /* IMPORTANT: DO NOT override transform - keeps translateZ(0) from inline */
-
-  /* All visual properties come from inline styles in PageHeader.tsx */
+  /* Keep all inline styles for proper rendering */
 }
 
-/* Page header icon itself - keep colored with reduced glow */
+/* CRITICAL: Page header icon itself - MUST be visible */
 .performance-mode header .spatial-icon {
-  /* Simplify drop-shadow but keep it visible */
-  filter: drop-shadow(0 0 12px currentColor) !important;
-  background: transparent !important;
-
-  /* Keep icon color from inline styles */
+  /* Force full visibility */
   opacity: 1 !important;
+  display: inline-flex !important;
+  visibility: visible !important;
+
+  /* Disable filters that might hide the icon */
+  filter: none !important;
+
+  /* Keep color from inline styles */
+  background: transparent !important;
 }
 
-/* Icon SVG elements - ensure full visibility */
+/* CRITICAL: Icon SVG elements - ensure full visibility */
 .performance-mode header .spatial-icon svg,
-.performance-mode header .spatial-icon path {
+.performance-mode header .spatial-icon path,
+.performance-mode header .spatial-icon * {
   opacity: 1 !important;
+  visibility: visible !important;
   fill: currentColor !important;
+  display: inline !important;
+}
+
+/* CRITICAL: Prevent any rule from hiding page header icons */
+.performance-mode header [role="img"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+}
+
+.performance-mode header [role="img"] * {
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* =========================================
