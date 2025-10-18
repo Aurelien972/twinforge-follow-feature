@@ -518,12 +518,31 @@
   display: flex !important;
 }
 
-/* Page header icon container - TOUJOURS visible */
+/* Page header icon container - TOUJOURS visible - CRITICAL FIX */
 .performance-mode header .breathing-icon,
-.performance-mode header .breathing-icon > div {
+.performance-mode header .breathing-icon *,
+.performance-mode header .breathing-icon > div,
+.performance-mode header .breathing-icon [role="img"] {
+  /* Force visibility */
   display: flex !important;
   opacity: 1 !important;
   visibility: visible !important;
+
+  /* Preserve transform for GPU layer - DO NOT REMOVE */
+  transform: inherit !important;
+
+  /* Preserve all inline styles for icon visibility */
+  background: inherit !important;
+  border: inherit !important;
+  box-shadow: inherit !important;
+  color: inherit !important;
+
+  /* Only disable expensive filters */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Disable animations but keep element visible */
+  animation: none !important;
 }
 
 /* PULSE COMPLEXES - Toutes désactivées */
@@ -804,6 +823,18 @@
 
 /* Page header spatial icon keeps simplified filter (defined above line 294) */
 
+/* CRITICAL: SpatialIcon component visibility in performance mode */
+.performance-mode .spatial-icon,
+.performance-mode .icon-container {
+  /* Ensure icon remains visible */
+  display: inline-flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  /* Preserve transform for proper rendering */
+  transform: inherit !important;
+}
+
 /* =========================================
    OPACITY ANIMATIONS - Static
    ========================================= */
@@ -817,7 +848,8 @@
    TRANSFORMS - Static except tap feedback and page header icons
    ========================================= */
 
-.performance-mode [style*="transform"]:not(:active):not(header .breathing-icon):not(header .breathing-icon *) {
+/* CRITICAL: Preserve transform for header icons and spatial icons */
+.performance-mode [style*="transform"]:not(:active):not(header .breathing-icon):not(header .breathing-icon *):not([role="img"]):not(.spatial-icon):not(.icon-container) {
   transform: none !important;
 }
 

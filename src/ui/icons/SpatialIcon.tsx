@@ -182,40 +182,14 @@ const SpatialIcon: React.FC<SpatialIconProps> = ({
         padding: `${Math.max(4, size * 0.15)}px`,
         border: isInteractive ? '1px solid color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent)' : 'none',
       };
-  return (
-    <motion.div
-      ref={iconRef}
-      className={containerClassName}
-      style={containerStyle}
-      variants={iconVariants}
-      initial="initial"
-      whileHover="hover"
-      whileTap={!isInteractive ? {} : shouldAnimate ? {
-        scale: 0.98,
-        transition: { duration: 0.08, ease: [0.16, 1, 0.3, 1] }
-      } : {}}
-      animate={motionAnimate}
-      transition={motionTransition}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={(e) => {
-        // console.log('🔊 AUDIO_DEBUG: SpatialIcon clicked', {
-        //   hasOnClick: !!onClick,
-        //   isInteractive,
-        //   eventType: e.type,
-        //   timestamp: new Date().toISOString()
-        // });
-        onClick?.();
-      }}
-      onKeyDown={isInteractive ? handleKeyDown : undefined}
-      role={role || (isInteractive ? 'button' : undefined)}
-      tabIndex={shouldHaveTabIndex}
-      aria-label={ariaLabel}
-      aria-hidden={shouldBeAriaHidden}
-      aria-describedby={ariaDescribedBy}
-    >
-      {/* TwinForge halo effect - for both default and pure variants when glowColor is specified */}
-      {(variant === 'default' || (variant === 'pure' && glowColor)) && (
+  // CRITICAL FIX: Conditional rendering based on performance mode
+  // In performance mode: use static div instead of motion.div
+  // In quality mode: use motion.div with all animations
+
+  const iconContent = (
+    <>
+      {/* TwinForge halo effect - disabled in performance mode */}
+      {!isPerformanceMode && (variant === 'default' || (variant === 'pure' && glowColor)) && (
         <div
           className="absolute inset-0 pointer-events-none transition-opacity duration-200"
           style={{
@@ -233,29 +207,82 @@ const SpatialIcon: React.FC<SpatialIconProps> = ({
           }}
         />
       )}
-      
+
       {Icon ? (
-        <Icon 
-          size={size} 
-          color={iconColor} 
+        <Icon
+          size={size}
+          color={iconColor}
           strokeWidth={strokeWidth}
-          style={{ // Removed redundant style prop, it's already passed via `style` prop of SpatialIcon
-            filter: glowColor ? 
-              `drop-shadow(0 0 12px ${glowColor}80) drop-shadow(0 0 24px ${glowColor}60) drop-shadow(0 0 36px color-mix(in srgb, ${glowColor} 40%, transparent))` :
-              variant === 'pure' ? 
-                `drop-shadow(0 0 6px ${iconColor}40)` : 
-                `drop-shadow(0 1px 2px rgba(0,0,0,0.2))`,
-            transition: 'color 200ms ease, filter 200ms ease',
+          style={{
+            filter: isPerformanceMode
+              ? glowColor
+                ? `drop-shadow(0 0 8px ${glowColor}60)`
+                : `drop-shadow(0 0 4px ${iconColor}40)`
+              : glowColor
+                ? `drop-shadow(0 0 12px ${glowColor}80) drop-shadow(0 0 24px ${glowColor}60) drop-shadow(0 0 36px color-mix(in srgb, ${glowColor} 40%, transparent))`
+                : variant === 'pure'
+                  ? `drop-shadow(0 0 6px ${iconColor}40)`
+                  : `drop-shadow(0 1px 2px rgba(0,0,0,0.2))`,
+            transition: isPerformanceMode ? 'none' : 'color 200ms ease, filter 200ms ease',
             transform: 'translateZ(0)',
-            // TwinForge stroke styling
             strokeLinecap: 'round',
             strokeLinejoin: 'round',
             ...style,
           }}
         />
       ) : (
-        <span style={{ fontSize: size, color: iconColor, transform: 'none' }}>⚠️</span> // fallback emoji
+        <span style={{ fontSize: size, color: iconColor, transform: 'none' }}>⚠️</span>
       )}
+    </>
+  );
+
+  // Performance mode: static div with no animations
+  if (isPerformanceMode) {
+    return (
+      <div
+        ref={iconRef}
+        className={containerClassName}
+        style={{...containerStyle, ...style}}
+        onClick={onClick}
+        onKeyDown={isInteractive ? handleKeyDown : undefined}
+        role={role || (isInteractive ? 'button' : undefined)}
+        tabIndex={shouldHaveTabIndex}
+        aria-label={ariaLabel}
+        aria-hidden={shouldBeAriaHidden}
+        aria-describedby={ariaDescribedBy}
+        data-performance-mode="static"
+      >
+        {iconContent}
+      </div>
+    );
+  }
+
+  // Quality mode: motion.div with all animations
+  return (
+    <motion.div
+      ref={iconRef}
+      className={containerClassName}
+      style={containerStyle}
+      variants={iconVariants}
+      initial="initial"
+      whileHover="hover"
+      whileTap={!isInteractive ? {} : shouldAnimate ? {
+        scale: 0.98,
+        transition: { duration: 0.08, ease: [0.16, 1, 0.3, 1] }
+      } : {}}
+      animate={motionAnimate}
+      transition={motionTransition}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      onKeyDown={isInteractive ? handleKeyDown : undefined}
+      role={role || (isInteractive ? 'button' : undefined)}
+      tabIndex={shouldHaveTabIndex}
+      aria-label={ariaLabel}
+      aria-hidden={shouldBeAriaHidden}
+      aria-describedby={ariaDescribedBy}
+    >
+      {iconContent}
     </motion.div>
   );
 };

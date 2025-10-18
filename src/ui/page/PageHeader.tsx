@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ICONS } from '../icons/registry';
 import SpatialIcon from '../icons/SpatialIcon';
 import { CIRCUIT_COLORS, type CircuitKey } from '../theme/circuits';
+import { usePerformanceMode } from '../../system/context/PerformanceModeContext';
 
 type Props = {
   icon?: keyof typeof ICONS;
@@ -14,15 +15,17 @@ type Props = {
   iconColor?: string;
 };
 
-export default function PageHeader({ 
-  icon = 'Home', 
-  title, 
-  subtitle, 
-  actions, 
+export default function PageHeader({
+  icon = 'Home',
+  title,
+  subtitle,
+  actions,
   className = '',
   circuit = 'home',
   iconColor
 }: Props) {
+  const { isPerformanceMode } = usePerformanceMode();
+
   // Gestion spéciale pour certains circuits
   const finalIcon = (() => {
     if (circuit === 'track') return ICONS.Target;
@@ -60,15 +63,17 @@ export default function PageHeader({
                 rgba(255, 255, 255, 0.15)
               `,
               border: `2px solid color-mix(in srgb, ${finalCircuitColor} 60%, transparent)`,
-              boxShadow: `
-                0 16px 64px color-mix(in srgb, ${finalCircuitColor} 45%, transparent),
-                0 0 100px color-mix(in srgb, ${finalCircuitColor} 35%, transparent),
-                0 0 160px color-mix(in srgb, var(--brand-primary) 25%, transparent),
-                inset 0 4px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.15)
-              `,
-              backdropFilter: 'blur(24px) saturate(200%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(200%)',
+              boxShadow: isPerformanceMode
+                ? `0 8px 32px color-mix(in srgb, ${finalCircuitColor} 30%, transparent), inset 0 2px 0 rgba(255, 255, 255, 0.2)`
+                : `
+                  0 16px 64px color-mix(in srgb, ${finalCircuitColor} 45%, transparent),
+                  0 0 100px color-mix(in srgb, ${finalCircuitColor} 35%, transparent),
+                  0 0 160px color-mix(in srgb, var(--brand-primary) 25%, transparent),
+                  inset 0 4px 0 rgba(255, 255, 255, 0.3),
+                  inset 0 -3px 0 rgba(0, 0, 0, 0.15)
+                `,
+              backdropFilter: isPerformanceMode ? 'none' : 'blur(24px) saturate(200%)',
+              WebkitBackdropFilter: isPerformanceMode ? 'none' : 'blur(24px) saturate(200%)',
               willChange: 'transform, box-shadow',
               transform: 'translateZ(0)',
             }}
@@ -82,8 +87,12 @@ export default function PageHeader({
               className="text-white relative z-10"
               style={{
                 color: finalCircuitColor,
-                filter: `drop-shadow(0 0 30px color-mix(in srgb, ${finalCircuitColor} 90%, transparent)) drop-shadow(0 0 60px color-mix(in srgb, ${finalCircuitColor} 60%, transparent))`,
-                textShadow: `0 0 40px color-mix(in srgb, ${finalCircuitColor} 80%, transparent), 0 0 80px color-mix(in srgb, var(--brand-primary) 40%, transparent)`
+                filter: isPerformanceMode
+                  ? `drop-shadow(0 0 8px ${finalCircuitColor}60)`
+                  : `drop-shadow(0 0 30px color-mix(in srgb, ${finalCircuitColor} 90%, transparent)) drop-shadow(0 0 60px color-mix(in srgb, ${finalCircuitColor} 60%, transparent))`,
+                textShadow: isPerformanceMode
+                  ? 'none'
+                  : `0 0 40px color-mix(in srgb, ${finalCircuitColor} 80%, transparent), 0 0 80px color-mix(in srgb, var(--brand-primary) 40%, transparent)`
               }}
               aria-hidden="true"
             />
@@ -99,7 +108,9 @@ export default function PageHeader({
               color: 'var(--text-primary)',
               fontWeight: 700,
               letterSpacing: '-0.01em',
-              textShadow: `0 0 40px color-mix(in srgb, ${finalCircuitColor} 50%, transparent)`,
+              textShadow: isPerformanceMode
+                ? '0 2px 8px rgba(0, 0, 0, 0.6)'
+                : `0 0 40px color-mix(in srgb, ${finalCircuitColor} 50%, transparent)`,
               lineHeight: '1.2'
             }}
           >
@@ -110,7 +121,9 @@ export default function PageHeader({
               className="text-gray-300 text-lg md:text-xl max-w-2xl leading-relaxed page-header-subtitle"
               style={{
                 color: `color-mix(in srgb, #E5E7EB 90%, ${finalCircuitColor} 10%)`,
-                textShadow: '0 0 20px rgba(0, 0, 0, 0.5)',
+                textShadow: isPerformanceMode
+                  ? '0 1px 4px rgba(0, 0, 0, 0.5)'
+                  : '0 0 20px rgba(0, 0, 0, 0.5)',
                 lineHeight: '1.4'
               }}
               aria-describedby="page-title"
