@@ -1,5 +1,7 @@
-import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import React, { useMemo } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import { useProfilePerformance } from './hooks/useProfilePerformance';
+import { ConditionalMotionSlide } from './components/shared/ConditionalMotionProfile';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import { useUserStore } from '../../../system/store/userStore';
@@ -26,13 +28,19 @@ import Haptics from '../../../utils/haptics';
 const ProfileNutritionTab: React.FC = () => {
   const { profile } = useUserStore();
 
+  // Performance optimization
+  const performanceConfig = useProfilePerformance();
+
   // Check profile completion for Recipe Workshop
   const profileCompletion = calculateRecipeWorkshopCompletion(profile);
   const { form, actions, state } = useProfileNutritionForm();
   const setTabDirty = useUnsavedChangesStore(state => state.setTabDirty);
 
-  // Calculate nutrition-specific completion percentage
-  const nutritionCompletionPercentage = calculateNutritionCompletion(profile);
+  // Calculate nutrition-specific completion percentage - memoized
+  const nutritionCompletionPercentage = useMemo(
+    () => calculateNutritionCompletion(profile),
+    [profile?.diet, profile?.allergies, profile?.food_preferences]
+  );
 
   
   const { register, handleSubmit, errors, isDirty, watchedValues, setValue } = form;
@@ -57,23 +65,32 @@ const ProfileNutritionTab: React.FC = () => {
   } = state;
   
   return (
-    <motion.div
-      className="space-y-6"
-      variants={uniformTabPanelVariants}
-      initial="initial"
-      animate="enter"
-      exit="exit"
+    <ConditionalMotionSlide
+      performanceConfig={performanceConfig}
+      direction="up"
+      distance={20}
+      className="space-y-6 profile-section"
     >
       {/* Profile Nudge for Recipe Workshop - Show completion guidance */}
-      <AnimatePresence>
-        {!profileCompletion.isSufficient && (
-          <ProfileNudge 
+      {performanceConfig.shouldUseAnimatePresence ? (
+        <AnimatePresence>
+          {!profileCompletion.isSufficient && (
+            <ProfileNudge
+              completion={profileCompletion}
+              variant="banner"
+              showDismiss={false}
+            />
+          )}
+        </AnimatePresence>
+      ) : (
+        !profileCompletion.isSufficient && (
+          <ProfileNudge
             completion={profileCompletion}
             variant="banner"
             showDismiss={false}
           />
-        )}
-      </AnimatePresence>
+        )
+      )}
       
       {/* Progress Header */}
       <ProgressBar
@@ -140,12 +157,7 @@ const ProfileNutritionTab: React.FC = () => {
         />
 
         {/* Global Save Action */}
-        <motion.div
-          className="flex justify-center pt-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.3 }}
-        >
+        <div className="flex justify-center pt-4">
           <button
             type="submit"
             disabled={saving || !isDirty}
@@ -163,7 +175,7 @@ const ProfileNutritionTab: React.FC = () => {
               <span>{saving ? 'Sauvegarde...' : 'Sauvegarder Tout'}</span>
             </div>
           </button>
-        </motion.div>
+        </div>
 
         {/* Validation Summary */}
         {Object.keys(errors).length > 0 && (
@@ -186,7 +198,7 @@ const ProfileNutritionTab: React.FC = () => {
           </GlassCard>
         )}
       </form>
-    </motion.div>
+    </ConditionalMotionSlide>
   );
 };
 

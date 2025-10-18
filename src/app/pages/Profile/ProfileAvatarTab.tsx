@@ -5,16 +5,17 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { useAvatarData } from './hooks/useAvatarData';
 import { AvatarStatusCard, LastScanCard, QuickActionsCard } from './components/AvatarInfoComponents';
-import { uniformStaggerContainerVariants, uniformStaggerItemVariants } from '../../../ui/tabs/tabsConfig';
+import { useProfilePerformance } from './hooks/useProfilePerformance';
+import { ConditionalMotionSlide, ConditionalMotionStagger } from './components/shared/ConditionalMotionProfile';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 
 const ProfileAvatarTab: React.FC = () => {
   const { data, loading, error } = useAvatarData();
+  const performanceConfig = useProfilePerformance();
 
   if (loading) {
     return (
@@ -50,27 +51,37 @@ const ProfileAvatarTab: React.FC = () => {
   }
 
   return (
-    <motion.div
-      className="space-y-6"
-      variants={uniformStaggerContainerVariants}
-      initial="hidden"
-      animate="visible"
+    <ConditionalMotionStagger
+      performanceConfig={performanceConfig}
+      className="space-y-6 profile-section"
     >
       {/* Avatar Status Card */}
-      <motion.div variants={uniformStaggerItemVariants}>
+      <ConditionalMotionSlide
+        performanceConfig={performanceConfig}
+        direction="up"
+        distance={10}
+      >
         <AvatarStatusCard data={data} />
-      </motion.div>
+      </ConditionalMotionSlide>
 
       {/* Last Scan Card */}
-      <motion.div variants={uniformStaggerItemVariants}>
+      <ConditionalMotionSlide
+        performanceConfig={performanceConfig}
+        direction="up"
+        distance={10}
+      >
         <LastScanCard data={data} />
-      </motion.div>
+      </ConditionalMotionSlide>
 
       {/* Quick Actions Card */}
-      <motion.div variants={uniformStaggerItemVariants}>
+      <ConditionalMotionSlide
+        performanceConfig={performanceConfig}
+        direction="up"
+        distance={10}
+      >
         <QuickActionsCard data={data} />
-      </motion.div>
-    </motion.div>
+      </ConditionalMotionSlide>
+    </ConditionalMotionStagger>
   );
 };
 

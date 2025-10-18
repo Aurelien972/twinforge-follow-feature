@@ -1,5 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo } from 'react';
+import { useProfilePerformance } from './hooks/useProfilePerformance';
+import { ConditionalMotionSlide } from './components/shared/ConditionalMotionProfile';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
@@ -32,11 +33,17 @@ const ProfileHealthTab: React.FC = () => {
   const { saveBasicHealthSection, saveMedicalSection, saveConstraintsSection, onSubmit } = actions;
   const { saving, sectionSaving, hasBasicChanges, hasMedicalChanges, hasConstraintsChanges } = state;
 
+  // Performance optimization
+  const performanceConfig = useProfilePerformance();
+
   const [newConstraint, setNewConstraint] = React.useState('');
   const [newPhysicalLimitation, setNewPhysicalLimitation] = React.useState('');
 
-  // Calculate completion percentage
-  const completionPercentage = calculateHealthCompletion(profile);
+  // Calculate completion percentage - memoized
+  const completionPercentage = useMemo(
+    () => calculateHealthCompletion(profile),
+    [profile?.constraints, profile?.medical_conditions, profile?.current_medications]
+  );
 
   // Get country health data for vaccinations
   const countryData = useCountryHealthData(profile?.country);
@@ -77,11 +84,11 @@ const ProfileHealthTab: React.FC = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="space-y-6"
+    <ConditionalMotionSlide
+      performanceConfig={performanceConfig}
+      direction="up"
+      distance={20}
+      className="space-y-6 profile-section"
     >
       {/* Progress Header */}
       <ProgressBar
@@ -254,7 +261,7 @@ const ProfileHealthTab: React.FC = () => {
           </GlassCard>
         )}
       </form>
-    </motion.div>
+    </ConditionalMotionSlide>
   );
 };
 

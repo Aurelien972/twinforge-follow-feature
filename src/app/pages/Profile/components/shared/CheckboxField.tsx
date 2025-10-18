@@ -4,6 +4,7 @@ import { ICONS } from '../../../../../ui/icons/registry';
 
 /**
  * Checkbox Field Component - Shared across profile tabs
+ * Optimized with performance-adaptive transitions
  */
 export const CheckboxField: React.FC<{
   register: any;
@@ -16,9 +17,14 @@ export const CheckboxField: React.FC<{
   compact?: boolean;
 }> = ({ register, name, label, description, checked, color = '#06B6D4', icon, compact = false }) => {
   return (
-    <label className={`flex items-center gap-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:bg-white/8 transition-colors ${
-      compact ? 'p-3' : 'p-4'
-    }`}>
+    <label
+      className={`flex items-center gap-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer profile-checkbox-field profile-hover-effect ${
+        compact ? 'p-3' : 'p-4'
+      }`}
+      style={{
+        transition: 'background-color var(--animation-duration-adaptive, 200ms) ease-out',
+      }}
+    >
       <input
         {...register(name)}
         type="checkbox"

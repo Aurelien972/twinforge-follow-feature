@@ -118,6 +118,11 @@
 @import './pipeline/forge-photo-capture.css';
 
 /* =========================================
+   PHASE 8.5: PROFILE PERFORMANCE OPTIMIZATIONS
+   ========================================= */
+@import '../app/pages/Profile/styles/profile-performance.css';
+
+/* =========================================
    PHASE 9: PAGE-SPECIFIC STYLES
    Styles organisés par page/module
    ========================================= */

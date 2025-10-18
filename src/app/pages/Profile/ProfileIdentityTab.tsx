@@ -1,10 +1,10 @@
 /**
  * Profile Identity Tab - Modularized Version
  * Main component orchestrating profile identity management
+ * Optimized with adaptive performance system
  */
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo } from 'react';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
@@ -12,8 +12,8 @@ import { isValidForCalculations } from './utils/profileCalculations';
 import { ProgressBar, SectionSaveButton, BMICalculatorCard } from './components/ProfileIdentityComponents';
 import { useProfileIdentityForm } from './hooks/useProfileIdentityForm';
 import { useUserStore } from '../../../system/store/userStore';
-import logger from '../../../lib/utils/logger';
-
+import { useProfilePerformance, useProfileMotionVariants } from './hooks/useProfilePerformance';
+import { ConditionalMotionSlide } from './components/shared/ConditionalMotionProfile';
 import { calculateIdentityCompletion } from './utils/profileCompletion';
 
 /**
@@ -27,6 +27,10 @@ const ProfileIdentityTab = React.memo(() => {
   const { saving, sectionSaving, hasRequiredChanges, hasOptionalChanges } = state;
   const { profile } = useUserStore();
 
+  // Performance optimization
+  const performanceConfig = useProfilePerformance();
+  const motionVariants = useProfileMotionVariants(performanceConfig);
+
   // Function to scroll to global save button
   const handleScrollToGlobalSave = () => {
     const element = document.getElementById('global-save-button-container');
@@ -35,15 +39,18 @@ const ProfileIdentityTab = React.memo(() => {
     }
   };
 
-  // Calculate completion percentage
-  const completionPercentage = calculateIdentityCompletion(profile);
+  // Calculate completion percentage - memoized
+  const completionPercentage = useMemo(
+    () => calculateIdentityCompletion(profile),
+    [profile?.displayName, profile?.sex, profile?.height_cm, profile?.weight_kg]
+  );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="space-y-6"
+    <ConditionalMotionSlide
+      performanceConfig={performanceConfig}
+      direction="up"
+      distance={20}
+      className="space-y-6 profile-section"
     >
       {/* Enhanced Progress Header */}
       <ProgressBar
@@ -55,24 +62,25 @@ const ProfileIdentityTab = React.memo(() => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Required Information Card */}
-        <GlassCard className="p-6" style={{
-          background: `
+        <GlassCard className="p-6 profile-glass-card" style={{
+          background: performanceConfig.enableGradients ? `
             radial-gradient(circle at 30% 20%, rgba(96, 165, 250, 0.08) 0%, transparent 60%),
             var(--glass-opacity)
-          `,
-          borderColor: 'rgba(96, 165, 250, 0.2)'
-        }}>
+          ` : 'var(--glass-opacity)',
+          borderColor: 'rgba(96, 165, 250, 0.2)',
+          '--fallback-solid-color': 'rgba(96, 165, 250, 0.05)'
+        } as React.CSSProperties}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-white font-semibold flex items-center gap-3">
-              <div 
-                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${performanceConfig.enableShadows ? 'profile-shadow' : ''}`}
                 style={{
-                  background: `
+                  background: performanceConfig.enableGradients ? `
                     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
                     linear-gradient(135deg, color-mix(in srgb, #60A5FA 35%, transparent), color-mix(in srgb, #60A5FA 25%, transparent))
-                  `,
+                  ` : 'rgba(96, 165, 250, 0.2)',
                   border: '2px solid color-mix(in srgb, #60A5FA 50%, transparent)',
-                  boxShadow: '0 0 20px color-mix(in srgb, #60A5FA 30%, transparent)'
+                  boxShadow: performanceConfig.enableShadows ? '0 0 20px color-mix(in srgb, #60A5FA 30%, transparent)' : 'none'
                 }}
               >
                 <SpatialIcon Icon={ICONS.User} size={20} style={{ color: '#60A5FA' }} variant="pure" />
@@ -542,7 +550,7 @@ const ProfileIdentityTab = React.memo(() => {
           </GlassCard>
         )}
       </form>
-    </motion.div>
+    </ConditionalMotionSlide>
   );
 });
 

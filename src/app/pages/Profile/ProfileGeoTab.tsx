@@ -6,7 +6,8 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { useProfilePerformance } from './hooks/useProfilePerformance';
+import { ConditionalMotionSlide, ConditionalMotionStagger } from './components/shared/ConditionalMotionProfile';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
@@ -26,6 +27,7 @@ const ProfileGeoTab: React.FC = () => {
   const { profile } = useUserStore();
   const { data: geoData, loading: geoLoading, error: geoError, refresh } = useGeographicData();
   const { countryData, loading: countryLoading, error: countryError, refresh: refreshCountryData } = useCountryHealthData();
+  const performanceConfig = useProfilePerformance();
 
   const hasCountry = !!profile?.country;
 
@@ -34,13 +36,11 @@ const ProfileGeoTab: React.FC = () => {
 
   if (!hasCountry) {
     return (
-      <motion.div
-        className="space-y-6"
-        variants={uniformStaggerContainerVariants}
-        initial="hidden"
-        animate="visible"
+      <ConditionalMotionSlide
+        performanceConfig={performanceConfig}
+        className="space-y-6 profile-section"
       >
-        <motion.div variants={uniformStaggerItemVariants}>
+        <div>
           <GlassCard className="p-8 text-center" style={{
             background: `
               radial-gradient(circle at 30% 20%, rgba(236, 72, 153, 0.12) 0%, transparent 60%),
@@ -78,20 +78,22 @@ const ProfileGeoTab: React.FC = () => {
               </div>
             </button>
           </GlassCard>
-        </motion.div>
-      </motion.div>
+        </div>
+      </ConditionalMotionSlide>
     );
   }
 
   return (
-    <motion.div
-      className="space-y-6"
-      variants={uniformStaggerContainerVariants}
-      initial="hidden"
-      animate="visible"
+    <ConditionalMotionStagger
+      performanceConfig={performanceConfig}
+      className="space-y-6 profile-section"
     >
       {/* Geographic Environment Section */}
-      <motion.div variants={uniformStaggerItemVariants}>
+      <ConditionalMotionSlide
+        performanceConfig={performanceConfig}
+        direction="up"
+        distance={10}
+      >
         <GlassCard className="p-6" style={{
           background: `
             radial-gradient(circle at 30% 20%, rgba(236, 72, 153, 0.08) 0%, transparent 60%),
@@ -205,11 +207,15 @@ const ProfileGeoTab: React.FC = () => {
             </div>
           )}
         </GlassCard>
-      </motion.div>
+      </ConditionalMotionSlide>
 
       {/* Country Health Context - Always show if country is set */}
       {hasCountry && (
-        <motion.div variants={uniformStaggerItemVariants}>
+        <ConditionalMotionSlide
+          performanceConfig={performanceConfig}
+          direction="up"
+          distance={10}
+        >
           <GlassCard className="p-6" style={{
             background: `
               radial-gradient(circle at 30% 20%, rgba(236, 72, 153, 0.08) 0%, transparent 60%),
@@ -267,12 +273,16 @@ const ProfileGeoTab: React.FC = () => {
 
             <CountryHealthDataDisplay countryData={countryData} loading={countryLoading} />
           </GlassCard>
-        </motion.div>
+        </ConditionalMotionSlide>
       )}
 
       {/* Info Banner */}
       {hasCountry && geoData && (
-        <motion.div variants={uniformStaggerItemVariants}>
+        <ConditionalMotionSlide
+          performanceConfig={performanceConfig}
+          direction="up"
+          distance={10}
+        >
           <GlassCard className="p-4" style={{
             background: 'rgba(236, 72, 153, 0.05)',
             borderColor: 'rgba(236, 72, 153, 0.2)',
@@ -288,9 +298,9 @@ const ProfileGeoTab: React.FC = () => {
               </div>
             </div>
           </GlassCard>
-        </motion.div>
+        </ConditionalMotionSlide>
       )}
-    </motion.div>
+    </ConditionalMotionStagger>
   );
 };
 

@@ -1,5 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo } from 'react';
+import { useProfilePerformance } from './hooks/useProfilePerformance';
+import { ConditionalMotionSlide } from './components/shared/ConditionalMotionProfile';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
@@ -21,15 +22,21 @@ const ProfileFastingTab: React.FC = () => {
   const { saving, sectionSaving, hasFastingChanges, hasObjectivesChanges } = state;
   const { proteinCalculation, selectedFastingProtocol, handleFastingProtocolChange, resetProteinTarget } = helpers;
 
-  // Calculate completion percentage
-  const completionPercentage = calculateFastingCompletion(profile);
+  // Performance optimization
+  const performanceConfig = useProfilePerformance();
+
+  // Calculate completion percentage - memoized
+  const completionPercentage = useMemo(
+    () => calculateFastingCompletion(profile),
+    [profile?.fastingWindow, profile?.proteinTarget_g, profile?.caloriesTarget]
+  );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="space-y-6"
+    <ConditionalMotionSlide
+      performanceConfig={performanceConfig}
+      direction="up"
+      distance={20}
+      className="space-y-6 profile-section"
     >
       {/* Progress Header */}
       <ProgressBar
@@ -402,7 +409,7 @@ const ProfileFastingTab: React.FC = () => {
           </GlassCard>
         )}
       </form>
-    </motion.div>
+    </ConditionalMotionSlide>
   );
 };
 
