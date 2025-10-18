@@ -63,59 +63,67 @@ const AnalysisLoadingSkeleton: React.FC = () => {
 
           <div className="relative z-10 space-y-6">
             {/* Icône de Forge Nutritionnelle Centrale */}
-            <motion.div
+            <MotionDiv
               className="w-24 h-24 mx-auto rounded-full flex items-center justify-center relative"
               style={{
-                background: `
-                  radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                  linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(34, 197, 94, 0.6))
-                `,
+                background: isPerformanceMode
+                  ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(34, 197, 94, 0.6))'
+                  : `
+                    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+                    linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(34, 197, 94, 0.6))
+                  `,
                 border: '3px solid rgba(16, 185, 129, 0.8)',
-                boxShadow: `
-                  0 0 60px rgba(16, 185, 129, 0.6),
-                  0 0 120px rgba(16, 185, 129, 0.3),
-                  inset 0 3px 0 rgba(255,255,255,0.4)
-                `,
+                boxShadow: isPerformanceMode
+                  ? '0 0 60px rgba(16, 185, 129, 0.6)'
+                  : `
+                    0 0 60px rgba(16, 185, 129, 0.6),
+                    0 0 120px rgba(16, 185, 129, 0.3),
+                    inset 0 3px 0 rgba(255,255,255,0.4)
+                  `,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
-              animate={reduceMotion ? {} : {
-                scale: [1, 1.05, 1],
-                boxShadow: [
-                  '0 0 60px rgba(16, 185, 129, 0.6), 0 0 120px rgba(16, 185, 129, 0.3)',
-                  '0 0 80px rgba(16, 185, 129, 0.8), 0 0 160px rgba(16, 185, 129, 0.4)',
-                  '0 0 60px rgba(16, 185, 129, 0.6), 0 0 120px rgba(16, 185, 129, 0.3)'
-                ]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <motion.div
-                className="flex items-center justify-center"
-                animate={reduceMotion ? {} : { rotate: 360 }}
-                transition={{
-                  duration: 4,
+              {...(!isPerformanceMode && {
+                animate: reduceMotion ? {} : {
+                  scale: [1, 1.05, 1],
+                  boxShadow: [
+                    '0 0 60px rgba(16, 185, 129, 0.6), 0 0 120px rgba(16, 185, 129, 0.3)',
+                    '0 0 80px rgba(16, 185, 129, 0.8), 0 0 160px rgba(16, 185, 129, 0.4)',
+                    '0 0 60px rgba(16, 185, 129, 0.6), 0 0 120px rgba(16, 185, 129, 0.3)'
+                  ]
+                },
+                transition: {
+                  duration: 3,
                   repeat: Infinity,
-                  ease: "linear"
-                }}
+                  ease: "easeInOut"
+                }
+              })}
+            >
+              <MotionDiv
+                className="flex items-center justify-center"
+                {...(!isPerformanceMode && {
+                  animate: reduceMotion ? {} : { rotate: 360 },
+                  transition: {
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }
+                })}
               >
-                <SpatialIcon 
-                  Icon={ICONS.Zap} 
-                  size={36} 
+                <SpatialIcon
+                  Icon={ICONS.Zap}
+                  size={36}
                   className="text-white"
                   style={{
                     filter: 'drop-shadow(0 0 12px rgba(255,255,255,0.8))',
                     display: 'block'
                   }}
                 />
-              </motion.div>
-              
-              {/* Particules de Forge IA autour de l'icône */}
-              {!reduceMotion && [...Array(6)].map((_, i) => (
+              </MotionDiv>
+
+              {/* Particules de Forge IA autour de l'icône - disabled in performance mode */}
+              {!reduceMotion && !isPerformanceMode && [...Array(6)].map((_, i) => (
                 <div
                   key={i}
                   className="absolute w-3 h-3 rounded-full"
@@ -128,7 +136,7 @@ const AnalysisLoadingSkeleton: React.FC = () => {
                   }}
                 />
               ))}
-            </motion.div>
+            </MotionDiv>
 
             <div>
               <h2 className="text-3xl font-bold text-white mb-3">
@@ -147,50 +155,54 @@ const AnalysisLoadingSkeleton: React.FC = () => {
                 { phase: 'Génération d\'Insights', icon: 'TrendingUp', color: '#22C55E' },
                 { phase: 'Recommandations Personnalisées', icon: 'Target', color: '#34D399' }
               ].map((item, index) => (
-                <motion.div
+                <MotionDiv
                   key={item.phase}
                   className="p-4 rounded-xl text-center"
                   style={{
                     background: `rgba(16, 185, 129, 0.1)`,
                     border: '1px solid rgba(16, 185, 129, 0.2)',
-                    backdropFilter: 'blur(8px) saturate(120%)'
+                    ...(isPerformanceMode ? {} : { backdropFilter: 'blur(8px) saturate(120%)' })
                   }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ 
-                    duration: reduceMotion ? 0.1 : 0.5, 
-                    delay: reduceMotion ? 0 : 0.2 + index * 0.1 
-                  }}
+                  {...(!isPerformanceMode && {
+                    initial: { opacity: 0, y: 20 },
+                    animate: { opacity: 1, y: 0 },
+                    transition: {
+                      duration: reduceMotion ? 0.1 : 0.5,
+                      delay: reduceMotion ? 0 : 0.2 + index * 0.1
+                    }
+                  })}
                 >
-                  <motion.div
+                  <MotionDiv
                     className="w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center"
                     style={{
                       background: `color-mix(in srgb, ${item.color} 20%, transparent)`,
                       border: `1px solid color-mix(in srgb, ${item.color} 30%, transparent)`
                     }}
-                    animate={reduceMotion ? {} : {
-                      scale: [1, 1.1, 1],
-                      boxShadow: [
-                        `0 0 16px ${item.color}40`,
-                        `0 0 24px ${item.color}60`,
-                        `0 0 16px ${item.color}40`
-                      ]
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      delay: index * 0.3,
-                      ease: "easeInOut"
-                    }}
+                    {...(!isPerformanceMode && {
+                      animate: reduceMotion ? {} : {
+                        scale: [1, 1.1, 1],
+                        boxShadow: [
+                          `0 0 16px ${item.color}40`,
+                          `0 0 24px ${item.color}60`,
+                          `0 0 16px ${item.color}40`
+                        ]
+                      },
+                      transition: {
+                        duration: 2,
+                        repeat: Infinity,
+                        delay: index * 0.3,
+                        ease: "easeInOut"
+                      }
+                    })}
                   >
-                    <SpatialIcon 
-                      Icon={ICONS[item.icon as keyof typeof ICONS]} 
-                      size={20} 
+                    <SpatialIcon
+                      Icon={ICONS[item.icon as keyof typeof ICONS]}
+                      size={20}
                       style={{ color: item.color }}
                     />
-                  </motion.div>
+                  </MotionDiv>
                   <div className="text-white font-medium text-sm">{item.phase}</div>
-                </motion.div>
+                </MotionDiv>
               ))}
             </div>
 
@@ -202,41 +214,44 @@ const AnalysisLoadingSkeleton: React.FC = () => {
               </div>
               
               <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-                <motion.div
+                <MotionDiv
                   className="h-full rounded-full relative overflow-hidden"
                   style={{
                     background: `
-                      linear-gradient(90deg, 
-                        #10B981, 
+                      linear-gradient(90deg,
+                        #10B981,
                         #22C55E,
                         #34D399
                       )
                     `,
-                    boxShadow: '0 0 16px rgba(16, 185, 129, 0.6)'
+                    boxShadow: isPerformanceMode ? 'none' : '0 0 16px rgba(16, 185, 129, 0.6)',
+                    width: isPerformanceMode ? '75%' : undefined
                   }}
-                  initial={{ width: 0 }}
-                  animate={{ width: '100%' }}
-                  transition={{
-                    duration: reduceMotion ? 0.1 : 8,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
+                  {...(!isPerformanceMode && {
+                    initial: { width: 0 },
+                    animate: { width: '100%' },
+                    transition: {
+                      duration: reduceMotion ? 0.1 : 8,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }
+                  })}
                 >
-                  {/* Shimmer effect */}
-                  {!reduceMotion && (
+                  {/* Shimmer effect - disabled in performance mode */}
+                  {!reduceMotion && !isPerformanceMode && (
                     <div
                       className="absolute inset-0 rounded-full"
                       style={{
-                        background: `linear-gradient(90deg, 
-                          transparent 0%, 
-                          rgba(255,255,255,0.6) 50%, 
+                        background: `linear-gradient(90deg,
+                          transparent 0%,
+                          rgba(255,255,255,0.6) 50%,
                           transparent 100%
                         )`,
                         animation: 'progressShimmer 2s ease-in-out infinite'
                       }}
                     />
                   )}
-                </motion.div>
+                </MotionDiv>
               </div>
             </div>
           </div>
@@ -246,13 +261,15 @@ const AnalysisLoadingSkeleton: React.FC = () => {
       {/* Squelettes de Graphiques */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Squelette Graphique de Tendance */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ 
-            duration: reduceMotion ? 0.1 : 0.6, 
-            delay: reduceMotion ? 0 : 0.3 
-          }}
+        <MotionDiv
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, x: -20 },
+            animate: { opacity: 1, x: 0 },
+            transition: {
+              duration: reduceMotion ? 0.1 : 0.6,
+              delay: reduceMotion ? 0 : 0.3
+            }
+          })}
         >
           <GlassCard className="p-6 h-80">
             <div className="flex items-center gap-3 mb-4">
@@ -268,38 +285,46 @@ const AnalysisLoadingSkeleton: React.FC = () => {
             {/* Squelette de graphique linéaire */}
             <div className="relative h-48 rounded-xl bg-white/5 border border-white/10 overflow-hidden">
               <div className="absolute inset-0 flex items-end justify-around p-4">
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="bg-blue-400/30 rounded-t"
-                    style={{
-                      width: '12px',
-                      height: `${30 + Math.random() * 60}%`
-                    }}
-                    initial={{ height: 0 }}
-                    animate={{ height: `${30 + Math.random() * 60}%` }}
-                    transition={{
-                      duration: reduceMotion ? 0.1 : 1.5,
-                      delay: reduceMotion ? 0 : i * 0.1,
-                      repeat: Infinity,
-                      repeatType: "reverse",
-                      ease: "easeInOut"
-                    }}
-                  />
-                ))}
+                {Array.from({ length: 7 }).map((_, i) => {
+                  const MotionBar = isPerformanceMode ? 'div' : motion.div;
+                  const staticHeight = 30 + Math.random() * 60;
+                  return (
+                    <MotionBar
+                      key={i}
+                      className="bg-blue-400/30 rounded-t"
+                      style={{
+                        width: '12px',
+                        height: isPerformanceMode ? `${staticHeight}%` : undefined
+                      }}
+                      {...(!isPerformanceMode && {
+                        initial: { height: 0 },
+                        animate: { height: `${staticHeight}%` },
+                        transition: {
+                          duration: reduceMotion ? 0.1 : 1.5,
+                          delay: reduceMotion ? 0 : i * 0.1,
+                          repeat: Infinity,
+                          repeatType: "reverse" as const,
+                          ease: "easeInOut"
+                        }
+                      })}
+                    />
+                  );
+                })}
               </div>
             </div>
           </GlassCard>
-        </motion.div>
+        </MotionDiv>
 
         {/* Squelette Graphique de Distribution */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ 
-            duration: reduceMotion ? 0.1 : 0.6, 
-            delay: reduceMotion ? 0 : 0.4 
-          }}
+        <MotionDiv
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, x: 20 },
+            animate: { opacity: 1, x: 0 },
+            transition: {
+              duration: reduceMotion ? 0.1 : 0.6,
+              delay: reduceMotion ? 0 : 0.4
+            }
+          })}
         >
           <GlassCard className="p-6 h-80">
             <div className="flex items-center gap-3 mb-4">
@@ -314,26 +339,28 @@ const AnalysisLoadingSkeleton: React.FC = () => {
             
             {/* Squelette de graphique circulaire */}
             <div className="relative h-48 flex items-center justify-center">
-              <motion.div
+              <MotionDiv
                 className="w-32 h-32 rounded-full border-8 border-transparent relative"
                 style={{
-                  background: `conic-gradient(from 0deg, 
-                    #EF4444 0% 30%, 
-                    #F59E0B 30% 60%, 
+                  background: `conic-gradient(from 0deg,
+                    #EF4444 0% 30%,
+                    #F59E0B 30% 60%,
                     #8B5CF6 60% 100%
                   )`,
                   mask: 'radial-gradient(circle at center, transparent 40%, black 42%)',
                   WebkitMask: 'radial-gradient(circle at center, transparent 40%, black 42%)'
                 }}
-                animate={reduceMotion ? {} : { rotate: 360 }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
+                {...(!isPerformanceMode && {
+                  animate: reduceMotion ? {} : { rotate: 360 },
+                  transition: {
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }
+                })}
               >
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-30" />
-              </motion.div>
+              </MotionDiv>
               
               {/* Centre du donut */}
               <div className="absolute inset-0 flex items-center justify-center">
@@ -344,21 +371,25 @@ const AnalysisLoadingSkeleton: React.FC = () => {
               </div>
             </div>
           </GlassCard>
-        </motion.div>
+        </MotionDiv>
       </div>
 
       {/* Squelettes d'Insights IA */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: reduceMotion ? 0.1 : 0.5, 
-              delay: reduceMotion ? 0 : 0.5 + index * 0.1 
-            }}
-          >
+        {Array.from({ length: 4 }).map((_, index) => {
+          const MotionCard = isPerformanceMode ? 'div' : motion.div;
+          return (
+            <MotionCard
+              key={index}
+              {...(!isPerformanceMode && {
+                initial: { opacity: 0, y: 20 },
+                animate: { opacity: 1, y: 0 },
+                transition: {
+                  duration: reduceMotion ? 0.1 : 0.5,
+                  delay: reduceMotion ? 0 : 0.5 + index * 0.1
+                }
+              })}
+            >
             <GlassCard 
               className="p-5"
               style={{
@@ -370,25 +401,27 @@ const AnalysisLoadingSkeleton: React.FC = () => {
               }}
             >
               <div className="flex items-start gap-3">
-                <motion.div 
+                <MotionDiv
                   className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0"
-                  animate={reduceMotion ? {} : {
-                    scale: [1, 1.1, 1],
-                    opacity: [0.7, 1, 0.7]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: index * 0.2,
-                    ease: "easeInOut"
-                  }}
+                  {...(!isPerformanceMode && {
+                    animate: reduceMotion ? {} : {
+                      scale: [1, 1.1, 1],
+                      opacity: [0.7, 1, 0.7]
+                    },
+                    transition: {
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: index * 0.2,
+                      ease: "easeInOut"
+                    }
+                  })}
                 >
                   <SpatialIcon 
                     Icon={[ICONS.TrendingUp, ICONS.Target, ICONS.BarChart3, ICONS.Zap][index]} 
                     size={14} 
                     className="text-emerald-400"
                   />
-                </motion.div>
+                </MotionDiv>
                 <div className="flex-1 space-y-2">
                   <div className="h-4 bg-white/10 rounded skeleton-glass" style={{ width: `${60 + Math.random() * 30}%` }}></div>
                   <div className="h-3 bg-white/5 rounded skeleton-glass" style={{ width: `${80 + Math.random() * 15}%` }}></div>
@@ -396,17 +429,20 @@ const AnalysisLoadingSkeleton: React.FC = () => {
                 </div>
               </div>
             </GlassCard>
-          </motion.div>
-        ))}
+            </MotionCard>
+          );
+        })}
       </div>
 
-      {/* Flux de Données IA */}
-      {!reduceMotion && (
-        <motion.div
+      {/* Flux de Données IA - disabled in performance mode */}
+      {!reduceMotion && !isPerformanceMode && (
+        <MotionDiv
           className="relative h-16 overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0 },
+            animate: { opacity: 1 },
+            transition: { duration: 0.8, delay: 0.8 }
+          })}
         >
           <div className="absolute inset-0 flex items-center justify-center">
             {/* Particules de données flottantes */}
@@ -424,39 +460,46 @@ const AnalysisLoadingSkeleton: React.FC = () => {
               />
             ))}
             
-            {/* Connecteurs de flux */}
+            {/* Connecteurs de flux - SVG path animations */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <motion.path
-                  key={i}
-                  d={`M ${10 + i * 25} 50 Q ${25 + i * 25} 20 ${40 + i * 25} 50`}
-                  stroke="#10B981"
-                  strokeWidth="1"
-                  fill="none"
-                  strokeDasharray="2 2"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: i * 0.5,
-                    ease: "easeInOut"
-                  }}
-                />
-              ))}
+              {Array.from({ length: 4 }).map((_, i) => {
+                const MotionPath = isPerformanceMode ? 'path' : motion.path;
+                return (
+                  <MotionPath
+                    key={i}
+                    d={`M ${10 + i * 25} 50 Q ${25 + i * 25} 20 ${40 + i * 25} 50`}
+                    stroke="#10B981"
+                    strokeWidth="1"
+                    fill="none"
+                    strokeDasharray="2 2"
+                    {...(!isPerformanceMode && {
+                      initial: { pathLength: 0 },
+                      animate: { pathLength: 1 },
+                      transition: {
+                        duration: 3,
+                        repeat: Infinity,
+                        delay: i * 0.5,
+                        ease: "easeInOut"
+                      }
+                    })}
+                  />
+                );
+              })}
             </svg>
           </div>
-        </motion.div>
+        </MotionDiv>
       )}
 
       {/* Message d'Encouragement */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ 
-          duration: reduceMotion ? 0.1 : 0.6, 
-          delay: reduceMotion ? 0 : 1.0 
-        }}
+      <MotionDiv
+        {...(!isPerformanceMode && {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: {
+            duration: reduceMotion ? 0.1 : 0.6,
+            delay: reduceMotion ? 0 : 1.0
+          }
+        })}
       >
         <GlassCard 
           className="p-6 text-center"
@@ -477,7 +520,7 @@ const AnalysisLoadingSkeleton: React.FC = () => {
             </p>
           </div>
         </GlassCard>
-      </motion.div>
+      </MotionDiv>
 
       {/* CSS Animations Personnalisées */}
       <style>{`

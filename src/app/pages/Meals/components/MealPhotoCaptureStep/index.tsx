@@ -658,10 +658,11 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-3">
+                    {/* Bouton Caméra - Style principal harmonisé avec Scan Repas IA */}
                     <button
                       onClick={handleBarcodeClick}
-                      className="btn-glass--primary touch-feedback-css"
+                      className="w-full btn-glass--primary touch-feedback-css"
                       style={{
                         background: `
                           linear-gradient(135deg,
@@ -676,40 +677,44 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
                           inset 0 3px 0 rgba(255,255,255,0.3),
                           inset 0 -3px 0 rgba(0,0,0,0.2)
                         `,
-                        border: '2px solid rgba(99, 102, 241, 0.6)'
+                        border: '2px solid rgba(99, 102, 241, 0.6)',
+                        padding: '1rem'
                       }}
                     >
                       <div className="relative flex flex-col items-center justify-center gap-2">
                         <SpatialIcon
                           Icon={ICONS.Camera}
-                          size={24}
+                          size={28}
                           className="text-white"
                           style={{
                             filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))'
                           }}
                         />
-                        <span className="font-bold text-sm">
-                          Caméra
+                        <span className="font-bold text-base">
+                          Scanner avec Caméra
                         </span>
                       </div>
                     </button>
+
+                    {/* Bouton Galerie - Style translucide violet harmonisé */}
                     <button
                       onClick={handleBarcodeImageUpload}
-                      className="btn-glass touch-feedback-css"
+                      className="w-full btn-glass touch-feedback-css"
                       style={{
                         background: `
                           linear-gradient(135deg,
-                            rgba(99, 102, 241, 0.25),
-                            rgba(79, 70, 229, 0.15)
+                            rgba(99, 102, 241, 0.2),
+                            rgba(79, 70, 229, 0.12)
                           )
                         `,
                         backdropFilter: 'blur(20px) saturate(140%)',
                         boxShadow: `
-                          0 8px 32px rgba(99, 102, 241, 0.25),
-                          0 0 40px rgba(99, 102, 241, 0.15),
-                          inset 0 2px 0 rgba(255,255,255,0.15)
+                          0 8px 32px rgba(99, 102, 241, 0.2),
+                          0 0 40px rgba(99, 102, 241, 0.12),
+                          inset 0 2px 0 rgba(255,255,255,0.12)
                         `,
-                        border: '2px solid rgba(99, 102, 241, 0.4)'
+                        border: '2px solid rgba(99, 102, 241, 0.35)',
+                        padding: '1rem'
                       }}
                     >
                       <div className="relative flex flex-col items-center justify-center gap-2">
@@ -721,8 +726,8 @@ const MealPhotoCaptureStep: React.FC<MealPhotoCaptureStepProps> = ({
                             filter: 'drop-shadow(0 2px 8px rgba(99, 102, 241, 0.5))'
                           }}
                         />
-                        <span className="font-bold text-sm text-white">
-                          Galerie
+                        <span className="font-bold text-sm text-indigo-200">
+                          Choisir depuis Galerie
                         </span>
                       </div>
                     </button>
