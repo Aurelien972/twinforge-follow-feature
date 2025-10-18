@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -15,10 +16,6 @@ interface InventoryItemProps {
   onStopEdit: () => void;
 }
 
-/**
- * Inventory Item - Élément d'Inventaire Individuel
- * Composant pour afficher et éditer un ingrédient détecté
- */
 const InventoryItem: React.FC<InventoryItemProps> = ({
   item,
   index,
@@ -28,6 +25,10 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
   onStartEdit,
   onStopEdit
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+  const MotionButton = isPerformanceMode ? 'button' : motion.button;
+
   const getCategoryColor = (category: string): string => {
     const categoryColors: Record<string, string> = {
       'Légumes': '#22C55E',
@@ -45,15 +46,17 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
   const categoryColor = getCategoryColor(item.category);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.95 }}
-      transition={{
-        duration: 0.35,
-        delay: index * 0.04,
-        ease: [0.4, 0, 0.2, 1]
-      }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, y: -20, scale: 0.95 },
+        transition: {
+          duration: 0.35,
+          delay: index * 0.04,
+          ease: [0.4, 0, 0.2, 1]
+        }
+      })}
       className="group"
     >
       <GlassCard
@@ -71,10 +74,10 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
           `,
           backdropFilter: 'blur(20px) saturate(150%)',
           WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-          transition: 'all 0.3s ease'
+          transition: isPerformanceMode ? 'none' : 'all 0.3s ease'
         }}
         onMouseEnter={(e) => {
-          if (window.matchMedia('(hover: hover)').matches) {
+          if (!isPerformanceMode && window.matchMedia('(hover: hover)').matches) {
             e.currentTarget.style.transform = 'translateY(-3px) scale(1.01)';
             e.currentTarget.style.boxShadow = `
               0 8px 24px rgba(0, 0, 0, 0.3),
@@ -85,7 +88,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
           }
         }}
         onMouseLeave={(e) => {
-          if (window.matchMedia('(hover: hover)').matches) {
+          if (!isPerformanceMode && window.matchMedia('(hover: hover)').matches) {
             e.currentTarget.style.transform = 'translateY(0) scale(1)';
             e.currentTarget.style.boxShadow = `
               0 4px 16px rgba(0, 0, 0, 0.2),
@@ -97,11 +100,13 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
         }}
       >
         <div className="flex items-center gap-4">
-          {/* Icône de Catégorie - Améliorée */}
-          <motion.div
+          {/* Icône de Catégorie */}
+          <MotionDiv
             className="flex-shrink-0"
-            whileHover={{ scale: 1.1, rotate: 5 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            {...(!isPerformanceMode && {
+              whileHover: { scale: 1.1, rotate: 5 },
+              transition: { type: 'spring', stiffness: 400, damping: 17 }
+            })}
           >
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center"
@@ -126,7 +131,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
                 }}
               />
             </div>
-          </motion.div>
+          </MotionDiv>
 
           {/* Informations de l'Ingrédient */}
           <div className="flex-1 min-w-0">
@@ -199,10 +204,10 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
             )}
           </div>
 
-          {/* Actions - Améliorées */}
+          {/* Actions */}
           <div className="flex items-center gap-2 ml-2">
             {isEditing ? (
-              <motion.button
+              <MotionButton
                 onClick={onStopEdit}
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
                 style={{
@@ -211,15 +216,17 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
                   boxShadow: '0 0 16px rgba(34, 197, 94, 0.3)',
                   backdropFilter: 'blur(12px)'
                 }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
+                {...(!isPerformanceMode && {
+                  whileHover: { scale: 1.1 },
+                  whileTap: { scale: 0.95 }
+                })}
                 aria-label="Valider"
               >
                 <SpatialIcon Icon={ICONS.Check} size={18} className="text-green-400" />
-              </motion.button>
+              </MotionButton>
             ) : (
               <>
-                <motion.button
+                <MotionButton
                   onClick={() => onStartEdit(item.id)}
                   className="w-10 h-10 rounded-xl flex items-center justify-center"
                   style={{
@@ -227,17 +234,19 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
                     border: '2px solid rgba(255, 255, 255, 0.18)',
                     backdropFilter: 'blur(12px)'
                   }}
-                  whileHover={{
-                    scale: 1.08,
-                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-                    borderColor: 'rgba(255, 255, 255, 0.3)'
-                  }}
-                  whileTap={{ scale: 0.95 }}
+                  {...(!isPerformanceMode && {
+                    whileHover: {
+                      scale: 1.08,
+                      backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                      borderColor: 'rgba(255, 255, 255, 0.3)'
+                    },
+                    whileTap: { scale: 0.95 }
+                  })}
                   aria-label="Modifier"
                 >
                   <SpatialIcon Icon={ICONS.Edit} size={16} className="text-white/90" />
-                </motion.button>
-                <motion.button
+                </MotionButton>
+                <MotionButton
                   onClick={() => onRemove(item.id)}
                   className="w-10 h-10 rounded-xl flex items-center justify-center"
                   style={{
@@ -245,23 +254,25 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
                     border: '2px solid rgba(239, 68, 68, 0.3)',
                     backdropFilter: 'blur(12px)'
                   }}
-                  whileHover={{
-                    scale: 1.08,
-                    backgroundColor: 'rgba(239, 68, 68, 0.25)',
-                    borderColor: 'rgba(239, 68, 68, 0.5)',
-                    boxShadow: '0 0 16px rgba(239, 68, 68, 0.4)'
-                  }}
-                  whileTap={{ scale: 0.95 }}
+                  {...(!isPerformanceMode && {
+                    whileHover: {
+                      scale: 1.08,
+                      backgroundColor: 'rgba(239, 68, 68, 0.25)',
+                      borderColor: 'rgba(239, 68, 68, 0.5)',
+                      boxShadow: '0 0 16px rgba(239, 68, 68, 0.4)'
+                    },
+                    whileTap: { scale: 0.95 }
+                  })}
                   aria-label="Supprimer"
                 >
                   <SpatialIcon Icon={ICONS.Trash2} size={16} className="text-red-400" />
-                </motion.button>
+                </MotionButton>
               </>
             )}
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

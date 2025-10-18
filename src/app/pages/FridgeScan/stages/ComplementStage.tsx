@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useFeedback } from '@/hooks';
 import { useToast } from '../../../../ui/components/ToastProvider';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
 import SuggestedItemsCard from '../components/SuggestedItemsCard';
@@ -26,7 +27,10 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
 }) => {
   const { click, success } = useFeedback();
   const { showToast } = useToast();
+  const { isPerformanceMode } = usePerformanceMode();
   const [hasUnaddedSelections, setHasUnaddedSelections] = useState(false);
+
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   const handleAddSelectedItems = (selectedItems: FridgeItem[]) => {
     logger.info('COMPLEMENT_STAGE', 'Adding selected complementary items', {
@@ -42,8 +46,8 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
 
     addSelectedComplementaryItems(selectedItems);
     success();
-    setHasUnaddedSelections(false); // Reset state after adding items
-    
+    setHasUnaddedSelections(false);
+
     showToast({
       type: 'success',
       title: 'Ingrédients ajoutés !',
@@ -51,10 +55,9 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
       duration: 3000
     });
 
-    // Auto-redirect to validation after adding items
     setTimeout(() => {
       onContinueToValidation();
-    }, 1000); // Small delay to let user see the success toast
+    }, 1000);
   };
 
   const handleContinueToValidation = () => {
@@ -94,18 +97,22 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
            backdropFilter: 'blur(28px) saturate(160%)',
            WebkitBackdropFilter: 'blur(28px) saturate(160%)'
          }}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+      <MotionDiv
+        {...(!isPerformanceMode && {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          exit: { opacity: 0, y: -20 },
+          transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
+        })}
         className="space-y-6"
       >
-        {/* Information Card - Améliorée */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+        {/* Information Card */}
+        <MotionDiv
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, scale: 0.95 },
+            animate: { opacity: 1, scale: 1 },
+            transition: { duration: 0.4, delay: 0.1 }
+          })}
           className="glass-card p-5"
           style={{
             background: `
@@ -123,17 +130,19 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
           }}
         >
           <div className="flex items-start gap-4">
-            <motion.div
+            <MotionDiv
               className="flex-shrink-0"
-              animate={{
-                scale: [1, 1.05, 1],
-                boxShadow: [
-                  '0 0 20px rgba(147, 51, 234, 0.3)',
-                  '0 0 28px rgba(147, 51, 234, 0.5)',
-                  '0 0 20px rgba(147, 51, 234, 0.3)'
-                ]
-              }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+              {...(!isPerformanceMode && {
+                animate: {
+                  scale: [1, 1.05, 1],
+                  boxShadow: [
+                    '0 0 20px rgba(147, 51, 234, 0.3)',
+                    '0 0 28px rgba(147, 51, 234, 0.5)',
+                    '0 0 20px rgba(147, 51, 234, 0.3)'
+                  ]
+                },
+                transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }
+              })}
             >
               <div className="w-12 h-12 rounded-full flex items-center justify-center"
                    style={{
@@ -144,7 +153,7 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
                    }}>
                 <SpatialIcon Icon={ICONS.AlertCircle} size={22} className="text-purple-300" />
               </div>
-            </motion.div>
+            </MotionDiv>
             <div className="flex-1 space-y-2">
               <h3 className="text-lg font-bold text-white">
                 Inventaire Insuffisant Détecté
@@ -157,7 +166,7 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
               </p>
             </div>
           </div>
-        </motion.div>
+        </MotionDiv>
 
         {/* Suggested Items Card */}
         {suggestedComplementaryItems.length > 0 && (
@@ -168,11 +177,13 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
           />
         )}
 
-        {/* Action Buttons - Améliorés */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+        {/* Action Buttons */}
+        <MotionDiv
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, y: 10 },
+            animate: { opacity: 1, y: 0 },
+            transition: { duration: 0.4, delay: 0.3 }
+          })}
           className="flex flex-col sm:flex-row gap-4"
         >
           <button
@@ -250,23 +261,25 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
               <span>Reprendre des Photos</span>
             </div>
           </button>
-        </motion.div>
+        </MotionDiv>
 
         {/* Dynamic guidance text */}
         {hasUnaddedSelections && (
           <div className="text-center">
             <p className="text-sm text-orange-300 bg-orange-500/10 border border-orange-500/20 rounded-lg px-4 py-2">
-              💡 Vous avez sélectionné des aliments mais ne les avez pas encore ajoutés. 
+              💡 Vous avez sélectionné des aliments mais ne les avez pas encore ajoutés.
               Cliquez sur "Ajouter X aliments" ou continuez sans les ajouter.
             </p>
           </div>
         )}
 
-        {/* Stats Summary - Améliorée */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
+        {/* Stats Summary */}
+        <MotionDiv
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, scale: 0.95 },
+            animate: { opacity: 1, scale: 1 },
+            transition: { duration: 0.4, delay: 0.4 }
+          })}
           className="glass-card p-5"
           style={{
             background: `
@@ -285,34 +298,38 @@ const ComplementStage: React.FC<ComplementStageProps> = ({
         >
           <div className="grid grid-cols-2 gap-6 text-center">
             <div className="space-y-2">
-              <motion.div
+              <MotionDiv
                 className="text-4xl font-bold"
                 style={{ color: '#A78BFA', textShadow: '0 0 16px rgba(167, 139, 250, 0.5)' }}
-                animate={{
-                  scale: [1, 1.05, 1]
-                }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                {...(!isPerformanceMode && {
+                  animate: {
+                    scale: [1, 1.05, 1]
+                  },
+                  transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' }
+                })}
               >
                 {userEditedInventory.length}
-              </motion.div>
+              </MotionDiv>
               <div className="text-sm font-medium text-gray-300">Ingrédients détectés</div>
             </div>
             <div className="space-y-2">
-              <motion.div
+              <MotionDiv
                 className="text-4xl font-bold"
                 style={{ color: '#18E3FF', textShadow: '0 0 16px rgba(24, 227, 255, 0.5)' }}
-                animate={{
-                  scale: [1, 1.05, 1]
-                }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                {...(!isPerformanceMode && {
+                  animate: {
+                    scale: [1, 1.05, 1]
+                  },
+                  transition: { duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }
+                })}
               >
                 {suggestedComplementaryItems.length}
-              </motion.div>
+              </MotionDiv>
               <div className="text-sm font-medium text-gray-300">Suggestions disponibles</div>
             </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </MotionDiv>
+      </MotionDiv>
     </div>
   );
 };
