@@ -1,7 +1,6 @@
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
-import { useActivityPerformance } from '../../hooks/useActivityPerformance';
 import React from 'react';
 
 interface Activity {
@@ -336,12 +335,11 @@ function getTargetStrengthMinutes(activityLevel?: string): number {
  * Calorie Progress Card - Suivi de progression dynamique selon l'objectif
  * Affiche différentes métriques selon l'objectif fitness de l'utilisateur
  */
-const CalorieProgressCard: React.FC<CalorieProgressCardProps> = ({
-  todayStats,
-  profile,
-  todayActivities = []
+const CalorieProgressCard: React.FC<CalorieProgressCardProps> = ({ 
+  todayStats, 
+  profile, 
+  todayActivities = [] 
 }) => {
-  const perf = useActivityPerformance();
   const activityProgress = analyzeActivityProgress(todayStats, profile, todayActivities);
   
   return (
@@ -352,9 +350,7 @@ const CalorieProgressCard: React.FC<CalorieProgressCardProps> = ({
       }}
     >
       <div className="calorie-progress-header">
-        <div className="calorie-progress-icon activity-icon-container activity-icon-container-lg activity-icon-primary" style={{
-          '--icon-glow-color': activityProgress.color
-        } as React.CSSProperties}>
+        <div className="calorie-progress-icon">
           <SpatialIcon
             Icon={ICONS[activityProgress.icon]}
             size={36}
