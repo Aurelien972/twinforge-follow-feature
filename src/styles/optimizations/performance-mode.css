@@ -4,30 +4,6 @@
    ========================================= */
 
 /* =========================================
-   NUCLEAR OPTION - Remove ALL borders
-   This rule MUST come first and be ULTRA specific
-   ========================================= */
-
-/* Remove borders from EVERYTHING except glass cards */
-.performance-mode * :not(.glass-card):not(.glass-base):not(.glass-card-cta) {
-  border: none !important;
-  border-width: 0 !important;
-  border-style: none !important;
-  border-color: transparent !important;
-  outline: none !important;
-}
-
-/* Remove borders from pseudo-elements */
-.performance-mode *::before:not(.glass-card *):not(.glass-base *):not(.glass-card-cta *),
-.performance-mode *::after:not(.glass-card *):not(.glass-base *):not(.glass-card-cta *) {
-  border: none !important;
-  border-width: 0 !important;
-  border-style: none !important;
-  border-color: transparent !important;
-  outline: none !important;
-}
-
-/* =========================================
    GLASS EFFECTS - Solid backgrounds
    ========================================= */
 
