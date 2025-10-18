@@ -3,7 +3,6 @@ import { motion, useReducedMotion } from 'framer-motion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
-import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 /**
  * Analysis Loading Skeleton - VisionOS 26 Forge Spatial
@@ -11,55 +10,45 @@ import { usePerformanceMode } from '../../../../../system/context/PerformanceMod
  */
 const AnalysisLoadingSkeleton: React.FC = () => {
   const reduceMotion = useReducedMotion();
-  const { isPerformanceMode } = usePerformanceMode();
-  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   return (
     <div className="space-y-6 analysis-loading-container">
       {/* Header de Forge Nutritionnelle */}
-      <MotionDiv
-        {...(!isPerformanceMode && {
-          initial: { opacity: 0, y: 20 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: reduceMotion ? 0.1 : 0.6 }
-        })}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: reduceMotion ? 0.1 : 0.6 }}
       >
-        <GlassCard
+        <GlassCard 
           className="p-8 text-center relative overflow-visible"
           style={{
-            background: isPerformanceMode
-              ? 'linear-gradient(145deg, color-mix(in srgb, #10B981 12%, #1e293b), color-mix(in srgb, #22C55E 8%, #0f172a))'
-              : `
-                radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
-                radial-gradient(circle at 70% 80%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(52, 211, 153, 0.06) 0%, transparent 70%),
-                var(--glass-opacity)
-              `,
+            background: `
+              radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
+              radial-gradient(circle at 70% 80%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(52, 211, 153, 0.06) 0%, transparent 70%),
+              var(--glass-opacity)
+            `,
             borderColor: 'rgba(16, 185, 129, 0.3)',
-            boxShadow: isPerformanceMode
-              ? '0 16px 48px rgba(0, 0, 0, 0.3)'
-              : `
-                0 16px 48px rgba(0, 0, 0, 0.3),
-                0 0 40px rgba(16, 185, 129, 0.2),
-                0 0 80px rgba(34, 197, 94, 0.15),
-                inset 0 2px 0 rgba(255, 255, 255, 0.2)
-              `,
-            ...(isPerformanceMode ? {} : { backdropFilter: 'blur(24px) saturate(160%)' })
+            boxShadow: `
+              0 16px 48px rgba(0, 0, 0, 0.3),
+              0 0 40px rgba(16, 185, 129, 0.2),
+              0 0 80px rgba(34, 197, 94, 0.15),
+              inset 0 2px 0 rgba(255, 255, 255, 0.2)
+            `,
+            backdropFilter: 'blur(24px) saturate(160%)'
           }}
         >
-          {/* Halo de Forge Nutritionnelle Spatial - disabled in performance mode */}
-          {!isPerformanceMode && (
-            <div
-              className="absolute inset-0 rounded-inherit pointer-events-none"
-              style={{
-                background: 'radial-gradient(circle at center, rgba(16, 185, 129, 0.08) 0%, transparent 70%)',
-                filter: 'blur(20px)',
-                transform: 'scale(1.2)',
-                zIndex: -1,
-                animation: !reduceMotion ? 'forge-glow 4s ease-in-out infinite' : 'none'
-              }}
-            />
-          )}
+          {/* Halo de Forge Nutritionnelle Spatial */}
+          <div
+            className="absolute inset-0 rounded-inherit pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle at center, rgba(16, 185, 129, 0.08) 0%, transparent 70%)',
+              filter: 'blur(20px)',
+              transform: 'scale(1.2)',
+              zIndex: -1,
+              animation: !reduceMotion ? 'forge-glow 4s ease-in-out infinite' : 'none'
+            }}
+          />
 
           <div className="relative z-10 space-y-6">
             {/* Icône de Forge Nutritionnelle Centrale */}
@@ -241,7 +230,7 @@ const AnalysisLoadingSkeleton: React.FC = () => {
             </div>
           </div>
         </GlassCard>
-      </MotionDiv>
+      </motion.div>
 
       {/* Squelettes de Graphiques */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
