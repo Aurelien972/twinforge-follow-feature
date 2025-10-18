@@ -45,6 +45,11 @@
 @import './glassV2/utilities.css';
 
 /* =========================================
+   PHASE 4.5: FORGE CULINAIRE THEME
+   ========================================= */
+@import './forge-culinary-theme.css';
+
+/* =========================================
    PHASE 5: COMPOSANTS SPÉCIALISÉS
    ========================================= */
 @import './components/common/_buttons-chips.css';

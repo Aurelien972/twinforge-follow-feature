@@ -1,0 +1,457 @@
+/**
+ * FORGE CULINAIRE - THEME CSS MODULE
+ * Système de thème centralisé pour tous les composants de la Forge Culinaire
+ *
+ * Architecture:
+ * - Variables CSS pour toutes les couleurs et effets
+ * - Utilisation de color-mix pour les variations dynamiques
+ * - Support des modes performance (désactivation des effets GPU-intensifs)
+ * - Fallbacks pour les navigateurs anciens
+ * - Respect de prefers-reduced-motion
+ */
+
+/* ========================================
+   SECTION 1: VARIABLES GLOBALES FORGE CULINAIRE
+   ======================================== */
+
+:root {
+  /* === FridgeScan - Thématique Rose/Pink === */
+  --fridge-scan-primary: #EC4899;       /* Rose primaire */
+  --fridge-scan-secondary: #F472B6;     /* Rose clair */
+  --fridge-scan-accent: #DB2777;        /* Rose foncé */
+
+  /* === Inventaires - Thématique Cyan === */
+  --fridge-inventory-primary: #06B6D4;  /* Cyan primaire */
+  --fridge-inventory-light: #67E8F9;    /* Cyan clair */
+  --fridge-inventory-dark: #0891B2;     /* Cyan foncé */
+  --fridge-inventory-emerald: #10B981;  /* Emeraude pour statuts */
+
+  /* === Plans - Thématique Violet/Purple === */
+  --fridge-plan-primary: #8B5CF6;       /* Violet primaire */
+  --fridge-plan-light: #A855F7;         /* Violet clair */
+  --fridge-plan-dark: #7C3AED;          /* Violet foncé */
+
+  /* === Recettes - Thématique Orange === */
+  --fridge-recipe-primary: #F97316;     /* Orange primaire */
+  --fridge-recipe-light: #FB923C;       /* Orange clair */
+  --fridge-recipe-dark: #EA580C;        /* Orange foncé */
+
+  /* === Shopping - Thématique Orange/Amber === */
+  --fridge-shopping-primary: #F59E0B;   /* Ambre primaire */
+  --fridge-shopping-light: #FCD34D;     /* Ambre clair */
+  --fridge-shopping-dark: #D97706;      /* Ambre foncé */
+
+  /* === Plasma/Analysis - Thématique Cyan/Plasma === */
+  --fridge-plasma-cyan: #22D3EE;        /* Cyan plasma */
+  --fridge-plasma-light: #67E8F9;       /* Cyan plasma clair */
+
+  /* === Statuts et Feedback === */
+  --fridge-success: #22C55E;            /* Vert succès */
+  --fridge-warning: #F59E0B;            /* Orange warning */
+  --fridge-error: #EF4444;              /* Rouge erreur */
+  --fridge-info: #3B82F6;               /* Bleu info */
+
+  /* === Texte === */
+  --fridge-text-primary: #fff;
+  --fridge-text-secondary: rgba(255, 255, 255, 0.9);
+  --fridge-text-muted: rgba(255, 255, 255, 0.7);
+  --fridge-text-dim: rgba(255, 255, 255, 0.6);
+  --fridge-text-subtle: rgba(255, 255, 255, 0.5);
+
+  /* === Backgrounds & Glass === */
+  --fridge-glass-opacity: rgba(255, 255, 255, 0.06);
+  --fridge-glass-border: rgba(255, 255, 255, 0.12);
+  --fridge-glass-hover: rgba(255, 255, 255, 0.10);
+
+  /* === Shadows & Effects === */
+  --fridge-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --fridge-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+  --fridge-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --fridge-shadow-xl: 0 12px 36px rgba(0, 0, 0, 0.3);
+  --fridge-shadow-2xl: 0 16px 48px rgba(0, 0, 0, 0.35);
+  --fridge-shadow-3xl: 0 25px 80px rgba(0, 0, 0, 0.4);
+
+  /* === Timing & Animation === */
+  --fridge-transition-fast: 150ms;
+  --fridge-transition-normal: 300ms;
+  --fridge-transition-slow: 500ms;
+  --fridge-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --fridge-ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+
+  /* === Spacing === */
+  --fridge-spacing-xs: 0.25rem;
+  --fridge-spacing-sm: 0.5rem;
+  --fridge-spacing-md: 1rem;
+  --fridge-spacing-lg: 1.5rem;
+  --fridge-spacing-xl: 2rem;
+  --fridge-spacing-2xl: 3rem;
+
+  /* === Border Radius === */
+  --fridge-radius-sm: 0.5rem;
+  --fridge-radius-md: 0.75rem;
+  --fridge-radius-lg: 1rem;
+  --fridge-radius-xl: 1.25rem;
+  --fridge-radius-2xl: 1.5rem;
+  --fridge-radius-full: 9999px;
+}
+
+/* ========================================
+   SECTION 2: CLASSES UTILITAIRES GLASS
+   ======================================== */
+
+/* === FridgeScan Glass (Rose) === */
+.fridge-glass-scan {
+  background: radial-gradient(
+      circle at 30% 20%,
+      color-mix(in srgb, var(--fridge-scan-primary) 18%, transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 70% 80%,
+      color-mix(in srgb, var(--fridge-scan-secondary) 15%, transparent) 0%,
+      transparent 50%
+    ),
+    var(--fridge-glass-opacity);
+  border-color: color-mix(in srgb, var(--fridge-scan-primary) 40%, transparent);
+  box-shadow: var(--fridge-shadow-xl),
+    0 0 60px color-mix(in srgb, var(--fridge-scan-primary) 30%, transparent),
+    inset 0 3px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+}
+
+.fridge-glass-scan-subtle {
+  background: radial-gradient(
+      circle at 30% 20%,
+      color-mix(in srgb, var(--fridge-scan-primary) 12%, transparent) 0%,
+      transparent 60%
+    ),
+    var(--fridge-glass-opacity);
+  border-color: color-mix(in srgb, var(--fridge-scan-primary) 28%, transparent);
+  box-shadow: var(--fridge-shadow-md),
+    0 0 24px color-mix(in srgb, var(--fridge-scan-primary) 18%, transparent),
+    inset 0 2px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+}
+
+/* === Inventory Glass (Cyan) === */
+.fridge-glass-inventory {
+  background: radial-gradient(
+      circle at 30% 20%,
+      color-mix(in srgb, var(--fridge-inventory-primary) 15%, transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 70% 80%,
+      color-mix(in srgb, var(--fridge-inventory-primary) 10%, transparent) 0%,
+      transparent 60%
+    ),
+    var(--fridge-glass-opacity);
+  border-color: color-mix(in srgb, var(--fridge-inventory-primary) 40%, transparent);
+  box-shadow: var(--fridge-shadow-xl),
+    0 0 40px color-mix(in srgb, var(--fridge-inventory-primary) 25%, transparent),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+/* === Plan Glass (Violet) === */
+.fridge-glass-plan {
+  background: radial-gradient(
+      circle at 30% 20%,
+      color-mix(in srgb, var(--fridge-plan-primary) 12%, transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 70% 80%,
+      color-mix(in srgb, var(--fridge-plan-light) 8%, transparent) 0%,
+      transparent 50%
+    ),
+    var(--fridge-glass-opacity);
+  border-color: color-mix(in srgb, var(--fridge-plan-primary) 25%, transparent);
+  box-shadow: var(--fridge-shadow-xl),
+    0 0 30px color-mix(in srgb, var(--fridge-plan-primary) 15%, transparent),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+/* === Recipe Glass (Orange) === */
+.fridge-glass-recipe {
+  background: radial-gradient(
+      circle at 30% 20%,
+      color-mix(in srgb, var(--fridge-recipe-primary) 12%, transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 70% 80%,
+      color-mix(in srgb, var(--fridge-recipe-light) 8%, transparent) 0%,
+      transparent 50%
+    ),
+    rgba(255, 255, 255, 0.05);
+  border-color: color-mix(in srgb, var(--fridge-recipe-primary) 25%, transparent);
+  box-shadow: var(--fridge-shadow-xl),
+    0 0 30px color-mix(in srgb, var(--fridge-recipe-primary) 15%, transparent),
+    0 0 60px color-mix(in srgb, var(--fridge-recipe-light) 10%, transparent),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+/* ========================================
+   SECTION 3: ICON CONTAINERS
+   ======================================== */
+
+.fridge-icon-scan {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--fridge-radius-full);
+  display: grid;
+  place-items: center;
+  background: radial-gradient(60% 60% at 30% 30%, rgba(255, 255, 255, 0.20), transparent 60%),
+    linear-gradient(
+      140deg,
+      color-mix(in srgb, var(--fridge-scan-secondary) 42%, transparent),
+      color-mix(in srgb, var(--fridge-scan-primary) 26%, transparent)
+    );
+  border: 2px solid color-mix(in srgb, var(--fridge-scan-primary) 64%, transparent);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.25),
+    0 0 36px color-mix(in srgb, var(--fridge-scan-primary) 42%, transparent);
+}
+
+.fridge-icon-inventory {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--fridge-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+      circle at 30% 20%,
+      color-mix(in srgb, var(--fridge-inventory-primary) 20%, transparent) 0%,
+      transparent 60%
+    ),
+    rgba(255, 255, 255, 0.1);
+  border: 2px solid color-mix(in srgb, var(--fridge-inventory-primary) 40%, transparent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--fridge-inventory-primary) 20%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.fridge-icon-plan {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--fridge-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 60%),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--fridge-plan-primary) 35%, transparent),
+      color-mix(in srgb, var(--fridge-plan-primary) 25%, transparent)
+    );
+  border: 2px solid color-mix(in srgb, var(--fridge-plan-primary) 50%, transparent);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--fridge-plan-primary) 40%, transparent);
+}
+
+/* ========================================
+   SECTION 4: BUTTONS
+   ======================================== */
+
+.fridge-btn-scan-primary {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--fridge-scan-primary) 90%, transparent),
+    color-mix(in srgb, var(--fridge-scan-secondary) 75%, transparent),
+    color-mix(in srgb, var(--fridge-scan-accent) 65%, transparent)
+  );
+  border: 3px solid color-mix(in srgb, var(--fridge-scan-primary) 75%, transparent);
+  box-shadow: 0 18px 60px color-mix(in srgb, var(--fridge-scan-primary) 60%, transparent),
+    0 0 100px color-mix(in srgb, var(--fridge-scan-primary) 50%, transparent),
+    0 0 150px color-mix(in srgb, var(--fridge-scan-secondary) 40%, transparent),
+    inset 0 5px 0 rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(28px) saturate(170%);
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
+  color: var(--fridge-text-primary);
+  transition: all var(--fridge-transition-normal) var(--fridge-ease-out);
+}
+
+.fridge-btn-scan-primary:hover:not(:disabled) {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 24px 80px color-mix(in srgb, var(--fridge-scan-primary) 75%, transparent),
+    0 0 130px color-mix(in srgb, var(--fridge-scan-primary) 65%, transparent),
+    0 0 200px color-mix(in srgb, var(--fridge-scan-secondary) 55%, transparent),
+    inset 0 5px 0 rgba(255, 255, 255, 0.7);
+}
+
+.fridge-btn-inventory-primary {
+  background: linear-gradient(135deg, #18E3FF 0%, #67E8F9 100%);
+  border: 2px solid rgba(24, 227, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(24, 227, 255, 0.4),
+    0 0 40px rgba(103, 232, 249, 0.25),
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  color: white;
+  transition: all var(--fridge-transition-normal) var(--fridge-ease-out);
+}
+
+.fridge-btn-inventory-primary:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.fridge-btn-plan-primary {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--fridge-plan-primary) 80%, transparent),
+    color-mix(in srgb, var(--fridge-plan-light) 70%, transparent)
+  );
+  border: 2px solid color-mix(in srgb, var(--fridge-plan-primary) 60%, transparent);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--fridge-plan-primary) 40%, transparent),
+    0 0 40px color-mix(in srgb, var(--fridge-plan-primary) 30%, transparent),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  color: white;
+  transition: all var(--fridge-transition-normal) var(--fridge-ease-out);
+}
+
+/* ========================================
+   SECTION 5: ANIMATIONS
+   ======================================== */
+
+@keyframes fridge-spatial-shimmer {
+  0% {
+    transform: translateX(-200%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes fridge-grid-pulse {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes fridge-scan-analysis-line {
+  0% {
+    left: 0;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes fridge-data-particle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fridge-ai-focus {
+  0%, 100% {
+    box-shadow: 0 0 50px color-mix(in srgb, var(--fridge-scan-primary) 80%, transparent),
+      0 0 100px color-mix(in srgb, var(--fridge-scan-primary) 60%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 70px color-mix(in srgb, var(--fridge-scan-primary) 90%, transparent),
+      0 0 120px color-mix(in srgb, var(--fridge-scan-primary) 70%, transparent);
+  }
+}
+
+.fridge-spatial-shimmer {
+  animation: fridge-spatial-shimmer 2s ease-in-out infinite;
+}
+
+.fridge-grid-pulse {
+  animation: fridge-grid-pulse 3s ease-in-out infinite;
+}
+
+.fridge-scan-analysis-line {
+  animation: fridge-scan-analysis-line 3s linear infinite;
+}
+
+.fridge-data-particle {
+  animation: fridge-data-particle 2s ease-in-out infinite;
+}
+
+.fridge-ai-focus {
+  animation: fridge-ai-focus 3s ease-in-out infinite;
+}
+
+/* ========================================
+   SECTION 6: PERFORMANCE MODE
+   ======================================== */
+
+[data-performance-mode="true"] .fridge-spatial-shimmer,
+[data-performance-mode="true"] .fridge-grid-pulse,
+[data-performance-mode="true"] .fridge-scan-analysis-line,
+[data-performance-mode="true"] .fridge-data-particle,
+[data-performance-mode="true"] .fridge-ai-focus {
+  animation: none !important;
+}
+
+[data-performance-mode="true"] .fridge-glass-scan,
+[data-performance-mode="true"] .fridge-glass-inventory,
+[data-performance-mode="true"] .fridge-glass-plan,
+[data-performance-mode="true"] .fridge-glass-recipe {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+[data-performance-mode="true"] .fridge-btn-scan-primary:hover,
+[data-performance-mode="true"] .fridge-btn-inventory-primary:hover,
+[data-performance-mode="true"] .fridge-btn-plan-primary:hover {
+  transform: none !important;
+}
+
+/* ========================================
+   SECTION 7: REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .fridge-spatial-shimmer,
+  .fridge-grid-pulse,
+  .fridge-scan-analysis-line,
+  .fridge-data-particle,
+  .fridge-ai-focus {
+    animation: none !important;
+  }
+
+  .fridge-btn-scan-primary,
+  .fridge-btn-inventory-primary,
+  .fridge-btn-plan-primary {
+    transition: none !important;
+  }
+}
+
+/* ========================================
+   SECTION 8: RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .fridge-icon-scan {
+    width: 56px;
+    height: 56px;
+  }
+
+  .fridge-icon-plan {
+    width: 48px;
+    height: 48px;
+  }
+}
