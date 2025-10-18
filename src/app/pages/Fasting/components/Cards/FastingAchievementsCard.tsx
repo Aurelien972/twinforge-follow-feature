@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 
 interface FastingSession {
   id?: string;
@@ -29,6 +30,9 @@ const FastingAchievementsCard: React.FC<FastingAchievementsCardProps> = ({
   session,
   sessionOutcome
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   if (!session) return null;
 
   // Contenu dynamique selon l'outcome
@@ -98,16 +102,14 @@ const FastingAchievementsCard: React.FC<FastingAchievementsCardProps> = ({
   const content = getOutcomeContent();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ 
-        duration: 0.8, 
-        delay: 0.6,
-        ease: [0.25, 0.1, 0.25, 1] 
-      }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 30, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        transition: { duration: 0.8, delay: 0.6, ease: [0.25, 0.1, 0.25, 1] }
+      })}
     >
-      <GlassCard 
+      <GlassCard
         className="p-6"
         style={{
           background: `
@@ -116,17 +118,19 @@ const FastingAchievementsCard: React.FC<FastingAchievementsCardProps> = ({
             var(--glass-opacity)
           `,
           borderColor: `color-mix(in srgb, ${content.color} 25%, transparent)`,
-          boxShadow: `
-            0 12px 40px rgba(0, 0, 0, 0.25),
-            0 0 30px color-mix(in srgb, ${content.color} 20%, transparent),
-            inset 0 2px 0 rgba(255, 255, 255, 0.15)
-          `,
-          backdropFilter: 'blur(20px) saturate(160%)'
+          boxShadow: isPerformanceMode
+            ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+            : `
+              0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, ${content.color} 20%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15)
+            `,
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(160%)'
         }}
       >
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <motion.div
+          <MotionDiv
             className="w-12 h-12 rounded-full flex items-center justify-center"
             style={{
               background: `
@@ -134,20 +138,16 @@ const FastingAchievementsCard: React.FC<FastingAchievementsCardProps> = ({
                 linear-gradient(135deg, color-mix(in srgb, ${content.color} 35%, transparent), color-mix(in srgb, ${content.color} 25%, transparent))
               `,
               border: `2px solid color-mix(in srgb, ${content.color} 50%, transparent)`,
-              boxShadow: `0 0 20px color-mix(in srgb, ${content.color} 30%, transparent)`
+              boxShadow: isPerformanceMode ? 'none' : `0 0 20px color-mix(in srgb, ${content.color} 30%, transparent)`
             }}
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ 
-              duration: 0.6, 
-              delay: 0.8,
-              type: 'spring',
-              stiffness: 200,
-              damping: 15
-            }}
+            {...(!isPerformanceMode && {
+              initial: { scale: 0, rotate: -180 },
+              animate: { scale: 1, rotate: 0 },
+              transition: { duration: 0.6, delay: 0.8, type: 'spring', stiffness: 200, damping: 15 }
+            })}
           >
             <SpatialIcon Icon={ICONS[content.icon]} size={20} style={{ color: content.color }} />
-          </motion.div>
+          </MotionDiv>
           <div>
             <h3 className="text-white font-bold text-xl">{content.title}</h3>
             <p className="text-white/70 text-sm">Accomplissements de votre forge</p>
@@ -155,15 +155,17 @@ const FastingAchievementsCard: React.FC<FastingAchievementsCardProps> = ({
         </div>
 
         {/* Message Principal */}
-        <motion.div 
+        <MotionDiv
           className="mb-6 p-4 rounded-xl"
           style={{
             background: `color-mix(in srgb, ${content.color} 6%, transparent)`,
             border: `1px solid color-mix(in srgb, ${content.color} 15%, transparent)`
           }}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 1.0 }}
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, x: -20 },
+            animate: { opacity: 1, x: 0 },
+            transition: { duration: 0.6, delay: 1.0 }
+          })}
         >
           <div className="flex items-start gap-3">
             <SpatialIcon Icon={ICONS.Lightbulb} size={16} style={{ color: content.color }} className="mt-0.5" />
@@ -171,7 +173,7 @@ const FastingAchievementsCard: React.FC<FastingAchievementsCardProps> = ({
               {content.message}
             </p>
           </div>
-        </motion.div>
+        </MotionDiv>
 
         {/* Accomplissements */}
         <div className="mb-6">
@@ -181,23 +183,25 @@ const FastingAchievementsCard: React.FC<FastingAchievementsCardProps> = ({
           </h4>
           <div className="space-y-2">
             {content.achievements.map((achievement, index) => (
-              <motion.div
+              <MotionDiv
                 key={index}
                 className="flex items-center gap-3 p-3 rounded-lg"
                 style={{
                   background: `color-mix(in srgb, ${content.color} 4%, transparent)`,
                   border: `1px solid color-mix(in srgb, ${content.color} 12%, transparent)`
                 }}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 1.2 + index * 0.1 }}
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0, x: -10 },
+                  animate: { opacity: 1, x: 0 },
+                  transition: { duration: 0.4, delay: 1.2 + index * 0.1 }
+                })}
               >
                 <div 
                   className="w-2 h-2 rounded-full flex-shrink-0" 
-                  style={{ background: content.color }} 
+                  style={{ background: content.color }}
                 />
                 <span className="text-white/80 text-sm">{achievement}</span>
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>
@@ -210,12 +214,14 @@ const FastingAchievementsCard: React.FC<FastingAchievementsCardProps> = ({
           </h4>
           <div className="space-y-2">
             {content.nextSteps.map((step, index) => (
-              <motion.div
+              <MotionDiv
                 key={index}
                 className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 1.6 + index * 0.1 }}
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0, x: -10 },
+                  animate: { opacity: 1, x: 0 },
+                  transition: { duration: 0.4, delay: 1.6 + index * 0.1 }
+                })}
               >
                 <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{
                   background: `color-mix(in srgb, ${content.color} 15%, transparent)`,
@@ -226,12 +232,12 @@ const FastingAchievementsCard: React.FC<FastingAchievementsCardProps> = ({
                   </span>
                 </div>
                 <span className="text-white/80 text-sm">{step}</span>
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

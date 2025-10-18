@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import { useTodayFastingSessions, type TodayFastingStats } from '@/app/pages/Fasting/hooks/useTodayFastingSessions';
 
 interface FastingDailySummaryCardProps {
@@ -44,6 +45,7 @@ function getConsistencyTheme(consistency: TodayFastingStats['consistency']) {
  * Affiche un résumé des sessions de jeûne complétées aujourd'hui
  */
 const FastingDailySummaryCard: React.FC<FastingDailySummaryCardProps> = ({ className = '' }) => {
+  const { isPerformanceMode } = usePerformanceMode();
   const { data, isLoading, error } = useTodayFastingSessions();
   
   if (isLoading) {
@@ -90,11 +92,15 @@ const FastingDailySummaryCard: React.FC<FastingDailySummaryCardProps> = ({ class
   const theme = getConsistencyTheme(stats.consistency);
   const today = format(new Date(), 'dd MMMM yyyy');
 
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }
+      })}
       className={className}
     >
       <GlassCard
@@ -106,12 +112,14 @@ const FastingDailySummaryCard: React.FC<FastingDailySummaryCardProps> = ({ class
             var(--glass-opacity)
           `,
           borderColor: `color-mix(in srgb, ${theme.color} 25%, transparent)`,
-          boxShadow: `
-            0 12px 40px rgba(0, 0, 0, 0.25),
-            0 0 30px color-mix(in srgb, ${theme.color} 15%, transparent),
-            inset 0 2px 0 rgba(255, 255, 255, 0.15)
-          `,
-          backdropFilter: 'blur(20px) saturate(160%)'
+          boxShadow: isPerformanceMode
+            ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+            : `
+              0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, ${theme.color} 15%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15)
+            `,
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(160%)'
         }}
       >
         <div className="space-y-6">
@@ -126,7 +134,7 @@ const FastingDailySummaryCard: React.FC<FastingDailySummaryCardProps> = ({ class
                     linear-gradient(135deg, color-mix(in srgb, ${theme.color} 35%, transparent), color-mix(in srgb, ${theme.color} 25%, transparent))
                   `,
                   border: `2px solid color-mix(in srgb, ${theme.color} 50%, transparent)`,
-                  boxShadow: `0 0 20px color-mix(in srgb, ${theme.color} 30%, transparent)`
+                  boxShadow: isPerformanceMode ? 'none' : `0 0 20px color-mix(in srgb, ${theme.color} 30%, transparent)`
                 }}
               >
                 <SpatialIcon Icon={ICONS[theme.icon]} size={20} style={{ color: theme.color }} />
@@ -223,7 +231,7 @@ const FastingDailySummaryCard: React.FC<FastingDailySummaryCardProps> = ({ class
 
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

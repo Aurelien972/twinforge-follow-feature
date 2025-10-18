@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import type { FastingInsight } from '../../hooks/useFastingInsightsGenerator';
 
 interface FastingInsightCardProps {
@@ -61,18 +62,19 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
   index,
   className = ''
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   const theme = getPriorityTheme(insight.priority);
   const iconName = getInsightTypeIcon(insight.type, insight.icon);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ 
-        duration: 0.5, 
-        delay: index * 0.1,
-        ease: [0.25, 0.1, 0.25, 1] 
-      }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        transition: { duration: 0.5, delay: index * 0.1, ease: [0.25, 0.1, 0.25, 1] }
+      })}
       className={className}
     >
       <GlassCard
@@ -84,12 +86,14 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
           `,
           borderColor: `color-mix(in srgb, ${insight.color} 25%, transparent)`,
           borderWidth: theme.borderWidth,
-          boxShadow: `
-            0 8px 32px rgba(0, 0, 0, 0.2),
-            0 0 20px color-mix(in srgb, ${insight.color} ${theme.glowIntensity}, transparent),
-            inset 0 1px 0 rgba(255, 255, 255, 0.12)
-          `,
-          backdropFilter: 'blur(16px) saturate(150%)'
+          boxShadow: isPerformanceMode
+            ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+            : `
+              0 8px 32px rgba(0, 0, 0, 0.2),
+              0 0 20px color-mix(in srgb, ${insight.color} ${theme.glowIntensity}, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, 0.12)
+            `,
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(16px) saturate(150%)'
         }}
       >
         <div className="flex items-start gap-4">
@@ -102,7 +106,7 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
                 linear-gradient(135deg, color-mix(in srgb, ${insight.color} 35%, transparent), color-mix(in srgb, ${insight.color} 25%, transparent))
               `,
               border: `${theme.borderWidth} solid color-mix(in srgb, ${insight.color} 50%, transparent)`,
-              boxShadow: `0 0 20px color-mix(in srgb, ${insight.color} 30%, transparent)`
+              boxShadow: isPerformanceMode ? 'none' : `0 0 20px color-mix(in srgb, ${insight.color} 30%, transparent)`
             }}
           >
             <SpatialIcon 
@@ -142,15 +146,17 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
             
             {/* Action Recommandée */}
             {insight.actionable && (
-              <motion.div 
+              <MotionDiv
                 className="p-3 rounded-lg"
                 style={{
                   background: `color-mix(in srgb, ${insight.color} 8%, transparent)`,
                   border: `1px solid color-mix(in srgb, ${insight.color} 20%, transparent)`
                 }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0, y: 10 },
+                  animate: { opacity: 1, y: 0 },
+                  transition: { duration: 0.4, delay: 0.2 + index * 0.1 }
+                })}
               >
                 <div className="flex items-start gap-2">
                   <SpatialIcon 
@@ -168,7 +174,7 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </MotionDiv>
             )}
           </div>
         </div>
@@ -193,7 +199,7 @@ const FastingInsightCard: React.FC<FastingInsightCardProps> = ({
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

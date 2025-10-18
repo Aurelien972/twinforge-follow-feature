@@ -2,12 +2,15 @@ import React from 'react';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 
 /**
  * Fasting Tips Card - Conseils de Jeûne
  * Composant autonome pour afficher les conseils pendant le jeûne
  */
 const FastingTipsCard: React.FC = () => {
+  const { isPerformanceMode } = usePerformanceMode();
+
   const tips = [
     {
       icon: 'Droplet',
@@ -40,11 +43,13 @@ const FastingTipsCard: React.FC = () => {
           var(--glass-opacity)
         `,
         borderColor: 'color-mix(in srgb, #F59E0B 20%, transparent)',
-        boxShadow: `
-          0 8px 32px rgba(0, 0, 0, 0.2),
-          0 0 20px color-mix(in srgb, #F59E0B 15%, transparent),
-          inset 0 1px 0 rgba(255, 255, 255, 0.12)
-        `
+        boxShadow: isPerformanceMode
+          ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+          : `
+            0 8px 32px rgba(0, 0, 0, 0.2),
+            0 0 20px color-mix(in srgb, #F59E0B 15%, transparent),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12)
+          `
       }}
     >
       <div className="space-y-4">
@@ -57,7 +62,7 @@ const FastingTipsCard: React.FC = () => {
                 linear-gradient(135deg, color-mix(in srgb, #F59E0B 30%, transparent), color-mix(in srgb, #F59E0B 20%, transparent))
               `,
               border: '2px solid color-mix(in srgb, #F59E0B 40%, transparent)',
-              boxShadow: '0 0 20px color-mix(in srgb, #F59E0B 30%, transparent)'
+              boxShadow: isPerformanceMode ? 'none' : '0 0 20px color-mix(in srgb, #F59E0B 30%, transparent)'
             }}
           >
             <SpatialIcon Icon={ICONS.Heart} size={16} style={{ color: '#F59E0B' }} />

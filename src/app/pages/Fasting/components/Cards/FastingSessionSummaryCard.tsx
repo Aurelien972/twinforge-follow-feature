@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import { formatElapsedTimeHours } from '@/app/pages/Fasting/utils/fastingUtils';
 
 interface FastingSession {
@@ -31,6 +32,9 @@ const FastingSessionSummaryCard: React.FC<FastingSessionSummaryCardProps> = ({
   session,
   sessionOutcome
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   if (!session) return null;
 
   // Couleurs dynamiques selon l'outcome
@@ -64,16 +68,14 @@ const FastingSessionSummaryCard: React.FC<FastingSessionSummaryCardProps> = ({
   const actualDuration = session.actualDurationHours ? formatElapsedTimeHours(session.actualDurationHours) : '0h 00m 00s';
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ 
-        duration: 0.6, 
-        delay: 0.3,
-        ease: [0.25, 0.1, 0.25, 1] 
-      }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        transition: { duration: 0.6, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }
+      })}
     >
-      <GlassCard 
+      <GlassCard
         className="p-6"
         style={{
           background: `
@@ -81,12 +83,14 @@ const FastingSessionSummaryCard: React.FC<FastingSessionSummaryCardProps> = ({
             var(--glass-opacity)
           `,
           borderColor: colors.border,
-          boxShadow: `
-            0 12px 40px rgba(0, 0, 0, 0.25),
-            0 0 30px color-mix(in srgb, ${colors.primary} 15%, transparent),
-            inset 0 2px 0 rgba(255, 255, 255, 0.15)
-          `,
-          backdropFilter: 'blur(20px) saturate(160%)'
+          boxShadow: isPerformanceMode
+            ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+            : `
+              0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, ${colors.primary} 15%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15)
+            `,
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(160%)'
         }}
       >
         <div className="flex items-center gap-3 mb-6">
@@ -98,7 +102,7 @@ const FastingSessionSummaryCard: React.FC<FastingSessionSummaryCardProps> = ({
                 linear-gradient(135deg, color-mix(in srgb, ${colors.primary} 35%, transparent), color-mix(in srgb, ${colors.primary} 25%, transparent))
               `,
               border: `2px solid color-mix(in srgb, ${colors.primary} 50%, transparent)`,
-              boxShadow: `0 0 20px color-mix(in srgb, ${colors.primary} 30%, transparent)`
+              boxShadow: isPerformanceMode ? 'none' : `0 0 20px color-mix(in srgb, ${colors.primary} 30%, transparent)`
             }}
           >
             <SpatialIcon Icon={ICONS.BarChart3} size={20} style={{ color: colors.primary }} />
@@ -112,65 +116,73 @@ const FastingSessionSummaryCard: React.FC<FastingSessionSummaryCardProps> = ({
         {/* Métriques Principales */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {/* Durée Réelle */}
-          <motion.div
+          <MotionDiv
             className="text-center p-4 rounded-xl"
             style={{
               background: `color-mix(in srgb, ${colors.primary} 10%, transparent)`,
               border: `1px solid color-mix(in srgb, ${colors.primary} 20%, transparent)`
             }}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
+            {...(!isPerformanceMode && {
+              initial: { opacity: 0, scale: 0.8 },
+              animate: { opacity: 1, scale: 1 },
+              transition: { duration: 0.5, delay: 0.5 }
+            })}
           >
             <div className="text-2xl font-bold text-white mb-1">
               {actualDuration}
             </div>
             <div className="text-white/70 text-sm font-medium">Durée Réelle</div>
-          </motion.div>
+          </MotionDiv>
 
           {/* Objectif */}
-          <motion.div
+          <MotionDiv
             className="text-center p-4 rounded-xl"
             style={{
               background: `color-mix(in srgb, ${colors.secondary} 10%, transparent)`,
               border: `1px solid color-mix(in srgb, ${colors.secondary} 20%, transparent)`
             }}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
+            {...(!isPerformanceMode && {
+              initial: { opacity: 0, scale: 0.8 },
+              animate: { opacity: 1, scale: 1 },
+              transition: { duration: 0.5, delay: 0.6 }
+            })}
           >
             <div className="text-2xl font-bold text-white mb-1">
               {session.targetHours}h
             </div>
             <div className="text-white/70 text-sm font-medium">Objectif</div>
-          </motion.div>
+          </MotionDiv>
 
           {/* Protocole */}
-          <motion.div
+          <MotionDiv
             className="text-center p-4 rounded-xl bg-white/5 border border-white/10"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
+            {...(!isPerformanceMode && {
+              initial: { opacity: 0, scale: 0.8 },
+              animate: { opacity: 1, scale: 1 },
+              transition: { duration: 0.5, delay: 0.7 }
+            })}
           >
             <div className="text-lg font-bold text-white mb-1">
               {session.protocol}
             </div>
             <div className="text-white/70 text-sm font-medium">Protocole</div>
-          </motion.div>
+          </MotionDiv>
 
           {/* Progression */}
-          <motion.div
+          <MotionDiv
             className="text-center p-4 rounded-xl bg-white/5 border border-white/10"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
+            {...(!isPerformanceMode && {
+              initial: { opacity: 0, scale: 0.8 },
+              animate: { opacity: 1, scale: 1 },
+              transition: { duration: 0.5, delay: 0.8 }
+            })}
           >
             <div className="text-lg font-bold text-white mb-1">
               {session.actualDurationHours && session.targetHours ? 
                 Math.round((session.actualDurationHours / session.targetHours) * 100) : 0}%
             </div>
             <div className="text-white/70 text-sm font-medium">Progression</div>
-          </motion.div>
+          </MotionDiv>
         </div>
 
         {/* Détails Temporels */}
@@ -202,7 +214,7 @@ const FastingSessionSummaryCard: React.FC<FastingSessionSummaryCardProps> = ({
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 
