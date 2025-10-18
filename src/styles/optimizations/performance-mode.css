@@ -330,6 +330,21 @@
   display: none !important;
 }
 
+/* Sidebar item icon containers - Remove ALL borders */
+.performance-mode .sidebar-item-icon-container,
+.performance-mode .sidebar-item-icon-container--active,
+.performance-mode .sidebar-item--primary .sidebar-item-icon-container,
+.performance-mode .sidebar-item--twin .sidebar-item-icon-container,
+.performance-mode .sidebar-item--forge .sidebar-item-icon-container {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.performance-mode .sidebar-item-icon-container::before,
+.performance-mode .sidebar-item-icon-container::after {
+  display: none !important;
+}
+
 /* Remove focus-ring cyan borders globally in performance mode */
 .performance-mode .focus-ring:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.3) !important;
