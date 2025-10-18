@@ -71,6 +71,12 @@
   transform: translateZ(0);
   will-change: transform, box-shadow;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Default high performance styles */
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
+    linear-gradient(135deg, color-mix(in srgb, #3B82F6 40%, transparent), color-mix(in srgb, #3B82F6 28%, transparent));
+  border: 2px solid color-mix(in srgb, #3B82F6 55%, transparent);
+  box-shadow: 0 0 30px color-mix(in srgb, #3B82F6 40%, transparent);
 }
 
 .activity-icon-enhanced::before {
@@ -83,6 +89,19 @@
   opacity: 0.5;
   z-index: -1;
   animation: icon-glow-subtle 3s ease-in-out infinite;
+}
+
+/* Performance Mode - Solid Icon Styles */
+[data-performance-mode="true"] .activity-icon-enhanced,
+.activity-icon-performance {
+  background: #000000;
+  border: 3px solid #3B82F6;
+  box-shadow: none;
+}
+
+[data-performance-mode="true"] .activity-icon-enhanced::before,
+.activity-icon-performance::before {
+  display: none;
 }
 
 @keyframes icon-glow-subtle {
@@ -451,6 +470,27 @@
   100% {
     transform: translateX(200%);
   }
+}
+
+/* Performance Mode - Disable Shimmer */
+[data-performance-mode="true"] .dynamic-cta-shimmer {
+  display: none;
+}
+
+/* Performance Mode - Simplify Button Effects */
+[data-performance-mode="true"] .dynamic-cta-button-3d {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.4) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.2) inset,
+    0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+[data-performance-mode="true"] .dynamic-cta-button-3d::after {
+  display: none;
+}
+
+[data-performance-mode="true"] .dynamic-cta-button-3d-high {
+  animation: none;
 }
 
 /* Button Content - Ensure it's above effects */

@@ -92,24 +92,10 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
     '--glow-color': `color-mix(in srgb, #3B82F6 30%, transparent)`
   } as React.CSSProperties;
 
-  const iconStyles = {
-    background: perf.mode === 'low' || perf.mode === 'medium'
-      ? '#000000'
-      : `
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25) 0%, transparent 60%),
-        linear-gradient(135deg, color-mix(in srgb, #3B82F6 40%, transparent), color-mix(in srgb, #3B82F6 28%, transparent))
-      `,
-    border: perf.mode === 'low' || perf.mode === 'medium'
-      ? `3px solid #3B82F6`
-      : `2px solid color-mix(in srgb, #3B82F6 55%, transparent)`,
-    boxShadow: perf.mode === 'low' || perf.mode === 'medium'
-      ? 'none'
-      : `0 0 30px color-mix(in srgb, #3B82F6 40%, transparent)`,
-    '--icon-color': '#3B82F6'
-  } as React.CSSProperties;
+  const isPerformanceMode = perf.mode === 'low' || perf.mode === 'medium';
 
   return (
-    <div className="dynamic-activity-cta activity-capture-enter">
+    <div className="dynamic-activity-cta activity-capture-enter" data-performance-mode={isPerformanceMode}>
       <GlassCard
         className="p-6 md:p-8 pb-8 md:pb-10 text-center relative overflow-hidden cursor-pointer activity-card-base"
         onClick={handleActivityInput}
@@ -161,7 +147,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
               urgencyConfig.animation === 'pulse' && perf.enableAnimations ? 'icon-pulse-css' :
               urgencyConfig.animation === 'breathing' && perf.enableAnimations ? 'icon-breathing-css' : ''
             }`}
-            style={iconStyles}
+            style={{ '--icon-color': '#3B82F6' } as React.CSSProperties}
           >
             <SpatialIcon
               Icon={ICONS[urgencyConfig.icon as keyof typeof ICONS]}
@@ -213,46 +199,30 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
             {/* Primary CTA - Enregistrer une activité */}
             <button
               onClick={handleActivityInput}
-              className="px-8 py-4 rounded-full font-bold text-lg text-white relative overflow-hidden min-h-[64px] w-full sm:w-auto transition-transform duration-200"
+              className={`dynamic-cta-button-3d dynamic-cta-button-3d-high min-h-[64px] w-full sm:w-auto ${
+                urgencyConfig.animation === 'breathing' && perf.enableAnimations ? 'btn-breathing-css' : ''
+              }`}
               style={{
-                background: `
-                  linear-gradient(135deg,
-                    color-mix(in srgb, #3B82F6 85%, transparent),
-                    color-mix(in srgb, #3B82F6 70%, transparent)
-                  )
-                `,
-                border: `2px solid #3B82F6`,
-                boxShadow: `
-                  0 12px 40px color-mix(in srgb, #3B82F6 40%, transparent),
-                  0 0 60px color-mix(in srgb, #3B82F6 30%, transparent),
-                  inset 0 3px 0 rgba(255, 255, 255, 0.4)
-                `,
-                backdropFilter: 'blur(20px) saturate(160%)'
-              }}
+                '--btn-color-light': '#60A5FA',
+                '--btn-color-base': '#3B82F6',
+                '--btn-color-dark': '#2563EB',
+                '--btn-shadow': 'rgba(59, 130, 246, 0.6)',
+                '--btn-glow': 'rgba(59, 130, 246, 0.8)'
+              } as React.CSSProperties}
             >
               {/* Shimmer Effect - Désactivé en mode low/medium */}
               {perf.enableShimmers && (
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-                    animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
-                    borderRadius: 'inherit'
-                  }}
-                />
+                <div className="dynamic-cta-shimmer" />
               )}
 
-              <div className="relative z-10 flex items-center justify-center gap-3">
+              <div>
                 <SpatialIcon
                   Icon={ICONS[urgencyConfig.icon as keyof typeof ICONS]}
                   size={24}
-                  style={{
-                    color: 'white',
-                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
-                  }}
+                  color="white"
                   variant="pure"
                 />
-                <span style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                <span>
                   {message.buttonText}
                 </span>
               </div>
