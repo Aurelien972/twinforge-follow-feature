@@ -22,52 +22,13 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
 
   return (
     <GlassCard
-      className="p-6"
-      style={{
-        background: `
-          radial-gradient(circle at 30% 20%, color-mix(in srgb, #EC4899 12%, transparent) 0%, transparent 60%),
-          radial-gradient(circle at 70% 80%, color-mix(in srgb, #F472B6 10%, transparent) 0%, transparent 50%),
-          rgba(255, 255, 255, 0.06)
-        `,
-        borderColor: 'color-mix(in srgb, #EC4899 28%, transparent)',
-        boxShadow: `
-          0 12px 36px rgba(0, 0, 0, 0.25),
-          0 0 24px color-mix(in srgb, #EC4899 18%, transparent),
-          inset 0 2px 0 rgba(255, 255, 255, 0.12)
-        `,
-        backdropFilter: 'blur(24px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(160%)'
-      }}
+      className="fridge-glass-scan-subtle p-6"
     >
       {/* Header de la Section */}
       <div className="flex items-center gap-4 mb-6">
         <MotionDiv
-          className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 relative"
-          style={{
-            background: `
-              radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.18) 0%, transparent 60%),
-              linear-gradient(135deg, color-mix(in srgb, #EC4899 35%, transparent), color-mix(in srgb, #F472B6 28%, transparent))
-            `,
-            border: '2.5px solid color-mix(in srgb, #EC4899 50%, transparent)',
-            boxShadow: `
-              0 0 24px color-mix(in srgb, #EC4899 35%, transparent),
-              inset 0 2px 0 rgba(255, 255, 255, 0.25)
-            `
-          }}
-          {...(!isPerformanceMode && {
-            animate: {
-              boxShadow: [
-                '0 0 24px color-mix(in srgb, #EC4899 35%, transparent)',
-                '0 0 32px color-mix(in srgb, #EC4899 45%, transparent)',
-                '0 0 24px color-mix(in srgb, #EC4899 35%, transparent)'
-              ]
-            },
-            transition: {
-              duration: 2.5,
-              repeat: Infinity,
-              ease: 'easeInOut'
-            }
-          })}
+          className={`fridge-icon-inventory ${isPerformanceMode ? '' : 'fridge-ai-focus'}`}
+          style={{ width: '56px', height: '56px' }}
         >
           <SpatialIcon
             Icon={ICONS.Image}
@@ -91,8 +52,8 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
         <div
           className="px-4 py-2 rounded-xl text-center"
           style={{
-            background: 'color-mix(in srgb, #EC4899 20%, transparent)',
-            border: '2px solid color-mix(in srgb, #EC4899 40%, transparent)',
+            background: 'color-mix(in srgb, var(--fridge-scan-primary) 20%, transparent)',
+            border: '2px solid color-mix(in srgb, var(--fridge-scan-primary) 40%, transparent)',
             backdropFilter: 'blur(12px)'
           }}
         >
@@ -118,7 +79,7 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
                 className="relative aspect-square rounded-2xl overflow-hidden"
                 style={{
                   background: 'rgba(255, 255, 255, 0.05)',
-                  border: '2px solid color-mix(in srgb, #EC4899 25%, transparent)',
+                  border: '2px solid color-mix(in srgb, var(--fridge-scan-primary) 25%, transparent)',
                   boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
                   transition: 'all 0.3s ease'
                 }}
@@ -127,16 +88,16 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
                     e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
                     e.currentTarget.style.boxShadow = `
                       0 8px 24px rgba(0, 0, 0, 0.3),
-                      0 0 24px color-mix(in srgb, #EC4899 35%, transparent)
+                      0 0 24px color-mix(in srgb, var(--fridge-scan-primary) 35%, transparent)
                     `;
-                    e.currentTarget.style.borderColor = 'color-mix(in srgb, #EC4899 45%, transparent)';
+                    e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--fridge-scan-primary) 45%, transparent)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (window.matchMedia('(hover: hover)').matches) {
                     e.currentTarget.style.transform = 'translateY(0) scale(1)';
                     e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
-                    e.currentTarget.style.borderColor = 'color-mix(in srgb, #EC4899 25%, transparent)';
+                    e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--fridge-scan-primary) 25%, transparent)';
                   }
                 }}
               >
@@ -200,7 +161,7 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
                   className="relative aspect-square rounded-2xl overflow-hidden"
                   style={{
                     background: 'rgba(255, 255, 255, 0.05)',
-                    border: '2px solid color-mix(in srgb, #EC4899 25%, transparent)',
+                    border: '2px solid color-mix(in srgb, var(--fridge-scan-primary) 25%, transparent)',
                     boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
                     transition: 'all 0.3s ease'
                   }}
@@ -209,16 +170,16 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
                       e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
                       e.currentTarget.style.boxShadow = `
                         0 8px 24px rgba(0, 0, 0, 0.3),
-                        0 0 24px color-mix(in srgb, #EC4899 35%, transparent)
+                        0 0 24px color-mix(in srgb, var(--fridge-scan-primary) 35%, transparent)
                       `;
-                      e.currentTarget.style.borderColor = 'color-mix(in srgb, #EC4899 45%, transparent)';
+                      e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--fridge-scan-primary) 45%, transparent)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (window.matchMedia('(hover: hover)').matches) {
                       e.currentTarget.style.transform = 'translateY(0) scale(1)';
                       e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
-                      e.currentTarget.style.borderColor = 'color-mix(in srgb, #EC4899 25%, transparent)';
+                      e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--fridge-scan-primary) 25%, transparent)';
                     }
                   }}
                 >
@@ -288,8 +249,8 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
           })}
           className="mt-6 p-4 rounded-xl"
           style={{
-            background: 'color-mix(in srgb, #EC4899 15%, transparent)',
-            border: '2px solid color-mix(in srgb, #EC4899 30%, transparent)',
+            background: 'color-mix(in srgb, var(--fridge-scan-primary) 15%, transparent)',
+            border: '2px solid color-mix(in srgb, var(--fridge-scan-primary) 30%, transparent)',
             backdropFilter: 'blur(16px)'
           }}
         >
@@ -297,11 +258,11 @@ const CapturedPhotosDisplay: React.FC<CapturedPhotosDisplayProps> = ({
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
               style={{
-                background: 'color-mix(in srgb, #EC4899 25%, transparent)',
-                border: '1.5px solid color-mix(in srgb, #EC4899 45%, transparent)'
+                background: 'color-mix(in srgb, var(--fridge-scan-primary) 25%, transparent)',
+                border: '1.5px solid color-mix(in srgb, var(--fridge-scan-primary) 45%, transparent)'
               }}
             >
-              <SpatialIcon Icon={ICONS.Info} size={16} color="#EC4899" variant="pure" />
+              <SpatialIcon Icon={ICONS.Info} size={16} style={{ color: 'var(--fridge-scan-primary)' }} variant="pure" />
             </div>
             <span className="text-pink-100 text-sm font-medium">
               Vous pouvez ajouter encore {6 - capturedPhotos.length} photo{6 - capturedPhotos.length > 1 ? 's' : ''} supplémentaire{6 - capturedPhotos.length > 1 ? 's' : ''}

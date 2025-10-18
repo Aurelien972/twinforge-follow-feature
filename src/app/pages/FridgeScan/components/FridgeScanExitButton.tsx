@@ -26,16 +26,11 @@ const FridgeScanExitButton: React.FC<FridgeScanExitButtonProps> = ({
     <div className="flex justify-center pt-6">
       <button
         onClick={onManualExit}
-        className="btn-glass--warning px-6 py-3"
+        className="fridge-btn-danger px-6 py-3"
         title="Quitter l'atelier de recettes"
-        style={{
-          background: 'color-mix(in srgb, #EF4444 15%, transparent)',
-          borderColor: 'color-mix(in srgb, #EF4444 30%, transparent)',
-          color: '#EF4444'
-        }}
       >
         <div className="flex items-center gap-2">
-          <SpatialIcon Icon={ICONS.X} size={16} />
+          <SpatialIcon Icon={ICONS.X} size={16} color="rgba(239, 68, 68, 1)" variant="pure" />
           <span>Quitter l'Atelier de Recettes</span>
         </div>
       </button>

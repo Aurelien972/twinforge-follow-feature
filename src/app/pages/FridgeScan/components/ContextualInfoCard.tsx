@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -9,36 +10,21 @@ import { ICONS } from '../../../../ui/icons/registry';
  * Composant éducatif expliquant le processus d'analyse de la Forge Spatiale
  */
 const ContextualInfoCard: React.FC = () => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.4 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.6, delay: 0.4 }
+      })}
     >
-      <GlassCard 
-        className="p-6"
-        style={{
-          background: `
-            radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-plasma-cyan) 8%, transparent) 0%, transparent 60%),
-            var(--glass-opacity)
-          `,
-          borderColor: 'color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent)',
-          boxShadow: `
-            0 8px 32px rgba(0, 0, 0, 0.2),
-            0 0 20px color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent),
-            inset 0 1px 0 rgba(255, 255, 255, 0.12)
-          `
-        }}
-      >
+      <GlassCard className="fridge-info-panel p-6">
         <div className="flex items-start gap-3">
-          <div 
-            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1"
-            style={{
-              background: 'color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent)',
-              border: '2px solid color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent)'
-            }}
-          >
-            <SpatialIcon Icon={ICONS.Info} size={12} style={{ color: 'var(--color-plasma-cyan)' }} />
+          <div className="fridge-icon-info w-8 h-8 flex-shrink-0 mt-1">
+            <SpatialIcon Icon={ICONS.Info} size={12} color="var(--fridge-inventory-primary)" variant="pure" />
           </div>
           <div>
             <h4 className="text-cyan-300 font-semibold mb-2">Que fait la Forge Spatiale ?</h4>
@@ -51,7 +37,7 @@ const ContextualInfoCard: React.FC = () => {
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

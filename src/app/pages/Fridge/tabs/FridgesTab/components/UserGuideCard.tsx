@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
@@ -14,6 +15,7 @@ const UserGuideCard: React.FC = () => {
   const navigate = useNavigate();
   const { click } = useFeedback();
   const { startScan } = useFridgeScanPipeline();
+  const { isPerformanceMode } = usePerformanceMode();
 
   const handleNewScan = () => {
     click();
@@ -22,48 +24,14 @@ const UserGuideCard: React.FC = () => {
   };
 
   return (
-    <GlassCard
-      className="p-8 text-center relative overflow-hidden rounded-3xl transform-gpu preserve-3d will-transform transition-all duration-300"
-      style={{
-        background: `
-          radial-gradient(circle at 30% 20%, rgba(24, 227, 255, 0.25) 0%, transparent 60%),
-          radial-gradient(circle at 70% 80%, rgba(103, 232, 249, 0.15) 0%, transparent 60%),
-          rgba(255, 255, 255, 0.06)
-        `,
-        borderColor: 'rgba(24, 227, 255, 0.4)',
-        backdropFilter: 'blur(20px) saturate(160%)',
-        boxShadow: `
-          0 12px 40px rgba(0, 0, 0, 0.25),
-          0 0 30px rgba(24, 227, 255, 0.3),
-          inset 0 2px 0 rgba(255, 255, 255, 0.15)
-        `
-      }}
-    >
+    <GlassCard className="fridge-glass-inventory p-8 text-center relative overflow-hidden rounded-3xl transform-gpu preserve-3d will-transform transition-all duration-300">
       <div className="flex flex-col items-center space-y-6">
         {/* Icône principale */}
-        <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center relative"
-          style={{
-            background: `
-              radial-gradient(circle at 30% 20%, rgba(24, 227, 255, 0.4) 0%, transparent 60%),
-              radial-gradient(circle at 70% 80%, rgba(103, 232, 249, 0.25) 0%, transparent 60%),
-              rgba(255, 255, 255, 0.1)
-            `,
-            border: `3px solid rgba(24, 227, 255, 0.6)`,
-            boxShadow: `
-              0 12px 40px rgba(24, 227, 255, 0.4),
-              0 0 60px rgba(103, 232, 249, 0.3),
-              inset 0 4px 0 rgba(255, 255, 255, 0.25),
-              inset 0 -2px 0 rgba(0, 0, 0, 0.1)
-            `
-          }}
-        >
-          <SpatialIcon 
-            Icon={ICONS.Refrigerator} 
+        <div className={`fridge-icon-inventory ${isPerformanceMode ? '' : 'fridge-ai-focus'} w-20 h-20 mx-auto`}>
+          <SpatialIcon
+            Icon={ICONS.Refrigerator}
             size={36}
-            style={{ 
-              color: '#18E3FF', fill: 'none', stroke: '#18E3FF',
-              filter: `drop-shadow(0 0 12px rgba(24, 227, 255, 0.6))`
-            }}
+            color="rgba(255, 255, 255, 0.95)"
             variant="pure"
           />
         </div>
@@ -82,26 +50,11 @@ const UserGuideCard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
           {/* Scan Rapide */}
           <div className="text-center space-y-3">
-            <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center"
-              style={{
-                background: `
-                  radial-gradient(circle at 30% 20%, rgba(24, 227, 255, 0.3) 0%, transparent 60%),
-                  rgba(255, 255, 255, 0.08)
-                `,
-                border: `2px solid rgba(24, 227, 255, 0.5)`,
-                boxShadow: `
-                  0 8px 24px rgba(24, 227, 255, 0.3),
-                  inset 0 2px 0 rgba(255, 255, 255, 0.2)
-                `
-              }}
-            >
-              <SpatialIcon 
-                Icon={ICONS.Camera} 
+            <div className="fridge-icon-inventory w-12 h-12 mx-auto">
+              <SpatialIcon
+                Icon={ICONS.Camera}
                 size={24}
-                style={{ 
-                  color: '#18E3FF', fill: 'none', stroke: '#18E3FF',
-                  filter: `drop-shadow(0 0 8px rgba(24, 227, 255, 0.5))`
-                }}
+                color="rgba(255, 255, 255, 0.95)"
                 variant="pure"
               />
             </div>
@@ -113,26 +66,11 @@ const UserGuideCard: React.FC = () => {
 
           {/* Recettes Personnalisées */}
           <div className="text-center space-y-3">
-            <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center"
-              style={{
-                background: `
-                  radial-gradient(circle at 30% 20%, rgba(24, 227, 255, 0.3) 0%, transparent 60%),
-                  rgba(255, 255, 255, 0.08)
-                `,
-                border: `2px solid rgba(24, 227, 255, 0.5)`,
-                boxShadow: `
-                  0 8px 24px rgba(24, 227, 255, 0.3),
-                  inset 0 2px 0 rgba(255, 255, 255, 0.2)
-                `
-              }}
-            >
-              <SpatialIcon 
-                Icon={ICONS.Utensils} 
+            <div className="fridge-icon-inventory w-12 h-12 mx-auto">
+              <SpatialIcon
+                Icon={ICONS.Utensils}
                 size={24}
-                style={{ 
-                  color: '#18E3FF', fill: 'none', stroke: '#18E3FF',
-                  filter: `drop-shadow(0 0 8px rgba(24, 227, 255, 0.5))`
-                }}
+                color="rgba(255, 255, 255, 0.95)"
                 variant="pure"
               />
             </div>
@@ -144,26 +82,11 @@ const UserGuideCard: React.FC = () => {
 
           {/* Plans de Repas */}
           <div className="text-center space-y-3">
-            <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center"
-              style={{
-                background: `
-                  radial-gradient(circle at 30% 20%, rgba(24, 227, 255, 0.3) 0%, transparent 60%),
-                  rgba(255, 255, 255, 0.08)
-                `,
-                border: `2px solid rgba(24, 227, 255, 0.5)`,
-                boxShadow: `
-                  0 8px 24px rgba(24, 227, 255, 0.3),
-                  inset 0 2px 0 rgba(255, 255, 255, 0.2)
-                `
-              }}
-            >
-              <SpatialIcon 
-                Icon={ICONS.Calendar} 
+            <div className="fridge-icon-inventory w-12 h-12 mx-auto">
+              <SpatialIcon
+                Icon={ICONS.Calendar}
                 size={24}
-                style={{ 
-                  color: '#18E3FF', fill: 'none', stroke: '#18E3FF',
-                  filter: `drop-shadow(0 0 8px rgba(24, 227, 255, 0.5))`
-                }}
+                color="rgba(255, 255, 255, 0.95)"
                 variant="pure"
               />
             </div>
@@ -177,30 +100,13 @@ const UserGuideCard: React.FC = () => {
         {/* Bouton d'action */}
         <button
           onClick={handleNewScan}
-          className="px-6 md:px-8 py-3 md:py-4 text-lg md:text-xl font-bold relative overflow-hidden rounded-full transition-all duration-200 hover:scale-105 active:scale-95"
-          style={{
-            background: `
-              linear-gradient(135deg, #18E3FF 0%, #67E8F9 100%)
-            `,
-            border: `2px solid rgba(24, 227, 255, 0.6)`,
-            boxShadow: `
-              0 8px 32px rgba(24, 227, 255, 0.4),
-              0 0 40px rgba(103, 232, 249, 0.25),
-              inset 0 2px 0 rgba(255, 255, 255, 0.25),
-              inset 0 -2px 0 rgba(0, 0, 0, 0.1)
-            `,
-            backdropFilter: 'blur(20px) saturate(160%)',
-            color: 'white'
-          }}
+          className="fridge-btn-inventory-primary px-6 md:px-8 py-3 md:py-4 text-lg md:text-xl font-bold relative overflow-hidden rounded-full transition-all duration-200 hover:scale-105 active:scale-95"
         >
           <span className="relative z-10 flex items-center gap-2">
-            <SpatialIcon 
-              Icon={ICONS.Camera} 
+            <SpatialIcon
+              Icon={ICONS.Camera}
               size={20}
-              style={{ 
-                color: 'white', fill: 'none', stroke: 'white',
-                filter: `drop-shadow(0 0 8px rgba(255, 255, 255, 0.4))`
-              }}
+              color="white"
               variant="pure"
             />
             Commencer - Scanner Mon Frigo
@@ -208,25 +114,14 @@ const UserGuideCard: React.FC = () => {
         </button>
 
         {/* Section Astuce */}
-        <div className="mt-8 p-4 rounded-lg w-full"
-          style={{
-            background: `
-              radial-gradient(circle at 30% 20%, rgba(24, 227, 255, 0.15) 0%, transparent 60%),
-              rgba(255, 255, 255, 0.04)
-            `,
-            border: `1px solid rgba(24, 227, 255, 0.3)`
-          }}
-        >
+        <div className="fridge-info-panel mt-8 p-4 w-full">
           <div className="flex items-start gap-3">
-            <SpatialIcon 
-              Icon={ICONS.Lightbulb} 
+            <SpatialIcon
+              Icon={ICONS.Lightbulb}
               size={20}
-              style={{ 
-                color: '#18E3FF', fill: 'none', stroke: '#18E3FF',
-                filter: `drop-shadow(0 0 6px rgba(24, 227, 255, 0.4))`,
-                marginTop: '2px'
-              }}
+              color="rgba(255, 255, 255, 0.95)"
               variant="pure"
+              style={{ marginTop: '2px' }}
             />
             <div className="text-left">
               <h5 className="text-sm font-semibold text-white/90 mb-1">Astuce TwinForge</h5>
