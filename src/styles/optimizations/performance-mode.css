@@ -286,6 +286,12 @@
   border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
+/* Logo Header - Remove ALL borders from logo button container */
+.performance-mode .header-liquid-glass button,
+.performance-mode .header-liquid-glass button > div {
+  border: none !important;
+}
+
 /* Mobile Drawer - Remove cyan focus borders */
 .performance-mode .mobile-drawer button:focus-visible,
 .performance-mode .mobile-drawer button:focus,
@@ -294,6 +300,16 @@
   outline: 2px solid rgba(255, 255, 255, 0.3) !important;
   outline-offset: 2px !important;
   border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Mobile Drawer - Remove ALL borders from sidebar item containers */
+.performance-mode .mobile-drawer .sidebar-item,
+.performance-mode .mobile-drawer .sidebar-item-icon-container,
+.performance-mode .mobile-drawer .sidebar-submenu-item,
+.performance-mode .mobile-drawer .sidebar-submenu-item-icon-container,
+.performance-mode .mobile-drawer button,
+.performance-mode .mobile-drawer a {
+  border: none !important;
 }
 
 /* Remove focus-ring cyan borders globally in performance mode */
