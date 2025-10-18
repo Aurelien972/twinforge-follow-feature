@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
+import { ConditionalMotion } from '../../../../../lib/motion/ConditionalMotion';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
 
@@ -65,14 +66,16 @@ function getPriorityLabel(priority: string): string {
   }
 }
 
-export const InsightCard: React.FC<InsightCardProps> = ({ insight, index }) => {
+export const InsightCard: React.FC<InsightCardProps> = React.memo(({ insight, index }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
   return (
-    <motion.div
+    <ConditionalMotion
       className="insight-card"
       style={{ '--insight-color': insight.color } as React.CSSProperties}
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
+      transition={{ duration: 0.4, delay: isPerformanceMode ? 0 : index * 0.1 }}
       whileHover={{ y: -2 }}
     >
       {/* Badges de métadonnées en haut à droite */}
@@ -125,6 +128,8 @@ export const InsightCard: React.FC<InsightCardProps> = ({ insight, index }) => {
           </p>
         </div>
       </div>
-    </motion.div>
+    </ConditionalMotion>
   );
-};
+});
+
+InsightCard.displayName = 'InsightCard';

@@ -41,6 +41,25 @@
   --mobile-border-active: 1px solid rgba(24, 227, 255, 0.4);
 }
 
+/* Classes d'animation conditionnelles pour mode performance */
+.mode-high-performance .urgent-forge-glow-css,
+.mode-high-performance .dynamic-particle-css,
+.mode-high-performance .shimmer-effect,
+.mode-high-performance .pulse-ring-animation {
+  animation: none !important;
+  opacity: 0.5;
+}
+
+.mode-high-performance .urgent-forge-glow-css {
+  filter: blur(10px) !important;
+}
+
+/* Shimmer désactivé en mode performance */
+.mode-high-performance [style*="celebration-cta-shimmer-movement"] {
+  animation: none !important;
+  opacity: 0;
+}
+
 /* Appliquer backdrop-filter: none sur tous les elements */
 .mode-high-performance *[class*="glass"],
 .mode-high-performance .header-liquid-glass,

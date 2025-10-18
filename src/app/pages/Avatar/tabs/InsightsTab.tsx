@@ -1,7 +1,6 @@
 // src/app/pages/Avatar/tabs/InsightsTab.tsx
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -17,7 +16,7 @@ import { SummaryDashboard } from './insights/SummaryDashboard';
 import InsightsGenerationExitModal from './insights/InsightsGenerationExitModal';
 import logger from '../../../../lib/utils/logger';
 import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
-import { ConditionalMotion } from '../../../../lib/motion/ConditionalMotion';
+import { ConditionalMotion, ConditionalAnimatePresence } from '../../../../lib/motion/ConditionalMotion';
 
 /**
  * Insights Tab - AI-Powered Morphology Analysis
@@ -25,6 +24,7 @@ import { ConditionalMotion } from '../../../../lib/motion/ConditionalMotion';
  */
 const InsightsTab: React.FC = () => {
   const { profile } = useUserStore();
+  const { isPerformanceMode } = usePerformanceMode();
 
   // Fetch latest body scan data
   const { data: latestScanData, isLoading: scanLoading } = useQuery({
@@ -142,7 +142,7 @@ const InsightsTab: React.FC = () => {
             <ConditionalMotion
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.6, delay: isPerformanceMode ? 0 : 0.2 }}
             >
               <GlassCard className="p-6 glass-card--priority">
                 <h4 className="text-white font-semibold mb-6 flex items-center gap-2 glowing-title-text"
@@ -183,7 +183,7 @@ const InsightsTab: React.FC = () => {
             <ConditionalMotion
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              transition={{ duration: 0.6, delay: isPerformanceMode ? 0 : 0.3 }}
             >
               <GlassCard className="p-6">
                 <h4 className="text-white font-semibold mb-6 flex items-center gap-2 glowing-title-text"
@@ -221,7 +221,7 @@ const InsightsTab: React.FC = () => {
             <ConditionalMotion
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              transition={{ duration: 0.6, delay: isPerformanceMode ? 0 : 0.4 }}
             >
               <GlassCard className="p-6">
                 <h4 className="text-white font-semibold mb-6 flex items-center gap-2 glowing-title-text"
@@ -259,7 +259,7 @@ const InsightsTab: React.FC = () => {
             <ConditionalMotion
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
+              transition={{ duration: 0.6, delay: isPerformanceMode ? 0 : 0.5 }}
             >
               <GlassCard className="p-6">
                 <h4 className="text-white font-semibold mb-6 flex items-center gap-2 glowing-title-text"

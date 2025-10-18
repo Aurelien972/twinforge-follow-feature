@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
+import { ConditionalMotion } from '../../../../../lib/motion/ConditionalMotion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
@@ -202,12 +203,14 @@ function analyzeMorphology(
   return insights;
 }
 
-const MorphologyInsightsCard: React.FC<MorphologyInsightsCardProps> = ({
+const MorphologyInsightsCard: React.FC<MorphologyInsightsCardProps> = React.memo(({
   finalShapeParams,
   resolvedGender,
   userProfile
 }) => {
-  const insights = React.useMemo(() => 
+  const { isPerformanceMode } = usePerformanceMode();
+
+  const insights = React.useMemo(() =>
     analyzeMorphology(finalShapeParams, resolvedGender, userProfile),
     [finalShapeParams, resolvedGender, userProfile]
   );
@@ -227,11 +230,11 @@ const MorphologyInsightsCard: React.FC<MorphologyInsightsCardProps> = ({
         `
       }}
     >
-      <motion.div
+      <ConditionalMotion
         className="slide-enter"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
+        transition={{ duration: 0.6, delay: isPerformanceMode ? 0 : 0.3 }}
       >
         <div className="bodyscan-flex-between mb-6">
           <h4 className="text-white font-semibold bodyscan-flex-center bodyscan-gap-sm">
@@ -260,15 +263,15 @@ const MorphologyInsightsCard: React.FC<MorphologyInsightsCardProps> = ({
         {/* Insights Grid */}
         <div className="morphology-insights-grid">
           {insights.map((insight, index) => (
-            <motion.div
+            <ConditionalMotion
               key={insight.id}
               className="morphology-insight-item"
-              style={{ 
+              style={{
                 '--insight-color': insight.color
               } as React.CSSProperties}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 + index * 0.1 }}
+              transition={{ duration: 0.4, delay: isPerformanceMode ? 0 : 0.1 + index * 0.1 }}
               whileHover={{ y: -2 }}
             >
               <div className="morphology-insight-icon-container">
@@ -282,16 +285,16 @@ const MorphologyInsightsCard: React.FC<MorphologyInsightsCardProps> = ({
               <div className="morphology-insight-title">
                 {insight.title}
               </div>
-            </motion.div>
+            </ConditionalMotion>
           ))}
         </div>
 
         {/* Encouraging Summary */}
-        <motion.div
+        <ConditionalMotion
           className="morphology-summary-card"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          transition={{ duration: 0.5, delay: isPerformanceMode ? 0 : 0.6 }}
           style={{
             borderRadius: '24px',
             overflow: 'hidden'
@@ -302,10 +305,12 @@ const MorphologyInsightsCard: React.FC<MorphologyInsightsCardProps> = ({
             Chaque caractéristique de votre corps raconte l'histoire de votre parcours 
             et offre des opportunités d'optimisation personnalisées.
           </p>
-        </motion.div>
-      </motion.div>
+        </ConditionalMotion>
+      </ConditionalMotion>
     </GlassCard>
   );
-};
+});
+
+MorphologyInsightsCard.displayName = 'MorphologyInsightsCard';
 
 export default MorphologyInsightsCard;

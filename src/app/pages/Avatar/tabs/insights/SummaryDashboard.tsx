@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
+import { ConditionalMotion } from '../../../../../lib/motion/ConditionalMotion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
@@ -13,7 +14,9 @@ interface SummaryDashboardProps {
   };
 }
 
-export const SummaryDashboard: React.FC<SummaryDashboardProps> = ({ summary }) => {
+export const SummaryDashboard: React.FC<SummaryDashboardProps> = React.memo(({ summary }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
   return (
     <GlassCard 
       className="p-6"
@@ -29,7 +32,7 @@ export const SummaryDashboard: React.FC<SummaryDashboardProps> = ({ summary }) =
         `
       }}
     >
-      <motion.div
+      <ConditionalMotion
         className="slide-enter"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -88,7 +91,9 @@ export const SummaryDashboard: React.FC<SummaryDashboardProps> = ({ summary }) =
             <div className="summary-metric-label">Recommandations</div>
           </div>
         </div>
-      </motion.div>
+      </ConditionalMotion>
     </GlassCard>
   );
-};
+});
+
+SummaryDashboard.displayName = 'SummaryDashboard';

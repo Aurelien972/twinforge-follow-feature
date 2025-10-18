@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
+import { ConditionalMotion } from '../../../../../lib/motion/ConditionalMotion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
@@ -131,8 +132,10 @@ const METRICS: MetricConfig[] = [
   }
 ];
 
-const BodyMetricsCard: React.FC<BodyMetricsCardProps> = ({ scan }) => {
-  const formattedMetrics = formatBodyMetrics(scan);
+const BodyMetricsCard: React.FC<BodyMetricsCardProps> = React.memo(({ scan }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
+  const formattedMetrics = React.useMemo(() => formatBodyMetrics(scan), [scan]);
 
   return (
     <GlassCard
@@ -149,7 +152,7 @@ const BodyMetricsCard: React.FC<BodyMetricsCardProps> = ({ scan }) => {
         `
       }}
     >
-      <motion.div
+      <ConditionalMotion
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -187,11 +190,11 @@ const BodyMetricsCard: React.FC<BodyMetricsCardProps> = ({ scan }) => {
             const isAvailable = value !== 'N/A';
 
             return (
-              <motion.div
+              <ConditionalMotion
                 key={metric.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.1 + index * 0.1 }}
+                transition={{ duration: 0.4, delay: isPerformanceMode ? 0 : 0.1 + index * 0.1 }}
                 whileHover={{ y: -2 }}
                 className="relative p-4 rounded-xl border transition-all duration-300 group"
                 style={{
@@ -243,18 +246,18 @@ const BodyMetricsCard: React.FC<BodyMetricsCardProps> = ({ scan }) => {
                     {subtext}
                   </div>
                 )}
-              </motion.div>
+              </ConditionalMotion>
             );
           })}
         </div>
 
         {/* Additional Info */}
         {scan.rawMeasurements && Object.keys(scan.rawMeasurements).length > 0 && (
-          <motion.div
+          <ConditionalMotion
             className="mt-6 p-4 rounded-xl bg-white/5 border border-white/10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
+            transition={{ duration: 0.5, delay: isPerformanceMode ? 0 : 0.6 }}
           >
             <div className="flex items-start gap-3">
               <SpatialIcon Icon={ICONS.Ruler} size={16} className="text-white/40 mt-1" />
@@ -270,12 +273,14 @@ const BodyMetricsCard: React.FC<BodyMetricsCardProps> = ({ scan }) => {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </ConditionalMotion>
         )}
 
-      </motion.div>
+      </ConditionalMotion>
     </GlassCard>
   );
-};
+});
+
+BodyMetricsCard.displayName = 'BodyMetricsCard';
 
 export default BodyMetricsCard;

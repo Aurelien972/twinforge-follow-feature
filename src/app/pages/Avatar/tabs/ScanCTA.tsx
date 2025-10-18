@@ -438,15 +438,17 @@ const ScanCTA: React.FC = () => {
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* Shimmer Effect */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-                  animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
-                  borderRadius: 'inherit'
-                }}
-              />
+              {/* Shimmer Effect - Désactivé en mode performance */}
+              {!isPerformanceMode && (
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                    animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
+                    borderRadius: 'inherit'
+                  }}
+                />
+              )}
 
               <div className="relative z-10 flex items-center justify-center gap-3">
                 <SpatialIcon
