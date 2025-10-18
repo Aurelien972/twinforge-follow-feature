@@ -402,6 +402,7 @@ html.mode-balanced .forge-particle {
 
 /* PRIORITÉ ABSOLUE : Désactiver cosmic-forge-pulse en mode performance */
 /* Sélecteurs multiples pour garantir l'application même sans classe body */
+/* ULTRA-PERFORMANCE: Background complètement remplacé - couleur unie SANS nébuleuses */
 body.performance-mode .bg-twinforge-visionos,
 body.mode-high-performance .bg-twinforge-visionos,
 .performance-mode .bg-twinforge-visionos,
@@ -412,8 +413,11 @@ html.mode-high-performance .bg-twinforge-visionos,
 [data-performance-mode="true"] .bg-twinforge-visionos,
 .mobile-performance-mode .bg-twinforge-visionos {
   /* Background COULEUR SOLIDE - ZÉRO GPU COST */
-  /* Pas de radial-gradient, juste une couleur unie pour desktop aussi */
+  /* Pas de radial-gradient, juste une couleur unie */
+  /* IMPORTANT: Remplace complètement le background pour supprimer les nébuleuses */
   background: var(--forge-deep) !important;
+  background-image: none !important;
+  background-color: var(--forge-deep) !important;
 
   /* Background size FIXE - pas d'animation */
   background-size: 100% 100% !important;
@@ -424,11 +428,13 @@ html.mode-high-performance .bg-twinforge-visionos,
   animation: none !important;
   animation-name: none !important;
   animation-play-state: paused !important;
+  animation-duration: 0s !important;
 
   /* Supprimer les optimisations GPU coûteuses */
   transform: none !important;
   will-change: auto !important;
   backface-visibility: visible !important;
+  perspective: none !important;
 }
 
 /* Texture de bruit DÉSACTIVÉE en mode performance pour économie maximale */

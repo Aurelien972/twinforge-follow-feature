@@ -14,14 +14,14 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
   className = ''
 }) => {
   const isDesktop = variant === 'desktop';
-  const { isPerformanceMode } = usePerformanceMode();
+  const { isPerformanceMode, mode } = usePerformanceMode();
 
   if (isDesktop) {
     return (
       <div
         className={`flex items-center ${className}`}
         style={{
-          transition: isPerformanceMode ? 'none' : 'all 300ms ease-out',
+          transition: mode === 'quality' ? 'all 300ms ease-out' : 'none',
           height: '100%'
         }}
       >
@@ -35,17 +35,17 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               color: '#E5E7EB',
               lineHeight: 1,
               textTransform: 'uppercase',
-              filter: isPerformanceMode
-                ? 'none'
-                : (isHovered
+              filter: mode === 'quality'
+                ? (isHovered
                   ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.3))'
-                  : 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.15))'),
-              transition: isPerformanceMode ? 'none' : 'filter 300ms ease'
+                  : 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.15))')
+                : 'none',
+              transition: mode === 'quality' ? 'filter 300ms ease' : 'none'
             }}
           >
             TWIN
           </span>
-          {isPerformanceMode ? (
+          {mode === 'high-performance' ? (
             // Mode Performance: Lettres individuelles avec couleurs distinctes
             <span style={{ display: 'inline-flex', gap: '0' }}>
               <span style={{
@@ -105,7 +105,7 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               }}>E</span>
             </span>
           ) : (
-            // Mode Quality: Gradient original
+            // Mode Balanced & Quality: Gradient
             <span
               style={{
                 fontFamily: "'Montserrat', sans-serif",
@@ -118,10 +118,12 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
                 backgroundClip: 'text',
                 lineHeight: 1,
                 textTransform: 'uppercase',
-                filter: isHovered
-                  ? 'drop-shadow(0 0 12px rgba(253, 200, 48, 0.5))'
-                  : 'drop-shadow(0 0 6px rgba(247, 147, 30, 0.3))',
-                transition: 'filter 300ms ease'
+                filter: mode === 'quality'
+                  ? (isHovered
+                    ? 'drop-shadow(0 0 12px rgba(253, 200, 48, 0.5))'
+                    : 'drop-shadow(0 0 6px rgba(247, 147, 30, 0.3))')
+                  : 'none',
+                transition: mode === 'quality' ? 'filter 300ms ease' : 'none'
               }}
             >
               FØRGE
@@ -136,7 +138,7 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
     <div
       className={`flex items-center ${className}`}
       style={{
-        transition: isPerformanceMode ? 'none' : 'all 300ms ease-out',
+        transition: mode === 'quality' ? 'all 300ms ease-out' : 'none',
         gap: '8px',
         position: 'relative'
       }}
@@ -170,17 +172,17 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
             color: '#E5E7EB',
             lineHeight: 1,
             textTransform: 'uppercase',
-            filter: isPerformanceMode
-              ? 'none'
-              : (isHovered
+            filter: mode === 'quality'
+              ? (isHovered
                 ? 'drop-shadow(0 0 6px rgba(255, 255, 255, 0.3))'
-                : 'drop-shadow(0 0 3px rgba(255, 255, 255, 0.15))'),
-            transition: isPerformanceMode ? 'none' : 'filter 300ms ease'
+                : 'drop-shadow(0 0 3px rgba(255, 255, 255, 0.15))')
+              : 'none',
+            transition: mode === 'quality' ? 'filter 300ms ease' : 'none'
           }}
         >
           TWIN
         </span>
-        {isPerformanceMode ? (
+        {mode === 'high-performance' ? (
           // Mode Performance: Lettres individuelles avec couleurs distinctes
           <span style={{ display: 'inline-flex', gap: '0' }}>
             <span style={{
@@ -240,7 +242,7 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
             }}>E</span>
           </span>
         ) : (
-          // Mode Quality: Gradient original
+          // Mode Balanced & Quality: Gradient
           <span
             style={{
               fontFamily: "'Montserrat', sans-serif",
@@ -253,10 +255,12 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               backgroundClip: 'text',
               lineHeight: 1,
               textTransform: 'uppercase',
-              filter: isHovered
-                ? 'drop-shadow(0 0 10px rgba(253, 200, 48, 0.4))'
-                : 'drop-shadow(0 0 5px rgba(247, 147, 30, 0.25))',
-              transition: 'filter 300ms ease'
+              filter: mode === 'quality'
+                ? (isHovered
+                  ? 'drop-shadow(0 0 10px rgba(253, 200, 48, 0.4))'
+                  : 'drop-shadow(0 0 5px rgba(247, 147, 30, 0.25))')
+                : 'none',
+              transition: mode === 'quality' ? 'filter 300ms ease' : 'none'
             }}
           >
             FØRGE
