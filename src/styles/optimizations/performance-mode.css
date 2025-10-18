@@ -164,18 +164,137 @@
 }
 
 /* =========================================
-   PAGE HEADER AND NAVIGATION - Keep intact
-   Do NOT apply performance mode to navigation elements
+   LOGO - Fix visibility in performance mode
    ========================================= */
 
-/* These remain unchanged and are excluded from performance mode */
-.performance-mode header,
-.performance-mode .sidebar,
-.performance-mode .mobile-drawer,
-.performance-mode .bottom-bar,
-.performance-mode .floating-chat-button {
-  /* Navigation elements keep their original styles */
-  all: revert;
+/* Remove all filter effects from logo text */
+.performance-mode .header-liquid-glass span[style*="filter"],
+.performance-mode .sidebar-glass-enhanced span[style*="filter"] {
+  filter: none !important;
+}
+
+/* Ensure FORGE text is visible with solid color */
+.performance-mode .header-liquid-glass span[style*="background-clip"],
+.performance-mode .sidebar-glass-enhanced span[style*="background-clip"] {
+  /* Replace gradient with solid orange color */
+  background: #F7931E !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  filter: none !important;
+}
+
+/* Ensure TWIN text is visible */
+.performance-mode .header-liquid-glass span[style*="color: #E5E7EB"],
+.performance-mode .sidebar-glass-enhanced span[style*="color: #E5E7EB"] {
+  color: #E5E7EB !important;
+  filter: none !important;
+}
+
+/* =========================================
+   HEADER & BOTTOM BAR BUTTONS - Match sidebar style
+   ========================================= */
+
+/* Header buttons - solid background like sidebar */
+.performance-mode .header-liquid-glass .glass-orb-button {
+  background: #1A2332 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.performance-mode .header-liquid-glass .glass-orb-button::before {
+  display: none !important;
+}
+
+.performance-mode .header-liquid-glass .glass-orb-button:hover {
+  transform: none !important;
+  background: #1A2332 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Bottom bar buttons - solid background like sidebar */
+.performance-mode .new-bottom-bar-button,
+.performance-mode .new-bottom-bar-button--central {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.performance-mode .new-bottom-bar-icon-container {
+  background: #1A2332 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.performance-mode .new-bottom-bar-icon-container::before {
+  display: none !important;
+}
+
+.performance-mode .new-bottom-bar-button:hover .new-bottom-bar-icon-container {
+  transform: none !important;
+  background: #1A2332 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* =========================================
+   CTA BUTTONS - Solid backgrounds
+   ========================================= */
+
+/* All CTA buttons get solid, visible backgrounds */
+.performance-mode .btn-glass,
+.performance-mode .btn-glass--primary,
+.performance-mode .btn-glass--secondary-nav,
+.performance-mode button[class*="cta"],
+.performance-mode button[class*="CTA"] {
+  background: #1A2332 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Primary CTAs get brand color */
+.performance-mode .btn-glass--primary {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7c3aed 100%) !important;
+  border-color: rgba(139, 92, 246, 0.4) !important;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Remove pseudo-elements from buttons */
+.performance-mode .btn-glass::before,
+.performance-mode .btn-glass::after,
+.performance-mode .btn-glass--primary::before,
+.performance-mode .btn-glass--primary::after,
+.performance-mode button[class*="cta"]::before,
+.performance-mode button[class*="cta"]::after {
+  display: none !important;
+}
+
+/* =========================================
+   PAGE HEADER AND NAVIGATION - Simplified
+   ========================================= */
+
+/* Remove complex effects from navigation while keeping structure */
+.performance-mode .header-liquid-glass,
+.performance-mode .sidebar-glass-enhanced,
+.performance-mode .new-mobile-bottom-bar-container {
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Remove animated borders and glows */
+.performance-mode .header-liquid-glass::before,
+.performance-mode .header-liquid-glass::after,
+.performance-mode .sidebar-glass-enhanced::before,
+.performance-mode .sidebar-glass-enhanced::after,
+.performance-mode .new-mobile-bottom-bar-container::before,
+.performance-mode .new-mobile-bottom-bar-container::after {
+  display: none !important;
+  opacity: 0 !important;
 }
 
 /* =========================================
@@ -230,35 +349,71 @@
    Keep only GlassCard borders visible
    ========================================= */
 
-/* Hide all div/section/motion.div borders */
+/* CRITICAL: Hide ALL borders from divs, sections, and generic containers */
 .performance-mode div:not(.glass-card):not(.glass-base):not(.glass-card-cta),
 .performance-mode section:not(.glass-card):not(.glass-base),
-.performance-mode [class*="container"]:not(.glass-card):not(.glass-base) {
+.performance-mode article:not(.glass-card):not(.glass-base),
+.performance-mode main:not(.glass-card):not(.glass-base),
+.performance-mode aside:not(.glass-card):not(.glass-base),
+.performance-mode [class*="container"]:not(.glass-card):not(.glass-base),
+.performance-mode [class*="wrapper"]:not(.glass-card):not(.glass-base),
+.performance-mode [class*="layout"]:not(.glass-card):not(.glass-base) {
   border: none !important;
+  border-width: 0 !important;
   border-color: transparent !important;
+  border-style: none !important;
   outline: none !important;
-}
-
-/* Tabs container - Remove all borders and pseudo-elements */
-.performance-mode .tabs-list-container {
-  border: none !important;
-  border-color: transparent !important;
   box-shadow: none !important;
 }
 
+/* Remove all pseudo-element borders */
+.performance-mode div:not(.glass-card):not(.glass-base):not(.glass-card-cta)::before,
+.performance-mode div:not(.glass-card):not(.glass-base):not(.glass-card-cta)::after,
+.performance-mode section:not(.glass-card):not(.glass-base)::before,
+.performance-mode section:not(.glass-card):not(.glass-base)::after,
+.performance-mode article:not(.glass-card):not(.glass-base)::before,
+.performance-mode article:not(.glass-card):not(.glass-base)::after {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* Tabs container - Remove all borders and pseudo-elements */
+.performance-mode .tabs-list-container,
+.performance-mode [class*="tabs"],
+.performance-mode [role="tablist"] {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
 .performance-mode .tabs-list-container::before,
-.performance-mode .tabs-list-container::after {
+.performance-mode .tabs-list-container::after,
+.performance-mode [class*="tabs"]::before,
+.performance-mode [class*="tabs"]::after {
   display: none !important;
   opacity: 0 !important;
   border: none !important;
+  border-width: 0 !important;
 }
 
-/* Grid containers - No borders */
+/* Grid and flex containers - No borders */
 .performance-mode .grid,
 .performance-mode [class*="grid"],
+.performance-mode .flex,
+.performance-mode [class*="flex"],
 .performance-mode .space-y-6,
-.performance-mode [class*="space-"] {
+.performance-mode [class*="space-"],
+.performance-mode [class*="gap-"] {
   border: none !important;
+  border-width: 0 !important;
+  outline: none !important;
 }
 
 /* ConnectedDevices specific containers */
@@ -266,11 +421,26 @@
 .performance-mode .providers-grid,
 .performance-mode .device-stats-grid {
   border: none !important;
+  border-width: 0 !important;
 }
 
-/* Remove inline style borders */
-.performance-mode [style*="border"] {
+/* Remove inline style borders - more aggressive */
+.performance-mode [style*="border"],
+.performance-mode [style*="Border"],
+.performance-mode [style*="BORDER"] {
   border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+}
+
+/* Remove borders from common utility classes */
+.performance-mode .rounded,
+.performance-mode [class*="rounded-"],
+.performance-mode .ring,
+.performance-mode [class*="ring-"] {
+  border: none !important;
+  border-width: 0 !important;
+  box-shadow: none !important;
 }
 
 /* Keep GlassCard borders intact */
@@ -279,4 +449,6 @@
 .performance-mode .glass-card-cta {
   /* These keep their border from the earlier rule */
   border-color: rgba(255, 255, 255, 0.1) !important;
+  border-width: 1px !important;
+  border-style: solid !important;
 }
