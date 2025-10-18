@@ -1,14 +1,14 @@
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
 import { useFeedback } from '../../../../../../hooks/useFeedback';
-import { usePreferredMotion } from '../../../../../../system/device/DeviceProvider';
 import { useLastActivity } from '../../../hooks/useActivitiesData';
 import { analyzeActivityContext } from './contextAnalysis';
 import { generateCTAMessage } from './messageGenerator';
 import { calculateUrgencyConfig, shouldShowParticles, getParticleCount } from './urgencyCalculator';
+import { useActivityPerformance } from '../../../hooks/useActivityPerformance';
+import { ConditionalMotionActivity } from '../../shared/ConditionalMotionActivity';
 import React from 'react';
 
 interface ActivityCTAProps {
@@ -49,7 +49,7 @@ function getContextualMetrics(todayStats?: any): string[] {
 const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile }) => {
   const navigate = useNavigate();
   const { click } = useFeedback();
-  const reduceMotion = usePreferredMotion() === 'reduced';
+  const perf = useActivityPerformance();
 
   // Récupérer la dernière activité globale (pas uniquement aujourd'hui)
   const { data: lastActivity } = useLastActivity();
@@ -110,43 +110,34 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
         interactive
         style={cardStyles}
       >
-        {/* Carrés tournants aux coins */}
-        <div className="training-hero-corners" aria-hidden="true">
-          {[0, 1, 2, 3].map((i) => (
-            <motion.div
-              key={i}
-              className="corner-particle"
-              style={{
-                position: 'absolute',
-                width: '8px',
-                height: '8px',
-                borderRadius: '2px',
-                background: `linear-gradient(135deg, #3B82F6, rgba(255, 255, 255, 0.8))`,
-                boxShadow: `0 0 20px #3B82F6`,
-                top: i < 2 ? '12px' : 'auto',
-                bottom: i >= 2 ? '12px' : 'auto',
-                left: i % 2 === 0 ? '12px' : 'auto',
-                right: i % 2 === 1 ? '12px' : 'auto'
-              }}
-              initial={{
-                rotate: i % 2 === 0 ? 45 : -45
-              }}
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.6, 1, 0.6],
-                rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                delay: i * 0.2,
-                ease: [0.4, 0, 0.2, 1]
-              }}
-            />
-          ))}
-        </div>
+        {/* Carrés tournants aux coins - Désactivés en mode low/medium */}
+        {perf.enableComplexEffects && (
+          <div className="training-hero-corners" aria-hidden="true">
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="corner-particle"
+                style={{
+                  position: 'absolute',
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '2px',
+                  background: `linear-gradient(135deg, #3B82F6, rgba(255, 255, 255, 0.8))`,
+                  boxShadow: `0 0 20px #3B82F6`,
+                  top: i < 2 ? '12px' : 'auto',
+                  bottom: i >= 2 ? '12px' : 'auto',
+                  left: i % 2 === 0 ? '12px' : 'auto',
+                  right: i % 2 === 1 ? '12px' : 'auto',
+                  transform: `rotate(${i % 2 === 0 ? 45 : -45}deg)`,
+                  animation: 'corner-particle-float 3s ease-in-out infinite',
+                  animationDelay: `${i * 0.2}s`
+                }}
+              />
+            ))}
+          </div>
+        )}
 
-        {(urgencyConfig.priority === 'high' || urgencyConfig.priority === 'critical') && !reduceMotion && (
+        {(urgencyConfig.priority === 'high' || urgencyConfig.priority === 'critical') && perf.enableComplexEffects && (
           <div
             className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
             style={{
@@ -161,8 +152,8 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
         <div className="relative z-10 space-y-4 md:space-y-6">
           <div
             className={`activity-icon-enhanced mx-auto rounded-full flex items-center justify-center relative ${
-              urgencyConfig.animation === 'pulse' && !reduceMotion ? 'icon-pulse-css' :
-              urgencyConfig.animation === 'breathing' && !reduceMotion ? 'icon-breathing-css' : ''
+              urgencyConfig.animation === 'pulse' && perf.enableAnimations ? 'icon-pulse-css' :
+              urgencyConfig.animation === 'breathing' && perf.enableAnimations ? 'icon-breathing-css' : ''
             }`}
             style={iconStyles}
           >
@@ -172,7 +163,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
               style={{ color: '#3B82F6' }}
             />
 
-            {shouldShowParticles(urgencyConfig) && !reduceMotion &&
+            {shouldShowParticles(urgencyConfig) && perf.enableParticles &&
               [...Array(getParticleCount(urgencyConfig))].map((_, i) => {
                 const angle = (i * 360) / getParticleCount(urgencyConfig);
                 const radius = 60;
@@ -212,16 +203,11 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
             )}
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="flex flex-col gap-4 items-center"
-          >
+          <div className="flex flex-col gap-4 items-center">
             {/* Primary CTA - Enregistrer une activité */}
-            <motion.button
+            <button
               onClick={handleActivityInput}
-              className="px-8 py-4 rounded-full font-bold text-lg text-white relative overflow-hidden min-h-[64px] w-full sm:w-auto"
+              className="px-8 py-4 rounded-full font-bold text-lg text-white relative overflow-hidden min-h-[64px] w-full sm:w-auto transition-transform duration-200"
               style={{
                 background: `
                   linear-gradient(135deg,
@@ -237,26 +223,18 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                 `,
                 backdropFilter: 'blur(20px) saturate(160%)'
               }}
-              whileHover={{
-                scale: 1.02,
-                y: -2,
-                boxShadow: `
-                  0 16px 50px color-mix(in srgb, #3B82F6 50%, transparent),
-                  0 0 80px color-mix(in srgb, #3B82F6 40%, transparent),
-                  inset 0 3px 0 rgba(255, 255, 255, 0.5)
-                `
-              }}
-              whileTap={{ scale: 0.98 }}
             >
-              {/* Shimmer Effect */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-                  animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
-                  borderRadius: 'inherit'
-                }}
-              />
+              {/* Shimmer Effect - Désactivé en mode low/medium */}
+              {perf.enableShimmers && (
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                    animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
+                    borderRadius: 'inherit'
+                  }}
+                />
+              )}
 
               <div className="relative z-10 flex items-center justify-center gap-3">
                 <SpatialIcon
@@ -272,11 +250,11 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                   {message.buttonText}
                 </span>
               </div>
-            </motion.button>
+            </button>
 
             {/* Secondary CTA - View Insights (transparent button) */}
             {hasActivities && (
-              <motion.button
+              <button
                 onClick={handleViewInsights}
                 className="px-6 py-4 rounded-full font-medium text-white/90 transition-all duration-200 min-h-[64px]"
                 style={{
@@ -285,25 +263,25 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                   backdropFilter: 'blur(12px) saturate(130%)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = `color-mix(in srgb, #3B82F6 12%, transparent)`;
-                  e.currentTarget.style.borderColor = `color-mix(in srgb, #3B82F6 30%, transparent)`;
-                  e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)';
+                  if (perf.mode !== 'low') {
+                    e.currentTarget.style.background = `color-mix(in srgb, #3B82F6 12%, transparent)`;
+                    e.currentTarget.style.borderColor = `color-mix(in srgb, #3B82F6 30%, transparent)`;
+                    e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)';
+                  }
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = `color-mix(in srgb, #3B82F6 8%, transparent)`;
                   e.currentTarget.style.borderColor = `color-mix(in srgb, #3B82F6 20%, transparent)`;
                   e.currentTarget.style.transform = 'translateY(0) scale(1)';
                 }}
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
               >
                 <div className="flex items-center justify-center gap-2">
                   <SpatialIcon Icon={ICONS.Zap} size={20} color="white" variant="pure" />
                   <span>Voir mes Insights</span>
                 </div>
-              </motion.button>
+              </button>
             )}
-          </motion.div>
+          </div>
 
           {/* Métriques Contextuelles - Placées après les boutons */}
           {contextualMetrics.length > 0 && (
