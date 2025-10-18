@@ -27,6 +27,12 @@
     will-change: auto !important;
     contain: none !important;
     isolation: auto !important;
+    /* CRITICAL: overflow on body breaks position:fixed on iOS */
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    /* Use position:static to ensure no interference */
+    position: static !important;
   }
 
   /* Remove transforms from all parent containers that could break fixed positioning */

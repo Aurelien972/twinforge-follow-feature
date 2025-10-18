@@ -41,23 +41,46 @@ function AppContent() {
   React.useEffect(() => {
     const anyOverlayOpen = isAnyOpen();
     if (anyOverlayOpen) {
-      // CRITICAL FIX: Don't use position:fixed on body - it breaks position:fixed children on mobile
-      // Instead, use a simpler overflow:hidden approach
-      const originalOverflow = document.body.style.overflow;
+      // CRITICAL: On mobile, overflow:hidden on body breaks position:fixed
+      // Use touch-action instead to prevent scroll
+      const isMobile = window.innerWidth <= 1024;
 
-      document.body.style.overflow = 'hidden';
+      if (isMobile) {
+        const originalTouchAction = document.body.style.touchAction;
+        const originalPosition = document.body.style.position;
 
-      logger.debug('OVERLAY_BODY_LOCK', 'Body scroll locked', {
-        anyOverlayOpen,
-        timestamp: new Date().toISOString(),
-      });
+        document.body.style.touchAction = 'none';
+        document.body.style.position = 'relative';
 
-      return () => {
-        document.body.style.overflow = originalOverflow;
-        logger.debug('OVERLAY_BODY_UNLOCK', 'Body scroll unlocked', {
+        logger.debug('OVERLAY_BODY_LOCK', 'Body scroll locked (mobile)', {
+          anyOverlayOpen,
           timestamp: new Date().toISOString(),
         });
-      };
+
+        return () => {
+          document.body.style.touchAction = originalTouchAction;
+          document.body.style.position = originalPosition;
+          logger.debug('OVERLAY_BODY_UNLOCK', 'Body scroll unlocked (mobile)', {
+            timestamp: new Date().toISOString(),
+          });
+        };
+      } else {
+        // Desktop: safe to use overflow hidden
+        const originalOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+
+        logger.debug('OVERLAY_BODY_LOCK', 'Body scroll locked (desktop)', {
+          anyOverlayOpen,
+          timestamp: new Date().toISOString(),
+        });
+
+        return () => {
+          document.body.style.overflow = originalOverflow;
+          logger.debug('OVERLAY_BODY_UNLOCK', 'Body scroll unlocked (desktop)', {
+            timestamp: new Date().toISOString(),
+          });
+        };
+      }
     }
   }, [isAnyOpen]);
 
