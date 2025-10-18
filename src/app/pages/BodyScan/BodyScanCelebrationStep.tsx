@@ -65,6 +65,13 @@ const BodyScanCelebrationStep: React.FC = () => {
   const score = confidence;
 
   const getCelebrationContent = () => {
+    // Adjust particle count based on performance mode
+    const getParticleCount = (base: number) => {
+      if (performanceConfig.mode === 'high-performance') return 0;
+      if (performanceConfig.mode === 'balanced') return Math.ceil(base / 2);
+      return base;
+    };
+
     if (score >= 0.9) {
       return {
         title: '🌟 Scan Absolument Parfait !',
@@ -73,7 +80,7 @@ const BodyScanCelebrationStep: React.FC = () => {
         motivationalQuote: 'Votre reflet numérique sera d\'une fidélité saisissante',
         color: '#10B981',
         icon: ICONS.Zap,
-        particleCount: 12,
+        particleCount: getParticleCount(12),
         celebrationLevel: 'legendary'
       };
     } else if (score >= 0.7) {
@@ -84,7 +91,7 @@ const BodyScanCelebrationStep: React.FC = () => {
         motivationalQuote: 'Préparez-vous à découvrir votre double numérique parfait',
         color: '#22C55E',
         icon: ICONS.Check,
-        particleCount: 10,
+        particleCount: getParticleCount(10),
         celebrationLevel: 'exceptional'
       };
     } else if (score >= 0.5) {
@@ -95,7 +102,7 @@ const BodyScanCelebrationStep: React.FC = () => {
         motivationalQuote: 'Votre avatar 3D sera fidèle à votre silhouette unique',
         color: '#10B981',
         icon: ICONS.Target,
-        particleCount: 8,
+        particleCount: getParticleCount(8),
         celebrationLevel: 'high'
       };
     } else if (score > 0) {
@@ -106,7 +113,7 @@ const BodyScanCelebrationStep: React.FC = () => {
         motivationalQuote: 'Votre scan a été optimisé avec précision',
         color: '#F59E0B',
         icon: ICONS.Zap,
-        particleCount: 6,
+        particleCount: getParticleCount(6),
         celebrationLevel: 'optimized'
       };
     } else {
@@ -118,7 +125,7 @@ const BodyScanCelebrationStep: React.FC = () => {
         motivationalQuote: 'Explorez votre avatar 3D personnalisé',
         color: '#8B5CF6',
         icon: ICONS.Eye,
-        particleCount: 6,
+        particleCount: getParticleCount(6),
         celebrationLevel: 'complete'
       };
     }
@@ -219,8 +226,10 @@ const BodyScanCelebrationStep: React.FC = () => {
             <SpatialIcon Icon={celebration.icon} size={48} color={celebration.color} />
           </div>
 
-          {/* Pulse Rings - disabled in performance mode */}
-          {performanceConfig.enablePulseAnimations && [...Array(3)].map((_, i) => (
+          {/* Pulse Rings - disabled in performance mode, reduced in balanced */}
+          {performanceConfig.enablePulseAnimations && [
+            ...Array(performanceConfig.mode === 'quality' ? 3 : 1)
+          ].map((_, i) => (
             <div
               key={`pulse-${i}`}
               className={`celebration-icon-pulse-ring celebration-icon-pulse-ring--${i + 1} absolute inset-0 rounded-full border-2`}
@@ -304,10 +313,12 @@ const BodyScanCelebrationStep: React.FC = () => {
         </ConditionalMotion>
       </ConditionalMotion>
 
-      {/* Celebration Confetti Effect - disabled in performance mode */}
+      {/* Celebration Confetti Effect - disabled in performance mode, reduced in balanced */}
       {performanceConfig.enableParticleEffects && (
         <div className="absolute inset-0 pointer-events-none overflow-visible">
-          {[...Array(8)].map((_, i) => (
+          {[
+            ...Array(performanceConfig.mode === 'quality' ? 8 : performanceConfig.mode === 'balanced' ? 4 : 0)
+          ].map((_, i) => (
             <div
               key={`confetti-${i}`}
               className={`celebration-confetti celebration-confetti--${i + 1} absolute w-2 h-6 rounded-full`}

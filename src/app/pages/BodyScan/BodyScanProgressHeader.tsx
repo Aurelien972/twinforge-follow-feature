@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { ConditionalMotion } from '../../../lib/motion/ConditionalMotion';
+import { useBodyScanPerformance } from '../../../hooks/useBodyScanPerformance';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
@@ -30,6 +31,7 @@ const BodyScanProgressHeader: React.FC<BodyScanProgressHeaderProps> = ({
   subMessage,
   className = '',
 }) => {
+  const performanceConfig = useBodyScanPerformance();
   const safeProgress = Number.isFinite(progress) ? Math.min(100, Math.max(0, progress)) : 0;
 
   const stepSize = 100 / steps.length;
@@ -81,11 +83,12 @@ const BodyScanProgressHeader: React.FC<BodyScanProgressHeaderProps> = ({
                     className={`${s.seg} ${themeClass} ${completed ? s.isComplete : ''} ${current ? s.isCurrent : ''}`}
                   >
                     {(completed || current) && (
-                      <motion.span
+                      <ConditionalMotion
+                        as="span"
                         className={`${s.fill} ${fillTheme}`}
-                        initial={{ width: 0 }}
+                        initial={performanceConfig.enableInitialAnimations ? { width: 0 } : false}
                         animate={{ width }}
-                        transition={{ duration: 0.45, ease: 'easeOut' }}
+                        transition={performanceConfig.enableFramerMotion ? { duration: 0.3, ease: 'easeOut' } : undefined}
                       />
                     )}
                   </div>

@@ -51,30 +51,42 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
     return null;
   }
 
-  // Points clés (statiques)
+  // Points clés (statiques) - Reduced count in performance mode
   const frontKeypoints = useMemo(
-    () => [
-      { x: 50, y: 12, label: 'Tête' },
-      { x: 40, y: 25, label: 'Épaule G' },
-      { x: 60, y: 25, label: 'Épaule D' },
-      { x: 50, y: 45, label: 'Taille' },
-      { x: 45, y: 65, label: 'Hanche G' },
-      { x: 55, y: 65, label: 'Hanche D' },
-      { x: 45, y: 90, label: 'Pied G' },
-      { x: 55, y: 90, label: 'Pied D' },
-    ],
-    []
+    () => {
+      const allPoints = [
+        { x: 50, y: 12, label: 'Tête' },
+        { x: 40, y: 25, label: 'Épaule G' },
+        { x: 60, y: 25, label: 'Épaule D' },
+        { x: 50, y: 45, label: 'Taille' },
+        { x: 45, y: 65, label: 'Hanche G' },
+        { x: 55, y: 65, label: 'Hanche D' },
+        { x: 45, y: 90, label: 'Pied G' },
+        { x: 55, y: 90, label: 'Pied D' },
+      ];
+      // Reduce to 5 keypoints in performance mode (head, shoulders, waist, feet)
+      return performanceConfig.mode === 'high-performance'
+        ? [allPoints[0], allPoints[1], allPoints[2], allPoints[3], allPoints[6]]
+        : allPoints;
+    },
+    [performanceConfig.mode]
   );
 
   const profileKeypoints = useMemo(
-    () => [
-      { x: 50, y: 15, label: 'Tête' },
-      { x: 45, y: 35, label: 'Épaule' },
-      { x: 50, y: 50, label: 'Taille' },
-      { x: 48, y: 70, label: 'Hanche' },
-      { x: 50, y: 90, label: 'Pied' },
-    ],
-    []
+    () => {
+      const allPoints = [
+        { x: 50, y: 15, label: 'Tête' },
+        { x: 45, y: 35, label: 'Épaule' },
+        { x: 50, y: 50, label: 'Taille' },
+        { x: 48, y: 70, label: 'Hanche' },
+        { x: 50, y: 90, label: 'Pied' },
+      ];
+      // Reduce to 3 keypoints in performance mode (head, waist, foot)
+      return performanceConfig.mode === 'high-performance'
+        ? [allPoints[0], allPoints[2], allPoints[4]]
+        : allPoints;
+    },
+    [performanceConfig.mode]
   );
 
   // Zones d'analyse dynamiques - DÉSACTIVÉES en mode performance
@@ -83,11 +95,16 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
   >([]);
 
   useEffect(() => {
-    // OPTIMIZATION: Désactiver complètement les zones en mode performance
-    if (!shouldAnimate || !performanceConfig.enableParticleEffects) return;
+    // OPTIMIZATION: Désactiver complètement la génération en mode performance
+    if (!shouldAnimate || !performanceConfig.enableParticleEffects) {
+      setAnalysisZones([]); // Clear zones immediately
+      return;
+    }
 
     const generateZones = () => {
-      const zones = Array.from({ length: 3 }, (_, i) => ({
+      // Reduce zone count: 3 → 2 in balanced mode
+      const zoneCount = performanceConfig.mode === 'quality' ? 3 : 2;
+      const zones = Array.from({ length: zoneCount }, (_, i) => ({
         x: Math.random() * 80 + 10,
         y: Math.random() * 80 + 10,
         intensity: Math.random() * 0.8 + 0.2,
@@ -97,9 +114,10 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
     };
 
     generateZones();
-    const interval = setInterval(generateZones, 2000);
+    // Increase interval: 2s → 3s for better performance
+    const interval = setInterval(generateZones, 3000);
     return () => clearInterval(interval);
-  }, [shouldAnimate, performanceConfig.enableParticleEffects]);
+  }, [shouldAnimate, performanceConfig.enableParticleEffects, performanceConfig.mode]);
 
   // Particules de flux de données (positions fixes par montage)
   type Particle = {
@@ -114,8 +132,14 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
   };
 
   const dataParticles: Particle[] = useMemo(() => {
+    // Reduce particle count based on performance mode
+    const particleCount = performanceConfig.mode === 'quality' ? 6 :
+                          performanceConfig.mode === 'balanced' ? 4 : 0;
+
+    if (particleCount === 0) return [];
+
     // Répartir sur toute la largeur, démarrage vers le bas pour une montée visible
-    return Array.from({ length: 6 }, (_, i) => {
+    return Array.from({ length: particleCount }, (_, i) => {
       const x = 12 + Math.random() * 76;            // 12% → 88% (évite les bords)
       const y = 70 + Math.random() * 25;            // zone inférieure (70% → 95%)
       const dx = (Math.random() - 0.5) * 30;        // dérive horizontale -15% → +15%
@@ -125,7 +149,7 @@ const ImmersivePhotoAnalysis: React.FC<ImmersivePhotoAnalysisProps> = ({
       const delay = i * 0.3;                         // décalage progressif
       return { id: `p-${i}`, x, y, dx, dy, speed, size, delay };
     });
-  }, []);
+  }, [performanceConfig.mode]);
 
   // Animation basique - conditionnelle selon mode performance
   const cardEnter = performanceConfig.enableInitialAnimations ? { opacity: 0, scale: 0.94 } : false;
