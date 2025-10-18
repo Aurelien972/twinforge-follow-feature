@@ -169,24 +169,35 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
       content: message
     };
 
+    logger.info('GLOBAL_CHAT_DRAWER', '🚀 User sent message', {
+      messageLength: message.length,
+      currentMode,
+      messageCount: messages.length
+    });
+
     addMessage(userMessage);
     setTyping(true);
 
     try {
+      logger.info('GLOBAL_CHAT_DRAWER', '📝 Getting conversation ID', { currentMode });
+
       const convId = conversationId || await chatConversationService.getOrCreateConversation(currentMode);
 
       if (!convId) {
+        logger.error('GLOBAL_CHAT_DRAWER', '❌ Failed to get conversation ID');
         throw new Error('Failed to get or create conversation');
       }
+
+      logger.info('GLOBAL_CHAT_DRAWER', '✅ Conversation ID obtained', { convId });
 
       if (!conversationId) {
         set({ conversationId: convId });
       }
 
       await chatConversationService.saveMessage(convId, userMessage);
+      logger.info('GLOBAL_CHAT_DRAWER', '✅ User message saved to DB');
 
       let systemPrompt = modeConfig.systemPrompt;
-
 
       const conversationMessages = messages.slice(-10);
 
@@ -196,9 +207,19 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
         { role: 'user' as const, content: message }
       ];
 
+      logger.info('GLOBAL_CHAT_DRAWER', '📤 Calling chatAIService.sendMessage', {
+        apiMessageCount: apiMessages.length,
+        mode: currentMode
+      });
+
       const response = await chatAIService.sendMessage({
         messages: apiMessages,
         mode: currentMode
+      });
+
+      logger.info('GLOBAL_CHAT_DRAWER', '✅ Received response from AI', {
+        hasContent: !!response.message?.content,
+        contentLength: response.message?.content?.length || 0
       });
 
       const assistantMessage = {
@@ -210,8 +231,13 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
       addMessage(assistantMessage);
       await chatConversationService.saveMessage(convId, assistantMessage);
 
+      logger.info('GLOBAL_CHAT_DRAWER', '✅ Assistant message saved to DB');
+
     } catch (error) {
-      logger.error('GLOBAL_CHAT_DRAWER', 'Error sending message', { error });
+      logger.error('GLOBAL_CHAT_DRAWER', '❌ Error in message flow', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
 
       addMessage({
         role: 'system' as const,

@@ -40,7 +40,15 @@ function log(level: 'info' | 'warn' | 'error', message: string, requestId: strin
 Deno.serve(async (req: Request) => {
   const requestId = crypto.randomUUID();
 
+  console.log('🚀 EDGE FUNCTION INVOKED - chat-ai', {
+    requestId,
+    timestamp: new Date().toISOString(),
+    method: req.method,
+    url: req.url
+  });
+
   if (req.method === "OPTIONS") {
+    console.log('✅ OPTIONS request handled', { requestId });
     return new Response(null, {
       status: 200,
       headers: corsHeaders,
@@ -48,16 +56,19 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    log('info', 'Chat request received', requestId, { method: req.method });
+    log('info', '📥 Chat request received', requestId, { method: req.method });
 
     if (!OPENAI_API_KEY) {
-      log('error', 'OPENAI_API_KEY not configured', requestId);
+      log('error', '❌ OPENAI_API_KEY not configured', requestId);
+      console.error('CRITICAL: OPENAI_API_KEY is missing!');
       throw new Error("OPENAI_API_KEY is not configured");
     }
 
+    console.log('✅ OPENAI_API_KEY is configured', { requestId });
+
     const { messages, mode, contextData, stream = false }: ChatRequest = await req.json();
 
-    log('info', 'Request parsed', requestId, {
+    log('info', '✅ Request parsed successfully', requestId, {
       mode,
       messageCount: messages.length,
       stream,

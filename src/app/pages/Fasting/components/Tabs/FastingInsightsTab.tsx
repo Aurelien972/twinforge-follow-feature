@@ -129,8 +129,8 @@ const FastingInsightsTab: React.FC = () => {
         </GlassCard>
       )}
       
-      {/* Insights Content */}
-      {insightsData && !isLoading && (
+      {/* Insights Content - Only show when there are insights */}
+      {insightsData && !isLoading && insightsData.insights.length > 0 && (
         <div className="space-y-6">
           {/* Summary Card */}
           <FastingInsightsSummaryCard
@@ -140,27 +140,24 @@ const FastingInsightsTab: React.FC = () => {
             tokensUsed={insightsData.tokensUsed}
             cached={insightsData.cached}
           />
-          
+
           {/* Individual Insights */}
-          {insightsData.insights.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-white font-semibold text-lg flex items-center gap-2">
+              <SpatialIcon Icon={ICONS.Lightbulb} size={18} className="text-green-400" />
+              Insights Détaillés ({insightsData.insights.length})
+            </h3>
+
             <div className="space-y-4">
-              <h3 className="text-white font-semibold text-lg flex items-center gap-2">
-                <SpatialIcon Icon={ICONS.Lightbulb} size={18} className="text-green-400" />
-                Insights Détaillés ({insightsData.insights.length})
-              </h3>
-              
-              <div className="space-y-4">
-                {insightsData.insights.map((insight, index) => (
-                  <FastingInsightCard
-                    key={insight.id}
-                    insight={insight}
-                    index={index}
-                  />
-                ))}
-              </div>
+              {insightsData.insights.map((insight, index) => (
+                <FastingInsightCard
+                  key={insight.id}
+                  insight={insight}
+                  index={index}
+                />
+              ))}
             </div>
-          )}
-          
+          </div>
         </div>
       )}
       

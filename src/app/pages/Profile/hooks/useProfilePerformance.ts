@@ -52,7 +52,7 @@ export function useProfilePerformance(): ProfilePerformanceConfig {
     // Base configuration
     const baseConfig: ProfilePerformanceConfig = {
       // Framer Motion - disable on low-end and medium mobile
-      shouldUseFramerMotion: shouldUseFramerMotion(),
+      shouldUseFramerMotion: shouldUseFramerMotion,
       shouldUseStagger: level === 'high' && !isMobile,
       shouldUseAnimatePresence: level === 'high' && !isMobile && !prefersReduced,
 

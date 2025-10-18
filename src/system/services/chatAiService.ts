@@ -39,18 +39,29 @@ class ChatAIService {
   }
 
   async sendMessage(request: ChatAIRequest): Promise<ChatAIResponse> {
+    const requestId = `chat-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     try {
-      logger.debug('CHAT_AI_SERVICE', 'Sending message to AI', {
+      logger.info('CHAT_AI_SERVICE', '🚀 Starting sendMessage request', {
+        requestId,
         mode: request.mode,
         messageCount: request.messages.length,
-        hasContext: !!request.contextData
+        hasContext: !!request.contextData,
+        baseUrl: this.baseUrl
       });
 
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
+        logger.error('CHAT_AI_SERVICE', '❌ User not authenticated', { requestId });
         throw new Error('User not authenticated');
       }
+
+      logger.info('CHAT_AI_SERVICE', '✅ Session validated, making fetch request', {
+        requestId,
+        userId: session.user.id,
+        url: `${this.baseUrl}/chat-ai`
+      });
 
       const response = await fetch(`${this.baseUrl}/chat-ai`, {
         method: 'POST',
@@ -62,21 +73,48 @@ class ChatAIService {
         body: JSON.stringify(request)
       });
 
+      logger.info('CHAT_AI_SERVICE', '📡 Fetch response received', {
+        requestId,
+        status: response.status,
+        ok: response.ok,
+        contentType: response.headers.get('Content-Type')
+      });
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        const errorText = await response.text();
+        logger.error('CHAT_AI_SERVICE', '❌ Response not OK', {
+          requestId,
+          status: response.status,
+          errorText
+        });
+
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: errorText || 'Unknown error' };
+        }
+
         throw new Error(errorData.error || `API error: ${response.status}`);
       }
 
       const data: ChatAIResponse = await response.json();
 
-      logger.info('CHAT_AI_SERVICE', 'Received AI response', {
+      logger.info('CHAT_AI_SERVICE', '✅ Response parsed successfully', {
+        requestId,
         mode: request.mode,
-        tokensUsed: data.usage?.total_tokens
+        tokensUsed: data.usage?.total_tokens,
+        hasMessage: !!data.message,
+        messageLength: data.message?.content?.length || 0
       });
 
       return data;
     } catch (error) {
-      logger.error('CHAT_AI_SERVICE', 'Error sending message', { error });
+      logger.error('CHAT_AI_SERVICE', '❌ Fatal error in sendMessage', {
+        requestId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       throw error;
     }
   }
