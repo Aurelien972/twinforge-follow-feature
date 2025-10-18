@@ -120,43 +120,6 @@
 }
 
 /* =========================================
-   PAGE HEADER ICONS - Keep visible with circuit colors
-   Exception pour les grandes icônes des PageHeader
-   ========================================= */
-
-/* Conserver les icônes de PageHeader visibles */
-.performance-mode .breathing-icon {
-  animation: none !important;
-  opacity: 1 !important;
-}
-
-/* Icon container de PageHeader - simplifié mais visible */
-.performance-mode .breathing-icon > div {
-  /* Garder le fond avec la couleur de circuit mais sans animation */
-  background: rgba(255, 255, 255, 0.15) !important;
-  border: 2px solid currentColor !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Icône elle-même garde sa couleur de circuit */
-.performance-mode .breathing-icon svg,
-.performance-mode .breathing-icon .spatial-icon {
-  filter: none !important;
-  text-shadow: none !important;
-}
-
-/* Titre de PageHeader garde son ombre de texte subtile */
-.performance-mode .page-header-title {
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-}
-
-.performance-mode .page-header-subtitle {
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* =========================================
    ANIMATIONS - All disabled
    ========================================= */
 
@@ -186,7 +149,7 @@
    CIRCUITS AND EFFECTS - Disabled
    ========================================= */
 
-.performance-mode [class*="breathing"]:not(.breathing-icon),
+.performance-mode [class*="breathing"],
 .performance-mode [class*="pulse"],
 .performance-mode [class*="glow"],
 .performance-mode [class*="shimmer"],
@@ -197,12 +160,17 @@
 }
 
 /* =========================================
-   SHADOWS - Optimized in shadow-optimizations.css
-   Box-shadows are now handled in dedicated file for better control
+   SHADOWS - Simplified
    ========================================= */
 
-/* Shadow optimizations moved to src/styles/optimizations/shadow-optimizations.css
-   for comprehensive mapping of all 676 box-shadow occurrences */
+.performance-mode [class*="shadow"] {
+  /* Remove all colored shadows and glows */
+  filter: none !important;
+}
+
+.performance-mode [style*="box-shadow"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
 
 /* =========================================
    LOADERS - Essential only
@@ -265,91 +233,13 @@
 }
 
 /* =========================================
-   FILTERS - All removed (except PageHeader icons)
+   FILTERS - All removed
    ========================================= */
 
-.performance-mode [style*="filter:"]:not(.breathing-icon):not(.breathing-icon *),
+.performance-mode [style*="filter:"],
 .performance-mode [class*="blur"],
 .performance-mode [class*="saturate"] {
   filter: none !important;
-}
-
-/* =========================================
-   FOCUS BORDERS - Remove cyan borders
-   ========================================= */
-
-/* Logo Header - Remove cyan focus border */
-.performance-mode .header-liquid-glass button:focus-visible,
-.performance-mode .header-liquid-glass button:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.3) !important;
-  outline-offset: 2px !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-/* Logo Header - Remove ALL borders from logo button container */
-.performance-mode .header-liquid-glass button,
-.performance-mode .header-liquid-glass button > div {
-  border: none !important;
-}
-
-/* Logo Header - Hide animated border pseudo-elements */
-.performance-mode .header-liquid-glass::before,
-.performance-mode .header-liquid-glass::after {
-  display: none !important;
-}
-
-/* Mobile Drawer - Remove cyan focus borders */
-.performance-mode .mobile-drawer button:focus-visible,
-.performance-mode .mobile-drawer button:focus,
-.performance-mode .mobile-drawer a:focus-visible,
-.performance-mode .mobile-drawer a:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.3) !important;
-  outline-offset: 2px !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-/* Mobile Drawer - Remove ALL borders from sidebar item containers */
-.performance-mode .mobile-drawer .sidebar-item,
-.performance-mode .mobile-drawer .sidebar-item-icon-container,
-.performance-mode .mobile-drawer .sidebar-submenu-item,
-.performance-mode .mobile-drawer .sidebar-submenu-item-icon-container,
-.performance-mode .mobile-drawer button,
-.performance-mode .mobile-drawer a {
-  border: none !important;
-}
-
-/* Mobile Drawer - Hide animated border pseudo-elements */
-.performance-mode .mobile-drawer::before,
-.performance-mode .mobile-drawer::after {
-  display: none !important;
-}
-
-/* Sidebar Desktop - Hide animated border pseudo-elements */
-.performance-mode .sidebar-glass-enhanced::before,
-.performance-mode .sidebar-glass-enhanced::after {
-  display: none !important;
-}
-
-/* Sidebar item icon containers - Remove ALL borders */
-.performance-mode .sidebar-item-icon-container,
-.performance-mode .sidebar-item-icon-container--active,
-.performance-mode .sidebar-item--primary .sidebar-item-icon-container,
-.performance-mode .sidebar-item--twin .sidebar-item-icon-container,
-.performance-mode .sidebar-item--forge .sidebar-item-icon-container {
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.performance-mode .sidebar-item-icon-container::before,
-.performance-mode .sidebar-item-icon-container::after {
-  display: none !important;
-}
-
-/* Remove focus-ring cyan borders globally in performance mode */
-.performance-mode .focus-ring:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.3) !important;
-  outline-offset: 2px !important;
-  box-shadow: none !important;
 }
 
 /* =========================================

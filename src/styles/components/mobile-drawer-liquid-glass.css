@@ -47,11 +47,6 @@
   max-width: 320px;
 }
 
-/* CORRECTION: Ajouter marge gauche pour éviter la coupure des boutons */
-.mobile-drawer > div {
-  padding-left: 16px;
-}
-
 /* Webkit scrollbar invisible */
 .mobile-drawer::-webkit-scrollbar {
   display: none;

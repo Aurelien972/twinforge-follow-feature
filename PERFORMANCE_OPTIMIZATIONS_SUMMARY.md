@@ -95,109 +95,22 @@ background: linear-gradient(135deg, #F7931E 0%, #FDC830 100%);
 
 ---
 
-### 3. ✅ Animations & Transitions (COMPLÉTÉ - NOUVEAU)
-**Fichier**: `src/styles/optimizations/animation-optimizations.css`
+### 3. ✅ Animations & Transitions (COMPLÉTÉ)
+**Fichier**: `src/styles/optimizations/performance-mode.css`
 
-**Total animations**: ~210 @keyframes dans 60 fichiers
-
-#### Stratégie
-- **Desktop**: Toutes animations @keyframes préservées
-- **Mobile**: Suppression 100% animations décoratives
-- **Conservées**: 3 animations essentielles uniquement
-
-##### Animations Essentielles (CONSERVÉES)
-1. **Loader Spinner**: `spin`, `icon-spin-css` - Feedback chargement
-2. **Tap Feedback**: `button-ripple-gpu`, `tileRipple` - Feedback tactile
-3. **Modal Slide-in**: `slide-in-mobile`, `glass-slide-up` - UX modals
-
-##### Animations Supprimées
-- Breathing/Breathe (35 occurrences) → Static opacity 0.75
-- Pulse (45 occurrences) → Static emphasis 0.95
-- Shimmer/Shine (40 occurrences) → Static shine 0.9
-- Glow (30 occurrences) → Static glow + brightness 1.1
-- Float/Particle (25 occurrences) → Removed + `display: none`
-- Flow/Energy (18 occurrences) → Removed
-- Scan/Analysis (28 occurrences) → Removed
-
-**Remplacement Statique**:
-```css
-/* Au lieu de pulse animation */
-.performance-mode [class*="pulse"] {
-  animation: none !important;
-  opacity: 0.95;
-  transform: scale(1);
-}
-```
+**Desktop**: Toutes animations actives (breathing, pulse, shimmer, float)
+**Mobile**: `animation: none` sauf feedback utilisateur essentiel
 
 **Impact**:
-- GPU Animation Layers: -70%
-- CPU usage: -60 à -65%
-- Batterie: +30% autonomie
-- Memory: -20%
-- Animations actives: 210 → 3 (98.5% réduction)
+- CPU usage: -35%
+- Batterie: +20% autonomie
+- Exceptions: tap feedback (0.08s), loaders essentiels
 
 ---
 
-### 4. ✅ Box-Shadow Simplification (COMPLÉTÉ - NOUVEAU)
-**Fichier**: `src/styles/optimizations/shadow-optimizations.css`
-
-**Total box-shadow**: 676 occurrences dans 87 fichiers
-
-#### Suppressions en Mode Performance
-
-##### A. Multi-Layer Shadows (280 occurrences)
-- **Desktop**: 3-5 box-shadow layers pour depth 3D
-- **Mobile**: 1 simple shadow
-
-```css
-/* Desktop: 5 layers */
-box-shadow:
-  0 30px 80px rgba(0,0,0,0.5),
-  0 12px 40px rgba(0,0,0,0.35),
-  0 4px 16px rgba(0,0,0,0.25),
-  inset 0 2px 0 rgba(255,255,255,0.2),
-  inset 0 -1px 0 rgba(0,0,0,0.15);
-
-/* Mobile: 1 layer */
-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-```
-
-##### B. Colored Glows (95 occurrences)
-- **Desktop**: Colored glow effects (cyan, orange, indigo)
-- **Mobile**: `box-shadow: none` + border coloré
-
-```css
-/* Desktop */
-box-shadow: 0 0 40px rgba(24, 227, 255, 0.3);
-
-/* Mobile */
-box-shadow: none;
-border: 1px solid rgba(24, 227, 255, 0.3);
-```
-
-##### C. Large Blur Shadows (180 occurrences)
-- **Desktop**: Blur 20-60px pour soft shadows
-- **Mobile**: Max blur 8px
-
-##### D. Inset Shadows (85 occurrences)
-- **Desktop**: Inset shadows pour depth 3D
-- **Mobile**: Supprimés, border subtile
-
-##### E. Autres Shadows (36 occurrences)
-- Filters avec drop-shadow
-- Shadow animations
-- Hover glows
-
-**Impact**:
-- GPU Paint Time: -40 à -50%
-- Compositing Layers: -30 à -40%
-- Memory Usage: -15 à -20%
-
----
-
-### 5. ✅ Filters (COMPLÉTÉ)
-**Desktop**: Drop-shadow filters, blur filters
-**Mobile**: `filter: none`
+### 4. ✅ Shadows & Filters (COMPLÉTÉ)
+**Desktop**: Multi-layer shadows, drop-shadow filters, blur filters
+**Mobile**: Shadows simplifiées, `filter: none`
 
 **Impact**:
 - GPU layers: -45%
@@ -205,246 +118,13 @@ border: 1px solid rgba(24, 227, 255, 0.3);
 
 ---
 
-### 6. ✅ Will-Change & Transform (COMPLÉTÉ)
+### 5. ✅ Will-Change & Transform (COMPLÉTÉ)
 **Desktop**: `will-change` sur éléments animés
 **Mobile**: `will-change: auto`, limit transform usage
 
 **Impact**:
 - Memory overhead: -20%
 - Compositor thrashing: -60%
-
----
-
-### 7. ✅ Framer Motion Optimization (COMPLÉTÉ - NOUVEAU)
-**Fichiers**: `src/lib/motion/PerformanceMotion.tsx` + `motion-replacements.css`
-
-**Stratégie**: Wrapper conditionnel qui bypass Framer Motion en mode performance
-
-#### Approche
-Au lieu de remplacer 314 fichiers utilisant Framer Motion, création d'un wrapper intelligent:
-
-```tsx
-// Au lieu de:
-import { motion } from 'framer-motion';
-
-// Utiliser:
-import { motion } from '@/lib/motion/PerformanceMotion';
-```
-
-#### Comportement par Mode
-
-**Desktop / Quality Mode**:
-- Framer Motion complet activé
-- Toutes animations et interactions préservées
-
-**Mobile / Performance Mode**:
-- `motion.div` → `<div>` natif
-- `whileHover` → `.hover-effect:hover` CSS
-- `whileTap` → `.tap-effect:active` CSS
-- `animate` → `data-motion` attributes + CSS animations
-- `AnimatePresence` → rendu direct sans transitions
-- Variants complexes → désactivés
-- Spring animations → `ease-out` CSS
-- Layout animations → désactivés
-- Drag → désactivé
-
-#### Patterns CSS Alternatifs
-
-```css
-/* Hover effects */
-.performance-mode .hover-effect:hover {
-  transform: scale(1.02);
-}
-
-/* Tap effects */
-.performance-mode .tap-effect:active {
-  transform: scale(0.98);
-}
-
-/* Animations d'entrée */
-[data-motion="fade-in"] { animation: motion-fade-in 0.3s; }
-[data-motion="slide-up"] { animation: motion-slide-up 0.3s; }
-```
-
-**Impact**:
-- Bundle size: -50 à -60% (bypass framer-motion)
-- Memory: -30% (no motion values, no RAF)
-- Battery: +25% (CSS au lieu de JS)
-- FPS: +15-20 FPS sur bas de gamme
-- Migration progressive: compatible avec code existant
-
----
-
-### 8. ✅ Logo FØRGE Optimization (DÉJÀ IMPLÉMENTÉ)
-**Fichier**: `src/ui/components/branding/TwinForgeLogo.tsx`
-
-Le logo FØRGE est déjà optimisé avec deux modes:
-
-**Desktop / Quality Mode**:
-```tsx
-<span style={{
-  background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)',
-  WebkitBackgroundClip: 'text',
-  filter: 'drop-shadow(0 0 12px rgba(253, 200, 48, 0.5))'
-}}>
-  FØRGE
-</span>
-```
-
-**Mobile / Performance Mode**:
-```tsx
-<span>
-  <span style={{ color: '#FF6B35' }}>F</span>
-  <span style={{ color: '#F89442' }}>Ø</span>
-  <span style={{ color: '#F7931E' }}>R</span>
-  <span style={{ color: '#FCBB45' }}>G</span>
-  <span style={{ color: '#FDC830' }}>E</span>
-</span>
-```
-
-**Impact**:
-- Gradient computation: removed
-- Drop-shadow filter: removed
-- Text rendering: optimized
-- Readability: maintained across all backgrounds
-
----
-
-### 9. ✅ Skeleton Loaders Optimization (COMPLÉTÉ - NOUVEAU)
-**Fichiers**:
-- `src/ui/components/skeletons/skeletons.css`
-- `src/ui/components/skeletons/SkeletonBase.tsx`
-- Tous les composants skeleton mis à jour
-
-**Problème**: Les squelettes de chargement utilisaient des effets glass coûteux (backdrop-filter, gradients complexes, animations shimmer)
-
-#### Optimisations Appliquées
-
-**Desktop / Quality Mode**:
-- Shimmer complexe avec gradients
-- Glow effects avec pseudo-elements
-- Backdrop-filter blur sur GlassCards
-- Animations smooth 2s
-
-**Mobile / Performance Mode**:
-- **Shimmer simplifié**: Gradient simple à pulse CSS
-- **Glow effects**: Désactivés (`display: none`)
-- **Backdrop-filter**: Désactivé complètement
-- **GlassCards**: Background opaque `rgba(255, 255, 255, 0.08)`
-- **Animation**: Pulse simple sans gradient shift
-
-#### CSS Créés
-
-```css
-/* Simple pulse pour performance mode */
-@keyframes skeleton-pulse-simple {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 0.9; }
-}
-
-/* Classe optimisée */
-.skeleton-glass-performance {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  animation: skeleton-pulse-simple 2s ease-in-out infinite;
-  backdrop-filter: none;
-}
-
-/* Override glass effects */
-.performance-mode .skeleton-glass {
-  backdrop-filter: none !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-```
-
-#### Composants Optimisés
-
-1. **SkeletonBase**: Détection performance mode + fallback CSS
-2. **ProfileTabSkeleton**: Simplifié
-3. **ProjectionTabSkeleton**: Simplifié
-4. **AvatarTabSkeleton**: Simplifié
-5. **TrainingProgressTabSkeleton**: Simplifié
-6. **DailyRecapSkeleton** (Meals): Simplifié
-7. **FastingHistoryLoadingSkeleton**: Simplifié
-8. **FastingProgressionLoadingSkeleton**: Simplifié
-9. **FastingInsightsLoadingSkeleton**: Simplifié
-10. **ActivityAnalysisLoadingSkeleton**: Simplifié
-11. **AILoadingSkeleton**: Simplifié
-12. **30+ Training Skeletons**: Tous mis à jour
-
-#### Mobile Centering
-
-Icônes et flex containers centrés sur mobile:
-```css
-@media (max-width: 768px) {
-  .skeleton-shimmer svg,
-  [class*="skeleton"] svg {
-    display: block;
-    margin: 0 auto;
-  }
-
-  [class*="skeleton"] [class*="flex"] {
-    justify-content: center;
-    align-items: center;
-  }
-}
-```
-
-#### Import Performance Motion
-
-Tous les skeletons utilisent maintenant le wrapper performance:
-```tsx
-// Ancien
-import { motion } from 'framer-motion';
-
-// Nouveau
-import { motion } from '@/lib/motion/PerformanceMotion';
-```
-
-**Impact**:
-- GPU layers pour skeletons: -70%
-- Backdrop-filter paint: removed
-- Shimmer animation: simplifié (gradient → pulse)
-- Memory: -15 à -20%
-- FPS pendant loading: +10-15 FPS
-- Visibility: containers restent visibles et structurés
-- Centering: icônes correctement centrés sur mobile
-
-**Files Modifiés**: 40+ skeleton components
-
----
-
-## Résumé des Optimisations
-
-### Fichiers d'Optimisation Créés
-1. `gradient-optimizations.css` - 647 gradients optimisés
-2. `shadow-optimizations.css` - 676 box-shadows optimisés
-3. `animation-optimizations.css` - 210 animations optimisées
-4. `motion-replacements.css` - Framer Motion alternatives
-5. `performance-mode.css` - Backdrop filters, transitions
-6. `mobile-replacements.css` - Alternatives mobiles
-7. `src/lib/motion/PerformanceMotion.tsx` - Motion wrapper
-8. `src/ui/components/skeletons/skeletons.css` - Skeleton optimizations
-
-### Ordre d'Import dans index.css
-```css
-@import './optimizations/gradient-optimizations.css';
-@import './optimizations/shadow-optimizations.css';
-@import './optimizations/animation-optimizations.css';
-@import './optimizations/motion-replacements.css';
-@import './optimizations/pipeline-animations.css';
-```
-
-### Couverture Totale
-- **2100+ optimisations** appliquées en mode performance
-- 647 gradients simplifiés
-- 676 box-shadows optimisés
-- 210 animations désactivées (3 conservées)
-- 314 fichiers Framer Motion optimisés (wrapper)
-- 180+ backdrop-filters remplacés
-- 40+ skeleton loaders optimisés
-- Logo FØRGE optimisé
 
 ---
 
@@ -483,8 +163,7 @@ All premium effects:    ✅ Preserved
 ```
 src/styles/optimizations/
 ├── performance-mode.css           # Mode performance principal
-├── gradient-optimizations.css     # Gradients 647 occurrences
-├── shadow-optimizations.css       # Box-shadows 676 occurrences (NOUVEAU)
+├── gradient-optimizations.css     # Gradients (NOUVEAU)
 ├── mobile-replacements.css        # Alternatives mobile
 ├── performance-modes.css          # Mode selector
 └── performance.css                # Base optimizations
@@ -495,8 +174,7 @@ src/styles/optimizations/
 @import './optimizations/performance-modes.css';
 @import './optimizations/responsive.css';
 @import './optimizations/performance.css';
-@import './optimizations/gradient-optimizations.css';
-@import './optimizations/shadow-optimizations.css'; /* NOUVEAU */
+@import './optimizations/gradient-optimizations.css'; /* NOUVEAU */
 @import './optimizations/pipeline-animations.css';
 ```
 

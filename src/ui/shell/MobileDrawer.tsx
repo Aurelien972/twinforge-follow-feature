@@ -178,7 +178,7 @@ const MobileDrawer = React.memo(() => {
               msOverflowStyle: 'none'
             }}
           >
-            <div className="py-3 pl-4 pr-2.5 space-y-2">
+            <div className="py-3 pl-3 pr-2.5 space-y-2">
               {/* Navigation Sections */}
               {navSections.map((section, index) => (
                 <React.Fragment key={index}>
