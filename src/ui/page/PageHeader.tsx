@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { ICONS } from '../icons/registry';
 import SpatialIcon from '../icons/SpatialIcon';
 import { CIRCUIT_COLORS, type CircuitKey } from '../theme/circuits';
-import { usePerformanceMode } from '../../system/context/PerformanceModeContext';
 
 type Props = {
   icon?: keyof typeof ICONS;
@@ -15,18 +14,15 @@ type Props = {
   iconColor?: string;
 };
 
-export default function PageHeader({
-  icon = 'Home',
-  title,
-  subtitle,
-  actions,
+export default function PageHeader({ 
+  icon = 'Home', 
+  title, 
+  subtitle, 
+  actions, 
   className = '',
   circuit = 'home',
   iconColor
 }: Props) {
-  const { mode } = usePerformanceMode();
-  const isHighPerformance = mode === 'high-performance';
-
   // Gestion spéciale pour certains circuits
   const finalIcon = (() => {
     if (circuit === 'track') return ICONS.Target;
@@ -35,9 +31,6 @@ export default function PageHeader({
 
   // Utiliser la couleur spécifique ou celle du circuit
   const finalCircuitColor = iconColor || CIRCUIT_COLORS[circuit];
-
-  // Taille de l'icône adaptée au mode performance
-  const iconSize = isHighPerformance ? 56 : 48;
   
   return (
     <header
@@ -58,30 +51,24 @@ export default function PageHeader({
             style={{
               '--header-icon-radius': '24px',
               borderRadius: 'var(--header-icon-radius)',
-              WebkitMaskImage: isHighPerformance ? 'none' : 'radial-gradient(white, black)',
-              maskImage: isHighPerformance ? 'none' : 'radial-gradient(white, black)',
-              background: isHighPerformance
-                ? `linear-gradient(145deg, rgba(26, 35, 50, 0.95), rgba(15, 25, 39, 0.98))`
-                : `
-                  radial-gradient(circle at 30% 30%, color-mix(in srgb, ${finalCircuitColor} 40%, transparent) 0%, transparent 60%),
-                  radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--brand-primary) 35%, transparent) 0%, transparent 50%),
-                  radial-gradient(circle at 50% 50%, color-mix(in srgb, ${finalCircuitColor} 25%, transparent) 0%, transparent 70%),
-                  rgba(255, 255, 255, 0.15)
-                `,
-              border: isHighPerformance
-                ? '2px solid rgba(255, 255, 255, 0.25)'
-                : `2px solid color-mix(in srgb, ${finalCircuitColor} 60%, transparent)`,
-              boxShadow: isHighPerformance
-                ? `0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.2)`
-                : `
-                  0 16px 64px color-mix(in srgb, ${finalCircuitColor} 45%, transparent),
-                  0 0 100px color-mix(in srgb, ${finalCircuitColor} 35%, transparent),
-                  0 0 160px color-mix(in srgb, var(--brand-primary) 25%, transparent),
-                  inset 0 4px 0 rgba(255, 255, 255, 0.3),
-                  inset 0 -3px 0 rgba(0, 0, 0, 0.15)
-                `,
-              backdropFilter: isHighPerformance ? 'none' : 'blur(24px) saturate(200%)',
-              WebkitBackdropFilter: isHighPerformance ? 'none' : 'blur(24px) saturate(200%)',
+              WebkitMaskImage: 'radial-gradient(white, black)',
+              maskImage: 'radial-gradient(white, black)',
+              background: `
+                radial-gradient(circle at 30% 30%, color-mix(in srgb, ${finalCircuitColor} 40%, transparent) 0%, transparent 60%),
+                radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--brand-primary) 35%, transparent) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, color-mix(in srgb, ${finalCircuitColor} 25%, transparent) 0%, transparent 70%),
+                rgba(255, 255, 255, 0.15)
+              `,
+              border: `2px solid color-mix(in srgb, ${finalCircuitColor} 60%, transparent)`,
+              boxShadow: `
+                0 16px 64px color-mix(in srgb, ${finalCircuitColor} 45%, transparent),
+                0 0 100px color-mix(in srgb, ${finalCircuitColor} 35%, transparent),
+                0 0 160px color-mix(in srgb, var(--brand-primary) 25%, transparent),
+                inset 0 4px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.15)
+              `,
+              backdropFilter: 'blur(24px) saturate(200%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(200%)',
               willChange: 'transform, box-shadow',
               transform: 'translateZ(0)',
             }}
@@ -90,17 +77,13 @@ export default function PageHeader({
           >
             <SpatialIcon
               Icon={finalIcon}
-              size={iconSize}
+              size={48}
               variant="pure"
               className="text-white relative z-10"
               style={{
                 color: finalCircuitColor,
-                filter: isHighPerformance
-                  ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.4))'
-                  : `drop-shadow(0 0 30px color-mix(in srgb, ${finalCircuitColor} 90%, transparent)) drop-shadow(0 0 60px color-mix(in srgb, ${finalCircuitColor} 60%, transparent))`,
-                textShadow: isHighPerformance
-                  ? 'none'
-                  : `0 0 40px color-mix(in srgb, ${finalCircuitColor} 80%, transparent), 0 0 80px color-mix(in srgb, var(--brand-primary) 40%, transparent))`
+                filter: `drop-shadow(0 0 30px color-mix(in srgb, ${finalCircuitColor} 90%, transparent)) drop-shadow(0 0 60px color-mix(in srgb, ${finalCircuitColor} 60%, transparent))`,
+                textShadow: `0 0 40px color-mix(in srgb, ${finalCircuitColor} 80%, transparent), 0 0 80px color-mix(in srgb, var(--brand-primary) 40%, transparent)`
               }}
               aria-hidden="true"
             />

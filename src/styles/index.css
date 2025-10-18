@@ -95,7 +95,6 @@
    PHASE 7: OPTIMISATIONS CONSOLIDÉES
    ========================================= */
 @import './optimizations/z-index-system.css';
-@import './optimizations/backdrop-filter-system.css';
 @import './optimizations/mobile-replacements.css';
 @import './optimizations/performance-modes.css';
 @import './optimizations/responsive.css';
