@@ -884,3 +884,89 @@
   isolation: auto !important;
   contain: none !important;
 }
+
+/* =========================================
+   WILL-CHANGE - Disabled (GPU optimization)
+   ========================================= */
+
+.performance-mode * {
+  /* Disable will-change to prevent unnecessary GPU layers */
+  will-change: auto !important;
+}
+
+/* Exception: Keep will-change for active tap feedback */
+.performance-mode *:active {
+  will-change: transform !important;
+}
+
+/* =========================================
+   PSEUDO-ELEMENTS - Decorative effects disabled
+   ========================================= */
+
+/* Disable ALL decorative ::before and ::after EXCEPT critical ones */
+.performance-mode *::before:not(header [class*="logo"] *)::before,
+.performance-mode *::after:not(header [class*="logo"] *)::after {
+  /* Remove glow effects */
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Remove animations */
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Glass sheen effects - disable completely */
+.performance-mode .glass-sheen::before,
+.performance-mode .glass-sheen::after,
+.performance-mode [class*="sheen"]::before,
+.performance-mode [class*="sheen"]::after {
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* Thermal distortion overlays - disable */
+.performance-mode .thermal-distortion::before,
+.performance-mode .thermal-distortion::after,
+.performance-mode [class*="distortion"]::before,
+.performance-mode [class*="distortion"]::after {
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* Ambient gradient effects - disable */
+.performance-mode .ambient-glow::before,
+.performance-mode .ambient-glow::after,
+.performance-mode [class*="ambient"]::before,
+.performance-mode [class*="ambient"]::after {
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* =========================================
+   COMPLEX BOX-SHADOWS - Simplified
+   ========================================= */
+
+/* Simplify all box-shadows to single layer EXCEPT protected elements */
+.performance-mode [style*="box-shadow"]:not(header [class*="logo"] *):not(header .breathing-icon *):not(header .flex-shrink-0 *):not(.sidebar-glass-enhanced):not(.sidebar-item-icon-container--active) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Remove excessive inset shadows */
+.performance-mode *:not(input):not(textarea):not(select):not(header .breathing-icon):not(header .breathing-icon *):not(header .flex-shrink-0 *):not(header [role="img"]) {
+  box-shadow: none !important;
+}
+
+/* =========================================
+   TEXT-SHADOW - Simplified
+   ========================================= */
+
+.performance-mode * {
+  text-shadow: none !important;
+}
+
+/* Exception: Keep simple text-shadow for page titles */
+.performance-mode .page-header-title,
+.performance-mode h1 {
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+}
