@@ -296,7 +296,14 @@
     background: rgba(255, 255, 255, 0.05) !important;
   }
   .cosmic-forge-particles { display: none !important; }
-  .bg-twinforge-visionos { background: var(--color-obsidian) !important; animation: none !important; }
+  .bg-twinforge-visionos {
+    /* Force background uni solide - pas de gradients */
+    background: var(--forge-deep) !important;
+    background-image: none !important;
+    background-color: var(--forge-deep) !important;
+    animation: none !important;
+    animation-name: none !important;
+  }
 }
 
 /* =========================================

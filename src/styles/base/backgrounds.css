@@ -622,3 +622,40 @@ html.mode-high-performance .forge-particle,
   - Texture grain pour éviter aplat
   - Cohérence entre modes quality et performance
 */
+
+/* =========================================
+   RÈGLE FINALE - PRIORITÉ MAXIMALE
+   Force background uni en mode performance
+   Écrase TOUT autre CSS même responsive.css
+   ========================================= */
+
+/* Spécificité maximale pour mode high-performance */
+html.mode-high-performance body .bg-twinforge-visionos,
+html.performance-mode body .bg-twinforge-visionos,
+body.mode-high-performance .bg-twinforge-visionos,
+body.performance-mode .bg-twinforge-visionos {
+  background: var(--forge-deep) !important;
+  background-image: none !important;
+  background-color: var(--forge-deep) !important;
+  animation: none !important;
+  animation-name: none !important;
+}
+
+/* Spécificité maximale pour mode balanced */
+html.mode-balanced body .bg-twinforge-visionos,
+body.mode-balanced .bg-twinforge-visionos {
+  /* Fond identique au mode quality MAIS sans animation */
+  background:
+    radial-gradient(ellipse 400% 300% at 20% 80%,
+      color-mix(in srgb, var(--nebula-hot-core) 2.5%, transparent) 0%,
+      color-mix(in srgb, var(--nebula-hot-edge) 1.5%, transparent) 40%,
+      transparent 70%),
+    radial-gradient(ellipse 350% 250% at 80% 20%,
+      color-mix(in srgb, var(--nebula-cold-core) 2%, transparent) 0%,
+      color-mix(in srgb, var(--nebula-cold-edge) 1.5%, transparent) 35%,
+      transparent 65%),
+    radial-gradient(circle at 50% 50%, var(--forge-medium) 0%, var(--forge-deep) 40%, var(--forge-void) 100%) !important;
+  background-size: 400% 300%, 350% 250%, 100% 100% !important;
+  animation: none !important;
+  animation-name: none !important;
+}
