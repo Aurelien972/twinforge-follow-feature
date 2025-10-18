@@ -2,6 +2,8 @@
 import { useCallback, useState } from 'react';
 import * as THREE from 'three';
 import { configureSceneMaterials } from '../../../../lib/3d/materials/unifiedMaterialSystem';
+import { applyMobileMaterials, simplifyExistingMaterials } from '../../../../lib/3d/materials/mobileMaterialSystem';
+import { detectDeviceCapabilities, getOptimalPerformanceConfig } from '../../../../lib/3d/performance/mobileDetection';
 import { resolveSkinTone, type SkinToneV2 } from '../../../../lib/scan/normalizeSkinTone';
 import logger from '../../../../lib/utils/logger';
 
@@ -24,7 +26,7 @@ export function useMaterialLifecycle({
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Configure materials
+  // Configure materials with mobile optimization
   const configureMaterials = useCallback(async (customSkinTone?: any) => {
     if (!scene) {
       logger.warn('MATERIAL_LIFECYCLE', 'Cannot configure materials - no scene available', {
@@ -35,7 +37,7 @@ export function useMaterialLifecycle({
     }
 
     const effectiveSkinTone = customSkinTone || skinTone;
-    
+
     if (!effectiveSkinTone) {
       logger.warn('MATERIAL_LIFECYCLE', 'Cannot configure materials - no skin tone data', {
         serverScanId,
@@ -47,12 +49,19 @@ export function useMaterialLifecycle({
     setIsConfiguring(true);
     setError(null);
 
+    // MOBILE OPTIMIZATION: Detect device and use optimized materials on mobile
+    const deviceCapabilities = detectDeviceCapabilities();
+    const performanceConfig = getOptimalPerformanceConfig(deviceCapabilities);
+
     try {
-      logger.info('MATERIAL_LIFECYCLE', 'Starting material configuration', {
+      logger.info('MATERIAL_LIFECYCLE', 'Starting material configuration with mobile detection', {
         serverScanId,
         hasSkinTone: !!effectiveSkinTone,
         finalGender,
-        philosophy: 'material_config_start'
+        isMobile: deviceCapabilities.isMobile,
+        performanceLevel: deviceCapabilities.performanceLevel,
+        enableProceduralTextures: performanceConfig.enableProceduralTextures,
+        philosophy: 'mobile_aware_material_config_start'
       });
 
       // Explicitly re-resolve the skin tone to ensure correct V2 format
@@ -62,18 +71,60 @@ export function useMaterialLifecycle({
         throw new Error('Failed to resolve skin tone to valid V2 format');
       }
 
-      const result = await configureSceneMaterials({
-        scene,
-        skinTone: resolvedSkinTone.tone,
-        enableProceduralTextures: true,
-        proceduralConfig: {
-          detailLevel: 'high',
-          poreIntensity: 0.6,
-          colorVariation: 0.3,
-          imperfectionIntensity: 0.2
-        },
-        serverScanId
-      });
+      // MOBILE OPTIMIZATION: Use simplified materials on mobile devices
+      let result: any;
+
+      if (deviceCapabilities.isMobile && deviceCapabilities.performanceLevel === 'low') {
+        // Ultra-optimized path for low-end mobile
+        logger.info('MATERIAL_LIFECYCLE', 'Using ultra-optimized mobile materials', {
+          performanceLevel: deviceCapabilities.performanceLevel,
+          philosophy: 'low_end_mobile_material_path'
+        });
+
+        result = await applyMobileMaterials(scene, {
+          performanceLevel: deviceCapabilities.performanceLevel,
+          enableProceduralTextures: false,
+          textureQuality: 'low',
+          skinToneRGB: resolvedSkinTone.tone.rgb
+        });
+      } else if (deviceCapabilities.isMobile) {
+        // Balanced mobile materials
+        logger.info('MATERIAL_LIFECYCLE', 'Using balanced mobile materials', {
+          performanceLevel: deviceCapabilities.performanceLevel,
+          philosophy: 'medium_mobile_material_path'
+        });
+
+        // First configure with unified system but simplified settings
+        result = await configureSceneMaterials({
+          scene,
+          skinTone: resolvedSkinTone.tone,
+          enableProceduralTextures: false, // Disabled on mobile
+          proceduralConfig: {
+            detailLevel: 'low',
+            poreIntensity: 0,
+            colorVariation: 0,
+            imperfectionIntensity: 0
+          },
+          serverScanId
+        });
+
+        // Then simplify further
+        simplifyExistingMaterials(scene, deviceCapabilities.performanceLevel);
+      } else {
+        // Desktop: Full quality materials
+        result = await configureSceneMaterials({
+          scene,
+          skinTone: resolvedSkinTone.tone,
+          enableProceduralTextures: performanceConfig.enableProceduralTextures,
+          proceduralConfig: {
+            detailLevel: 'high',
+            poreIntensity: 0.6,
+            colorVariation: 0.3,
+            imperfectionIntensity: 0.2
+          },
+          serverScanId
+        });
+      }
 
       if (!result.success) {
         throw new Error(result.error || 'Material configuration failed');

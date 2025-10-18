@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 import { OrbitTouchControls } from '../../../../lib/3d/camera/OrbitTouchControls';
 import { setupLighting } from '../../../../lib/3d/setup/lightingSetup';
+import { setupAdaptiveLighting } from '../../../../lib/3d/setup/lightingSetupMobile';
 import { setupStudioEnvironment, calculateEnvMapIntensity } from '../../../../lib/3d/setup/environmentSetup';
 import logger from '../../../../lib/utils/logger';
+import { detectDeviceCapabilities, getOptimalPerformanceConfig, type PerformanceConfig } from '../../../../lib/3d/performance/mobileDetection';
 
 export interface SceneInstance {
   renderer: THREE.WebGLRenderer;
@@ -16,41 +18,65 @@ export interface SceneInstance {
 interface SceneCreationOptions {
   container: HTMLDivElement;
   finalGender: 'male' | 'female';
-  faceOnly?: boolean; // ADDED
+  faceOnly?: boolean;
   serverScanId?: string;
+  performanceConfig?: PerformanceConfig; // ADDED: Optional performance config override
 }
 
 /**
  * Create complete Three.js scene with renderer, camera, and controls
  */
 export function createScene(options: SceneCreationOptions): SceneInstance {
-  const { container, finalGender, faceOnly, serverScanId } = options; // MODIFIED
-  
-  logger.info('SCENE_MANAGER', 'Creating Three.js scene', {
+  const { container, finalGender, faceOnly, serverScanId, performanceConfig: customConfig } = options;
+
+  // MOBILE OPTIMIZATION: Detect device capabilities and get optimal config
+  const deviceCapabilities = detectDeviceCapabilities();
+  const performanceConfig = customConfig || getOptimalPerformanceConfig(deviceCapabilities);
+
+  logger.info('SCENE_MANAGER', 'Creating Three.js scene with mobile optimizations', {
     gender: finalGender,
-    faceOnly, // ADDED
+    faceOnly,
     serverScanId,
     containerSize: { width: container.clientWidth, height: container.clientHeight },
-    philosophy: 'core_scene_creation'
+    deviceType: deviceCapabilities.type,
+    performanceLevel: deviceCapabilities.performanceLevel,
+    isMobile: deviceCapabilities.isMobile,
+    isLowEndDevice: deviceCapabilities.isLowEndDevice,
+    optimizedPixelRatio: performanceConfig.pixelRatio,
+    shadowsEnabled: performanceConfig.shadowsEnabled,
+    maxLights: performanceConfig.maxLights,
+    targetFPS: performanceConfig.targetFPS,
+    philosophy: 'mobile_optimized_scene_creation'
   });
 
-  // Create renderer with strict settings
+  // MOBILE OPTIMIZATION: Create renderer with adaptive settings
   const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: true, // Garder alpha à true pour la transparence
-    powerPreference: 'high-performance',
+    antialias: !deviceCapabilities.isMobile, // Disable antialias on mobile for performance
+    alpha: true,
+    powerPreference: deviceCapabilities.isMobile ? 'default' : 'high-performance', // Battery-friendly on mobile
     preserveDrawingBuffer: false,
     failIfMajorPerformanceCaveat: false
   });
 
   renderer.setSize(container.clientWidth, container.clientHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // CRITICAL: Use optimized pixelRatio from performance config (1 on mobile)
+  renderer.setPixelRatio(performanceConfig.pixelRatio);
+
+  // CRITICAL: Disable shadows on mobile for massive performance gain
+  renderer.shadowMap.enabled = performanceConfig.shadowsEnabled;
+  if (performanceConfig.shadowsEnabled) {
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  }
+
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = deviceCapabilities.isMobile ? THREE.LinearToneMapping : THREE.ACESFilmicToneMapping; // Simpler tone mapping on mobile
   renderer.toneMappingExposure = 1.25;
-  renderer.physicallyCorrectLights = true;
+  renderer.physicallyCorrectLights = !deviceCapabilities.isMobile; // Disable expensive calculations on mobile
+
+  // Store performance config on renderer for later access
+  (renderer as any)._performanceConfig = performanceConfig;
+  (renderer as any)._deviceCapabilities = deviceCapabilities;
   
   container.appendChild(renderer.domElement);
 
@@ -58,11 +84,19 @@ export function createScene(options: SceneCreationOptions): SceneInstance {
   const scene = new THREE.Scene();
   scene.background = null; // MODIFIÉ : Définir le fond de la scène à null pour qu'il soit transparent
 
-  // Add grid helper for reference (only for full body)
-  if (!faceOnly) {
+  // MOBILE OPTIMIZATION: Remove GridHelper on mobile (expensive to render)
+  if (!faceOnly && !deviceCapabilities.isMobile) {
     const gridHelper = new THREE.GridHelper(10, 10, 0x444444, 0x222222);
-    gridHelper.position.y = -0.1; // Slightly below ground level
+    gridHelper.position.y = -0.1;
     scene.add(gridHelper);
+
+    logger.info('SCENE_MANAGER', 'Grid helper added (desktop only)', {
+      philosophy: 'desktop_debug_grid'
+    });
+  } else if (deviceCapabilities.isMobile) {
+    logger.info('SCENE_MANAGER', 'Grid helper skipped on mobile for performance', {
+      philosophy: 'mobile_optimization_no_grid'
+    });
   }
 
   // Create camera with optimized FOV
@@ -122,16 +156,31 @@ export function createScene(options: SceneCreationOptions): SceneInstance {
     controls.setTarget(new THREE.Vector3(0, 1.0, 0)); // Higher target for full body view
   }
 
-  // Setup lighting
-  setupLighting(scene);
+  // MOBILE OPTIMIZATION: Setup adaptive lighting based on device capabilities
+  if (deviceCapabilities.isMobile || deviceCapabilities.isTablet) {
+    setupAdaptiveLighting(scene, {
+      performanceLevel: deviceCapabilities.performanceLevel,
+      maxLights: performanceConfig.maxLights,
+      enableShadows: performanceConfig.shadowsEnabled
+    });
+  } else {
+    // Desktop: Use full lighting system
+    setupLighting(scene);
+  }
 
-  // Setup IBL (Image-Based Lighting) for photo-realistic reflections
-  setupStudioEnvironment(scene, renderer);
+  // MOBILE OPTIMIZATION: Setup environment only if enabled in performance config
+  if (performanceConfig.enableEnvironmentMap) {
+    setupStudioEnvironment(scene, renderer);
+    logger.info('SCENE_MANAGER', 'IBL environment configured', {
+      hasEnvironment: !!scene.environment,
+      philosophy: 'photo_realistic_ibl_active'
+    });
+  } else {
+    logger.info('SCENE_MANAGER', 'IBL environment skipped for mobile performance', {
+      philosophy: 'mobile_no_environment_map'
+    });
+  }
 
-  logger.info('SCENE_MANAGER', 'IBL environment configured', {
-    hasEnvironment: !!scene.environment,
-    philosophy: 'photo_realistic_ibl_active'
-  });
 
   // Store renderer and camera globally for material compilation
   (window as any).__THREE_RENDERER__ = renderer;
@@ -176,7 +225,8 @@ export function createResizeHandler(
 }
 
 /**
- * Start animation loop
+ * Start animation loop with mobile optimizations
+ * MOBILE OPTIMIZATION: FPS throttling and pause when not visible
  */
 export function startAnimationLoop(
   sceneInstance: SceneInstance,
@@ -185,12 +235,56 @@ export function startAnimationLoop(
 ): () => void {
   const { scene, renderer, camera, controls } = sceneInstance;
   let firstFrameRendered = false;
+  let animationId: number | null = null;
+  let isPaused = false;
+
+  // Get performance config from renderer
+  const performanceConfig = (renderer as any)._performanceConfig;
+  const deviceCapabilities = (renderer as any)._deviceCapabilities;
+  const targetFPS = performanceConfig?.targetFPS || 60;
+  const frameInterval = 1000 / targetFPS; // ms per frame
+  let lastFrameTime = performance.now();
 
   controls.setAutoRotate(autoRotate);
 
-  const animate = () => {
-    const animationId = requestAnimationFrame(animate);
-    
+  // MOBILE OPTIMIZATION: Pause rendering when page is not visible
+  const handleVisibilityChange = () => {
+    if (document.hidden) {
+      isPaused = true;
+      if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+      logger.info('SCENE_MANAGER', 'Animation loop paused (page hidden)', {
+        philosophy: 'mobile_battery_optimization'
+      });
+    } else {
+      isPaused = false;
+      lastFrameTime = performance.now(); // Reset timing
+      animationId = requestAnimationFrame(animate);
+      logger.info('SCENE_MANAGER', 'Animation loop resumed (page visible)', {
+        philosophy: 'mobile_resume_rendering'
+      });
+    }
+  };
+
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  // MOBILE OPTIMIZATION: FPS-throttled animation loop
+  const animate = (currentTime: number) => {
+    if (isPaused) return;
+
+    animationId = requestAnimationFrame(animate);
+
+    // FPS throttling for mobile devices
+    const elapsed = currentTime - lastFrameTime;
+    if (elapsed < frameInterval) {
+      return; // Skip this frame
+    }
+
+    // Update lastFrameTime for next frame
+    lastFrameTime = currentTime - (elapsed % frameInterval);
+
     controls.update();
     renderer.render(scene, camera);
 
@@ -199,21 +293,31 @@ export function startAnimationLoop(
       firstFrameRendered = true;
       onFirstFrame?.();
     }
-
-    return animationId;
   };
 
-  const animationId = animate();
+  animationId = requestAnimationFrame(animate);
 
-  logger.info('SCENE_MANAGER', 'Animation loop started', {
+  logger.info('SCENE_MANAGER', 'Animation loop started with mobile optimizations', {
     autoRotate,
     containerId: sceneInstance.containerId,
-    philosophy: 'core_animation_loop_active'
+    isMobile: deviceCapabilities?.isMobile,
+    targetFPS,
+    frameInterval,
+    philosophy: 'mobile_optimized_animation_loop'
   });
 
   // Return cleanup function
   return () => {
-    cancelAnimationFrame(animationId);
+    if (animationId !== null) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    isPaused = true;
+
+    logger.info('SCENE_MANAGER', 'Animation loop stopped and cleaned up', {
+      philosophy: 'animation_loop_cleanup'
+    });
   };
 }
 
