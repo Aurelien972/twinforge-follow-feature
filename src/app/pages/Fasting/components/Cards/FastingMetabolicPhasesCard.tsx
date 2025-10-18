@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import { 
   getCurrentFastingPhase, 
   getPhaseProgress, 
@@ -28,6 +29,10 @@ const FastingMetabolicPhasesCard: React.FC<FastingMetabolicPhasesCardProps> = ({
   targetHours,
   userWeight = 70
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
+  // Conditional motion component
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   const elapsedHours = elapsedSeconds / 3600;
   const currentPhase = getCurrentFastingPhase(elapsedHours);
   const phaseProgress = getPhaseProgress(elapsedHours, currentPhase);
@@ -59,12 +64,14 @@ const FastingMetabolicPhasesCard: React.FC<FastingMetabolicPhasesCardProps> = ({
           var(--glass-opacity)
         `,
         borderColor: `color-mix(in srgb, ${currentPhase.color} 30%, transparent)`,
-        boxShadow: `
-          0 12px 40px rgba(0, 0, 0, 0.25),
-          0 0 30px color-mix(in srgb, ${currentPhase.color} 20%, transparent),
-          inset 0 2px 0 rgba(255, 255, 255, 0.15)
-        `,
-        backdropFilter: 'blur(20px) saturate(160%)'
+        boxShadow: isPerformanceMode
+          ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+          : `
+            0 12px 40px rgba(0, 0, 0, 0.25),
+            0 0 30px color-mix(in srgb, ${currentPhase.color} 20%, transparent),
+            inset 0 2px 0 rgba(255, 255, 255, 0.15)
+          `,
+        backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(160%)'
       }}
     >
       <div className="space-y-6">
@@ -72,14 +79,14 @@ const FastingMetabolicPhasesCard: React.FC<FastingMetabolicPhasesCardProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
-              className="w-12 h-12 rounded-full flex items-center justify-center breathing-icon"
+              className={`w-12 h-12 rounded-full flex items-center justify-center ${!isPerformanceMode ? 'breathing-icon' : ''}`}
               style={{
                 background: `
                   radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
                   linear-gradient(135deg, color-mix(in srgb, ${currentPhase.color} 40%, transparent), color-mix(in srgb, ${currentPhase.color} 30%, transparent))
                 `,
                 border: `2px solid color-mix(in srgb, ${currentPhase.color} 60%, transparent)`,
-                boxShadow: `0 0 25px color-mix(in srgb, ${currentPhase.color} 50%, transparent)`
+                boxShadow: isPerformanceMode ? 'none' : `0 0 25px color-mix(in srgb, ${currentPhase.color} 50%, transparent)`
               }}
             >
               <SpatialIcon
@@ -195,23 +202,25 @@ const FastingMetabolicPhasesCard: React.FC<FastingMetabolicPhasesCardProps> = ({
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {currentPhase.benefits.map((benefit, index) => (
-              <motion.div
+              <MotionDiv
                 key={index}
                 className="flex items-center gap-2 p-2 rounded-lg"
                 style={{
                   background: `color-mix(in srgb, ${currentPhase.color} 6%, transparent)`,
                   border: `1px solid color-mix(in srgb, ${currentPhase.color} 15%, transparent)`
                 }}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0, x: -10 },
+                  animate: { opacity: 1, x: 0 },
+                  transition: { duration: 0.4, delay: index * 0.1 }
+                })}
               >
                 <div 
                   className="w-2 h-2 rounded-full flex-shrink-0" 
                   style={{ background: currentPhase.color }} 
                 />
                 <span className="text-white/80 text-sm">{benefit}</span>
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>
@@ -223,29 +232,33 @@ const FastingMetabolicPhasesCard: React.FC<FastingMetabolicPhasesCardProps> = ({
             <span>{Math.round(phaseProgress)}%</span>
           </div>
           <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-            <motion.div
+            <MotionDiv
               className="h-2 rounded-full relative overflow-hidden"
               style={{
                 background: `linear-gradient(90deg, ${currentPhase.color}, color-mix(in srgb, ${currentPhase.color} 80%, white))`,
-                boxShadow: `0 0 8px color-mix(in srgb, ${currentPhase.color} 60%, transparent)`,
+                boxShadow: isPerformanceMode ? 'none' : `0 0 8px color-mix(in srgb, ${currentPhase.color} 60%, transparent)`,
                 width: `${phaseProgress}%`
               }}
-              initial={{ width: 0 }}
-              animate={{ width: `${phaseProgress}%` }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              {...(!isPerformanceMode && {
+                initial: { width: 0 },
+                animate: { width: `${phaseProgress}%` },
+                transition: { duration: 0.8, ease: "easeOut" }
+              })}
             >
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: `linear-gradient(90deg, 
-                    transparent 0%, 
-                    rgba(255,255,255,0.4) 50%, 
-                    transparent 100%
-                  )`,
-                  animation: 'progressShimmer 2s ease-in-out infinite'
-                }}
-              />
-            </motion.div>
+              {!isPerformanceMode && (
+                <div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: `linear-gradient(90deg,
+                      transparent 0%,
+                      rgba(255,255,255,0.4) 50%,
+                      transparent 100%
+                    )`,
+                    animation: 'progressShimmer 2s ease-in-out infinite'
+                  }}
+                />
+              )}
+            </MotionDiv>
           </div>
         </div>
       </div>

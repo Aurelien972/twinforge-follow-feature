@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import type { FastingProgressionMetrics, FastingProgressionAnalysis } from '../../hooks/useFastingProgressionData';
 
 interface FastingProgressionSummaryCardProps {
@@ -63,6 +64,11 @@ const FastingProgressionSummaryCard: React.FC<FastingProgressionSummaryCardProps
   cached,
   className = ''
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
+  // Conditional motion component
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   const theme = getPerformanceTheme(metrics.consistencyScore);
 
   return (

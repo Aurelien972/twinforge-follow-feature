@@ -4,6 +4,7 @@ import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import { format, parseISO, startOfWeek, getDay } from 'date-fns';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import type { FastingConsistencyData } from '../../hooks/useFastingProgressionData';
 
 interface FastingHeatmapProps {
@@ -65,6 +66,10 @@ const FastingHeatmap: React.FC<FastingHeatmapProps> = ({
   periodDays,
   className = ''
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
+  // Conditional motion components
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   // Organize data into weeks for heatmap display
   const heatmapWeeks = React.useMemo(() => {
     const weeks: FastingConsistencyData[][] = [];
@@ -131,10 +136,12 @@ const FastingHeatmap: React.FC<FastingHeatmapProps> = ({
   }, [data]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.4 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.6, delay: 0.4 }
+      })}
       className={className}
     >
       <GlassCard
@@ -146,12 +153,14 @@ const FastingHeatmap: React.FC<FastingHeatmapProps> = ({
             var(--glass-opacity)
           `,
           borderColor: 'color-mix(in srgb, #8B5CF6 25%, transparent)',
-          boxShadow: `
-            0 12px 40px rgba(0, 0, 0, 0.25),
-            0 0 30px color-mix(in srgb, #8B5CF6 15%, transparent),
-            inset 0 2px 0 rgba(255, 255, 255, 0.15)
-          `,
-          backdropFilter: 'blur(20px) saturate(160%)'
+          boxShadow: isPerformanceMode
+            ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+            : `
+              0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, #8B5CF6 15%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15)
+            `,
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(160%)'
         }}
       >
         <div className="space-y-6">
@@ -166,7 +175,7 @@ const FastingHeatmap: React.FC<FastingHeatmapProps> = ({
                     linear-gradient(135deg, color-mix(in srgb, #8B5CF6 35%, transparent), color-mix(in srgb, #8B5CF6 25%, transparent))
                   `,
                   border: '2px solid color-mix(in srgb, #8B5CF6 50%, transparent)',
-                  boxShadow: '0 0 20px color-mix(in srgb, #8B5CF6 30%, transparent)'
+                  boxShadow: isPerformanceMode ? 'none' : '0 0 20px color-mix(in srgb, #8B5CF6 30%, transparent)'
                 }}
               >
                 <SpatialIcon Icon={ICONS.Calendar} size={20} style={{ color: '#8B5CF6' }} />
@@ -223,20 +232,22 @@ const FastingHeatmap: React.FC<FastingHeatmapProps> = ({
                       const { color, intensity } = getIntensityColor(day.totalHours, day.outcome);
                       
                       return (
-                        <motion.div
+                        <MotionDiv
                           key={day.date}
                           className="aspect-square rounded-sm cursor-pointer group relative"
                           style={{
                             backgroundColor: color,
                             opacity: intensity
                           }}
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ 
-                            duration: 0.2, 
-                            delay: (weekIndex * 7 + dayIndex) * 0.01 
-                          }}
-                          whileHover={{ scale: 1.2, zIndex: 10 }}
+                          {...(!isPerformanceMode && {
+                            initial: { scale: 0 },
+                            animate: { scale: 1 },
+                            transition: {
+                              duration: 0.2,
+                              delay: (weekIndex * 7 + dayIndex) * 0.01
+                            },
+                            whileHover: { scale: 1.2, zIndex: 10 }
+                          })}
                         >
                           {/* Tooltip */}
                           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black/90 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
@@ -252,7 +263,7 @@ const FastingHeatmap: React.FC<FastingHeatmapProps> = ({
                               </div>
                             )}
                           </div>
-                        </motion.div>
+                        </MotionDiv>
                       );
                     })}
                   </div>
@@ -295,7 +306,7 @@ const FastingHeatmap: React.FC<FastingHeatmapProps> = ({
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

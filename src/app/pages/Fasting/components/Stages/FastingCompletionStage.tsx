@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import { formatElapsedTimeHours, determineSessionOutcome, getOutcomeTheme } from '@/app/pages/Fasting/utils/fastingUtils';
 import FastingSessionSummaryCard from '@/app/pages/Fasting/components/Cards/FastingSessionSummaryCard';
 import FastingAchievementsCard from '@/app/pages/Fasting/components/Cards/FastingAchievementsCard';
@@ -35,6 +36,10 @@ const FastingCompletionStage: React.FC<FastingCompletionStageProps> = ({
   targetHours,
   onSaveFastingSession
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
+  // Conditional motion components
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   // Déterminer l'outcome de la session
   const sessionOutcome = session?.actualDurationHours ? 
     determineSessionOutcome(session.actualDurationHours, session.targetHours || targetHours) : 
@@ -51,16 +56,15 @@ const FastingCompletionStage: React.FC<FastingCompletionStageProps> = ({
   return (
     <div className="space-y-6">
       {/* Composant Principal de Completion */}
-      <motion.div
-        initial={{ opacity: 0, y: 40, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ 
-          duration: 0.8, 
-          ease: [0.25, 0.1, 0.25, 1],
-          type: 'spring',
-          stiffness: 200,
-          damping: 20
-        }}
+      <MotionDiv
+        {...(!isPerformanceMode && {
+          initial: { opacity: 0, y: 40, scale: 0.9 },
+          animate: { opacity: 1, y: 0, scale: 1 },
+          transition: {
+            duration: 0.8,
+            ease: [0.25, 0.1, 0.25, 1]
+          }
+        })}
       >
         <GlassCard 
           className="p-8 text-center"
@@ -71,19 +75,21 @@ const FastingCompletionStage: React.FC<FastingCompletionStageProps> = ({
               var(--glass-opacity)
             `,
             borderColor: `color-mix(in srgb, ${theme.primaryColor} 30%, transparent)`,
-            boxShadow: `
-              0 20px 60px rgba(0, 0, 0, 0.4),
-              0 0 40px color-mix(in srgb, ${theme.primaryColor} 20%, transparent),
-              0 0 80px color-mix(in srgb, ${theme.secondaryColor} 15%, transparent),
-              inset 0 2px 0 rgba(255, 255, 255, 0.2)
-            `,
-            backdropFilter: 'blur(28px) saturate(170%)'
+            boxShadow: isPerformanceMode
+              ? '0 12px 48px rgba(0, 0, 0, 0.4)'
+              : `
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                0 0 40px color-mix(in srgb, ${theme.primaryColor} 20%, transparent),
+                0 0 80px color-mix(in srgb, ${theme.secondaryColor} 15%, transparent),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2)
+              `,
+            backdropFilter: isPerformanceMode ? 'none' : 'blur(28px) saturate(170%)'
           }}
         >
           <div className="space-y-6">
             {/* Icône Dynamique */}
             <div className="flex items-center justify-center w-full">
-              <motion.div
+              <MotionDiv
                 className="w-32 h-32 rounded-full flex items-center justify-center relative"
                 style={{
                   background: `
@@ -92,31 +98,34 @@ const FastingCompletionStage: React.FC<FastingCompletionStageProps> = ({
                     linear-gradient(135deg, color-mix(in srgb, ${theme.primaryColor} 45%, transparent), color-mix(in srgb, ${theme.secondaryColor} 35%, transparent))
                   `,
                   border: `4px solid color-mix(in srgb, ${theme.primaryColor} 70%, transparent)`,
-                  boxShadow: `
-                    0 0 60px color-mix(in srgb, ${theme.primaryColor} 70%, transparent),
-                    0 0 100px color-mix(in srgb, ${theme.primaryColor} 50%, transparent),
-                    0 0 140px color-mix(in srgb, ${theme.secondaryColor} 40%, transparent),
-                    inset 0 4px 0 rgba(255,255,255,0.5),
-                    inset 0 -3px 0 rgba(0,0,0,0.2)
-                  `,
-                  backdropFilter: 'blur(20px) saturate(170%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(170%)',
+                  boxShadow: isPerformanceMode
+                    ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+                    : `
+                      0 0 60px color-mix(in srgb, ${theme.primaryColor} 70%, transparent),
+                      0 0 100px color-mix(in srgb, ${theme.primaryColor} 50%, transparent),
+                      0 0 140px color-mix(in srgb, ${theme.secondaryColor} 40%, transparent),
+                      inset 0 4px 0 rgba(255,255,255,0.5),
+                      inset 0 -3px 0 rgba(0,0,0,0.2)
+                    `,
+                  backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(170%)',
+                  WebkitBackdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(170%)',
                   margin: '0 auto'
                 }}
-                initial={{ scale: 0, rotate: -90 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ 
-                  duration: 0.8, 
-                  delay: 0.2,
-                  type: 'spring',
-                  stiffness: 150,
-                  damping: 12
-                }}
+                {...(!isPerformanceMode && {
+                  initial: { scale: 0, rotate: -90 },
+                  animate: { scale: 1, rotate: 0 },
+                  transition: {
+                    duration: 0.8,
+                    delay: 0.2
+                  }
+                })}
               >
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.6 }}
+                <MotionDiv
+                  {...(!isPerformanceMode && {
+                    initial: { scale: 0, opacity: 0 },
+                    animate: { scale: 1, opacity: 1 },
+                    transition: { duration: 0.5, delay: 0.6 }
+                  })}
                 >
                   <SpatialIcon
                     Icon={ICONS[theme.icon]}
@@ -131,18 +140,18 @@ const FastingCompletionStage: React.FC<FastingCompletionStageProps> = ({
                     }}
                     variant="pure"
                   />
-                </motion.div>
+                </MotionDiv>
 
                 {/* Anneaux de Célébration */}
-                {sessionOutcome === 'success' && (
+                {!isPerformanceMode && sessionOutcome === 'success' && (
                   <>
                     <motion.div
                       className="absolute inset-0 rounded-full border-2"
                       style={{ borderColor: `color-mix(in srgb, ${theme.primaryColor} 50%, transparent)` }}
                       initial={{ scale: 1, opacity: 0 }}
                       animate={{ scale: 1.5, opacity: 0 }}
-                      transition={{ 
-                        duration: 2, 
+                      transition={{
+                        duration: 2,
                         delay: 1,
                         repeat: Infinity,
                         ease: 'easeOut'
@@ -153,8 +162,8 @@ const FastingCompletionStage: React.FC<FastingCompletionStageProps> = ({
                       style={{ borderColor: `color-mix(in srgb, ${theme.secondaryColor} 40%, transparent)` }}
                       initial={{ scale: 1, opacity: 0 }}
                       animate={{ scale: 1.8, opacity: 0 }}
-                      transition={{ 
-                        duration: 2.5, 
+                      transition={{
+                        duration: 2.5,
                         delay: 1.5,
                         repeat: Infinity,
                         ease: 'easeOut'
@@ -162,81 +171,92 @@ const FastingCompletionStage: React.FC<FastingCompletionStageProps> = ({
                     />
                   </>
                 )}
-              </motion.div>
+              </MotionDiv>
             </div>
 
             {/* Message Dynamique */}
-            <motion.div 
+            <MotionDiv
               className="space-y-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              {...(!isPerformanceMode && {
+                initial: { opacity: 0, y: 20 },
+                animate: { opacity: 1, y: 0 },
+                transition: { duration: 0.6, delay: 0.4 }
+              })}
             >
-              <motion.h2 
+              <MotionDiv
                 className="text-3xl font-bold text-white"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0, scale: 0.8 },
+                  animate: { opacity: 1, scale: 1 },
+                  transition: { duration: 0.6, delay: 0.5 }
+                })}
               >
                 {theme.title}
-              </motion.h2>
-              <motion.p 
+              </MotionDiv>
+              <MotionDiv
                 className="text-white/80 text-lg"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0 },
+                  animate: { opacity: 1 },
+                  transition: { duration: 0.6, delay: 0.6 }
+                })}
               >
                 {theme.subtitle}
-              </motion.p>
-              
+              </MotionDiv>
+
               {/* Durée Réelle avec Animation */}
-              <motion.div 
+              <MotionDiv
                 className="text-4xl font-black"
                 style={{ color: theme.primaryColor }}
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ 
-                  duration: 0.8, 
-                  delay: 0.7,
-                  type: 'spring',
-                  stiffness: 200,
-                  damping: 15
-                }}
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0, scale: 0.5 },
+                  animate: { opacity: 1, scale: 1 },
+                  transition: {
+                    duration: 0.8,
+                    delay: 0.7
+                  }
+                })}
               >
                 {actualDuration}
-              </motion.div>
-              <motion.p 
+              </MotionDiv>
+              <MotionDiv
                 className="text-white/70 text-base"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.8 }}
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0 },
+                  animate: { opacity: 1 },
+                  transition: { duration: 0.6, delay: 0.8 }
+                })}
               >
                 Durée réelle de votre jeûne
-              </motion.p>
-            </motion.div>
+              </MotionDiv>
+            </MotionDiv>
 
             {/* Bouton de Sauvegarde */}
-            <motion.div 
+            <MotionDiv
               className="flex justify-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.9 }}
+              {...(!isPerformanceMode && {
+                initial: { opacity: 0, y: 20 },
+                animate: { opacity: 1, y: 0 },
+                transition: { duration: 0.6, delay: 0.9 }
+              })}
             >
               <button
                 onClick={onSaveFastingSession}
                 className="px-8 py-4 text-xl font-bold rounded-full relative overflow-hidden"
                 style={{
-                  background: `linear-gradient(135deg, 
-                    color-mix(in srgb, #3B82F6 80%, transparent), 
+                  background: `linear-gradient(135deg,
+                    color-mix(in srgb, #3B82F6 80%, transparent),
                     color-mix(in srgb, #06B6D4 60%, transparent)
                   )`,
                   border: '3px solid color-mix(in srgb, #3B82F6 60%, transparent)',
-                  boxShadow: `
-                    0 16px 50px color-mix(in srgb, #3B82F6 50%, transparent),
-                    0 0 80px color-mix(in srgb, #3B82F6 40%, transparent),
-                    inset 0 4px 0 rgba(255,255,255,0.5)
-                  `,
-                  backdropFilter: 'blur(24px) saturate(170%)',
+                  boxShadow: isPerformanceMode
+                    ? '0 12px 40px rgba(59, 130, 246, 0.4)'
+                    : `
+                      0 16px 50px color-mix(in srgb, #3B82F6 50%, transparent),
+                      0 0 80px color-mix(in srgb, #3B82F6 40%, transparent),
+                      inset 0 4px 0 rgba(255,255,255,0.5)
+                    `,
+                  backdropFilter: isPerformanceMode ? 'none' : 'blur(24px) saturate(170%)',
                   color: '#fff',
                   transition: 'all 0.2s ease'
                 }}
@@ -246,10 +266,10 @@ const FastingCompletionStage: React.FC<FastingCompletionStageProps> = ({
                   <span>Sauvegarder</span>
                 </div>
               </button>
-            </motion.div>
+            </MotionDiv>
           </div>
         </GlassCard>
-      </motion.div>
+      </MotionDiv>
 
       {/* Résumé de Session - Composant Extrait */}
       <FastingSessionSummaryCard 
