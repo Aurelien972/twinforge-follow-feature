@@ -6,6 +6,7 @@ import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
 import { Link } from '../../../../../app/nav/Link';
 import { calculateProfileCompleteness, getProfileStatusMessage } from '../../../../../lib/profile/profileCompleteness';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 interface ProfileCompletenessAlertProps {
   profile: any;
@@ -17,6 +18,8 @@ interface ProfileCompletenessAlertProps {
 const ProfileCompletenessAlert: React.FC<ProfileCompletenessAlertProps> = ({
   profile,
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   // CRITICAL FIX: Enhanced useMemo with deep dependency tracking
   const profileAnalysis = React.useMemo(() => {
     logger.debug('PROFILE_COMPLETENESS_ALERT', 'Recalculating profile completeness', {
@@ -106,20 +109,21 @@ const ProfileCompletenessAlert: React.FC<ProfileCompletenessAlertProps> = ({
   const alertStyle = alertColors[alertSeverity];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5 }
+      })}
     >
-      <GlassCard 
+      <GlassCard
         className="p-4"
         style={{
-          background: `
-            radial-gradient(circle at 30% 20%, ${alertStyle.bg} 0%, transparent 60%),
-            var(--glass-opacity)
-          `,
+          background: isPerformanceMode
+            ? `linear-gradient(145deg, ${alertStyle.bg}, transparent)`
+            : `radial-gradient(circle at 30% 20%, ${alertStyle.bg} 0%, transparent 60%), var(--glass-opacity)`,
           borderColor: alertStyle.border,
-          boxShadow: `0 0 20px ${alertStyle.text}15`
+          boxShadow: isPerformanceMode ? '0 4px 16px rgba(0, 0, 0, 0.5)' : `0 0 20px ${alertStyle.text}15`
         }}
       >
         <div className="flex items-center justify-between">
@@ -168,7 +172,7 @@ const ProfileCompletenessAlert: React.FC<ProfileCompletenessAlertProps> = ({
           </Link>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

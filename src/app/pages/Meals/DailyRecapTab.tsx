@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
+import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 import { useLocation } from 'react-router-dom';
 import { mealsRepo } from '../../../system/data/repositories/mealsRepo';
 import { useUserStore } from '../../../system/store/userStore';
@@ -35,6 +36,8 @@ interface DailyRecapTabProps {
 const DailyRecapTab: React.FC<DailyRecapTabProps> = ({ onLoadingChange }) => {
   const location = useLocation();
   const { session, profile } = useUserStore();
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   const userId = session?.user?.id;
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -265,10 +268,12 @@ const DailyRecapTab: React.FC<DailyRecapTabProps> = ({ onLoadingChange }) => {
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+      <MotionDiv
+        {...(!isPerformanceMode && {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.5, ease: 'easeOut' }
+        })}
         className="space-y-6 w-full"
       >
       {/* Profile Completeness Alert - CRITICAL FIX: Add debugging key */}
@@ -314,7 +319,7 @@ const DailyRecapTab: React.FC<DailyRecapTabProps> = ({ onLoadingChange }) => {
         deletingMealId={deletingMealId}
         onDeleteMeal={handleDeleteMeal}
       />
-      </motion.div>
+      </MotionDiv>
 
       {/* Modal de Détail - GÉRÉE AU NIVEAU DU TAB */}
       <AnimatePresence>

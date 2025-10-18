@@ -5,6 +5,7 @@ import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import { useFeedback } from '@/hooks/useFeedback';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import { analyzeNutritionalContext } from './contextAnalysis';
 import { generateDynamicMessage, generateContextualMetrics } from './messageGenerator';
 import { 
@@ -52,7 +53,11 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
 }) => {
   const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
+  const { isPerformanceMode } = usePerformanceMode();
   const { click, success, successMajor } = useFeedback();
+
+  // Conditional motion components
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   // Analyser le contexte nutritionnel
   const context = React.useMemo(() => {
@@ -102,43 +107,45 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
         style={cardStyles}
       >
         {/* Carrés tournants aux coins - Style harmonisé avec les autres forges */}
-        <div className="training-hero-corners" aria-hidden="true">
-          {[0, 1, 2, 3].map((i) => (
-            <motion.div
-              key={i}
-              className="corner-particle"
-              style={{
-                position: 'absolute',
-                width: '8px',
-                height: '8px',
-                borderRadius: '2px',
-                background: `linear-gradient(135deg, ${urgencyConfig.color}, rgba(255, 255, 255, 0.8))`,
-                boxShadow: `0 0 20px ${urgencyConfig.color}`,
-                top: i < 2 ? '12px' : 'auto',
-                bottom: i >= 2 ? '12px' : 'auto',
-                left: i % 2 === 0 ? '12px' : 'auto',
-                right: i % 2 === 1 ? '12px' : 'auto'
-              }}
-              initial={{
-                rotate: i % 2 === 0 ? 45 : -45
-              }}
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.6, 1, 0.6],
-                rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                delay: i * 0.2,
-                ease: [0.4, 0, 0.2, 1]
-              }}
-            />
-          ))}
-        </div>
+        {!isPerformanceMode && (
+          <div className="training-hero-corners" aria-hidden="true">
+            {[0, 1, 2, 3].map((i) => (
+              <motion.div
+                key={i}
+                className="corner-particle"
+                style={{
+                  position: 'absolute',
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '2px',
+                  background: `linear-gradient(135deg, ${urgencyConfig.color}, rgba(255, 255, 255, 0.8))`,
+                  boxShadow: `0 0 20px ${urgencyConfig.color}`,
+                  top: i < 2 ? '12px' : 'auto',
+                  bottom: i >= 2 ? '12px' : 'auto',
+                  left: i % 2 === 0 ? '12px' : 'auto',
+                  right: i % 2 === 1 ? '12px' : 'auto'
+                }}
+                initial={{
+                  rotate: i % 2 === 0 ? 45 : -45
+                }}
+                animate={{
+                  scale: [1, 1.3, 1],
+                  opacity: [0.6, 1, 0.6],
+                  rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: [0.4, 0, 0.2, 1]
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Halo de Forge Dynamique - Animation Pulse Permanente */}
-        {!reduceMotion && (
+        {!isPerformanceMode && !reduceMotion && (
           <div
             className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
             style={{
@@ -154,7 +161,7 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
           {/* Icône Principale Dynamique avec Particules Jaillissantes */}
           <div
             className={`w-20 h-20 md:w-24 md:h-24 mx-auto rounded-full flex items-center justify-center relative ${
-              !reduceMotion ? 'icon-breathing-css' : ''
+              !isPerformanceMode && !reduceMotion ? 'icon-breathing-css' : ''
             }`}
             style={iconStyles}
           >
@@ -165,7 +172,7 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
             />
 
             {/* Particules de Forge Jaillissantes - Style Forge Énergétique */}
-            {!reduceMotion &&
+            {!isPerformanceMode && !reduceMotion &&
               [...Array(6)].map((_, i) => {
                 const angle = (i * 360) / 6;
                 const radius = 60;
@@ -218,7 +225,7 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
                     background: `color-mix(in srgb, ${urgencyConfig.color} 15%, transparent)`,
                     border: `1px solid color-mix(in srgb, ${urgencyConfig.color} 25%, transparent)`,
                     color: urgencyConfig.color,
-                    backdropFilter: 'blur(8px) saturate(120%)',
+                    ...(isPerformanceMode ? {} : { backdropFilter: 'blur(8px) saturate(120%)' }),
                     animationDelay: `${index * 0.1}s`
                   }}
                 >
@@ -233,7 +240,7 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
             <button
               onClick={handleScanMeal}
               className={`px-6 md:px-8 py-3 md:py-4 text-lg md:text-xl font-bold relative overflow-hidden rounded-full ${
-                urgencyConfig.animation === 'pulse' && !reduceMotion ? 'btn-breathing-css' : ''
+                urgencyConfig.animation === 'pulse' && !isPerformanceMode && !reduceMotion ? 'btn-breathing-css' : ''
               }`}
               style={buttonStyles}
             >
@@ -247,13 +254,13 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
               </div>
 
               {/* Shimmer Effect pour urgence normale */}
-              {urgencyConfig.priority === 'medium' && !reduceMotion && (
+              {urgencyConfig.priority === 'medium' && !isPerformanceMode && !reduceMotion && (
                 <div
                   className="absolute inset-0 rounded-inherit pointer-events-none dynamic-shimmer-css"
                   style={{
-                    background: `linear-gradient(90deg, 
-                      transparent 0%, 
-                      rgba(255,255,255,0.3) 50%, 
+                    background: `linear-gradient(90deg,
+                      transparent 0%,
+                      rgba(255,255,255,0.3) 50%,
                       transparent 100%
                     )`
                   }}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
 import AnalysisOverlays from './AnalysisOverlays';
@@ -34,23 +35,19 @@ const AnalysisViewport: React.FC<AnalysisViewportProps> = ({
   analysisColor,
 }) => {
   const reduceMotion = useReducedMotion();
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   return (
-    <GlassCard 
+    <GlassCard
       className="p-6 relative overflow-visible glass-card--analysis"
       style={{
-        background: `
-          radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
-          radial-gradient(circle at 70% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
-          var(--glass-opacity)
-        `,
+        background: isPerformanceMode
+          ? 'linear-gradient(145deg, color-mix(in srgb, #10B981 10%, #1e293b), color-mix(in srgb, #10B981 5%, #0f172a))'
+          : `radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 60%), radial-gradient(circle at 70% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 50%), var(--glass-opacity)`,
         borderColor: 'rgba(16, 185, 129, 0.3)',
-        boxShadow: `
-          0 12px 40px rgba(0, 0, 0, 0.25),
-          0 0 30px rgba(16, 185, 129, 0.15),
-          inset 0 2px 0 rgba(255, 255, 255, 0.15)
-        `,
-        backdropFilter: 'blur(20px) saturate(150%)',
+        boxShadow: isPerformanceMode ? '0 8px 32px rgba(0, 0, 0, 0.5)' : `0 12px 40px rgba(0, 0, 0, 0.25), 0 0 30px rgba(16, 185, 129, 0.15), inset 0 2px 0 rgba(255, 255, 255, 0.15)`,
+        ...(isPerformanceMode ? {} : { backdropFilter: 'blur(20px) saturate(150%)' })
       }}
     >
       <div className="flex items-center justify-between mb-4">
@@ -65,16 +62,11 @@ const AnalysisViewport: React.FC<AnalysisViewportProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: `
-                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(5, 150, 105, 0.3))
-              `,
+              background: isPerformanceMode
+                ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(5, 150, 105, 0.3))'
+                : `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(5, 150, 105, 0.3))`,
               border: '2px solid rgba(16, 185, 129, 0.6)',
-              boxShadow: `
-                0 0 24px rgba(16, 185, 129, 0.5),
-                inset 0 2px 0 rgba(255,255,255,0.3),
-                inset 0 -2px 0 rgba(0,0,0,0.2)
-              `
+              boxShadow: isPerformanceMode ? '0 4px 16px rgba(0, 0, 0, 0.5)' : `0 0 24px rgba(16, 185, 129, 0.5), inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.2)`
             }}
           >
             <SpatialIcon
@@ -97,37 +89,30 @@ const AnalysisViewport: React.FC<AnalysisViewportProps> = ({
         <div
           className="flex items-center gap-2 px-4 py-2"
           style={{
-            background: `
-              linear-gradient(135deg,
-                rgba(16, 185, 129, 0.25),
-                rgba(34, 197, 94, 0.2)
-              )
-            `,
+            background: `linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(34, 197, 94, 0.2))`,
             border: '2px solid rgba(16, 185, 129, 0.5)',
             borderRadius: '20px',
-            backdropFilter: 'blur(16px) saturate(140%)',
-            boxShadow: `
-              0 4px 20px rgba(16, 185, 129, 0.3),
-              0 0 30px rgba(16, 185, 129, 0.2),
-              inset 0 1px 0 rgba(255,255,255,0.25)
-            `
+            ...(isPerformanceMode ? {} : { backdropFilter: 'blur(16px) saturate(140%)' }),
+            boxShadow: isPerformanceMode ? '0 4px 16px rgba(0, 0, 0, 0.5)' : `0 4px 20px rgba(16, 185, 129, 0.3), 0 0 30px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(255,255,255,0.25)`
           }}
         >
-          <motion.div
+          <MotionDiv
             className="w-2.5 h-2.5 rounded-full"
             style={{
               backgroundColor: analysisColor,
               boxShadow: `0 0 12px ${analysisColor}`
             }}
-            animate={reduceMotion ? {} : {
-              scale: [1, 1.4, 1],
-              opacity: [0.7, 1, 0.7]
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
+            {...(!isPerformanceMode && !reduceMotion && {
+              animate: {
+                scale: [1, 1.4, 1],
+                opacity: [0.7, 1, 0.7]
+              },
+              transition: {
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            })}
           />
           <span
             className="font-bold text-sm"
@@ -150,7 +135,7 @@ const AnalysisViewport: React.FC<AnalysisViewportProps> = ({
         />
         
         {/* Overlays d'Analyse Dynamiques */}
-        {!reduceMotion && (
+        {!isPerformanceMode && !reduceMotion && (
           <AnalysisOverlays
             analysisZones={analysisZones}
             currentPhase={currentPhase}

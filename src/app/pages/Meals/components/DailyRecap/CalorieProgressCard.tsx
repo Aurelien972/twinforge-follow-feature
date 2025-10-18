@@ -2,6 +2,7 @@ import React from 'react';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 interface CalorieProgressCardProps {
   todayStats: {
@@ -36,19 +37,19 @@ const CalorieProgressCard: React.FC<CalorieProgressCardProps> = ({
   calorieStatus,
   profile,
 }) => {
-  const progressPercentage = calorieTargetAnalysis.target > 0 
+  const { isPerformanceMode } = usePerformanceMode();
+  const progressPercentage = calorieTargetAnalysis.target > 0
     ? Math.min(100, (todayStats.totalCalories / calorieTargetAnalysis.target) * 100)
     : 0;
 
   return (
-    <GlassCard 
+    <GlassCard
       className="p-6 glass-card--summary"
       style={{
         '--recommendation-color': calorieStatus.color,
-        background: `
-          radial-gradient(circle at 30% 20%, color-mix(in srgb, ${calorieStatus.color} 6%, transparent) 0%, transparent 60%),
-          var(--glass-opacity)
-        `,
+        background: isPerformanceMode
+          ? `linear-gradient(145deg, color-mix(in srgb, ${calorieStatus.color} 8%, #1e293b), color-mix(in srgb, ${calorieStatus.color} 4%, #0f172a))`
+          : `radial-gradient(circle at 30% 20%, color-mix(in srgb, ${calorieStatus.color} 6%, transparent) 0%, transparent 60%), var(--glass-opacity)`,
         borderColor: `color-mix(in srgb, ${calorieStatus.color} 15%, transparent)`
       }}
     >
@@ -56,12 +57,11 @@ const CalorieProgressCard: React.FC<CalorieProgressCardProps> = ({
         <div
           className="w-12 h-12 rounded-full flex items-center justify-center"
           style={{
-            background: `
-              radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-              linear-gradient(135deg, color-mix(in srgb, #10B981 30%, transparent), color-mix(in srgb, #10B981 20%, transparent))
-            `,
+            background: isPerformanceMode
+              ? `linear-gradient(135deg, color-mix(in srgb, #10B981 30%, transparent), color-mix(in srgb, #10B981 20%, transparent))`
+              : `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, color-mix(in srgb, #10B981 30%, transparent), color-mix(in srgb, #10B981 20%, transparent))`,
             border: `2px solid color-mix(in srgb, #10B981 40%, transparent)`,
-            boxShadow: `0 0 20px color-mix(in srgb, #10B981 30%, transparent)`
+            boxShadow: isPerformanceMode ? '0 4px 16px rgba(0, 0, 0, 0.5)' : `0 0 20px color-mix(in srgb, #10B981 30%, transparent)`
           }}
         >
           <SpatialIcon Icon={ICONS.Target} size={20} style={{ color: '#10B981' }} />
@@ -80,7 +80,7 @@ const CalorieProgressCard: React.FC<CalorieProgressCardProps> = ({
       <div className="mb-4 p-3 rounded-xl" style={{
         background: `color-mix(in srgb, ${calorieStatus.color} 6%, transparent)`,
         border: `1px solid color-mix(in srgb, ${calorieStatus.color} 18%, transparent)`,
-        backdropFilter: 'blur(8px) saturate(120%)'
+        ...(isPerformanceMode ? {} : { backdropFilter: 'blur(8px) saturate(120%)' })
       }}>
         <div className="flex items-start gap-2">
           <SpatialIcon 

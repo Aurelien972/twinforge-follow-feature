@@ -4,6 +4,7 @@ import { fr } from 'date-fns/locale';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 interface DailyStatsGridProps {
   todayStats: {
@@ -28,30 +29,29 @@ const DailyStatsGrid: React.FC<DailyStatsGridProps> = ({
   todayStats,
   calorieStatus,
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Calories Totales */}
-      <GlassCard 
+      <GlassCard
         className="p-6 text-center glass-card--summary"
         style={{
           '--recommendation-color': calorieStatus.color,
-          background: `
-            radial-gradient(circle at 30% 20%, color-mix(in srgb, ${calorieStatus.color} 6%, transparent) 0%, transparent 60%),
-            var(--glass-opacity)
-          `,
+          background: isPerformanceMode
+            ? `linear-gradient(145deg, color-mix(in srgb, ${calorieStatus.color} 8%, #1e293b), color-mix(in srgb, ${calorieStatus.color} 4%, #0f172a))`
+            : `radial-gradient(circle at 30% 20%, color-mix(in srgb, ${calorieStatus.color} 6%, transparent) 0%, transparent 60%), var(--glass-opacity)`,
           borderColor: `color-mix(in srgb, ${calorieStatus.color} 15%, transparent)`
         }}
       >
         <div className="text-center mb-6">
-          <div 
-            className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center breathing-icon"
+          <div
+            className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${!isPerformanceMode ? 'breathing-icon' : ''}`}
             style={{
-              background: `
-                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                linear-gradient(135deg, color-mix(in srgb, ${calorieStatus.color} 35%, transparent), color-mix(in srgb, ${calorieStatus.color} 25%, transparent))
-              `,
+              background: isPerformanceMode
+                ? `linear-gradient(135deg, color-mix(in srgb, ${calorieStatus.color} 35%, transparent), color-mix(in srgb, ${calorieStatus.color} 25%, transparent))`
+                : `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, color-mix(in srgb, ${calorieStatus.color} 35%, transparent), color-mix(in srgb, ${calorieStatus.color} 25%, transparent))`,
               border: `2px solid color-mix(in srgb, ${calorieStatus.color} 50%, transparent)`,
-              boxShadow: `0 0 30px color-mix(in srgb, ${calorieStatus.color} 40%, transparent)`
+              boxShadow: isPerformanceMode ? '0 4px 16px rgba(0, 0, 0, 0.5)' : `0 0 30px color-mix(in srgb, ${calorieStatus.color} 40%, transparent)`
             }}
           >
             <SpatialIcon Icon={ICONS.Zap} size={28} style={{ color: calorieStatus.color }} />
@@ -72,27 +72,25 @@ const DailyStatsGrid: React.FC<DailyStatsGridProps> = ({
       </GlassCard>
 
       {/* Nombre de Repas */}
-      <GlassCard 
+      <GlassCard
         className="p-6 text-center glass-card--summary"
         style={{
           '--recommendation-color': '#3B82F6',
-          background: `
-            radial-gradient(circle at 30% 20%, color-mix(in srgb, #3B82F6 6%, transparent) 0%, transparent 60%),
-            var(--glass-opacity)
-          `,
+          background: isPerformanceMode
+            ? 'linear-gradient(145deg, color-mix(in srgb, #3B82F6 8%, #1e293b), color-mix(in srgb, #3B82F6 4%, #0f172a))'
+            : `radial-gradient(circle at 30% 20%, color-mix(in srgb, #3B82F6 6%, transparent) 0%, transparent 60%), var(--glass-opacity)`,
           borderColor: `color-mix(in srgb, #3B82F6 15%, transparent)`
         }}
       >
         <div className="text-center mb-6">
-          <div 
-            className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center breathing-icon"
+          <div
+            className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${!isPerformanceMode ? 'breathing-icon' : ''}`}
             style={{
-              background: `
-                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                linear-gradient(135deg, color-mix(in srgb, #3B82F6 35%, transparent), color-mix(in srgb, #3B82F6 25%, transparent))
-              `,
+              background: isPerformanceMode
+                ? 'linear-gradient(135deg, color-mix(in srgb, #3B82F6 35%, transparent), color-mix(in srgb, #3B82F6 25%, transparent))'
+                : `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, color-mix(in srgb, #3B82F6 35%, transparent), color-mix(in srgb, #3B82F6 25%, transparent))`,
               border: '2px solid color-mix(in srgb, #3B82F6 50%, transparent)',
-              boxShadow: '0 0 30px color-mix(in srgb, #3B82F6 40%, transparent)'
+              boxShadow: isPerformanceMode ? '0 4px 16px rgba(0, 0, 0, 0.5)' : '0 0 30px color-mix(in srgb, #3B82F6 40%, transparent)'
             }}
           >
             <SpatialIcon Icon={ICONS.Utensils} size={28} className="text-blue-400" />
@@ -109,27 +107,25 @@ const DailyStatsGrid: React.FC<DailyStatsGridProps> = ({
       </GlassCard>
 
       {/* Dernier Repas */}
-      <GlassCard 
+      <GlassCard
         className="p-6 text-center glass-card--summary"
         style={{
           '--recommendation-color': '#8B5CF6',
-          background: `
-            radial-gradient(circle at 30% 20%, color-mix(in srgb, #8B5CF6 6%, transparent) 0%, transparent 60%),
-            var(--glass-opacity)
-          `,
+          background: isPerformanceMode
+            ? 'linear-gradient(145deg, color-mix(in srgb, #8B5CF6 8%, #1e293b), color-mix(in srgb, #8B5CF6 4%, #0f172a))'
+            : `radial-gradient(circle at 30% 20%, color-mix(in srgb, #8B5CF6 6%, transparent) 0%, transparent 60%), var(--glass-opacity)`,
           borderColor: `color-mix(in srgb, #8B5CF6 15%, transparent)`
         }}
       >
         <div className="text-center mb-6">
-          <div 
-            className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center breathing-icon"
+          <div
+            className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${!isPerformanceMode ? 'breathing-icon' : ''}`}
             style={{
-              background: `
-                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-                linear-gradient(135deg, color-mix(in srgb, #8B5CF6 35%, transparent), color-mix(in srgb, #8B5CF6 25%, transparent))
-              `,
+              background: isPerformanceMode
+                ? 'linear-gradient(135deg, color-mix(in srgb, #8B5CF6 35%, transparent), color-mix(in srgb, #8B5CF6 25%, transparent))'
+                : `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, color-mix(in srgb, #8B5CF6 35%, transparent), color-mix(in srgb, #8B5CF6 25%, transparent))`,
               border: '2px solid color-mix(in srgb, #8B5CF6 50%, transparent)',
-              boxShadow: '0 0 30px color-mix(in srgb, #8B5CF6 40%, transparent)'
+              boxShadow: isPerformanceMode ? '0 4px 16px rgba(0, 0, 0, 0.5)' : '0 0 30px color-mix(in srgb, #8B5CF6 40%, transparent)'
             }}
           >
             <SpatialIcon Icon={ICONS.Clock} size={28} className="text-purple-400" />

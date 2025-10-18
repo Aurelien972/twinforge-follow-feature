@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '../../../../ui/cards/GlassCard';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
 import s from './MealProgressHeader.module.css';
@@ -33,6 +34,8 @@ export default function MealProgressHeader({
   message,
   subMessage,
 }: MealProgressHeaderProps) {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionSpan = isPerformanceMode ? 'span' : motion.span;
   const safe = Number.isFinite(progress) ? Math.min(100, Math.max(0, progress)) : 0;
 
   const stepSize = 100 / STEPS.length;
@@ -79,11 +82,14 @@ export default function MealProgressHeader({
                     className={`${s.seg} ${themeClass} ${completed ? s.isComplete : ''} ${current ? s.isCurrent : ''}`}
                   >
                     {(completed || current) && (
-                      <motion.span
+                      <MotionSpan
                         className={`${s.fill} ${fillTheme}`}
-                        initial={{ width: 0 }}
-                        animate={{ width }}
-                        transition={{ duration: 0.45, ease: 'easeOut' }}
+                        {...(!isPerformanceMode && {
+                          initial: { width: 0 },
+                          animate: { width },
+                          transition: { duration: 0.45, ease: 'easeOut' }
+                        })}
+                        style={isPerformanceMode ? { width } : undefined}
                       />
                     )}
                   </div>

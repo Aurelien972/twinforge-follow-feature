@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 import CalorieHighlightCard from './CalorieHighlightCard';
 import MacronutrientsCard from './MacronutrientsCard';
 import DetectedFoodsCard from './DetectedFoodsCard';
@@ -45,6 +46,7 @@ const MealResultsDisplayStep: React.FC<MealResultsDisplayStepProps> = ({
   progressMessage,
   progressSubMessage,
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
   const [celebrationActive, setCelebrationActive] = React.useState(false);
 
 

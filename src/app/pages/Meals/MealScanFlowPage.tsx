@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useBlocker } from 'react-router-dom';
+import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { nanoid } from 'nanoid';
 import { useUserStore } from '../../../system/store/userStore';
@@ -32,6 +33,8 @@ import Portal from '../../../ui/components/Portal';
 const MealScanFlowPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   const { profile, authReady, session, user } = useUserStore();
   const { showToast } = useToast();
   const { success, error: errorSound } = useFeedback();
@@ -752,18 +755,20 @@ const MealScanFlowPage: React.FC = () => {
   return (
     <div className="w-full min-w-0 pb-8" style={{ overflow: 'visible !important' }}>
       <AnimatePresence mode="wait">
-        <motion.div
+        <MotionDiv
           key={scanFlowState.currentStep}
           className="meal-scan-step pb-6"
           data-step={scanFlowState.currentStep}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, y: 20 },
+            animate: { opacity: 1, y: 0 },
+            exit: { opacity: 0, y: -20 },
+            transition: { duration: 0.3 }
+          })}
           style={{ minHeight: 'auto', overflow: 'visible' }}
         >
           {renderContent()}
-        </motion.div>
+        </MotionDiv>
       </AnimatePresence>
       
       {/* Modal de Confirmation de Sortie */}

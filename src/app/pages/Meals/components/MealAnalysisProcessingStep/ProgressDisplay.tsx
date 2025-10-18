@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 interface ProgressDisplayProps {
   currentProgress: number;
@@ -24,24 +25,30 @@ const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
   analysisColor,
 }) => {
   const reduceMotion = useReducedMotion();
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   return (
     <GlassCard
       className="p-6 text-center glass-card--progress"
       style={{
-        background: `
-          radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
-          radial-gradient(circle at 70% 80%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
-          var(--glass-opacity)
-        `,
+        background: isPerformanceMode
+          ? 'linear-gradient(145deg, color-mix(in srgb, #10B981 10%, #1e293b), color-mix(in srgb, #22C55E 6%, #0f172a))'
+          : `
+            radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 70% 80%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
+            var(--glass-opacity)
+          `,
         borderColor: 'rgba(16, 185, 129, 0.3)',
         borderRadius: '24px',
-        backdropFilter: 'blur(20px) saturate(150%)',
-        boxShadow: `
-          0 12px 40px rgba(0, 0, 0, 0.25),
-          0 0 30px rgba(16, 185, 129, 0.15),
-          inset 0 2px 0 rgba(255, 255, 255, 0.15)
-        `
+        ...(isPerformanceMode ? {} : { backdropFilter: 'blur(20px) saturate(150%)' }),
+        boxShadow: isPerformanceMode
+          ? '0 12px 40px rgba(0, 0, 0, 0.25)'
+          : `
+            0 12px 40px rgba(0, 0, 0, 0.25),
+            0 0 30px rgba(16, 185, 129, 0.15),
+            inset 0 2px 0 rgba(255, 255, 255, 0.15)
+          `
       }}
     >
       <div className="space-y-3">
@@ -80,8 +87,8 @@ const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
                   filter: 'drop-shadow(0 2px 8px rgba(16, 185, 129, 0.8))'
                 }}
               />
-              {/* Halo rotatif */}
-              {!reduceMotion && (
+              {/* Halo rotatif - disabled in performance mode */}
+              {!reduceMotion && !isPerformanceMode && (
                 <div
                   className="absolute inset-0 rounded-full"
                   style={{
@@ -114,7 +121,7 @@ const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
         </p>
         
         {/* Badge dynamique de phase avec bordures arrondies */}
-        <motion.div
+        <MotionDiv
           className="inline-flex items-center justify-center gap-2 px-4 py-2 mx-auto"
           style={{
             background: `
@@ -125,16 +132,20 @@ const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
             `,
             border: '2px solid rgba(16, 185, 129, 0.4)',
             borderRadius: '999px',
-            boxShadow: `
-              0 0 20px rgba(16, 185, 129, 0.3),
-              inset 0 1px 0 rgba(255,255,255,0.2)
-            `,
-            backdropFilter: 'blur(12px)'
+            boxShadow: isPerformanceMode
+              ? 'none'
+              : `
+                0 0 20px rgba(16, 185, 129, 0.3),
+                inset 0 1px 0 rgba(255,255,255,0.2)
+              `,
+            ...(isPerformanceMode ? {} : { backdropFilter: 'blur(12px)' })
           }}
           key={currentPhase}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
+          {...(!isPerformanceMode && {
+            initial: { opacity: 0, scale: 0.9 },
+            animate: { opacity: 1, scale: 1 },
+            transition: { duration: 0.4 }
+          })}
         >
           <div
             className="w-2 h-2 rounded-full"
@@ -154,27 +165,29 @@ const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
             {currentPhase === 'detection' ? 'Détection' :
              currentPhase === 'analysis' ? 'Analyse' : 'Calcul'}
           </span>
-        </motion.div>
+        </MotionDiv>
         
         {/* Indicateur de progression visuel */}
         <div className="flex items-center justify-center gap-1 mt-3">
           {['detection', 'analysis', 'calculation'].map((phase, index) => (
-            <motion.div
+            <MotionDiv
               key={phase}
               className="w-2 h-2 rounded-full"
               style={{
                 background: phase === currentPhase ? analysisColor : 'rgba(255, 255, 255, 0.3)',
                 boxShadow: phase === currentPhase ? `0 0 8px ${analysisColor}60` : 'none'
               }}
-              animate={phase === currentPhase ? {
-                scale: [1, 1.2, 1],
-                opacity: [0.8, 1, 0.8]
-              } : {}}
-              transition={{
-                duration: 1.5,
-                repeat: phase === currentPhase ? Infinity : 0,
-                ease: "easeInOut"
-              }}
+              {...(!isPerformanceMode && {
+                animate: phase === currentPhase ? {
+                  scale: [1, 1.2, 1],
+                  opacity: [0.8, 1, 0.8]
+                } : {},
+                transition: {
+                  duration: 1.5,
+                  repeat: phase === currentPhase ? Infinity : 0,
+                  ease: "easeInOut"
+                }
+              })}
             />
           ))}
         </div>
@@ -200,14 +213,14 @@ const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
             animate={{ width: `${currentProgress}%` }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            {/* Shimmer effect */}
-            {!reduceMotion && (
+            {/* Shimmer effect - disabled in performance mode */}
+            {!reduceMotion && !isPerformanceMode && (
               <div
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: `linear-gradient(90deg, 
-                    transparent 0%, 
-                    rgba(255,255,255,0.4) 50%, 
+                  background: `linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255,255,255,0.4) 50%,
                     transparent 100%
                   )`,
                   animation: 'progressShimmer 2s ease-in-out infinite'

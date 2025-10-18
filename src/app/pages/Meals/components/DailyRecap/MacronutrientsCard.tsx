@@ -3,6 +3,7 @@ import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
 import { analyzeMacronutrients } from './MacroAnalysis';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 interface MacronutrientsCardProps {
   todayStats: {
@@ -21,6 +22,7 @@ const MacronutrientsCard: React.FC<MacronutrientsCardProps> = ({
   todayStats,
   profile,
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
   const macroAnalysis = analyzeMacronutrients(todayStats.macros, profile);
 
   if (todayStats.mealsCount === 0) {
@@ -28,27 +30,25 @@ const MacronutrientsCard: React.FC<MacronutrientsCardProps> = ({
   }
 
   return (
-    <GlassCard 
+    <GlassCard
       className="p-6 glass-card--summary"
       style={{
         '--recommendation-color': 'var(--nutrition-primary)',
-        background: `
-          radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--nutrition-primary) 6%, transparent) 0%, transparent 60%),
-          var(--glass-opacity)
-        `,
+        background: isPerformanceMode
+          ? 'linear-gradient(145deg, color-mix(in srgb, var(--nutrition-primary) 8%, #1e293b), color-mix(in srgb, var(--nutrition-primary) 4%, #0f172a))'
+          : `radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--nutrition-primary) 6%, transparent) 0%, transparent 60%), var(--glass-opacity)`,
         borderColor: `color-mix(in srgb, var(--nutrition-primary) 15%, transparent)`
       }}
     >
       <div className="flex items-center gap-3 mb-6">
-        <div 
+        <div
           className="w-12 h-12 rounded-full flex items-center justify-center"
           style={{
-            background: `
-              radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-              linear-gradient(135deg, color-mix(in srgb, var(--nutrition-primary) 30%, transparent), color-mix(in srgb, var(--nutrition-secondary) 20%, transparent))
-            `,
+            background: isPerformanceMode
+              ? 'linear-gradient(135deg, color-mix(in srgb, var(--nutrition-primary) 30%, transparent), color-mix(in srgb, var(--nutrition-secondary) 20%, transparent))'
+              : `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, color-mix(in srgb, var(--nutrition-primary) 30%, transparent), color-mix(in srgb, var(--nutrition-secondary) 20%, transparent))`,
             border: '2px solid color-mix(in srgb, var(--nutrition-primary) 40%, transparent)',
-            boxShadow: '0 0 20px color-mix(in srgb, var(--nutrition-primary) 30%, transparent)'
+            boxShadow: isPerformanceMode ? '0 4px 16px rgba(0, 0, 0, 0.5)' : '0 0 20px color-mix(in srgb, var(--nutrition-primary) 30%, transparent)'
           }}
         >
           <SpatialIcon Icon={ICONS.BarChart3} size={20} style={{ color: 'var(--nutrition-primary)' }} />
