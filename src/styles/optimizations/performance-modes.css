@@ -60,6 +60,47 @@
   opacity: 0;
 }
 
+/* =========================================
+   LOGO BRANDING - Optimisations Mode Performance
+   Désactivation complète des animations et effets
+   ========================================= */
+
+/* Désactiver toutes les animations SVG dans le ForgeHammerIcon */
+.mode-high-performance svg animate,
+.mode-high-performance svg [attributeName] {
+  animation: none !important;
+  animation-play-state: paused !important;
+  animation-duration: 0s !important;
+}
+
+/* Supprimer les filtres SVG coûteux */
+.mode-high-performance svg filter,
+.mode-high-performance svg feGaussianBlur,
+.mode-high-performance svg feMerge {
+  display: none !important;
+}
+
+/* Désactiver tous les drop-shadow sur le logo */
+.mode-high-performance [class*="TwinForgeLogo"],
+.mode-high-performance svg {
+  filter: none !important;
+}
+
+/* Forcer les transitions à none sur le logo */
+.mode-high-performance [class*="TwinForgeLogo"] *,
+.mode-high-performance [class*="TwinForgeLogo"] span {
+  transition: none !important;
+  transition-duration: 0s !important;
+  animation: none !important;
+}
+
+/* Supprimer les transformations coûteuses */
+.mode-high-performance [class*="TwinForgeLogo"] {
+  transform: none !important;
+  will-change: auto !important;
+  backface-visibility: visible !important;
+}
+
 /* Appliquer backdrop-filter: none sur tous les elements */
 .mode-high-performance *[class*="glass"],
 .mode-high-performance .header-liquid-glass,

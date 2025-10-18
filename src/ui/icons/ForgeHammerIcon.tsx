@@ -1,4 +1,5 @@
 import React from 'react';
+import { usePerformanceMode } from '../../system/context/PerformanceModeContext';
 
 interface ForgeHammerIconProps {
   width?: number;
@@ -13,6 +14,7 @@ export const ForgeHammerIcon: React.FC<ForgeHammerIconProps> = ({
   className = '',
   isHovered = false
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
   const uniqueId = React.useId();
   const gradId = `forgeGrad-${uniqueId}`;
   const gradHoverId = `forgeGradHover-${uniqueId}`;
@@ -26,9 +28,11 @@ export const ForgeHammerIcon: React.FC<ForgeHammerIconProps> = ({
       className={className}
       xmlns="http://www.w3.org/2000/svg"
       style={{
-        filter: isHovered
-          ? 'drop-shadow(0 0 12px rgba(253, 200, 48, 0.5))'
-          : 'drop-shadow(0 0 6px rgba(247, 147, 30, 0.3))'
+        filter: isPerformanceMode
+          ? 'none'
+          : (isHovered
+            ? 'drop-shadow(0 0 12px rgba(253, 200, 48, 0.5))'
+            : 'drop-shadow(0 0 6px rgba(247, 147, 30, 0.3))')
       }}
     >
       <defs>
@@ -53,8 +57,8 @@ export const ForgeHammerIcon: React.FC<ForgeHammerIconProps> = ({
 
       <path
         d="M 20 10 L 85 10 L 85 28 L 65 28 L 65 70 L 40 70 L 40 28 L 20 28 Z"
-        fill={isHovered ? `url(#${gradHoverId})` : `url(#${gradId})`}
-        filter={`url(#${filterId})`}
+        fill={isPerformanceMode ? `url(#${gradId})` : (isHovered ? `url(#${gradHoverId})` : `url(#${gradId})`)}
+        filter={isPerformanceMode ? 'none' : `url(#${filterId})`}
         stroke="rgba(15, 23, 42, 0.8)"
         strokeWidth="2.5"
       />
@@ -67,42 +71,46 @@ export const ForgeHammerIcon: React.FC<ForgeHammerIconProps> = ({
         opacity="0.6"
       />
 
-      <circle cx="80" cy="18" r="3" fill="#FDC830" opacity={isHovered ? 1 : 0.9}>
-        <animate
-          attributeName="opacity"
-          values="0.4;1;0.4"
-          dur="1.5s"
-          repeatCount="indefinite"
-        />
-        <animate attributeName="r" values="2.5;3.5;2.5" dur="1.5s" repeatCount="indefinite" />
-      </circle>
+      {!isPerformanceMode && (
+        <>
+          <circle cx="80" cy="18" r="3" fill="#FDC830" opacity={isHovered ? 1 : 0.9}>
+            <animate
+              attributeName="opacity"
+              values="0.4;1;0.4"
+              dur="1.5s"
+              repeatCount="indefinite"
+            />
+            <animate attributeName="r" values="2.5;3.5;2.5" dur="1.5s" repeatCount="indefinite" />
+          </circle>
 
-      <circle cx="25" cy="16" r="2.5" fill="#FF6B35" opacity={isHovered ? 0.9 : 0.8}>
-        <animate
-          attributeName="opacity"
-          values="0.3;0.9;0.3"
-          dur="2s"
-          repeatCount="indefinite"
-        />
-      </circle>
+          <circle cx="25" cy="16" r="2.5" fill="#FF6B35" opacity={isHovered ? 0.9 : 0.8}>
+            <animate
+              attributeName="opacity"
+              values="0.3;0.9;0.3"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </circle>
 
-      <circle cx="75" cy="24" r="2" fill="#FDC830" opacity={isHovered ? 0.8 : 0.7}>
-        <animate
-          attributeName="opacity"
-          values="0.3;0.8;0.3"
-          dur="1.8s"
-          repeatCount="indefinite"
-        />
-      </circle>
+          <circle cx="75" cy="24" r="2" fill="#FDC830" opacity={isHovered ? 0.8 : 0.7}>
+            <animate
+              attributeName="opacity"
+              values="0.3;0.8;0.3"
+              dur="1.8s"
+              repeatCount="indefinite"
+            />
+          </circle>
 
-      <circle cx="52" cy="12" r="2.5" fill="#F7931E" opacity={isHovered ? 0.9 : 0.75}>
-        <animate
-          attributeName="opacity"
-          values="0.4;0.9;0.4"
-          dur="2.2s"
-          repeatCount="indefinite"
-        />
-      </circle>
+          <circle cx="52" cy="12" r="2.5" fill="#F7931E" opacity={isHovered ? 0.9 : 0.75}>
+            <animate
+              attributeName="opacity"
+              values="0.4;0.9;0.4"
+              dur="2.2s"
+              repeatCount="indefinite"
+            />
+          </circle>
+        </>
+      )}
     </svg>
   );
 };

@@ -21,7 +21,7 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
       <div
         className={`flex items-center ${className}`}
         style={{
-          transition: 'all 300ms ease-out',
+          transition: isPerformanceMode ? 'none' : 'all 300ms ease-out',
           height: '100%'
         }}
       >
@@ -35,10 +35,12 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               color: '#E5E7EB',
               lineHeight: 1,
               textTransform: 'uppercase',
-              filter: isHovered
-                ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.3))'
-                : 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.15))',
-              transition: 'filter 300ms ease'
+              filter: isPerformanceMode
+                ? 'none'
+                : (isHovered
+                  ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.3))'
+                  : 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.15))'),
+              transition: isPerformanceMode ? 'none' : 'filter 300ms ease'
             }}
           >
             TWIN
@@ -54,8 +56,8 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
                 color: '#FF6B35',
                 lineHeight: 1,
                 textTransform: 'uppercase',
-                filter: isHovered ? 'drop-shadow(0 0 6px rgba(255, 107, 53, 0.4))' : 'drop-shadow(0 0 3px rgba(255, 107, 53, 0.2))',
-                transition: 'filter 300ms ease'
+                filter: 'none',
+                transition: 'none'
               }}>F</span>
               <span style={{
                 fontFamily: "'Montserrat', sans-serif",
@@ -65,8 +67,8 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
                 color: '#F89442',
                 lineHeight: 1,
                 textTransform: 'uppercase',
-                filter: isHovered ? 'drop-shadow(0 0 6px rgba(248, 148, 66, 0.4))' : 'drop-shadow(0 0 3px rgba(248, 148, 66, 0.2))',
-                transition: 'filter 300ms ease'
+                filter: 'none',
+                transition: 'none'
               }}>Ø</span>
               <span style={{
                 fontFamily: "'Montserrat', sans-serif",
@@ -76,8 +78,8 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
                 color: '#F7931E',
                 lineHeight: 1,
                 textTransform: 'uppercase',
-                filter: isHovered ? 'drop-shadow(0 0 6px rgba(247, 147, 30, 0.4))' : 'drop-shadow(0 0 3px rgba(247, 147, 30, 0.2))',
-                transition: 'filter 300ms ease'
+                filter: 'none',
+                transition: 'none'
               }}>R</span>
               <span style={{
                 fontFamily: "'Montserrat', sans-serif",
@@ -87,8 +89,8 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
                 color: '#FCBB45',
                 lineHeight: 1,
                 textTransform: 'uppercase',
-                filter: isHovered ? 'drop-shadow(0 0 6px rgba(252, 187, 69, 0.4))' : 'drop-shadow(0 0 3px rgba(252, 187, 69, 0.2))',
-                transition: 'filter 300ms ease'
+                filter: 'none',
+                transition: 'none'
               }}>G</span>
               <span style={{
                 fontFamily: "'Montserrat', sans-serif",
@@ -98,8 +100,8 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
                 color: '#FDC830',
                 lineHeight: 1,
                 textTransform: 'uppercase',
-                filter: isHovered ? 'drop-shadow(0 0 6px rgba(253, 200, 48, 0.4))' : 'drop-shadow(0 0 3px rgba(253, 200, 48, 0.2))',
-                transition: 'filter 300ms ease'
+                filter: 'none',
+                transition: 'none'
               }}>E</span>
             </span>
           ) : (
@@ -134,7 +136,7 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
     <div
       className={`flex items-center ${className}`}
       style={{
-        transition: 'all 300ms ease-out',
+        transition: isPerformanceMode ? 'none' : 'all 300ms ease-out',
         gap: '8px',
         position: 'relative'
       }}
@@ -168,10 +170,12 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
             color: '#E5E7EB',
             lineHeight: 1,
             textTransform: 'uppercase',
-            filter: isHovered
-              ? 'drop-shadow(0 0 6px rgba(255, 255, 255, 0.3))'
-              : 'drop-shadow(0 0 3px rgba(255, 255, 255, 0.15))',
-            transition: 'filter 300ms ease'
+            filter: isPerformanceMode
+              ? 'none'
+              : (isHovered
+                ? 'drop-shadow(0 0 6px rgba(255, 255, 255, 0.3))'
+                : 'drop-shadow(0 0 3px rgba(255, 255, 255, 0.15))'),
+            transition: isPerformanceMode ? 'none' : 'filter 300ms ease'
           }}
         >
           TWIN
@@ -187,8 +191,8 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               color: '#FF6B35',
               lineHeight: 1,
               textTransform: 'uppercase',
-              filter: isHovered ? 'drop-shadow(0 0 5px rgba(255, 107, 53, 0.3))' : 'drop-shadow(0 0 2px rgba(255, 107, 53, 0.15))',
-              transition: 'filter 300ms ease'
+              filter: 'none',
+              transition: 'none'
             }}>F</span>
             <span style={{
               fontFamily: "'Montserrat', sans-serif",
@@ -198,8 +202,8 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               color: '#F89442',
               lineHeight: 1,
               textTransform: 'uppercase',
-              filter: isHovered ? 'drop-shadow(0 0 5px rgba(248, 148, 66, 0.3))' : 'drop-shadow(0 0 2px rgba(248, 148, 66, 0.15))',
-              transition: 'filter 300ms ease'
+              filter: 'none',
+              transition: 'none'
             }}>Ø</span>
             <span style={{
               fontFamily: "'Montserrat', sans-serif",
@@ -209,8 +213,8 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               color: '#F7931E',
               lineHeight: 1,
               textTransform: 'uppercase',
-              filter: isHovered ? 'drop-shadow(0 0 5px rgba(247, 147, 30, 0.3))' : 'drop-shadow(0 0 2px rgba(247, 147, 30, 0.15))',
-              transition: 'filter 300ms ease'
+              filter: 'none',
+              transition: 'none'
             }}>R</span>
             <span style={{
               fontFamily: "'Montserrat', sans-serif",
@@ -220,8 +224,8 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               color: '#FCBB45',
               lineHeight: 1,
               textTransform: 'uppercase',
-              filter: isHovered ? 'drop-shadow(0 0 5px rgba(252, 187, 69, 0.3))' : 'drop-shadow(0 0 2px rgba(252, 187, 69, 0.15))',
-              transition: 'filter 300ms ease'
+              filter: 'none',
+              transition: 'none'
             }}>G</span>
             <span style={{
               fontFamily: "'Montserrat', sans-serif",
@@ -231,8 +235,8 @@ export const TwinForgeLogo: React.FC<TwinForgeLogoProps> = ({
               color: '#FDC830',
               lineHeight: 1,
               textTransform: 'uppercase',
-              filter: isHovered ? 'drop-shadow(0 0 5px rgba(253, 200, 48, 0.3))' : 'drop-shadow(0 0 2px rgba(253, 200, 48, 0.15))',
-              transition: 'filter 300ms ease'
+              filter: 'none',
+              transition: 'none'
             }}>E</span>
           </span>
         ) : (
