@@ -11,6 +11,8 @@ import { useBodyScanData } from '../../../../hooks/useBodyScanData';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import ProjectionTabSkeleton from '../../../../ui/components/skeletons/ProjectionTabSkeleton';
 import logger from '../../../../lib/utils/logger';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
+import { ConditionalMotion } from '../../../../lib/motion/ConditionalMotion';
 
 const ProjectionTab: React.FC = () => {
   const { profile } = useUserStore();
@@ -329,7 +331,7 @@ const ProjectionTab: React.FC = () => {
   }
 
   return (
-    <motion.div
+    <ConditionalMotion
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -370,7 +372,7 @@ const ProjectionTab: React.FC = () => {
           isLoading={isCalculating}
         />
       </div>
-    </motion.div>
+    </ConditionalMotion>
   );
 };
 

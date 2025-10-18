@@ -9,6 +9,8 @@ import { ICONS } from '../../../../ui/icons/registry';
 import { useUserStore } from '../../../../system/store/userStore';
 import { bodyScanRepo } from '../../../../system/data/repositories/bodyScanRepo';
 import HistoricalScanModal from './HistoricalScanModal';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
+import { ConditionalMotion } from '../../../../lib/motion/ConditionalMotion';
 
 const isValidNumber = (n: unknown): n is number =>
   typeof n === 'number' && Number.isFinite(n);
@@ -65,6 +67,7 @@ const Row: React.FC<{ icon: keyof typeof ICONS; label: string; value: string | n
 const HistoryTab: React.FC = () => {
   const { profile } = useUserStore();
   const userId = profile?.userId;
+  const { isPerformanceMode } = usePerformanceMode();
 
   const [selectedScanId, setSelectedScanId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -181,7 +184,7 @@ const HistoryTab: React.FC = () => {
   const canLoadMore = scans && scans.length > 0 && scans.length === displayLimit;
 
   return (
-    <motion.div
+    <ConditionalMotion
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -232,7 +235,7 @@ const HistoryTab: React.FC = () => {
             );
 
             return (
-              <motion.div
+              <ConditionalMotion
                 key={scan.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -299,7 +302,7 @@ const HistoryTab: React.FC = () => {
                     </button>
                   </div>
                 </GlassCard>
-              </motion.div>
+              </ConditionalMotion>
             );
           })}
         </AnimatePresence>
@@ -308,7 +311,8 @@ const HistoryTab: React.FC = () => {
       {/* Load More Button */}
       {canLoadMore && (
         <div className="flex justify-center mt-8">
-          <motion.button
+          <ConditionalMotion
+            as="button"
             onClick={handleLoadMore}
             className="btn-glass--secondary px-6 py-3"
             initial={{ opacity: 0, y: 20 }}
@@ -321,7 +325,7 @@ const HistoryTab: React.FC = () => {
               <SpatialIcon Icon={ICONS.ChevronDown} size={16} className="text-white/70" />
               <span>Charger plus de scans</span>
             </div>
-          </motion.button>
+          </ConditionalMotion>
         </div>
       )}
 
@@ -330,7 +334,7 @@ const HistoryTab: React.FC = () => {
           <HistoricalScanModal scanId={selectedScanId} onClose={handleCloseModal} />
         )}
       </AnimatePresence>
-    </motion.div>
+    </ConditionalMotion>
   );
 };
 

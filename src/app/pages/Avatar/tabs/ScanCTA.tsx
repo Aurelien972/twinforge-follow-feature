@@ -5,6 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../../../system/supabase/client';
 import { useUserStore } from '../../../../system/store/userStore';
 import { useFeedback } from '../../../../hooks/useFeedback';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
+import { ConditionalMotion } from '../../../../lib/motion/ConditionalMotion';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -104,6 +106,7 @@ const ScanCTA: React.FC = () => {
   const navigate = useNavigate();
   const { profile } = useUserStore();
   const { click, success } = useFeedback();
+  const { isPerformanceMode } = usePerformanceMode();
 
   // Fetch latest body scan
   const { data: latestScan, isLoading, error } = useQuery({
@@ -198,14 +201,14 @@ const ScanCTA: React.FC = () => {
   }
 
   return (
-    <motion.div
+    <ConditionalMotion
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className="space-y-6 w-full"
     >
       {/* Main CTA Card */}
-      <motion.div
+      <ConditionalMotion
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -226,55 +229,57 @@ const ScanCTA: React.FC = () => {
             `
           }}
         >
-          {/* 4 Carrés décoratifs aux coins */}
-          <div className="training-hero-corners" aria-hidden="true">
-            {[0, 1, 2, 3].map((i) => (
-              <motion.div
-                key={i}
-                className="corner-particle"
-                style={{
-                  position: 'absolute',
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '2px',
-                  background: `linear-gradient(135deg, ${scanStatus.color}, rgba(255, 255, 255, 0.8))`,
-                  boxShadow: `0 0 20px ${scanStatus.color}`,
-                  top: i < 2 ? '12px' : 'auto',
-                  bottom: i >= 2 ? '12px' : 'auto',
-                  left: i % 2 === 0 ? '12px' : 'auto',
-                  right: i % 2 === 1 ? '12px' : 'auto'
-                }}
-                initial={{
-                  rotate: i % 2 === 0 ? 45 : -45
-                }}
-                animate={{
-                  scale: [1, 1.3, 1],
-                  opacity: [0.6, 1, 0.6],
-                  rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  delay: i * 0.2,
-                  ease: [0.4, 0, 0.2, 1]
-                }}
-              />
-            ))}
-          </div>
+          {/* 4 Carrés décoratifs aux coins - Désactivés en mode performance */}
+          {!isPerformanceMode && (
+            <div className="training-hero-corners" aria-hidden="true">
+              {[0, 1, 2, 3].map((i) => (
+                <motion.div
+                  key={i}
+                  className="corner-particle"
+                  style={{
+                    position: 'absolute',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '2px',
+                    background: `linear-gradient(135deg, ${scanStatus.color}, rgba(255, 255, 255, 0.8))`,
+                    boxShadow: `0 0 20px ${scanStatus.color}`,
+                    top: i < 2 ? '12px' : 'auto',
+                    bottom: i >= 2 ? '12px' : 'auto',
+                    left: i % 2 === 0 ? '12px' : 'auto',
+                    right: i % 2 === 1 ? '12px' : 'auto'
+                  }}
+                  initial={{
+                    rotate: i % 2 === 0 ? 45 : -45
+                  }}
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.6, 1, 0.6],
+                    rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                    ease: [0.4, 0, 0.2, 1]
+                  }}
+                />
+              ))}
+            </div>
+          )}
 
-          {/* Halo de Forge Corporelle - Animation Pulse Permanente */}
+          {/* Halo de Forge Corporelle - Animation conditionnelle */}
           <div
-            className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
+            className={`absolute inset-0 rounded-inherit pointer-events-none ${!isPerformanceMode ? 'urgent-forge-glow-css' : ''}`}
             style={{
               background: `radial-gradient(circle at center, color-mix(in srgb, ${scanStatus.color} 8%, transparent) 0%, transparent 70%)`,
-              filter: 'blur(20px)',
+              filter: isPerformanceMode ? 'blur(10px)' : 'blur(20px)',
               transform: 'scale(1.2)',
               zIndex: -1
             }}
           />
 
           {/* Status Icon */}
-          <motion.div
+          <ConditionalMotion
             className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center relative"
             style={{
               background: `
@@ -282,7 +287,9 @@ const ScanCTA: React.FC = () => {
                 linear-gradient(135deg, color-mix(in srgb, ${scanStatus.color} 35%, transparent), color-mix(in srgb, ${scanStatus.color} 25%, transparent))
               `,
               border: `2px solid color-mix(in srgb, ${scanStatus.color} 50%, transparent)`,
-              boxShadow: `0 0 40px color-mix(in srgb, ${scanStatus.color} 40%, transparent)`
+              boxShadow: isPerformanceMode
+                ? `0 0 20px color-mix(in srgb, ${scanStatus.color} 20%, transparent)`
+                : `0 0 40px color-mix(in srgb, ${scanStatus.color} 40%, transparent)`
             }}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -297,8 +304,8 @@ const ScanCTA: React.FC = () => {
               variant="pure"
             />
 
-            {/* Pulse ring for urgent states */}
-            {scanStatus.urgency === 'high' && (
+            {/* Pulse ring for urgent states - Désactivé en mode performance */}
+            {scanStatus.urgency === 'high' && !isPerformanceMode && (
               <motion.div
                 className="absolute inset-0 rounded-full border-2"
                 style={{ borderColor: `color-mix(in srgb, ${scanStatus.color} 40%, transparent)` }}
@@ -314,8 +321,19 @@ const ScanCTA: React.FC = () => {
               />
             )}
 
-            {/* Particules orbitales animées - visible uniquement quand à jour (status up_to_date) */}
-            {scanStatus.status === 'up_to_date' && (
+            {/* Static indicator en mode performance */}
+            {scanStatus.urgency === 'high' && isPerformanceMode && (
+              <div
+                className="absolute inset-0 rounded-full border-2"
+                style={{
+                  borderColor: `color-mix(in srgb, ${scanStatus.color} 40%, transparent)`,
+                  opacity: 0.5
+                }}
+              />
+            )}
+
+            {/* Particules orbitales animées - Désactivées en mode performance */}
+            {scanStatus.status === 'up_to_date' && !isPerformanceMode && (
               <>
                 {[...Array(6)].map((_, i) => {
                   const angle = (i * 360) / 6;
@@ -340,10 +358,10 @@ const ScanCTA: React.FC = () => {
                 })}
               </>
             )}
-          </motion.div>
+          </ConditionalMotion>
 
           {/* Status Message */}
-          <motion.div
+          <ConditionalMotion
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -358,10 +376,10 @@ const ScanCTA: React.FC = () => {
             <p className="text-white/80 text-lg leading-relaxed max-w-md mx-auto">
               {scanStatus.subtitle}
             </p>
-          </motion.div>
+          </ConditionalMotion>
 
           {/* Scan Frequency Info */}
-          <motion.div
+          <ConditionalMotion
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.6 }}
@@ -380,17 +398,18 @@ const ScanCTA: React.FC = () => {
               Pour un suivi optimal de votre évolution corporelle, nous recommandons un scan tous les 7 jours.
               Cela permet de détecter les changements subtils et d'ajuster vos objectifs en conséquence.
             </p>
-          </motion.div>
+          </ConditionalMotion>
 
           {/* Action Buttons */}
-          <motion.div
+          <ConditionalMotion
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             {/* Primary CTA - New Scan */}
-            <motion.button
+            <ConditionalMotion
+              as="button"
               onClick={handleStartNewScan}
               className="px-8 py-4 rounded-full font-bold text-lg text-white relative overflow-hidden min-h-[64px]"
               style={{
@@ -443,11 +462,12 @@ const ScanCTA: React.FC = () => {
                   {scanStatus.status === 'never_scanned' ? 'Créer mon Avatar 3D' : 'Nouveau Scan'}
                 </span>
               </div>
-            </motion.button>
+            </ConditionalMotion>
 
             {/* Secondary CTA - View Insights (only if scans exist) */}
             {scanStatus.status !== 'never_scanned' && (
-              <motion.button
+              <ConditionalMotion
+                as="button"
                 onClick={handleViewInsights}
                 className="px-6 py-4 rounded-full font-medium text-white/90 transition-all duration-200 min-h-[64px]"
                 style={{
@@ -472,15 +492,15 @@ const ScanCTA: React.FC = () => {
                   <SpatialIcon Icon={ICONS.Zap} size={20} color="white" variant="pure" />
                   <span>Voir mes Insights</span>
                 </div>
-              </motion.button>
+              </ConditionalMotion>
             )}
-          </motion.div>
+          </ConditionalMotion>
         </GlassCard>
-      </motion.div>
+      </ConditionalMotion>
 
       {/* Progress Tracking Card */}
       {scanStatus.status !== 'never_scanned' && (
-        <motion.div
+        <ConditionalMotion
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
@@ -551,7 +571,7 @@ const ScanCTA: React.FC = () => {
               {/* Progress Bar */}
               <div className="relative">
                 <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
-                  <motion.div
+                  <ConditionalMotion
                     className="h-3 rounded-full relative overflow-hidden"
                     style={{
                       background: `linear-gradient(90deg, ${scanStatus.color}, color-mix(in srgb, ${scanStatus.color} 80%, white))`,
@@ -574,7 +594,7 @@ const ScanCTA: React.FC = () => {
                         animation: 'progressShimmer 2s ease-in-out infinite'
                       }}
                     />
-                  </motion.div>
+                  </ConditionalMotion>
                 </div>
 
                 <div className="flex justify-between mt-2 text-xs text-white/50">
@@ -600,11 +620,11 @@ const ScanCTA: React.FC = () => {
               </div>
             </div>
           </GlassCard>
-        </motion.div>
+        </ConditionalMotion>
       )}
 
       {/* Benefits Card */}
-      <motion.div
+      <ConditionalMotion
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
@@ -644,7 +664,7 @@ const ScanCTA: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <motion.div
+            <ConditionalMotion
               className="morphology-insight-item"
               style={{ '--insight-color': '#22C55E' } as React.CSSProperties}
               initial={{ opacity: 0, y: 15 }}
@@ -663,9 +683,9 @@ const ScanCTA: React.FC = () => {
               <div className="morphology-insight-title">
                 Détectez les changements subtils
               </div>
-            </motion.div>
+            </ConditionalMotion>
 
-            <motion.div
+            <ConditionalMotion
               className="morphology-insight-item"
               style={{ '--insight-color': '#3B82F6' } as React.CSSProperties}
               initial={{ opacity: 0, y: 15 }}
@@ -684,9 +704,9 @@ const ScanCTA: React.FC = () => {
               <div className="morphology-insight-title">
                 Recommandations personnalisées
               </div>
-            </motion.div>
+            </ConditionalMotion>
 
-            <motion.div
+            <ConditionalMotion
               className="morphology-insight-item"
               style={{ '--insight-color': '#A855F7' } as React.CSSProperties}
               initial={{ opacity: 0, y: 15 }}
@@ -705,11 +725,11 @@ const ScanCTA: React.FC = () => {
               <div className="morphology-insight-title">
                 Visualisez vos progrès
               </div>
-            </motion.div>
+            </ConditionalMotion>
           </div>
         </GlassCard>
-      </motion.div>
-    </motion.div>
+      </ConditionalMotion>
+    </ConditionalMotion>
   );
 };
 

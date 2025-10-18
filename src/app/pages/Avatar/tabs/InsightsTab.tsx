@@ -16,6 +16,8 @@ import { NoScanState } from './insights/NoScanState';
 import { SummaryDashboard } from './insights/SummaryDashboard';
 import InsightsGenerationExitModal from './insights/InsightsGenerationExitModal';
 import logger from '../../../../lib/utils/logger';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
+import { ConditionalMotion } from '../../../../lib/motion/ConditionalMotion';
 
 /**
  * Insights Tab - AI-Powered Morphology Analysis
@@ -113,7 +115,7 @@ const InsightsTab: React.FC = () => {
   
   return (
     <>
-      <motion.div
+      <ConditionalMotion
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -137,7 +139,7 @@ const InsightsTab: React.FC = () => {
         <div className="space-y-6">
           {/* High Priority Insights */}
           {insights.filter(insight => insight.priority === 'high').length > 0 && (
-            <motion.div
+            <ConditionalMotion
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -173,12 +175,12 @@ const InsightsTab: React.FC = () => {
                     ))}
                 </div>
               </GlassCard>
-            </motion.div>
+            </ConditionalMotion>
           )}
 
           {/* Morphology Insights */}
           {insights.filter(insight => insight.category === 'morphology').length > 0 && (
-            <motion.div
+            <ConditionalMotion
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
@@ -211,12 +213,12 @@ const InsightsTab: React.FC = () => {
                     ))}
                 </div>
               </GlassCard>
-            </motion.div>
+            </ConditionalMotion>
           )}
 
           {/* Fitness & Goals Insights */}
           {insights.filter(insight => ['fitness', 'goals'].includes(insight.category)).length > 0 && (
-            <motion.div
+            <ConditionalMotion
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -249,12 +251,12 @@ const InsightsTab: React.FC = () => {
                     ))}
                 </div>
               </GlassCard>
-            </motion.div>
+            </ConditionalMotion>
           )}
 
           {/* Health & Nutrition Insights */}
           {insights.filter(insight => ['health', 'nutrition'].includes(insight.category)).length > 0 && (
-            <motion.div
+            <ConditionalMotion
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
@@ -287,12 +289,12 @@ const InsightsTab: React.FC = () => {
                     ))}
                 </div>
               </GlassCard>
-            </motion.div>
+            </ConditionalMotion>
           )}
         </div>
       )}
     </div>
-      </motion.div>
+      </ConditionalMotion>
     </>
   );
 };

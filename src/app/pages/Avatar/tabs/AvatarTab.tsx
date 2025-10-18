@@ -12,6 +12,8 @@ import MorphologyInsightsCard from './components/MorphologyInsightsCard';
 import BodyMetricsCard from './components/BodyMetricsCard';
 import AvatarTabSkeleton from '../../../../ui/components/skeletons/AvatarTabSkeleton';
 import logger from '../../../../lib/utils/logger';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
+import { ConditionalMotion } from '../../../../lib/motion/ConditionalMotion';
 
 /**
  * Avatar Tab - Viewer 3D avec ajustements fins
@@ -20,6 +22,7 @@ import logger from '../../../../lib/utils/logger';
 const AvatarTab: React.FC = () => {
   const navigate = useNavigate();
   const { profile } = useUserStore();
+  const { isPerformanceMode } = usePerformanceMode();
 
   // Use the same robust hook as ProjectionTab
   const { bodyScanData: latestScanData, isLoading, error } = useBodyScanData();
@@ -114,14 +117,14 @@ const AvatarTab: React.FC = () => {
     return (
       // Removed 'profile-section-container' and added 'p-8' directly to GlassCard for consistent padding
       <GlassCard className="text-center p-8">
-        <motion.div
+        <ConditionalMotion
           className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 border border-red-400/30 flex items-center justify-center"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         >
           <SpatialIcon Icon={ICONS.AlertCircle} size={32} color="#EF4444" />
-        </motion.div>
+        </ConditionalMotion>
         
         <h3 className="text-xl font-bold text-white mb-3">Erreur de chargement</h3>
         <p className="text-red-300 text-sm mb-6 leading-relaxed max-w-md mx-auto">
@@ -164,26 +167,28 @@ const AvatarTab: React.FC = () => {
   if (!latestScanData || !hasMinimalData) {
     return (
       <GlassCard className="text-center p-8" interactive>
-        <motion.div
+        <ConditionalMotion
           className="w-20 h-20 mx-auto rounded-full bg-blue-500/20 flex items-center justify-center mb-6 relative"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         >
           <SpatialIcon Icon={ICONS.Scan} size={40} className="text-blue-400" />
-          <motion.div
-            className="absolute inset-0 rounded-full border-2 border-blue-400/30"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.6, 0.3]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </motion.div>
+          {!isPerformanceMode && (
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-blue-400/30"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.3, 0.6, 0.3]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          )}
+        </ConditionalMotion>
 
         <h3 className="text-2xl font-bold text-white mb-3">
           Aucun avatar corporel
@@ -240,7 +245,7 @@ const AvatarTab: React.FC = () => {
     // Removed 'profile-section-container' class from here.
     // The padding will now be handled by the parent of AvatarTab (Tabs.Panel),
     // allowing GlassCard to expand to the full width of the Tabs.Panel.
-    <motion.div
+    <ConditionalMotion
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -315,16 +320,19 @@ const AvatarTab: React.FC = () => {
         }}
       >
         {/* Effet de respiration en fond */}
-        <div
-          className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
-          style={{
-            background: `radial-gradient(circle at center, color-mix(in srgb, #8B5CF6 8%, transparent) 0%, transparent 70%)`,
-            filter: 'blur(20px)',
-            transform: 'scale(1.2)',
-            zIndex: 0
-          }}
-        />
-        <motion.button
+        {!isPerformanceMode && (
+          <div
+            className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
+            style={{
+              background: `radial-gradient(circle at center, color-mix(in srgb, #8B5CF6 8%, transparent) 0%, transparent 70%)`,
+              filter: 'blur(20px)',
+              transform: 'scale(1.2)',
+              zIndex: 0
+            }}
+          />
+        )}
+        <ConditionalMotion
+          as="button"
           onClick={() => navigate('/body-scan')}
           className="w-full px-8 py-4 rounded-2xl font-bold text-lg text-white relative overflow-hidden min-h-[64px] z-10"
           style={{
@@ -344,14 +352,16 @@ const AvatarTab: React.FC = () => {
           whileTap={{ scale: 0.99 }}
         >
           {/* Shimmer Effect */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent)',
-              animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
-              borderRadius: 'inherit'
-            }}
-          />
+          {!isPerformanceMode && (
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: 'linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent)',
+                animation: 'celebration-cta-shimmer-movement 2s ease-in-out infinite',
+                borderRadius: 'inherit'
+              }}
+            />
+          )}
 
           <div className="relative z-10 flex items-center justify-center gap-3">
             <SpatialIcon
@@ -370,9 +380,9 @@ const AvatarTab: React.FC = () => {
               Nouveau scan corporel
             </span>
           </div>
-        </motion.button>
+        </ConditionalMotion>
       </GlassCard>
-    </motion.div>
+    </ConditionalMotion>
   );
 };
 

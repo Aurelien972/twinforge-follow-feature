@@ -4,15 +4,19 @@ import { motion } from 'framer-motion';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
+import { ConditionalMotion } from '../../../../lib/motion/ConditionalMotion';
 
 /**
  * Face Tab - Feature à venir
  * L'onglet scan facial sera disponible dans une future version
  */
 const FaceTab: React.FC = () => {
+  const { isPerformanceMode } = usePerformanceMode();
+
   return (
     <div className="space-y-6 w-full">
-      <motion.div
+      <ConditionalMotion
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -35,7 +39,7 @@ const FaceTab: React.FC = () => {
           }}
         >
           {/* Icon principal */}
-          <motion.div
+          <ConditionalMotion
             className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center relative"
             style={{
               background: `
@@ -57,23 +61,25 @@ const FaceTab: React.FC = () => {
             />
 
             {/* Pulse ring */}
-            <motion.div
-              className="absolute inset-0 rounded-full border-2"
-              style={{ borderColor: 'rgba(236, 72, 153, 0.4)' }}
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.6, 0.3]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          </motion.div>
+            {!isPerformanceMode && (
+              <motion.div
+                className="absolute inset-0 rounded-full border-2"
+                style={{ borderColor: 'rgba(236, 72, 153, 0.4)' }}
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.6, 0.3]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+            )}
+          </ConditionalMotion>
 
           {/* Message */}
-          <motion.div
+          <ConditionalMotion
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -85,10 +91,10 @@ const FaceTab: React.FC = () => {
             <p className="text-white/80 text-lg leading-relaxed max-w-md mx-auto">
               Cette fonctionnalité sera disponible prochainement
             </p>
-          </motion.div>
+          </ConditionalMotion>
 
           {/* Info Card */}
-          <motion.div
+          <ConditionalMotion
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.6 }}
@@ -107,9 +113,9 @@ const FaceTab: React.FC = () => {
               Concentrez-vous sur votre scan corporel pour créer votre avatar complet.
               Le scan facial sera ajouté dans une prochaine mise à jour.
             </p>
-          </motion.div>
+          </ConditionalMotion>
         </GlassCard>
-      </motion.div>
+      </ConditionalMotion>
     </div>
   );
 };
