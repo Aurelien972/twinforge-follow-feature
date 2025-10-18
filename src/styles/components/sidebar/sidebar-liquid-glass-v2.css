@@ -283,8 +283,8 @@
 }
 
 .sidebar-item[aria-current="page"] .sidebar-item-icon {
-  color: var(--color-plasma-cyan) !important;
-  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-plasma-cyan) 40%, transparent)) !important;
+  color: var(--item-circuit-color, var(--color-plasma-cyan)) !important;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--item-circuit-color, var(--color-plasma-cyan)) 40%, transparent)) !important;
 }
 
 .sidebar-item[aria-current="page"] .sidebar-item-label {

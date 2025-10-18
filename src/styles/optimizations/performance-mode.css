@@ -394,6 +394,140 @@
 }
 
 /* =========================================
+   HEADER - Solid backgrounds and disabled animations
+   ========================================= */
+
+.performance-mode .header-liquid-glass {
+  /* Solid background instead of ultra-transparent */
+  background: #0F1927 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Clean shadow without excessive blur */
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.20),
+    0 2px 8px rgba(0, 0, 0, 0.12) !important;
+
+  /* Keep border for definition */
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+/* Disable animated gradient border */
+.performance-mode .header-liquid-glass::before {
+  animation: none !important;
+  opacity: 0.6 !important;
+}
+
+/* Simplify ambient glow */
+.performance-mode .header-liquid-glass::after {
+  opacity: 0.25 !important;
+  filter: blur(8px) !important;
+  animation: none !important;
+}
+
+/* Header buttons: simplified glass pills */
+.performance-mode .header-liquid-glass .glass-orb-button {
+  background: #1A2332 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* =========================================
+   BOTTOM BAR - Solid backgrounds and disabled animations
+   ========================================= */
+
+.performance-mode .new-mobile-bottom-bar-container {
+  /* Solid background instead of ultra-transparent */
+  background: #0F1927 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Clean shadow */
+  box-shadow:
+    0 -4px 24px rgba(0, 0, 0, 0.20),
+    0 -2px 8px rgba(0, 0, 0, 0.12) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+/* Disable animated gradient border */
+.performance-mode .new-mobile-bottom-bar-container::before {
+  animation: none !important;
+  opacity: 0.6 !important;
+}
+
+/* Simplify ambient glow */
+.performance-mode .new-mobile-bottom-bar-container::after {
+  opacity: 0.25 !important;
+  filter: blur(8px) !important;
+  animation: none !important;
+}
+
+/* Bottom bar icon containers: simplified */
+.performance-mode .new-bottom-bar-icon-container {
+  background: #1A2332 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Active state: preserve colored shadows but reduced */
+.performance-mode .new-bottom-bar-icon-container--active {
+  box-shadow:
+    0 4px 16px color-mix(in srgb, var(--button-color) 15%, transparent),
+    0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* =========================================
+   CENTRAL ACTIONS MENU - Simplified glass
+   ========================================= */
+
+.performance-mode .central-actions-panel {
+  background: #0F1927 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.25),
+    0 4px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* =========================================
+   FLOATING CHAT BUTTON - Simplified effects
+   ========================================= */
+
+.performance-mode .floating-chat-button,
+.performance-mode .floating-voice-coach-button,
+.performance-mode .unified-floating-button {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  animation: none !important;
+}
+
+.performance-mode .floating-chat-button::before,
+.performance-mode .floating-chat-button::after,
+.performance-mode .floating-voice-coach-button::before,
+.performance-mode .floating-voice-coach-button::after {
+  animation: none !important;
+  opacity: 0.5 !important;
+}
+
+/* =========================================
+   CHAT DRAWER - Simplified glass effects
+   ========================================= */
+
+.performance-mode .mobile-drawer,
+.performance-mode .global-chat-drawer,
+.performance-mode .unified-coach-drawer {
+  background: #0F1927 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.25),
+    0 4px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* =========================================
    ANIMATIONS KEYFRAMES - Optimisation Sélective
    ========================================= */
 
