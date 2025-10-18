@@ -184,7 +184,12 @@ export function useBodyProjection({
     setIsCalculating(true);
     setError(null);
 
-    // PHASE 1 OPTIMIZATION: Debounce reduced from 300ms to 200ms for better responsiveness
+    // MOBILE OPTIMIZATION: Adaptive debounce based on device
+    // Mobile: 500ms to prevent excessive calculations
+    // Desktop: 200ms for responsiveness
+    const isMobile = /mobile|android|iphone|ipod/i.test(navigator.userAgent);
+    const debounceMs = isMobile ? 500 : 200;
+
     calculationTimeoutRef.current = setTimeout(async () => {
       isCalculatingRef.current = true;
       const calculationStartTime = Date.now();
@@ -283,7 +288,7 @@ export function useBodyProjection({
         setIsCalculating(false);
         isCalculatingRef.current = false;
       }
-    }, 200); // PHASE 1 OPTIMIZATION: Reduced from 300ms
+    }, debounceMs); // MOBILE OPTIMIZATION: 500ms on mobile, 200ms on desktop
 
     return () => {
       if (calculationTimeoutRef.current) {

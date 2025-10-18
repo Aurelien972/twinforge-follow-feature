@@ -89,8 +89,9 @@ const ProjectionTab: React.FC = () => {
   const viewerUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingProjectionRef = useRef<any>(null);
 
-  // PHASE 1 OPTIMIZATION: Threshold increased from 0.02 to 0.05 to reduce unnecessary re-renders
-  const MORPH_CHANGE_THRESHOLD = 0.05;
+  // MOBILE OPTIMIZATION: Higher threshold on mobile to reduce updates
+  const isMobile = /mobile|android|iphone|ipod/i.test(navigator.userAgent);
+  const MORPH_CHANGE_THRESHOLD = isMobile ? 0.08 : 0.05;
 
   // PHASE 1 OPTIMIZATION: Reduced logging overhead - only log in dev mode
   const areObjectsEqual = useCallback((a: any, b: any, threshold: number = MORPH_CHANGE_THRESHOLD, debugLabel?: string): boolean => {
@@ -211,10 +212,13 @@ const ProjectionTab: React.FC = () => {
     // Store pending projection
     pendingProjectionRef.current = projection;
 
-    // Debounce viewer updates by 400ms (on top of calculation debounce)
+    // MOBILE OPTIMIZATION: Debounce viewer updates - higher on mobile
+    const isMobile = /mobile|android|iphone|ipod/i.test(navigator.userAgent);
+    const viewerDebounceMs = isMobile ? 600 : 400;
+
     viewerUpdateTimeoutRef.current = setTimeout(() => {
       setDebouncedProjection(pendingProjectionRef.current);
-    }, 400);
+    }, viewerDebounceMs);
 
     return () => {
       if (viewerUpdateTimeoutRef.current) {

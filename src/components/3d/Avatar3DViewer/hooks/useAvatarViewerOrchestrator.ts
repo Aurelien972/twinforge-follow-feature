@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo, useLayoutEffect } from 'react';
+import { useState, useCallback, useRef, useMemo, useLayoutEffect, useEffect } from 'react';
 import { useSceneLifecycle } from './useSceneLifecycle';
 import { useModelLifecycle } from './useModelLifecycle';
 import { useMorphLifecycle } from './useMorphLifecycle';
@@ -11,6 +11,7 @@ import logger from '../../../../lib/utils/logger';
 import { DEBUG_FLAGS } from '../../../../config/debugFlags';
 import * as THREE from 'three';
 import { getGlobalPerformanceMonitor } from '../../../../lib/utils/PerformanceMonitor';
+import { mobileMemoryMonitor, cleanupThreeJSResources } from '../../../../lib/3d/performance/mobileMemoryMonitor';
 
 /**
  * Apply face-only clipping to hide body parts below shoulders
@@ -718,6 +719,13 @@ export function useAvatarViewerOrchestrator(
 
     sceneLifecycle.initializeScene().then(() => {
       perfMonitor.endOperation(opId);
+
+      // MOBILE OPTIMIZATION: Start memory monitoring after scene initialization
+      mobileMemoryMonitor.startMonitoring();
+      logger.info('ORCHESTRATOR', 'Mobile memory monitoring started', {
+        serverScanId,
+        philosophy: 'memory_monitoring_init'
+      });
     }).catch((error) => {
       perfMonitor.endOperation(opId);
       logger.error('ORCHESTRATOR', 'Scene initialization failed', {
@@ -725,17 +733,39 @@ export function useAvatarViewerOrchestrator(
         serverScanId,
         philosophy: 'scene_init_error'
       });
-      
+
       setViewerState(prev => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Initialization failed',
         isLoading: false,
       }));
-      
+
       initGuardRef.current = false;
     });
 
   }, [container]); // CRITICAL: Removed serverScanId from deps to prevent reload on scan ID changes
+
+  // MOBILE OPTIMIZATION: Register cleanup callback for memory pressure
+  useEffect(() => {
+    if (!sceneLifecycle.scene) return;
+
+    const cleanupCallback = () => {
+      if (sceneLifecycle.scene) {
+        cleanupThreeJSResources(sceneLifecycle.scene);
+      }
+    };
+
+    mobileMemoryMonitor.onMemoryPressure(cleanupCallback);
+
+    logger.info('ORCHESTRATOR', 'Registered Three.js cleanup callback for memory pressure', {
+      serverScanId,
+      philosophy: 'memory_pressure_cleanup_registered'
+    });
+
+    return () => {
+      // Cleanup is handled by the monitor's internal callback list
+    };
+  }, [sceneLifecycle.scene, serverScanId]);
 
   // Separate effect to handle model loading when scene becomes available
   useLayoutEffect(() => {
@@ -880,11 +910,13 @@ export function useAvatarViewerOrchestrator(
       });
     }
 
-    // OPTIMIZED: Throttle updates - 150ms for ultra-responsive projection mode
-    // Reduced from 300ms for better real-time feedback during parameter adjustments
+    // MOBILE OPTIMIZATION: Adaptive throttle based on device
+    // Mobile: 400ms to prevent excessive updates and memory pressure
+    // Desktop: 150ms for responsive feedback
     const now = Date.now();
     const timeSinceLastUpdate = now - lastMorphUpdateRef.current;
-    const MIN_UPDATE_INTERVAL = 150; // ms - PHASE 1 OPTIMIZATION: reduced for better UX
+    const isMobile = typeof navigator !== 'undefined' && /mobile|android|iphone|ipod/i.test(navigator.userAgent);
+    const MIN_UPDATE_INTERVAL = isMobile ? 400 : 150; // ms
 
     const performUpdate = async () => {
       // CRITICAL: Set guard flag to prevent concurrent updates
@@ -1123,6 +1155,9 @@ export function useAvatarViewerOrchestrator(
     finalGenderLockedRef.current = false;
     processedSkinToneLockedRef.current = false;
 
+    // MOBILE OPTIMIZATION: Stop memory monitoring before cleanup
+    mobileMemoryMonitor.stopMonitoring();
+
     // Complete cleanup
     sceneLifecycle.cleanup();
     modelLifecycle.cleanupModel();
@@ -1151,6 +1186,17 @@ export function useAvatarViewerOrchestrator(
       philosophy: 'retry_state_reset_complete'
     });
   }, [sceneLifecycle.cleanup, modelLifecycle.cleanupModel, morphLifecycle.resetMorphs, autoRotate, serverScanId]);
+
+  // MOBILE OPTIMIZATION: Stop memory monitoring on component unmount
+  useEffect(() => {
+    return () => {
+      mobileMemoryMonitor.stopMonitoring();
+      logger.info('ORCHESTRATOR', 'Memory monitoring stopped on unmount', {
+        serverScanId,
+        philosophy: 'memory_monitoring_cleanup'
+      });
+    };
+  }, [serverScanId]);
 
   // Determine readiness and error state
   const isReady = viewerState.isViewerReady && !viewerState.isLoading && !viewerState.error;
