@@ -311,6 +311,76 @@
 }
 
 /* =========================================
+   PERFORMANCE MODE - OPAQUE OPTIMIZATIONS
+   Remove all expensive effects for performance
+   ========================================= */
+
+/* High-performance mode: opaque header, no effects */
+.mode-high-performance .header-liquid-glass {
+  background: rgba(11, 14, 23, 0.95) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Remove all decorative pseudo-elements in performance mode */
+.mode-high-performance .header-liquid-glass::before,
+.mode-high-performance .header-liquid-glass::after {
+  display: none !important;
+}
+
+/* Simplify Zap button (Outils du Forgeron) in performance mode */
+.mode-high-performance .central-action-button {
+  background: rgba(247, 147, 30, 0.15) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 2px solid rgba(247, 147, 30, 0.4) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Remove animated corner squares in performance mode */
+.mode-high-performance .central-action-button > div[style*="position: absolute"] {
+  display: none !important;
+}
+
+/* Remove pulsing glow effect in performance mode */
+.mode-high-performance .central-action-button > div[class*="absolute inset-0"] {
+  display: none !important;
+}
+
+/* Simplify hamburger menu button in performance mode */
+.mode-high-performance .user-panel-toggle {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Disable all animations in performance mode */
+.mode-high-performance .header-liquid-glass *,
+.mode-high-performance .central-action-button *,
+.mode-high-performance .user-panel-toggle * {
+  animation: none !important;
+  transition: background-color 0.15s ease, transform 0.15s ease !important;
+}
+
+/* Simplify hover states in performance mode */
+@media (hover: hover) and (pointer: fine) {
+  .mode-high-performance .central-action-button:hover {
+    background: rgba(247, 147, 30, 0.25) !important;
+    transform: translateZ(0) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .mode-high-performance .user-panel-toggle:hover {
+    background: rgba(255, 255, 255, 0.18) !important;
+    transform: translateZ(0) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+/* =========================================
    RESPONSIVE VISIBILITY CONTROLS
    Force hamburger menu to be mobile-only
    ========================================= */
