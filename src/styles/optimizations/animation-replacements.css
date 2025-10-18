@@ -1,0 +1,456 @@
+/**
+ * Animation Replacements System
+ *
+ * Systematically replaces all @keyframes animations based on performance mode:
+ *
+ * - mode-quality (Desktop): All animations preserved
+ * - mode-balanced (Tablet): Simplified animations, reduced durations
+ * - mode-high-performance (Mobile): Only essential animations, static alternatives
+ *
+ * Essential animations kept on mobile:
+ * 1. icon-spin-css (loader spinner)
+ * 2. Simple tap feedback (scale via transition)
+ * 3. Slide-in modals (transform translateY via transition)
+ */
+
+/* ============================================
+   MOBILE HIGH-PERFORMANCE MODE
+   Disable ALL decorative animations
+   ============================================ */
+
+.mode-high-performance {
+  /* Disable all decorative breathing/pulsing animations */
+  --animation-breathing: none;
+  --animation-pulse: none;
+  --animation-shimmer: none;
+  --animation-glow: none;
+  --animation-float: none;
+  --animation-flow: none;
+
+  /* Keep only essential animations */
+  --animation-spin: icon-spin-css 1s linear infinite;
+  --animation-slide-in: slideInUp 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-fade-in: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Disable all breathing animations */
+.mode-high-performance [class*="breathing"],
+.mode-high-performance [class*="breathe"],
+.mode-high-performance .guide-breathing-animation,
+.mode-high-performance .breathing-icon,
+.mode-high-performance .fridge-breathing,
+.mode-high-performance .forgeBreathe,
+.mode-high-performance .btnBreathing {
+  animation: none !important;
+  opacity: 0.9 !important;
+}
+
+/* Disable all pulse animations */
+.mode-high-performance [class*="pulse"],
+.mode-high-performance .gridPulse,
+.mode-high-performance .keypointPulse,
+.mode-high-performance .icon-pulse-css,
+.mode-high-performance .borderPulse,
+.mode-high-performance .glowPulse,
+.mode-high-performance .step2-pulse,
+.mode-high-performance .voicePulse,
+.mode-high-performance .errorPulse,
+.mode-high-performance .celebrationPulse,
+.mode-high-performance .training-pulse,
+.mode-high-performance .recovery-pulse,
+.mode-high-performance .rep-pulse,
+.mode-high-performance .mobile-glow-pulse {
+  animation: none !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+}
+
+/* Disable all shimmer animations */
+.mode-high-performance [class*="shimmer"],
+.mode-high-performance .spatial-shimmer,
+.mode-high-performance .text-shimmer,
+.mode-high-performance .shimmer-visionos,
+.mode-high-performance .progressShimmer,
+.mode-high-performance .ctaShimmer,
+.mode-high-performance .fridge-shimmer,
+.mode-high-performance .training-shimmer,
+.mode-high-performance .shimmer-illustration,
+.mode-high-performance .active-exercise-shimmer,
+.mode-high-performance .training-button-shine {
+  animation: none !important;
+  background-image: none !important;
+}
+
+/* Disable all glow animations */
+.mode-high-performance [class*="glow"],
+.mode-high-performance .spatial-glow-pulse,
+.mode-high-performance .text-glow-pulse,
+.mode-high-performance .cta-glow-pulse,
+.mode-high-performance .forgePulseGlow,
+.mode-high-performance .breathing-glow,
+.mode-high-performance .step2-icon-glow,
+.mode-high-performance .celebration-ambient-glow,
+.mode-high-performance .icon-pulse-glow,
+.mode-high-performance .glow-icon-breathe,
+.mode-high-performance .focusGlow,
+.mode-high-performance .celebrationGlow {
+  animation: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Disable all float/flow animations */
+.mode-high-performance .particle-float,
+.mode-high-performance .particle-float-up,
+.mode-high-performance .dataParticle,
+.mode-high-performance .dataParticleFlow,
+.mode-high-performance .energy-flow,
+.mode-high-performance .energy-flow-contained,
+.mode-high-performance .fridge-particle-float,
+.mode-high-performance .celebration-particle-float {
+  animation: none !important;
+  opacity: 0.3 !important;
+}
+
+/* Disable scan line animations */
+.mode-high-performance .scanLineVertical,
+.mode-high-performance .scanLineHorizontal,
+.mode-high-performance .fridge-scan-move,
+.mode-high-performance .gridCellPulse,
+.mode-high-performance .analysisZone,
+.mode-high-performance .aiFocus {
+  animation: none !important;
+  opacity: 0.5 !important;
+}
+
+/* Disable border/ring animations */
+.mode-high-performance .borderFlow,
+.mode-high-performance .borderPulse,
+.mode-high-performance .step2-border-rotate,
+.mode-high-performance .avatarBorderFlow,
+.mode-high-performance .pulse-ring-success,
+.mode-high-performance .forgePulseRing,
+.mode-high-performance .fridge-ring-pulse,
+.mode-high-performance .celebration-icon-pulse-ring,
+.mode-high-performance .tileRipple {
+  animation: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Disable background animations */
+.mode-high-performance .cosmic-forge-pulse,
+.mode-high-performance .ember-rise,
+.mode-high-performance .thermal-distortion,
+.mode-high-performance .circuit-glow-ember,
+.mode-high-performance .circuit-glow-core,
+.mode-high-performance .gradient-shift,
+.mode-high-performance .rotate-gradient,
+.mode-high-performance .forge-sparks {
+  animation: none !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Disable celebration animations */
+.mode-high-performance .celebration-ray-pulse,
+.mode-high-performance .celebration-icon-inner-glow,
+.mode-high-performance .celebration-title-glow-pulse,
+.mode-high-performance .celebration-cta-shimmer-movement,
+.mode-high-performance .celebration-cta-sparkle-twinkle,
+.mode-high-performance .celebration-confetti-fall {
+  animation: none !important;
+  opacity: 0.8 !important;
+}
+
+/* Disable flame/ignition animations */
+.mode-high-performance .copper-ignition-line,
+.mode-high-performance .cyan-halo-diffusion,
+.mode-high-performance .copper-flash,
+.mode-high-performance .cyan-cooling,
+.mode-high-performance .badge-flame-flicker {
+  animation: none !important;
+  opacity: 0.9 !important;
+}
+
+/* Disable rotation animations (except essential spinner) */
+.mode-high-performance .forgeRotateGlow,
+.mode-high-performance .glow-icon-rotate-gentle,
+.mode-high-performance .badge-clock-rotate {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Disable typing animations */
+.mode-high-performance .typingBounce,
+.mode-high-performance .typingDotBounce,
+.mode-high-performance .recordingPulse,
+.mode-high-performance .recordingDotPulse,
+.mode-high-performance .sendButtonPulse {
+  animation: none !important;
+}
+
+/* Disable skeleton animations */
+.mode-high-performance .skeletonPulse,
+.mode-high-performance .skeleton-pulse,
+.mode-high-performance .shimmer-wave,
+.mode-high-performance .shimmer-wave-local,
+.mode-high-performance .training-skeleton-shimmer,
+.mode-high-performance .highlight-pulse {
+  animation: none !important;
+  opacity: 0.4 !important;
+}
+
+/* Disable modal/transition animations (keep simple slide-in) */
+.mode-high-performance .glass-slide-up,
+.mode-high-performance .scroll-reveal-fade-in,
+.mode-high-performance .messageEnter,
+.mode-high-performance .messageSlideIn,
+.mode-high-performance .errorSlideIn,
+.mode-high-performance .notification-bounce,
+.mode-high-performance .badgeAppear,
+.mode-high-performance .spring-in {
+  animation: var(--animation-slide-in) !important;
+  animation-duration: 0.2s !important;
+}
+
+/* Disable fridge-specific animations */
+.mode-high-performance .fridge-guide-pulse,
+.mode-high-performance .fridge-grid-pulse,
+.mode-high-performance .fridge-fade-in {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Disable training-specific animations */
+.mode-high-performance .training-button-pulse-shadow,
+.mode-high-performance .training-halo-pulse,
+.mode-high-performance .timer-pulse-gpu,
+.mode-high-performance .rounds-increment-gpu {
+  animation: none !important;
+}
+
+/* Disable meal/recipe animations */
+.mode-high-performance .breathingIconPulse,
+.mode-high-performance .planGenerationPulse,
+.mode-high-performance .recipe-generation-pulse {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Disable progress/fill animations */
+.mode-high-performance .progressFill,
+.mode-high-performance .forgeProgressFill {
+  animation: none !important;
+}
+
+/* Disable corner/badge animations */
+.mode-high-performance .cornerSquarePulse,
+.mode-high-performance .dotPulse,
+.mode-high-performance .activePulse,
+.mode-high-performance .focusPulse,
+.mode-high-performance .step2BadgePulse {
+  animation: none !important;
+}
+
+/* Disable flash/active state animations */
+.mode-high-performance .flash-active {
+  animation: none !important;
+}
+
+/* KEEP essential animations */
+.mode-high-performance .spin,
+.mode-high-performance .fridge-spin,
+.mode-high-performance .icon-spin-css,
+.mode-high-performance .processingSpinSlow,
+.mode-high-performance [class*="loading"] .spin,
+.mode-high-performance [class*="spinner"] {
+  animation: icon-spin-css 1s linear infinite !important;
+}
+
+/* Keep simple fade-in for content loading */
+.mode-high-performance .fadeIn,
+.mode-high-performance .fade-slide-in,
+.mode-high-performance .forgeFadeIn {
+  animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Keep simple slide-in for modals */
+.mode-high-performance .slideInUp,
+.mode-high-performance .forgeSlideInUp {
+  animation: slideInUp 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Replace tap feedback with simple CSS transition */
+.mode-high-performance button,
+.mode-high-performance [role="button"],
+.mode-high-performance .clickable {
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.mode-high-performance button:active,
+.mode-high-performance [role="button"]:active,
+.mode-high-performance .clickable:active {
+  transform: scale(0.95) !important;
+  animation: none !important;
+}
+
+/* Static alternatives for disabled animations */
+.mode-high-performance [class*="pulse"]::after,
+.mode-high-performance [class*="glow"]::after,
+.mode-high-performance [class*="shimmer"]::after {
+  display: none !important;
+}
+
+/* Disable all ::before and ::after pseudo-element animations */
+.mode-high-performance *::before,
+.mode-high-performance *::after {
+  animation: none !important;
+}
+
+/* ============================================
+   TABLET BALANCED MODE
+   Simplified animations with reduced durations
+   ============================================ */
+
+.mode-balanced {
+  /* Reduce animation durations by 50% */
+  --animation-duration-fast: 0.5s;
+  --animation-duration-normal: 1s;
+  --animation-duration-slow: 1.5s;
+}
+
+/* Simplify breathing animations */
+.mode-balanced [class*="breathing"],
+.mode-balanced [class*="breathe"] {
+  animation-duration: var(--animation-duration-normal) !important;
+  animation-timing-function: ease-in-out !important;
+}
+
+/* Simplify pulse animations */
+.mode-balanced [class*="pulse"] {
+  animation-duration: var(--animation-duration-normal) !important;
+  animation-iteration-count: infinite !important;
+}
+
+/* Simplify shimmer animations */
+.mode-balanced [class*="shimmer"] {
+  animation-duration: var(--animation-duration-slow) !important;
+  opacity: 0.6 !important;
+}
+
+/* Reduce glow intensity */
+.mode-balanced [class*="glow"] {
+  animation-duration: var(--animation-duration-normal) !important;
+  filter: blur(4px) !important;
+}
+
+/* Disable complex particle animations */
+.mode-balanced .particle-float,
+.mode-balanced .particle-float-up,
+.mode-balanced .dataParticle,
+.mode-balanced .dataParticleFlow {
+  animation: none !important;
+  opacity: 0.5 !important;
+}
+
+/* Simplify border animations */
+.mode-balanced .borderFlow,
+.mode-balanced .borderPulse,
+.mode-balanced .avatarBorderFlow {
+  animation-duration: var(--animation-duration-slow) !important;
+}
+
+/* Disable complex background animations */
+.mode-balanced .cosmic-forge-pulse,
+.mode-balanced .ember-rise,
+.mode-balanced .thermal-distortion {
+  animation: none !important;
+}
+
+/* Simplify celebration animations */
+.mode-balanced .celebration-confetti-fall,
+.mode-balanced .celebration-particle-float {
+  animation: none !important;
+}
+
+/* Speed up transition animations */
+.mode-balanced [class*="slide"],
+.mode-balanced [class*="fade"] {
+  animation-duration: var(--animation-duration-fast) !important;
+}
+
+/* ============================================
+   DESKTOP QUALITY MODE
+   All animations preserved
+   ============================================ */
+
+.mode-quality {
+  /* All animations work as designed */
+  /* No overrides needed */
+}
+
+/* ============================================
+   ESSENTIAL ANIMATIONS (Always Available)
+   ============================================ */
+
+/* Loader spinner - always enabled */
+@keyframes icon-spin-css {
+  from { transform: rotate(0deg) translateZ(0); }
+  to { transform: rotate(360deg) translateZ(0); }
+}
+
+/* Simple fade-in - always enabled */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateZ(0);
+  }
+}
+
+/* Simple slide-in - always enabled */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+  }
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+/* Use GPU acceleration for essential animations only */
+.mode-high-performance [class*="spin"],
+.mode-high-performance [class*="slide"],
+.mode-high-performance [class*="fade"] {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Disable will-change for static elements */
+.mode-high-performance *:not([class*="spin"]):not([class*="slide"]):not([class*="fade"]) {
+  will-change: auto !important;
+}
+
+/* Reduce motion for users with preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .mode-high-performance *,
+  .mode-balanced *,
+  .mode-quality * {
+    animation: none !important;
+  }
+}
