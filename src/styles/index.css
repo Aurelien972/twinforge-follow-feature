@@ -102,6 +102,7 @@
 @import './optimizations/gradient-optimizations.css';
 @import './optimizations/shadow-optimizations.css';
 @import './optimizations/animation-optimizations.css';
+@import './optimizations/motion-replacements.css';
 @import './optimizations/pipeline-animations.css';
 @import './mobile/touch.css';
 
