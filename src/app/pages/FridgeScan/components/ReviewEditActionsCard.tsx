@@ -175,9 +175,9 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                     animate: {
                       scale: [1, 1.05, 1],
                       boxShadow: [
-                        '0 0 40px color-mix(in srgb, #EC4899 60%, transparent)',
-                        '0 0 50px color-mix(in srgb, #EC4899 75%, transparent)',
-                        '0 0 40px color-mix(in srgb, #EC4899 60%, transparent)'
+                        '0 0 40px rgba(236, 72, 153, 0.6)',
+                        '0 0 50px rgba(236, 72, 153, 0.75)',
+                        '0 0 40px rgba(236, 72, 153, 0.6)'
                       ]
                     },
                     transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }
@@ -460,9 +460,9 @@ const ReviewEditActionsCard: React.FC<ReviewEditActionsCardProps> = ({
                     animate: {
                       scale: [1, 1.05, 1],
                       boxShadow: [
-                        '0 0 40px color-mix(in srgb, #EC4899 60%, transparent), 0 0 80px color-mix(in srgb, #8B5CF6 40%, transparent)',
-                        '0 0 50px color-mix(in srgb, #EC4899 75%, transparent), 0 0 100px color-mix(in srgb, #8B5CF6 55%, transparent)',
-                        '0 0 40px color-mix(in srgb, #EC4899 60%, transparent), 0 0 80px color-mix(in srgb, #8B5CF6 40%, transparent)'
+                        '0 0 40px rgba(236, 72, 153, 0.6), 0 0 80px rgba(139, 92, 246, 0.4)',
+                        '0 0 50px rgba(236, 72, 153, 0.75), 0 0 100px rgba(139, 92, 246, 0.55)',
+                        '0 0 40px rgba(236, 72, 153, 0.6), 0 0 80px rgba(139, 92, 246, 0.4)'
                       ]
                     },
                     transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }

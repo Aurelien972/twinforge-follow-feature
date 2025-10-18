@@ -100,9 +100,9 @@ const RecentScansCard: React.FC = () => {
             animate={{
               scale: [1, 1.05, 1],
               boxShadow: [
-                '0 0 20px color-mix(in srgb, #EC4899 40%, transparent)',
-                '0 0 30px color-mix(in srgb, #EC4899 55%, transparent)',
-                '0 0 20px color-mix(in srgb, #EC4899 40%, transparent)'
+                '0 0 20px rgba(236, 72, 153, 0.4)',
+                '0 0 30px rgba(236, 72, 153, 0.55)',
+                '0 0 20px rgba(236, 72, 153, 0.4)'
               ]
             }}
             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -180,8 +180,8 @@ const RecentScansCard: React.FC = () => {
               whileHover={{
                 scale: 1.02,
                 background: 'rgba(236, 72, 153, 0.08)',
-                borderColor: 'color-mix(in srgb, #EC4899 30%, transparent)',
-                boxShadow: '0 0 20px color-mix(in srgb, #EC4899 20%, transparent)'
+                borderColor: 'rgba(236, 72, 153, 0.3)',
+                boxShadow: '0 0 20px rgba(236, 72, 153, 0.2)'
               }}
             >
               <div className="flex items-center gap-4">

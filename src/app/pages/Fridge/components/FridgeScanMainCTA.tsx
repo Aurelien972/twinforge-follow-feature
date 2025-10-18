@@ -146,9 +146,9 @@ const FridgeScanMainCTA: React.FC = () => {
               animate: {
                 scale: [1, 1.06, 1],
                 boxShadow: [
-                  '0 0 50px color-mix(in srgb, #EC4899 70%, transparent), 0 0 100px color-mix(in srgb, #F472B6 50%, transparent)',
-                  '0 0 55px color-mix(in srgb, #EC4899 75%, transparent), 0 0 110px color-mix(in srgb, #F472B6 55%, transparent)',
-                  '0 0 50px color-mix(in srgb, #EC4899 70%, transparent), 0 0 100px color-mix(in srgb, #F472B6 50%, transparent)'
+                  '0 0 50px rgba(236, 72, 153, 0.7), 0 0 100px rgba(244, 114, 182, 0.5)',
+                  '0 0 55px rgba(236, 72, 153, 0.75), 0 0 110px rgba(244, 114, 182, 0.55)',
+                  '0 0 50px rgba(236, 72, 153, 0.7), 0 0 100px rgba(244, 114, 182, 0.5)'
                 ]
               },
               transition: { duration: 3, repeat: Infinity, ease: [0.45, 0.05, 0.55, 0.95] }

@@ -6,6 +6,7 @@ import { useUserStore } from '@/system/store/userStore';
 import { useExitModalStore } from '@/system/store/exitModalStore';
 import { useToast } from '@/ui/components/ToastProvider';
 import { useFastingHistory } from '../../hooks/useFastingHistory';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import GlassCard from '@/ui/cards/GlassCard';
