@@ -492,6 +492,58 @@
     0 4px 16px rgba(0, 0, 0, 0.15) !important;
 }
 
+/* Pills/buttons dans le panneau - fond plus solide */
+.performance-mode .central-actions-panel .glass-card {
+  background: #1A2332 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Icon containers dans les pills - utiliser les couleurs circuit correctes */
+.performance-mode .central-actions-panel .glass-card .w-6.h-6 {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 50%),
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 20%, #1A2332),
+      color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 12%, #1A2332)) !important;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  border: 1.5px solid color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 35%, transparent) !important;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 0 12px color-mix(in srgb, var(--pill-circuit-color, #18E3FF) 18%, transparent) !important;
+}
+
+/* Avatar Twin Button en mode performance */
+.performance-mode .central-actions-panel .avatar-twin-button {
+  background: #1A2332 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Disable animations du panneau en mode performance */
+.performance-mode .central-actions-panel::before,
+.performance-mode .central-actions-panel::after {
+  animation: none !important;
+  opacity: 0.5 !important;
+}
+
+/* Disable animations des bordures */
+.performance-mode .central-actions-panel .avatar-twin-button::before {
+  animation: none !important;
+  opacity: 0.4 !important;
+}
+
+.performance-mode .central-actions-panel .avatar-twin-button::after {
+  display: none !important;
+}
+
 /* =========================================
    FLOATING CHAT BUTTON - Simplified effects
    ========================================= */

@@ -221,7 +221,7 @@ const MobileDrawer = React.memo(() => {
                             }
                           `}
                           onClick={handleNavItemClick}
-                          style={{ '--item-circuit-color': item.circuitColor || getCircuitColor(item.to) } as React.CSSProperties}
+                          style={{ '--item-circuit-color': item.circuitColor } as React.CSSProperties}
                         >
                           {/* Icon container with glass pill effect */}
                           <div className={`sidebar-item-icon-container ${
@@ -231,10 +231,10 @@ const MobileDrawer = React.memo(() => {
                               Icon={ICONS[item.icon]}
                               size={16}
                               className={`sidebar-item-icon ${isActive(item.to) || hasActiveSubItem ? '' : 'opacity-80 group-hover:opacity-100'}`}
-                              color={isActive(item.to) || hasActiveSubItem ? getCircuitColor(item.to) : undefined}
+                              color={isActive(item.to) || hasActiveSubItem ? item.circuitColor : undefined}
                               style={isActive(item.to) || hasActiveSubItem ? {
-                                color: getCircuitColor(item.to),
-                                filter: `drop-shadow(0 0 8px ${getCircuitColor(item.to)}60)`
+                                color: item.circuitColor,
+                                filter: `drop-shadow(0 0 8px ${item.circuitColor}60)`
                               } : undefined}
                             />
                           </div>
@@ -285,7 +285,7 @@ const MobileDrawer = React.memo(() => {
                                     `}
                                     onClick={() => setDrawer(false)}
                                     aria-current={isSubActive ? 'page' : undefined}
-                                    style={{ '--item-circuit-color': subItem.color || item.circuitColor || getCircuitColor(item.to) } as React.CSSProperties}
+                                    style={{ '--item-circuit-color': subItem.color || item.circuitColor } as React.CSSProperties}
                                   >
                                     <div className={`sidebar-submenu-item-icon-container ${isSubActive || isPrimaryAndPageActive ? 'sidebar-submenu-item-icon-container--active' : ''}`}>
                                       <SpatialIcon

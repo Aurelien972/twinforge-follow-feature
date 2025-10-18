@@ -114,7 +114,7 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
         subtitle: 'Live Training',
         icon: 'Dumbbell',
         route: '/training',
-        color: '#F97316',
+        color: '#18E3FF', // Cyan - harmonisé avec Forge Corporelle
         available: true,
         description: 'Accéder à la pipeline de training avec coaching en direct'
       },
@@ -150,8 +150,8 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
         id: 'forge-vitale',
         label: 'Forge Vitale',
         subtitle: 'Bientôt disponible',
-        icon: 'Heart',
-        color: '#EF4444',
+        icon: 'HeartPulse', // Harmonisé avec navigation.ts
+        color: '#EF4444', // Rouge - harmonisé avec Forge Vitale
         available: false,
         comingSoon: true,
         description: 'Suivi de santé complet (bientôt disponible)'
@@ -170,7 +170,7 @@ export const QUICK_ACTION_SECTIONS: QuickActionSection[] = [
         subtitle: 'Créez votre jumeau numérique',
         icon: 'Scan',
         route: '/body-scan',
-        color: '#D946EF',
+        color: '#A855F7', // Violet - harmonisé avec Mon Twin
         available: true,
         description: 'Scanner et créer votre avatar 3D personnalisé'
       }

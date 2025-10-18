@@ -582,6 +582,14 @@
     -webkit-transform: translate3d(0, 0, 0);
   }
 
+  /* Adapter le fond pour mobile - légèrement plus opaque */
+  body:not(.performance-mode) .central-actions-panel {
+    background:
+      var(--liquid-reflections-multi),
+      var(--liquid-highlight-corner),
+      rgba(11, 14, 23, 0.55) !important;
+  }
+
   .central-actions-panel::after {
     filter: blur(8px);
     /* Disable glow animation on mobile for better performance */
@@ -601,6 +609,14 @@
     transform: translate3d(0, 0, 0);
     -webkit-transform: translate3d(0, 0, 0);
     will-change: transform;
+  }
+
+  /* Pills plus visibles sur mobile - fond semi-opaque */
+  body:not(.performance-mode) .central-actions-panel .glass-card {
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12) 0%, transparent 60%),
+      rgba(26, 35, 50, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
   }
 
   /* Optimiser l'espace vertical sur mobile - tout doit être visible sans scroll */
