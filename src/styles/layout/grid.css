@@ -48,14 +48,17 @@ button,[role="button"],.glass-card[data-interactive]{touch-action:manipulation;}
 
 /* iOS swipe-back & fixed-positioning hardening */
 @supports (-webkit-touch-callout: none){
-  html,body{
-    position:static !important;
-    overflow-x:hidden !important;
-    overflow-y:auto !important;
+  /* CRITICAL: body must NOT have overflow or height:100% - it breaks position:fixed on iOS */
+  html{
     height:100% !important;
+  }
+  body{
+    position:static !important;
+    overflow:visible !important;
+    overflow-x:visible !important;
+    overflow-y:visible !important;
+    min-height:100% !important;
     -webkit-overflow-scrolling:touch !important;
-    overscroll-behavior-x:none !important;
-    overscroll-behavior-y:auto !important;
   }
   #root{
     position:static !important;

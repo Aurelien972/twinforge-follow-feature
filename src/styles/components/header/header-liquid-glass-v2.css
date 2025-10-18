@@ -10,7 +10,7 @@
   left: 24px !important;
   right: 24px !important;
   height: 64px !important;
-  z-index: 9999 !important;
+  z-index: 999999 !important;
   isolation: isolate !important;
   border-radius: 20px !important;
   overflow: visible !important;

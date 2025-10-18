@@ -12,7 +12,7 @@
   --new-bottom-bar-padding: 12px;
   --new-bottom-bar-button-size: 56px;
   --new-bottom-bar-central-button-size: 80px;
-  --new-bottom-bar-z-index: 9996;
+  --new-bottom-bar-z-index: 999996;
 
   /* Floating CTA button dimensions for stacking calculations */
   --floating-cta-button-height: 60px;

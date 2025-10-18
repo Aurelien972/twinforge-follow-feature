@@ -15,7 +15,7 @@
 
 /* Remove ALL transform-related properties from body and html that create new stacking contexts */
 @media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  html, body {
+  html {
     transform: none !important;
     -webkit-transform: none !important;
     transform-style: flat !important;
@@ -27,12 +27,29 @@
     will-change: auto !important;
     contain: none !important;
     isolation: auto !important;
-    /* CRITICAL: overflow on body breaks position:fixed on iOS */
+    position: static !important;
+    height: 100% !important;
+  }
+
+  /* CRITICAL: body must have NO overflow properties - they break position:fixed on iOS */
+  body {
+    transform: none !important;
+    -webkit-transform: none !important;
+    transform-style: flat !important;
+    -webkit-transform-style: flat !important;
+    perspective: none !important;
+    -webkit-perspective: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    will-change: auto !important;
+    contain: none !important;
+    isolation: auto !important;
+    position: static !important;
     overflow: visible !important;
     overflow-x: visible !important;
     overflow-y: visible !important;
-    /* Use position:static to ensure no interference */
-    position: static !important;
+    min-height: 100% !important;
+    height: auto !important;
   }
 
   /* Remove transforms from all parent containers that could break fixed positioning */
