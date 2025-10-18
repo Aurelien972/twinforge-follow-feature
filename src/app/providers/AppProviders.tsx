@@ -13,6 +13,7 @@ import { useAutoSync } from '../../hooks/useAutoSync';
 import { useUserStore } from '../../system/store/userStore';
 import logger from '../../lib/utils/logger';
 import { BackgroundManager } from '../../ui/components/BackgroundManager';
+import PerformanceRecommendationAlert, { usePerformanceRecommendationAlert } from '../../ui/components/PerformanceRecommendationAlert';
 
 // Create QueryClient with enhanced cache configuration for persistence
 const queryClient = new QueryClient({
@@ -183,6 +184,20 @@ function AutoSyncInitializer({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function PerformanceAlertManager() {
+  const { showAlert, recommendation, dismissAlert } = usePerformanceRecommendationAlert();
+
+  if (!showAlert || !recommendation) return null;
+
+  return (
+    <PerformanceRecommendationAlert
+      recommendation={recommendation}
+      onDismiss={dismissAlert}
+      onNavigateToSettings={dismissAlert}
+    />
+  );
+}
+
 export function AppProviders({ children }: { children: React.ReactNode }) {
   // Initialize cache persistence on mount
   React.useEffect(() => {
@@ -201,6 +216,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
                 <ToastProvider>
                   <PerformanceInitializer>
                     <AutoSyncInitializer>
+                      <PerformanceAlertManager />
                       {children}
                     </AutoSyncInitializer>
                   </PerformanceInitializer>

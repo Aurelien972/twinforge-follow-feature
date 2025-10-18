@@ -1,26 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 import { useToast } from '../../../ui/components/ToastProvider';
+import PerformanceModeCard from '../../../ui/components/PerformanceModeCard';
+import { devicePerformanceDetectionService, PerformanceRecommendation } from '../../../system/services/devicePerformanceDetectionService';
+import { PerformanceMode } from '../../../system/store/performanceModeStore';
 
 const GeneralSettingsTab: React.FC = () => {
-  const { isPerformanceMode, isLoading, togglePerformanceMode } = usePerformanceMode();
+  const { mode, recommendedMode, isLoading, setMode } = usePerformanceMode();
   const { showToast } = useToast();
+  const [deviceRecommendation, setDeviceRecommendation] = useState<PerformanceRecommendation | null>(null);
+  const [isChanging, setIsChanging] = useState(false);
 
-  const handleToggle = async () => {
+  useEffect(() => {
+    const recommendation = devicePerformanceDetectionService.analyzeDevice();
+    setDeviceRecommendation(recommendation);
+  }, []);
+
+  const handleModeChange = async (newMode: PerformanceMode) => {
+    if (isChanging || isLoading) return;
+
+    setIsChanging(true);
     try {
-      await togglePerformanceMode();
+      await setMode(newMode);
+
+      const modeLabels: Record<PerformanceMode, string> = {
+        'high-performance': 'Performance Maximale',
+        'balanced': 'Équilibré',
+        'quality': 'Qualité Premium',
+      };
+
       showToast({
         type: 'success',
-        title: isPerformanceMode ? 'Mode Performance désactivé' : 'Mode Performance activé',
-        message: isPerformanceMode
-          ? 'Tous les effets visuels sont maintenant actifs'
-          : 'Optimisation pour iPhone 10 et appareils anciens activée',
-        duration: 3000,
+        title: `Mode ${modeLabels[newMode]} activé`,
+        message: 'La page va se recharger pour appliquer les changements',
+        duration: 2000,
       });
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       showToast({
         type: 'error',
@@ -28,116 +50,104 @@ const GeneralSettingsTab: React.FC = () => {
         message: 'Impossible de modifier le mode performance',
         duration: 3000,
       });
+      setIsChanging(false);
     }
   };
 
   return (
     <div className="space-y-6">
-      <GlassCard className="p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-3">
-              <SpatialIcon
-                Icon={ICONS.Zap}
-                size={24}
-                color={isPerformanceMode ? '#10B981' : '#94A3B8'}
-                variant="pure"
-              />
-              <h3 className="text-lg font-semibold text-white">
-                Mode Performance
+      {deviceRecommendation && (
+        <GlassCard className="p-6">
+          <div className="flex items-start gap-4">
+            <SpatialIcon
+              Icon={ICONS.Smartphone}
+              size={28}
+              color="#60A5FA"
+              variant="pure"
+            />
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-white mb-2">
+                Votre Appareil
               </h3>
-            </div>
-
-            <p className="text-sm text-slate-400 mb-4 leading-relaxed">
-              Optimise l'application pour les appareils anciens (iPhone 10, iPhone 8, etc.) en désactivant
-              tous les effets visuels coûteux. Élimine le flickering et garantit une fluidité à 60fps.
-            </p>
-
-            <div className="space-y-2 text-xs text-slate-500">
-              <div className="flex items-start gap-2">
-                <span className="text-slate-600">•</span>
-                <span>Désactive les animations et transitions</span>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                <div>
+                  <span className="text-xs text-slate-500 block mb-1">Modèle</span>
+                  <span className="text-sm text-white font-medium">{deviceRecommendation.deviceSpecs.deviceModel}</span>
+                </div>
+                <div>
+                  <span className="text-xs text-slate-500 block mb-1">Catégorie</span>
+                  <span className="text-sm text-white font-medium">
+                    {devicePerformanceDetectionService.getCategoryLabel(deviceRecommendation.deviceCategory)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-xs text-slate-500 block mb-1">RAM</span>
+                  <span className="text-sm text-white font-medium">{deviceRecommendation.deviceSpecs.memoryGB}GB</span>
+                </div>
+                <div>
+                  <span className="text-xs text-slate-500 block mb-1">Score</span>
+                  <span className="text-sm text-white font-medium">{deviceRecommendation.performanceScore}/100</span>
+                </div>
               </div>
-              <div className="flex items-start gap-2">
-                <span className="text-slate-600">•</span>
-                <span>Remplace les effets de verre par des fonds solides</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-slate-600">•</span>
-                <span>Supprime les particules et effets lumineux</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-slate-600">•</span>
-                <span>Conserve toute la navigation et les fonctionnalités</span>
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <div className="h-2 rounded-full bg-slate-700 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${deviceRecommendation.performanceScore}%` }}
+                      transition={{ delay: 0.3, duration: 1, ease: 'easeOut' }}
+                      className="h-full rounded-full"
+                      style={{
+                        background: deviceRecommendation.performanceScore >= 70
+                          ? 'linear-gradient(90deg, #10B981, #34D399)'
+                          : deviceRecommendation.performanceScore >= 50
+                          ? 'linear-gradient(90deg, #3B82F6, #60A5FA)'
+                          : 'linear-gradient(90deg, #F59E0B, #FBBF24)',
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+        </GlassCard>
+      )}
 
-          <div className="flex flex-col items-center gap-2">
-            <button
-              onClick={handleToggle}
-              disabled={isLoading}
-              className="relative inline-flex h-12 w-24 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
-              style={{
-                backgroundColor: isPerformanceMode ? '#10B981' : '#334155',
-                borderColor: isPerformanceMode ? '#10B981' : '#475569',
-              }}
-              role="switch"
-              aria-checked={isPerformanceMode}
-              aria-label="Activer le mode performance"
-            >
-              <motion.span
-                className="pointer-events-none inline-block h-10 w-10 transform rounded-full shadow-lg ring-0 transition duration-200 ease-in-out"
-                style={{
-                  backgroundColor: 'white',
-                }}
-                animate={{
-                  x: isPerformanceMode ? 48 : 2,
-                  y: 2,
-                }}
-                transition={{
-                  type: 'spring',
-                  stiffness: 500,
-                  damping: 30,
-                }}
-              />
-            </button>
-
-            <span className="text-xs font-medium text-slate-400">
-              {isPerformanceMode ? 'Activé' : 'Désactivé'}
-            </span>
-          </div>
+      <div>
+        <div className="mb-4">
+          <h3 className="text-xl font-bold text-white mb-2">
+            Choisissez votre mode de performance
+          </h3>
+          <p className="text-sm text-slate-400">
+            Nous avons conçu 3 niveaux de qualité visuelle pour adapter l'expérience à votre appareil.
+            Vous pouvez changer de mode à tout moment.
+          </p>
         </div>
 
-        {isPerformanceMode && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 p-4 rounded-2xl"
-            style={{
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
-            }}
-          >
-            <div className="flex items-start gap-3">
-              <SpatialIcon
-                Icon={ICONS.CheckCircle}
-                size={20}
-                color="#10B981"
-                variant="pure"
-              />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-emerald-400 mb-1">
-                  Mode Performance actif
-                </p>
-                <p className="text-xs text-emerald-300 opacity-90">
-                  Votre appareil bénéficie maintenant d'une expérience optimisée pour des performances maximales
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </GlassCard>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <PerformanceModeCard
+            mode="high-performance"
+            isSelected={mode === 'high-performance'}
+            isRecommended={recommendedMode === 'high-performance'}
+            onClick={() => handleModeChange('high-performance')}
+            disabled={isChanging || isLoading}
+          />
+          <PerformanceModeCard
+            mode="balanced"
+            isSelected={mode === 'balanced'}
+            isRecommended={recommendedMode === 'balanced'}
+            onClick={() => handleModeChange('balanced')}
+            disabled={isChanging || isLoading}
+          />
+          <PerformanceModeCard
+            mode="quality"
+            isSelected={mode === 'quality'}
+            isRecommended={recommendedMode === 'quality'}
+            onClick={() => handleModeChange('quality')}
+            disabled={isChanging || isLoading}
+          />
+        </div>
+      </div>
 
       <GlassCard className="p-6">
         <div className="flex items-start gap-3">
@@ -149,13 +159,31 @@ const GeneralSettingsTab: React.FC = () => {
           />
           <div className="flex-1">
             <h4 className="text-sm font-semibold text-white mb-2">
-              Recommandations
+              À propos des modes de performance
             </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Le mode performance est recommandé pour les appareils de plus de 5 ans ou si vous constatez
-              du flickering, des ralentissements ou une consommation de batterie élevée. Vous pouvez activer
-              et désactiver ce mode à tout moment selon vos besoins.
-            </p>
+            <ul className="text-xs text-slate-400 leading-relaxed space-y-2">
+              <li className="flex items-start gap-2">
+                <span className="text-emerald-400 mt-0.5">•</span>
+                <span>
+                  <strong className="text-slate-300">Performance Maximale:</strong> Désactive tous les effets visuels coûteux pour garantir 60fps.
+                  Idéal pour les appareils anciens (iPhone 8-10) ou si vous privilégiez la fluidité et la batterie.
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-400 mt-0.5">•</span>
+                <span>
+                  <strong className="text-slate-300">Équilibré:</strong> Active les animations essentielles et un design soigné.
+                  Compromis idéal entre performance et esthétique. Recommandé pour iPhone 11-12 et appareils mid-range.
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 mt-0.5">•</span>
+                <span>
+                  <strong className="text-slate-300">Qualité Premium:</strong> Active tous les effets visuels pour une expérience immersive complète.
+                  Nécessite un appareil performant (iPhone 13+ ou desktop récent).
+                </span>
+              </li>
+            </ul>
           </div>
         </div>
       </GlassCard>
