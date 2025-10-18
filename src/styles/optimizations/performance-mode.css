@@ -224,3 +224,59 @@
   isolation: auto !important;
   contain: none !important;
 }
+
+/* =========================================
+   CONTAINERS - Hide all container borders
+   Keep only GlassCard borders visible
+   ========================================= */
+
+/* Hide all div/section/motion.div borders */
+.performance-mode div:not(.glass-card):not(.glass-base):not(.glass-card-cta),
+.performance-mode section:not(.glass-card):not(.glass-base),
+.performance-mode [class*="container"]:not(.glass-card):not(.glass-base) {
+  border: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+}
+
+/* Tabs container - Remove all borders and pseudo-elements */
+.performance-mode .tabs-list-container {
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.performance-mode .tabs-list-container::before,
+.performance-mode .tabs-list-container::after {
+  display: none !important;
+  opacity: 0 !important;
+  border: none !important;
+}
+
+/* Grid containers - No borders */
+.performance-mode .grid,
+.performance-mode [class*="grid"],
+.performance-mode .space-y-6,
+.performance-mode [class*="space-"] {
+  border: none !important;
+}
+
+/* ConnectedDevices specific containers */
+.performance-mode .devices-header,
+.performance-mode .providers-grid,
+.performance-mode .device-stats-grid {
+  border: none !important;
+}
+
+/* Remove inline style borders */
+.performance-mode [style*="border"] {
+  border: none !important;
+}
+
+/* Keep GlassCard borders intact */
+.performance-mode .glass-card,
+.performance-mode .glass-base,
+.performance-mode .glass-card-cta {
+  /* These keep their border from the earlier rule */
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}

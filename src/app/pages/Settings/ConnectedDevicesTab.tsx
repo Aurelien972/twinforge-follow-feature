@@ -361,7 +361,7 @@ const ConnectedDevicesTab: React.FC = () => {
             </div>
 
             {/* Coming Soon Section */}
-            <div style={{ marginTop: '2rem', padding: '1.5rem', borderRadius: '16px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <div style={{ marginTop: '2rem', padding: '1.5rem', borderRadius: '16px', background: 'rgba(255, 255, 255, 0.03)' }} className="glass-card">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
                 <SpatialIcon Icon={ICONS.Clock} size={20} style={{ color: '#06B6D4' }} />
                 <h4 style={{ fontSize: '1rem', fontWeight: '600', color: 'white', margin: 0 }}>
