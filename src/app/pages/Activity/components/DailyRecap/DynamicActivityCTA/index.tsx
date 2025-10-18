@@ -1,4 +1,6 @@
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
@@ -8,8 +10,6 @@ import { analyzeActivityContext } from './contextAnalysis';
 import { generateCTAMessage } from './messageGenerator';
 import { calculateUrgencyConfig, shouldShowParticles, getParticleCount } from './urgencyCalculator';
 import { useActivityPerformance } from '../../../hooks/useActivityPerformance';
-import { ConditionalMotionActivity } from '../../shared/ConditionalMotionActivity';
-import React from 'react';
 
 interface ActivityCTAProps {
   todayStats?: {
@@ -93,6 +93,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
   } as React.CSSProperties;
 
   const isPerformanceMode = perf.mode === 'low' || perf.mode === 'medium';
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   return (
     <div className="dynamic-activity-cta activity-capture-enter" data-performance-mode={isPerformanceMode}>
@@ -103,33 +104,47 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
         style={cardStyles}
       >
         {/* Carrés tournants aux coins - Désactivés en mode low/medium */}
-        {perf.enableComplexEffects && (
+        {perf.enableRotations && (
           <div className="training-hero-corners" aria-hidden="true">
             {[0, 1, 2, 3].map((i) => (
-              <div
+              <MotionDiv
                 key={i}
                 className="corner-particle"
                 style={{
                   position: 'absolute',
-                  width: '8px',
-                  height: '8px',
+                  width: '12px',
+                  height: '12px',
                   borderRadius: '2px',
-                  background: `linear-gradient(135deg, #3B82F6, rgba(255, 255, 255, 0.8))`,
-                  boxShadow: `0 0 20px #3B82F6`,
+                  background: 'linear-gradient(135deg, #3B82F6, rgba(96, 165, 250, 0.8))',
+                  boxShadow: '0 0 20px #3B82F6',
                   top: i < 2 ? '12px' : 'auto',
                   bottom: i >= 2 ? '12px' : 'auto',
                   left: i % 2 === 0 ? '12px' : 'auto',
                   right: i % 2 === 1 ? '12px' : 'auto',
-                  transform: `rotate(${i % 2 === 0 ? 45 : -45}deg)`,
-                  animation: 'corner-particle-float 3s ease-in-out infinite',
-                  animationDelay: `${i * 0.2}s`
+                  willChange: isPerformanceMode ? 'auto' : 'transform, opacity'
                 }}
+                {...(!isPerformanceMode && {
+                  initial: {
+                    rotate: i % 2 === 0 ? 45 : -45
+                  },
+                  animate: {
+                    scale: [1, 1.2, 1],
+                    opacity: [0.6, 0.9, 0.6],
+                    rotate: i % 2 === 0 ? [45, 55, 45] : [-45, -55, -45]
+                  },
+                  transition: {
+                    duration: 3.5,
+                    repeat: Infinity,
+                    delay: i * 0.25,
+                    ease: [0.45, 0.05, 0.55, 0.95]
+                  }
+                })}
               />
             ))}
           </div>
         )}
 
-        {(urgencyConfig.priority === 'high' || urgencyConfig.priority === 'critical') && perf.enableComplexEffects && (
+        {(urgencyConfig.priority === 'high' || urgencyConfig.priority === 'critical') && perf.enableGlows && (
           <div
             className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
             style={{
@@ -142,22 +157,69 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
         )}
 
         <div className="relative z-10 space-y-4 md:space-y-6">
-          <div
-            className={`activity-icon-enhanced mx-auto rounded-full flex items-center justify-center relative ${
-              urgencyConfig.animation === 'pulse' && perf.enableAnimations ? 'icon-pulse-css' :
-              urgencyConfig.animation === 'breathing' && perf.enableAnimations ? 'icon-breathing-css' : ''
+          {/* Icône Principale avec Animation VisionOS 26 */}
+          <MotionDiv
+            className={`w-28 h-28 mx-auto rounded-full flex items-center justify-center relative ${
+              urgencyConfig.animation === 'pulse' && perf.enablePulseEffects ? 'icon-pulse-css' :
+              urgencyConfig.animation === 'breathing' && perf.enablePulseEffects ? 'icon-breathing-css' : ''
             }`}
-            style={{ '--icon-color': '#3B82F6' } as React.CSSProperties}
+            style={{
+              background: `
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, transparent 60%),
+                radial-gradient(circle at 70% 70%, color-mix(in srgb, #3B82F6 35%, transparent) 0%, transparent 50%),
+                linear-gradient(135deg, color-mix(in srgb, #3B82F6 55%, transparent), color-mix(in srgb, #60A5FA 45%, transparent))
+              `,
+              border: '3px solid color-mix(in srgb, #3B82F6 70%, transparent)',
+              boxShadow: `
+                0 0 40px color-mix(in srgb, #3B82F6 60%, transparent),
+                0 0 80px color-mix(in srgb, #3B82F6 40%, transparent),
+                inset 0 3px 0 rgba(255,255,255,0.4)
+              `,
+              willChange: isPerformanceMode ? 'auto' : 'transform'
+            }}
+            {...(!isPerformanceMode && {
+              animate: {
+                scale: [1, 1.05, 1],
+                boxShadow: [
+                  '0 0 40px rgba(59, 130, 246, 0.6), 0 0 80px rgba(59, 130, 246, 0.4)',
+                  '0 0 45px rgba(59, 130, 246, 0.65), 0 0 90px rgba(59, 130, 246, 0.45)',
+                  '0 0 40px rgba(59, 130, 246, 0.6), 0 0 80px rgba(59, 130, 246, 0.4)'
+                ]
+              },
+              transition: { duration: 3, repeat: Infinity, ease: [0.45, 0.05, 0.55, 0.95] }
+            })}
           >
             <SpatialIcon
               Icon={ICONS[urgencyConfig.icon as keyof typeof ICONS]}
-              size={(urgencyConfig.priority === 'high' || urgencyConfig.priority === 'critical') ? 64 : 56}
-              style={{ color: '#3B82F6' }}
+              size={(urgencyConfig.priority === 'high' || urgencyConfig.priority === 'critical') ? 56 : 48}
+              color="rgba(255, 255, 255, 0.95)"
+              variant="pure"
             />
 
-            {shouldShowParticles(urgencyConfig) && perf.enableParticles &&
-              [...Array(getParticleCount(urgencyConfig))].map((_, i) => {
-                const angle = (i * 360) / getParticleCount(urgencyConfig);
+            {/* Anneau de Pulsation */}
+            {!isPerformanceMode && perf.enableAnimations && (
+              <motion.div
+                className="absolute inset-0 rounded-full border-3"
+                style={{
+                  borderColor: 'color-mix(in srgb, #3B82F6 70%, transparent)',
+                  willChange: 'transform, opacity'
+                }}
+                animate={{
+                  scale: [1, 1.5, 1.5],
+                  opacity: [0.7, 0, 0]
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: 'easeOut'
+                }}
+              />
+            )}
+
+            {/* Particules Jaillissantes - Toujours 6 particules */}
+            {perf.enableParticles && !isPerformanceMode &&
+              [...Array(6)].map((_, i) => {
+                const angle = (i * 360) / 6;
                 const radius = 60;
                 const x = Math.cos((angle * Math.PI) / 180) * radius;
                 const y = Math.sin((angle * Math.PI) / 180) * radius;
@@ -178,7 +240,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
                 );
               })
             }
-          </div>
+          </MotionDiv>
 
           <div className="space-y-2 md:space-y-3">
             <h2 className="text-2xl md:text-3xl font-bold text-white">
