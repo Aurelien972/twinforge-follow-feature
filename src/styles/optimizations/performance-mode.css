@@ -433,21 +433,53 @@
   border-color: transparent !important;
 }
 
-/* Remove borders from common utility classes */
-.performance-mode .rounded,
-.performance-mode [class*="rounded-"],
-.performance-mode .ring,
-.performance-mode [class*="ring-"] {
+/* CRITICAL: Remove ALL Tailwind border utility classes */
+.performance-mode .border:not(.glass-card):not(.glass-base):not(.glass-card-cta),
+.performance-mode [class*="border-"]:not(.glass-card):not(.glass-base):not(.glass-card-cta),
+.performance-mode .rounded:not(.glass-card):not(.glass-base):not(.glass-card-cta),
+.performance-mode [class*="rounded-"]:not(.glass-card):not(.glass-base):not(.glass-card-cta),
+.performance-mode .ring:not(.glass-card):not(.glass-base):not(.glass-card-cta),
+.performance-mode [class*="ring-"]:not(.glass-card):not(.glass-base):not(.glass-card-cta) {
   border: none !important;
   border-width: 0 !important;
+  border-color: transparent !important;
   box-shadow: none !important;
 }
 
-/* Keep GlassCard borders intact */
+/* Remove specific Tailwind border classes that create gray lines */
+.performance-mode .border-white\/10,
+.performance-mode .border-white\/5,
+.performance-mode .border-white\/20,
+.performance-mode .border-gray-200,
+.performance-mode .border-gray-300,
+.performance-mode .border-slate-200,
+.performance-mode .border-slate-300,
+.performance-mode [class*="border-gray"],
+.performance-mode [class*="border-slate"],
+.performance-mode [class*="border-zinc"],
+.performance-mode [class*="border-neutral"] {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+}
+
+/* Keep GlassCard borders intact - MUST override all other rules */
 .performance-mode .glass-card,
 .performance-mode .glass-base,
 .performance-mode .glass-card-cta {
   /* These keep their border from the earlier rule */
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+}
+
+/* Ensure glass cards ALWAYS show borders even with Tailwind classes */
+.performance-mode .glass-card.border,
+.performance-mode .glass-base.border,
+.performance-mode .glass-card-cta.border,
+.performance-mode .glass-card[class*="border-"],
+.performance-mode .glass-base[class*="border-"],
+.performance-mode .glass-card-cta[class*="border-"] {
   border-color: rgba(255, 255, 255, 0.1) !important;
   border-width: 1px !important;
   border-style: solid !important;
