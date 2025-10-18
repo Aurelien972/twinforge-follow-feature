@@ -13,6 +13,7 @@ import CalorieTrendChart from './components/MealInsights/CalorieTrendChart';
 import MacroDistributionChart from './components/MealInsights/MacroDistributionChart';
 import NutritionHeatmap from './components/MealInsights/NutritionHeatmap';
 import { getProgressionMetrics } from './components/MealInsights/progressionMetricsUtils';
+import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 
 /**
  * Progression Tab - Suivi de la Progression Nutritionnelle TwinForge
@@ -21,7 +22,11 @@ import { getProgressionMetrics } from './components/MealInsights/progressionMetr
 const ProgressionTab: React.FC = () => {
   const navigate = useNavigate();
   const { session, profile } = useUserStore();
+  const { isPerformanceMode } = usePerformanceMode();
   const userId = session?.user?.id;
+
+  // Conditional component based on performance mode
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   // Récupérer les repas des 7 derniers jours pour les métriques de progression
   const { data: weekMeals, isLoading: isWeekLoading } = useQuery({
@@ -202,10 +207,12 @@ const ProgressionTab: React.FC = () => {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5, ease: 'easeOut' }
+      })}
       className="space-y-6 w-full"
     >
       {/* Métriques de Progression - Hero Section */}
@@ -241,7 +248,7 @@ const ProgressionTab: React.FC = () => {
           profile={profile}
         />
       )}
-    </motion.div>
+    </MotionDiv>
   );
 };
 

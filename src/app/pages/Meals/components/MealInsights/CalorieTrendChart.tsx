@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 interface CalorieTrendData {
   date: string;
@@ -57,6 +58,7 @@ const CalorieTrendChart: React.FC<CalorieTrendChartProps> = ({
   objective,
 }) => {
   const reduceMotion = useReducedMotion();
+  const { isPerformanceMode } = usePerformanceMode();
 
   // Calculer les statistiques de manière robuste
   const avgCalories = data.length > 0 ?
@@ -76,7 +78,7 @@ const CalorieTrendChart: React.FC<CalorieTrendChartProps> = ({
                    objective === 'muscle_gain' ? '#22C55E' : '#10B981';
 
   return (
-    <div className="chart-enter">
+    <div className={isPerformanceMode ? '' : 'chart-enter'}>
       <GlassCard 
         className="p-6"
         style={{
@@ -186,21 +188,22 @@ const CalorieTrendChart: React.FC<CalorieTrendChartProps> = ({
                 stroke="url(#lineGradient)"
                 strokeWidth={3}
                 fill="url(#calorieGradient)"
-                dot={{ 
-                  fill: lineColor, 
-                  strokeWidth: 2, 
+                dot={{
+                  fill: lineColor,
+                  strokeWidth: 2,
                   stroke: 'rgba(255,255,255,0.8)',
-                  r: 4 
+                  r: 4
                 }}
-                activeDot={{ 
-                  r: 6, 
+                activeDot={{
+                  r: 6,
                   fill: lineColor,
                   stroke: 'rgba(255,255,255,0.9)',
                   strokeWidth: 2,
-                  filter: `drop-shadow(0 0 8px ${lineColor}80)`
+                  filter: isPerformanceMode ? 'none' : `drop-shadow(0 0 8px ${lineColor}80)`
                 }}
-                animationDuration={reduceMotion ? 0 : 1500}
+                animationDuration={isPerformanceMode || reduceMotion ? 0 : 1500}
                 animationEasing="ease-out"
+                isAnimationActive={!isPerformanceMode && !reduceMotion}
               />
             </LineChart>
           </ResponsiveContainer>

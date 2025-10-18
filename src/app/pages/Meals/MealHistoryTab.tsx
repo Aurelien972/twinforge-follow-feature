@@ -12,6 +12,7 @@ import { useFeedback } from '../../../hooks/useFeedback';
 import { useToast } from '../../../ui/components/ToastProvider';
 import logger from '../../../lib/utils/logger';
 import MealDetailModal from './components/shared/MealDetailModal';
+import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 
 /**
  * Meal History Tab - Historique des Repas TwinForge
@@ -21,10 +22,14 @@ const MealHistoryTab: React.FC = () => {
   const { session } = useUserStore();
   const { click, glassClick, success, error: errorSound } = useFeedback();
   const { showToast } = useToast();
+  const { isPerformanceMode } = usePerformanceMode();
   const queryClient = useQueryClient();
   const userId = session?.user?.id;
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
   const [deletingMealId, setDeletingMealId] = useState<string | null>(null);
+
+  // Conditional component based on performance mode
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   // Log when component mounts to track tab activation
   React.useEffect(() => {
@@ -204,10 +209,12 @@ const MealHistoryTab: React.FC = () => {
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+      <MotionDiv
+        {...(!isPerformanceMode && {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.5, ease: 'easeOut' }
+        })}
         className="space-y-6 w-full"
       >
         {Object.entries(groupedMeals).map(([date, dayMeals]) => (
@@ -370,18 +377,28 @@ const MealHistoryTab: React.FC = () => {
             </GlassCard>
           </div>
         ))}
-      </motion.div>
+      </MotionDiv>
 
       {/* Modal de Détail */}
-      <AnimatePresence>
-        {selectedMeal && (
+      {isPerformanceMode ? (
+        selectedMeal && (
           <MealDetailModal
             meal={selectedMeal}
             onClose={() => setSelectedMeal(null)}
             onDelete={handleDeleteMeal}
           />
-        )}
-      </AnimatePresence>
+        )
+      ) : (
+        <AnimatePresence>
+          {selectedMeal && (
+            <MealDetailModal
+              meal={selectedMeal}
+              onClose={() => setSelectedMeal(null)}
+              onDelete={handleDeleteMeal}
+            />
+          )}
+        </AnimatePresence>
+      )}
     </>
   );
 };

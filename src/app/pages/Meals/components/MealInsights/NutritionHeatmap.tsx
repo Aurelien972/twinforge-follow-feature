@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 interface NutritionHeatmapProps {
   meals: any[];
@@ -29,16 +30,18 @@ const NutritionHeatmap: React.FC<NutritionHeatmapProps> = ({
   profile,
 }) => {
   const reduceMotion = useReducedMotion();
+  const { isPerformanceMode } = usePerformanceMode();
 
   // Don't render if not enough data
   if (!meals || meals.length < 7) {
     return null;
   }
 
-  // Préparer les données de la heatmap (4 dernières semaines)
+  // Préparer les données de la heatmap (2 semaines en mode performance, 4 sinon)
   const heatmapData = React.useMemo(() => {
     const today = new Date();
-    const fourWeeksAgo = subDays(today, 28);
+    const weeksAgo = isPerformanceMode ? 14 : 28;
+    const fourWeeksAgo = subDays(today, weeksAgo);
     const days = eachDayOfInterval({ start: fourWeeksAgo, end: today });
     
     // Calculer l'objectif calorique
@@ -93,7 +96,7 @@ const NutritionHeatmap: React.FC<NutritionHeatmapProps> = ({
     }
     
     return { days: heatmapDays, weeks };
-  }, [meals, profile]);
+  }, [meals, profile, isPerformanceMode]);
 
   // Calculer les statistiques de la heatmap
   const stats = React.useMemo(() => {
@@ -127,7 +130,7 @@ const NutritionHeatmap: React.FC<NutritionHeatmapProps> = ({
   };
 
   return (
-    <div className="heatmap-enter">
+    <div className={isPerformanceMode ? '' : 'heatmap-enter'}>
       <GlassCard 
         className="p-6"
         style={{
@@ -162,7 +165,9 @@ const NutritionHeatmap: React.FC<NutritionHeatmapProps> = ({
             </div>
             <div>
               <h3 className="text-white font-bold text-xl">Activité Nutritionnelle</h3>
-              <p className="text-cyan-200 text-sm">Votre régularité de suivi sur 4 semaines</p>
+              <p className="text-cyan-200 text-sm">
+                Votre régularité de suivi sur {isPerformanceMode ? '2 semaines' : '4 semaines'}
+              </p>
             </div>
           </div>
           
@@ -200,14 +205,14 @@ const NutritionHeatmap: React.FC<NutritionHeatmapProps> = ({
                 {week.map((day, dayIndex) => (
                   <div
                     key={day.date}
-                    className="aspect-square rounded-lg border cursor-pointer group relative overflow-hidden heatmap-cell-enter min-w-0"
+                    className={isPerformanceMode ? 'aspect-square rounded-lg border cursor-pointer group relative overflow-hidden min-w-0' : 'aspect-square rounded-lg border cursor-pointer group relative overflow-hidden heatmap-cell-enter min-w-0'}
                     style={{
                       backgroundColor: getStatusColor(day.status, day.intensity),
-                      borderColor: day.status !== 'none' ? 
+                      borderColor: day.status !== 'none' ?
                         `color-mix(in srgb, ${getStatusColor(day.status, 1)} 40%, transparent)` :
                         'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(4px) saturate(120%)',
-                      animationDelay: `${(weekIndex * 7 + dayIndex) * 0.02}s`
+                      backdropFilter: isPerformanceMode ? 'none' : 'blur(4px) saturate(120%)',
+                      ...(!isPerformanceMode && { animationDelay: `${(weekIndex * 7 + dayIndex) * 0.02}s` })
                     }}
                     title={`${day.dayName} ${day.dayNumber} ${day.monthName} - ${day.calories} kcal (${day.mealsCount} repas)`}
                   >

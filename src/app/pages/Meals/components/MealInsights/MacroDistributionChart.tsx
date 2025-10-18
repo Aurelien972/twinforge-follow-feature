@@ -100,6 +100,7 @@ const MacroDistributionChart: React.FC<MacroDistributionChartProps> = ({
   profile,
 }) => {
   const reduceMotion = useReducedMotion();
+  const { isPerformanceMode } = usePerformanceMode();
 
   // Calculer le score d'équilibre global
   const balanceScore = React.useMemo(() => {
@@ -120,7 +121,7 @@ const MacroDistributionChart: React.FC<MacroDistributionChartProps> = ({
   }
 
   return (
-    <div className="chart-enter-right">
+    <div className={isPerformanceMode ? '' : 'chart-enter-right'}>
       <GlassCard 
         className="p-6"
         style={{
@@ -195,8 +196,9 @@ const MacroDistributionChart: React.FC<MacroDistributionChartProps> = ({
                 outerRadius={80}
                 paddingAngle={2}
                 dataKey="percentage"
-                animationDuration={reduceMotion ? 0 : 1200}
+                animationDuration={isPerformanceMode || reduceMotion ? 0 : 1200}
                 animationEasing="ease-out"
+                isAnimationActive={!isPerformanceMode && !reduceMotion}
               >
                 {data.map((entry, index) => (
                   <Cell 
@@ -218,9 +220,9 @@ const MacroDistributionChart: React.FC<MacroDistributionChartProps> = ({
           {/* Centre du Donut - Score Global */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-center">
-              <div 
-                className="text-2xl font-bold text-white mb-1 score-scale-enter"
-                style={{ animationDelay: '0.8s' }}
+              <div
+                className={isPerformanceMode ? 'text-2xl font-bold text-white mb-1' : 'text-2xl font-bold text-white mb-1 score-scale-enter'}
+                style={isPerformanceMode ? {} : { animationDelay: '0.8s' }}
               >
                 {balanceScore}
               </div>
@@ -234,11 +236,11 @@ const MacroDistributionChart: React.FC<MacroDistributionChartProps> = ({
           {data.map((macro, index) => (
             <div
               key={macro.name}
-              className="text-center p-4 rounded-xl legend-item-enter"
+              className={isPerformanceMode ? 'text-center p-4 rounded-xl' : 'text-center p-4 rounded-xl legend-item-enter'}
               style={{
                 background: `color-mix(in srgb, ${macro.color} 8%, transparent)`,
                 border: `1px solid color-mix(in srgb, ${macro.color} 20%, transparent)`,
-                animationDelay: `${0.6 + index * 0.1}s`
+                ...(!isPerformanceMode && { animationDelay: `${0.6 + index * 0.1}s` })
               }}
             >
               <div className="flex items-center justify-center gap-1 mb-1">

@@ -658,6 +658,86 @@
 }
 
 /* =========================================
+   MEALS PROGRESSION TAB - Animations désactivées
+   ========================================= */
+
+/* Metric cards animations */
+.performance-mode .metric-card-enter,
+.performance-mode .metric-icon-glow-css,
+.performance-mode .metric-value-enter,
+.performance-mode .status-badge-enter {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Chart animations */
+.performance-mode .chart-enter,
+.performance-mode .chart-enter-right {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Hero metrics section */
+.performance-mode .hero-metrics-enter {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Progression glow effect */
+.performance-mode .progression-glow-css {
+  animation: none !important;
+  opacity: 0.15 !important;
+  filter: blur(8px) !important;
+}
+
+/* Legend items */
+.performance-mode .legend-item-enter {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Heatmap animations */
+.performance-mode .heatmap-enter,
+.performance-mode .heatmap-cell-enter {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Score scale animation */
+.performance-mode .score-scale-enter {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* =========================================
+   MEALS HISTORY TAB - Animations désactivées
+   ========================================= */
+
+/* Meal group and item animations */
+.performance-mode .meal-group-enter,
+.performance-mode .meal-item-enter {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Progress fill animation */
+.performance-mode .progress-fill-css {
+  animation: none !important;
+  transition: width 0.3s ease-out !important;
+}
+
+/* Metric icon static variant */
+.performance-mode .metric-icon-static {
+  animation: none !important;
+}
+
+/* Metric particle effects - remove completely */
+.performance-mode .metric-particle-css {
+  display: none !important;
+  animation: none !important;
+}
+
+/* =========================================
    ALTERNATIVES STATIQUES - Remplacements visuels
    ========================================= */
 

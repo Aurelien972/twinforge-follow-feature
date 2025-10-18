@@ -3,6 +3,7 @@ import { useReducedMotion } from 'framer-motion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 
 interface ProgressionMetricsProps {
   metrics: {
@@ -39,6 +40,7 @@ const MetricCard: React.FC<{
   index: number;
 }> = ({ title, value, subtitle, icon, color, progress, target, status, index }) => {
   const reduceMotion = useReducedMotion();
+  const { isPerformanceMode } = usePerformanceMode();
 
   const statusConfig = {
     excellent: { bgColor: 'rgba(34, 197, 94, 0.12)', borderColor: 'rgba(34, 197, 94, 0.3)', textColor: '#22C55E' },
@@ -53,9 +55,9 @@ const MetricCard: React.FC<{
   };
 
   return (
-    <div 
-      className="metric-card-enter"
-      style={{ animationDelay: `${index * 0.1}s` }}
+    <div
+      className={isPerformanceMode ? '' : 'metric-card-enter'}
+      style={isPerformanceMode ? {} : { animationDelay: `${index * 0.1}s` }}
     >
       <GlassCard 
         className="p-6 text-center relative overflow-visible"
@@ -74,7 +76,7 @@ const MetricCard: React.FC<{
         {/* Icône avec Halo */}
         <div
           className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center relative ${
-            status === 'excellent' && !reduceMotion ? 'metric-icon-glow-css' : 'metric-icon-static'
+            status === 'excellent' && !reduceMotion && !isPerformanceMode ? 'metric-icon-glow-css' : 'metric-icon-static'
           }`}
           style={{
             background: `
@@ -92,7 +94,7 @@ const MetricCard: React.FC<{
           />
           
           {/* Particules de statut */}
-          {status === 'excellent' && !reduceMotion && [...Array(3)].map((_, i) => (
+          {status === 'excellent' && !reduceMotion && !isPerformanceMode && [...Array(3)].map((_, i) => (
             <div
               key={i}
               className={`absolute w-1.5 h-1.5 rounded-full metric-particle-css metric-particle-css--${i + 1}`}
@@ -107,8 +109,8 @@ const MetricCard: React.FC<{
         </div>
 
         {/* Valeur Principale */}
-        <div 
-          className="text-3xl font-bold mb-2 metric-value-enter"
+        <div
+          className={isPerformanceMode ? 'text-3xl font-bold mb-2' : 'text-3xl font-bold mb-2 metric-value-enter'}
           style={{ color: statusStyle.textColor }}
         >
           {value}
@@ -147,13 +149,13 @@ const MetricCard: React.FC<{
         {/* Badge de Statut */}
         {status && (
           <div
-            className="absolute -top-2 -right-2 px-2 py-1 rounded-full text-xs font-medium status-badge-enter"
+            className={isPerformanceMode ? 'absolute -top-2 -right-2 px-2 py-1 rounded-full text-xs font-medium' : 'absolute -top-2 -right-2 px-2 py-1 rounded-full text-xs font-medium status-badge-enter'}
             style={{
               background: statusStyle.bgColor,
               border: `1px solid ${statusStyle.borderColor}`,
               color: statusStyle.textColor,
-              backdropFilter: 'blur(8px) saturate(120%)',
-              animationDelay: `${0.8 + index * 0.1}s`
+              backdropFilter: isPerformanceMode ? 'none' : 'blur(8px) saturate(120%)',
+              ...(!isPerformanceMode && { animationDelay: `${0.8 + index * 0.1}s` })
             }}
           >
             {status === 'excellent' ? '🏆' : 
@@ -174,6 +176,7 @@ const ProgressionMetrics: React.FC<ProgressionMetricsProps> = ({
   profile,
 }) => {
   const reduceMotion = useReducedMotion();
+  const { isPerformanceMode } = usePerformanceMode();
 
   // Déterminer les statuts basés sur les métriques
   const getCalorieStatus = (adherence: number) => {
@@ -197,7 +200,7 @@ const ProgressionMetrics: React.FC<ProgressionMetricsProps> = ({
   return (
     <div className="space-y-6">
       {/* Hero Metrics - Section Principale */}
-      <div className="hero-metrics-enter">
+      <div className={isPerformanceMode ? '' : 'hero-metrics-enter'}>
         <GlassCard 
           className="p-6 relative"
           style={{
@@ -217,15 +220,17 @@ const ProgressionMetrics: React.FC<ProgressionMetricsProps> = ({
           }}
         >
           {/* Halo de Forge Progression */}
-          <div
-            className="absolute inset-0 rounded-inherit pointer-events-none progression-glow-css"
+          {!isPerformanceMode && (
+            <div
+              className="absolute inset-0 rounded-inherit pointer-events-none progression-glow-css"
             style={{
               background: 'radial-gradient(circle at center, rgba(6, 182, 212, 0.08) 0%, transparent 70%)',
               filter: 'blur(20px)',
               transform: 'scale(1.3)',
               zIndex: -1
             }}
-          />
+            />
+          )}
 
           {/* Header néo-onglo intégré */}
           <div className="flex items-center gap-3 mb-6">
@@ -251,9 +256,9 @@ const ProgressionMetrics: React.FC<ProgressionMetricsProps> = ({
           {/* Métriques Principales - Même style que DailyRecap */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div 
-                className="text-4xl font-bold text-green-400 mb-2 metric-value-enter"
-                style={{ animationDelay: '0.2s' }}
+              <div
+                className={isPerformanceMode ? 'text-4xl font-bold text-green-400 mb-2' : 'text-4xl font-bold text-green-400 mb-2 metric-value-enter'}
+                style={isPerformanceMode ? {} : { animationDelay: '0.2s' }}
               >
                 {metrics.avgDailyCalories}
               </div>
@@ -264,9 +269,9 @@ const ProgressionMetrics: React.FC<ProgressionMetricsProps> = ({
             </div>
             
             <div className="text-center">
-              <div 
-                className="text-4xl font-bold text-blue-400 mb-2 metric-value-enter"
-                style={{ animationDelay: '0.3s' }}
+              <div
+                className={isPerformanceMode ? 'text-4xl font-bold text-blue-400 mb-2' : 'text-4xl font-bold text-blue-400 mb-2 metric-value-enter'}
+                style={isPerformanceMode ? {} : { animationDelay: '0.3s' }}
               >
                 {metrics.calorieAdherence}%
               </div>
@@ -275,9 +280,9 @@ const ProgressionMetrics: React.FC<ProgressionMetricsProps> = ({
             </div>
             
             <div className="text-center">
-              <div 
-                className="text-4xl font-bold text-purple-400 mb-2 metric-value-enter"
-                style={{ animationDelay: '0.4s' }}
+              <div
+                className={isPerformanceMode ? 'text-4xl font-bold text-purple-400 mb-2' : 'text-4xl font-bold text-purple-400 mb-2 metric-value-enter'}
+                style={isPerformanceMode ? {} : { animationDelay: '0.4s' }}
               >
                 {metrics.consistency}%
               </div>
@@ -288,9 +293,9 @@ const ProgressionMetrics: React.FC<ProgressionMetricsProps> = ({
             </div>
             
             <div className="text-center">
-              <div 
-                className="text-4xl font-bold text-red-400 mb-2 metric-value-enter"
-                style={{ animationDelay: '0.5s' }}
+              <div
+                className={isPerformanceMode ? 'text-4xl font-bold text-red-400 mb-2' : 'text-4xl font-bold text-red-400 mb-2 metric-value-enter'}
+                style={isPerformanceMode ? {} : { animationDelay: '0.5s' }}
               >
                 {metrics.proteinAdherence}%
               </div>
