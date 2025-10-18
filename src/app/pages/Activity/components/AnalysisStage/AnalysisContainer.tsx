@@ -1,11 +1,10 @@
-import { motion } from 'framer-motion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
-import { usePreferredMotion } from '../../../../../system/device/DeviceProvider';
+import { useActivityPerformance } from '../../hooks/useActivityPerformance';
 import AnalysisIcon from './AnalysisIcon';
 import AnalysisProgress from './AnalysisProgress';
 import AnalysisModules from './AnalysisModules';
 import AnalysisEffects from './AnalysisEffects';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface AnalysisContainerProps {
   isProcessing: boolean;
@@ -18,19 +17,30 @@ interface AnalysisContainerProps {
  * Analysis Container - Conteneur principal de l'analyse
  * Orchestrateur des composants d'analyse avec effets visuels
  */
-const AnalysisContainer: React.FC<AnalysisContainerProps> = ({ 
-  isProcessing, 
-  progress, 
-  currentMessage, 
-  subMessage 
+const AnalysisContainer: React.FC<AnalysisContainerProps> = ({
+  isProcessing,
+  progress,
+  currentMessage,
+  subMessage
 }) => {
-  const reduceMotion = usePreferredMotion() === 'reduced';
+  const perf = useActivityPerformance();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const perfClass = `activity-perf-${perf.mode}`;
+      containerRef.current.classList.add(perfClass);
+      return () => {
+        containerRef.current?.classList.remove(perfClass);
+      };
+    }
+  }, [perf.mode]);
 
   return (
-    <div className="space-y-6 relative overflow-hidden">
+    <div className="space-y-6 relative overflow-hidden analysis-stage-container" ref={containerRef}>
       {/* Conteneur Principal d'Analyse */}
-      <GlassCard 
-        className="p-8 text-center relative overflow-hidden"
+      <GlassCard
+        className="p-8 text-center relative overflow-hidden analysis-stage-card"
         style={{
           background: `
             radial-gradient(circle at 30% 20%, color-mix(in srgb, #3B82F6 15%, transparent) 0%, transparent 60%),
@@ -51,12 +61,11 @@ const AnalysisContainer: React.FC<AnalysisContainerProps> = ({
         }}
       >
         {/* Effets de Fond Énergétiques */}
-        <AnalysisEffects reduceMotion={reduceMotion} />
+        <AnalysisEffects />
 
         <div className="space-y-6 relative z-10">
           {/* Icône Centrale de la Forge Énergétique */}
-          <AnalysisIcon 
-            reduceMotion={reduceMotion}
+          <AnalysisIcon
             progress={progress}
           />
 
@@ -70,11 +79,11 @@ const AnalysisContainer: React.FC<AnalysisContainerProps> = ({
             </p>
             
             {/* Barre de Progression Énergétique */}
-            <AnalysisProgress progress={progress} reduceMotion={reduceMotion} />
+            <AnalysisProgress progress={progress} />
           </div>
 
           {/* Modules de Traitement Énergétique */}
-          <AnalysisModules progress={progress} reduceMotion={reduceMotion} />
+          <AnalysisModules progress={progress} />
         </div>
       </GlassCard>
     </div>

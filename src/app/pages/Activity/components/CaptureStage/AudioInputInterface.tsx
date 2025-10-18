@@ -1,9 +1,10 @@
-import { motion } from 'framer-motion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
 import { useFeedback } from '../../../../../hooks/useFeedback';
-import React from 'react';
+import { useActivityPerformance } from '../../hooks/useActivityPerformance';
+import { ConditionalMotionActivity } from '../shared/ConditionalMotionActivity';
+import React, { useEffect, useRef } from 'react';
 
 interface AudioInputInterfaceProps {
   isRecording: boolean;
@@ -29,6 +30,18 @@ const AudioInputInterface: React.FC<AudioInputInterfaceProps> = ({
   isProcessing
 }) => {
   const { click } = useFeedback();
+  const perf = useActivityPerformance();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const perfClass = `activity-perf-${perf.mode}`;
+      containerRef.current.classList.add(perfClass);
+      return () => {
+        containerRef.current?.classList.remove(perfClass);
+      };
+    }
+  }, [perf.mode]);
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -47,6 +60,7 @@ const AudioInputInterface: React.FC<AudioInputInterfaceProps> = ({
   };
 
   return (
+    <div ref={containerRef}>
     <GlassCard className="capture-audio-container capture-stage-card capture-input-interface">
       <div className="space-y-6">
         {/* Icône de Microphone Centrale */}
@@ -95,10 +109,19 @@ const AudioInputInterface: React.FC<AudioInputInterfaceProps> = ({
 
         {/* Durée d'enregistrement */}
         {isRecording && (
-          <motion.div
+          <ConditionalMotionActivity
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: perf.transitionDuration }}
             className="text-center"
+            fallback={<div className="text-center">
+              <div className="capture-audio-status">
+                <div className="capture-audio-status-indicator" />
+                <span className="capture-audio-timer">
+                  {formatDuration(recordingDuration)}
+                </span>
+              </div>
+            </div>}
           >
             <div className="capture-audio-status">
               <div className="capture-audio-status-indicator" />
@@ -106,7 +129,7 @@ const AudioInputInterface: React.FC<AudioInputInterfaceProps> = ({
                 {formatDuration(recordingDuration)}
               </span>
             </div>
-          </motion.div>
+          </ConditionalMotionActivity>
         )}
 
         {/* Contrôles d'Enregistrement */}
@@ -165,6 +188,7 @@ const AudioInputInterface: React.FC<AudioInputInterfaceProps> = ({
 
       </div>
     </GlassCard>
+    </div>
   );
 };
 

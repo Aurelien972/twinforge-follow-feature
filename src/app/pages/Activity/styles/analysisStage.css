@@ -1,6 +1,7 @@
 /**
  * Analysis Stage Styles - Pipeline Étape 2
  * Optimisations pour AnalysisContainer, AnalysisIcon, AnalysisEffects, AnalysisModules, AnalysisProgress
+ * Performance Mode Integration - Adaptive animations and effects
  */
 
 /* =========================================
@@ -66,8 +67,11 @@
     0 0 40px color-mix(in srgb, #3B82F6 60%, transparent),
     0 0 80px color-mix(in srgb, #06B6D4 50%, transparent),
     inset 0 4px 0 rgba(255,255,255,0.4);
-  animation: analysisIconRotate 10s linear infinite;
   transform-origin: center;
+}
+
+.activity-perf-high .analysis-icon-ring {
+  animation: analysisIconRotate 10s linear infinite;
 }
 
 @keyframes analysisIconRotate {
@@ -90,7 +94,8 @@
   transform: translateZ(0);
 }
 
-.analysis-icon-pulse {
+.activity-perf-high .analysis-icon-pulse,
+.activity-perf-medium .analysis-icon-pulse {
   animation: analysisIconPulse 3s ease-in-out infinite;
 }
 
@@ -130,10 +135,14 @@
   height: 3px;
   background: radial-gradient(circle, #3B82F6 0%, transparent 70%);
   border-radius: 50%;
-  opacity: 0.6;
-  animation: particleFloat 8s ease-in-out infinite;
+  opacity: 0;
   transform: translateZ(0);
   will-change: transform, opacity;
+}
+
+.activity-perf-high .analysis-particle {
+  opacity: 0.6;
+  animation: particleFloat 8s ease-in-out infinite;
 }
 
 .analysis-particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
@@ -194,8 +203,23 @@
   inset: 0;
   border-radius: 9999px;
   background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%);
-  animation: progressShimmer 2.5s ease-in-out infinite;
   pointer-events: none;
+  opacity: 0;
+}
+
+.activity-perf-high .analysis-progress-shimmer,
+.activity-perf-medium .analysis-progress-shimmer {
+  opacity: 1;
+  animation: progressShimmer 2.5s ease-in-out infinite;
+}
+
+@keyframes progressShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .analysis-progress-percentage {
@@ -261,6 +285,9 @@
 
 .analysis-module-active .analysis-module-icon {
   background: color-mix(in srgb, #06B6D4 20%, transparent);
+}
+
+.activity-perf-high .analysis-module-active .analysis-module-icon {
   animation: moduleIconSpin 2s linear infinite;
 }
 
