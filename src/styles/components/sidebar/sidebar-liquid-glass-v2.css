@@ -336,16 +336,16 @@
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  /* Premium glass effect for icon container */
+  /* Premium glass effect for icon container - Jaune/Orange harmonisé */
   background:
     radial-gradient(circle at 35% 35%, rgba(255,255,255,0.35) 0%, transparent 50%),
-    radial-gradient(circle at 65% 65%, rgba(247, 147, 30, 0.22) 0%, transparent 60%),
+    radial-gradient(circle at 65% 65%, rgba(253, 200, 48, 0.22) 0%, transparent 60%),
     linear-gradient(135deg,
-      rgba(255, 107, 53, 0.25),
+      rgba(253, 200, 48, 0.25),
       rgba(247, 147, 30, 0.18));
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(253, 200, 48, 0.3);
   box-shadow:
-    0 2px 8px rgba(247, 147, 30, 0.25),
+    0 2px 8px rgba(253, 200, 48, 0.25),
     0 0 16px rgba(253, 200, 48, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
   flex-shrink: 0;
@@ -399,16 +399,16 @@
   color: rgba(255, 255, 255, 0.85) !important;
 }
 
-/* Séparateur sous le Tableau de Bord */
+/* Séparateur sous le Tableau de Bord - Jaune/Orange harmonisé */
 .sidebar-primary-separator {
   height: 1px;
   margin: 0.625rem -0.625rem 0.75rem -0.625rem;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(247, 147, 30, 0.15) 20%,
-    rgba(253, 200, 48, 0.18) 50%,
-    rgba(247, 147, 30, 0.15) 80%,
+    rgba(253, 200, 48, 0.2) 20%,
+    rgba(253, 200, 48, 0.25) 50%,
+    rgba(253, 200, 48, 0.2) 80%,
     transparent 100%
   );
   position: relative;
@@ -421,7 +421,7 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(253, 200, 48, 0.12) 50%,
+    rgba(253, 200, 48, 0.15) 50%,
     transparent 100%
   );
   filter: blur(2px);

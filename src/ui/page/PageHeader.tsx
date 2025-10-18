@@ -44,7 +44,7 @@ export default function PageHeader({
       <div className="flex flex-row items-center gap-6 mb-8">
         {/* Icône avec rendu optimisé selon le mode */}
         {isPerformanceMode ? (
-          // MODE PERFORMANCE: Rendu simplifié mais attrayant
+          // MODE PERFORMANCE: Rendu simplifié mais attrayant avec ombre colorée légère
           <div className="flex-shrink-0">
             <div
               className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center relative overflow-hidden"
@@ -57,6 +57,7 @@ export default function PageHeader({
                 boxShadow: `
                   0 8px 24px rgba(0, 0, 0, 0.4),
                   0 2px 8px color-mix(in srgb, ${finalCircuitColor} 20%, transparent),
+                  0 4px 16px color-mix(in srgb, ${finalCircuitColor} 15%, transparent),
                   inset 0 2px 0 rgba(255, 255, 255, 0.15),
                   inset 0 -2px 0 rgba(0, 0, 0, 0.2)
                 `,
@@ -82,7 +83,7 @@ export default function PageHeader({
                 className="text-white relative z-10"
                 style={{
                   color: finalCircuitColor,
-                  filter: `drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))`,
+                  filter: `drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) drop-shadow(0 1px 3px color-mix(in srgb, ${finalCircuitColor} 25%, transparent))`,
                   opacity: 1
                 }}
                 aria-hidden="true"

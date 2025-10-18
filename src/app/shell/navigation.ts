@@ -54,7 +54,7 @@ export function navFor(): NavSection[] {
           label: 'Coeur de la Forge',
           subtitle: 'Tableau de Bord',
           isPrimary: true,
-          circuitColor: '#F7931E', // Logo Orange - primary brand color
+          circuitColor: '#FDC830', // Jaune/Orange - Coeur de la Forge
           actionLabel: undefined // No action badge for dashboard
         },
       ],
@@ -73,7 +73,7 @@ export function navFor(): NavSection[] {
           label: 'Mon Twin',
           subtitle: 'Avatar 3D',
           isTwin: true,
-          circuitColor: '#8B5CF6', // Violet
+          circuitColor: '#A855F7', // Violet/Pourpre
           tabs: ['Scanner', 'Avatar', 'Projection', 'Insights', 'Historique']
         },
       ],
@@ -263,7 +263,7 @@ export function navFor(): NavSection[] {
               to: '/fasting#insights',
               icon: 'TrendingUp',
               label: 'Insights',
-              color: '#10B981' // Vert
+              color: '#10B981' // Vert (harmonisé avec l'onglet)
             },
             {
               to: '/fasting#progression',

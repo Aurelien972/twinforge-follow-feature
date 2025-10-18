@@ -332,7 +332,7 @@ const MobileDrawer = React.memo(() => {
                       ${isActive('/profile') ? 'text-white shadow-sm' : 'text-white/70 hover:text-white'}
                     `}
                     onClick={() => setDrawer(false)}
-                    style={{ '--item-circuit-color': '#18E3FF' } as React.CSSProperties}
+                    style={{ '--item-circuit-color': '#FDC830' } as React.CSSProperties}
                   >
                     <div className={`sidebar-item-icon-container ${isActive('/profile') ? 'sidebar-item-icon-container--active' : ''}`}>
                       <SpatialIcon
@@ -340,8 +340,8 @@ const MobileDrawer = React.memo(() => {
                         size={16}
                         className={`sidebar-item-icon ${isActive('/profile') ? '' : 'opacity-80 group-hover:opacity-100'}`}
                         style={isActive('/profile') ? {
-                          color: '#18E3FF',
-                          filter: 'drop-shadow(0 0 8px rgba(24, 227, 255, 0.6))'
+                          color: '#FDC830',
+                          filter: 'drop-shadow(0 0 8px rgba(253, 200, 48, 0.6))'
                         } : undefined}
                       />
                     </div>
@@ -363,7 +363,7 @@ const MobileDrawer = React.memo(() => {
                       ${isActive('/settings') ? 'text-white shadow-sm' : 'text-white/70 hover:text-white'}
                     `}
                     onClick={() => setDrawer(false)}
-                    style={{ '--item-circuit-color': '#7A5AF8' } as React.CSSProperties}
+                    style={{ '--item-circuit-color': '#FDC830' } as React.CSSProperties}
                   >
                     <div className={`sidebar-item-icon-container ${isActive('/settings') ? 'sidebar-item-icon-container--active' : ''}`}>
                       <SpatialIcon
@@ -371,8 +371,8 @@ const MobileDrawer = React.memo(() => {
                         size={16}
                         className={`sidebar-item-icon ${isActive('/settings') ? '' : 'opacity-80 group-hover:opacity-100'}`}
                         style={isActive('/settings') ? {
-                          color: '#7A5AF8',
-                          filter: 'drop-shadow(0 0 8px rgba(122, 90, 248, 0.6))'
+                          color: '#FDC830',
+                          filter: 'drop-shadow(0 0 8px rgba(253, 200, 48, 0.6))'
                         } : undefined}
                       />
                     </div>
