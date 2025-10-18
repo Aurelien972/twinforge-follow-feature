@@ -106,43 +106,48 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
         interactive
         style={cardStyles}
       >
-        {/* Carrés tournants aux coins - Style harmonisé avec les autres forges */}
-        {!isPerformanceMode && (
-          <div className="training-hero-corners" aria-hidden="true">
-            {[0, 1, 2, 3].map((i) => (
-              <motion.div
-                key={i}
-                className="corner-particle"
-                style={{
-                  position: 'absolute',
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '2px',
-                  background: `linear-gradient(135deg, ${urgencyConfig.color}, rgba(255, 255, 255, 0.8))`,
-                  boxShadow: `0 0 20px ${urgencyConfig.color}`,
-                  top: i < 2 ? '12px' : 'auto',
-                  bottom: i >= 2 ? '12px' : 'auto',
-                  left: i % 2 === 0 ? '12px' : 'auto',
-                  right: i % 2 === 1 ? '12px' : 'auto'
-                }}
-                initial={{
+        {/* Carrés aux 4 coins - Toujours visibles, optimisés selon le mode performance */}
+        <div className="training-hero-corners" aria-hidden="true">
+          {[0, 1, 2, 3].map((i) => (
+            <MotionDiv
+              key={i}
+              className="corner-particle"
+              style={{
+                position: 'absolute',
+                width: '12px',
+                height: '12px',
+                borderRadius: '2px',
+                background: isPerformanceMode
+                  ? 'linear-gradient(135deg, #10B981, rgba(16, 185, 129, 0.8))'
+                  : `linear-gradient(135deg, ${urgencyConfig.color}, rgba(255, 255, 255, 0.8))`,
+                boxShadow: isPerformanceMode
+                  ? '0 0 20px #10B981'
+                  : `0 0 20px ${urgencyConfig.color}`,
+                top: i < 2 ? '12px' : 'auto',
+                bottom: i >= 2 ? '12px' : 'auto',
+                left: i % 2 === 0 ? '12px' : 'auto',
+                right: i % 2 === 1 ? '12px' : 'auto',
+                willChange: isPerformanceMode ? 'auto' : 'transform, opacity'
+              }}
+              {...(!isPerformanceMode && {
+                initial: {
                   rotate: i % 2 === 0 ? 45 : -45
-                }}
-                animate={{
+                },
+                animate: {
                   scale: [1, 1.3, 1],
                   opacity: [0.6, 1, 0.6],
                   rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
-                }}
-                transition={{
+                },
+                transition: {
                   duration: 3,
                   repeat: Infinity,
                   delay: i * 0.2,
                   ease: [0.4, 0, 0.2, 1]
-                }}
-              />
-            ))}
-          </div>
-        )}
+                }
+              })}
+            />
+          ))}
+        </div>
 
         {/* Halo de Forge Dynamique - Animation Pulse Permanente */}
         {!isPerformanceMode && !reduceMotion && (
