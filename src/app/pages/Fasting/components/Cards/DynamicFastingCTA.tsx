@@ -6,6 +6,7 @@ import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
 import { useFeedback } from '../../../../../hooks/useFeedback';
 import { usePreferredMotion } from '../../../../../system/device/DeviceProvider';
+import { usePerformanceMode } from '../../../../../system/context/PerformanceModeContext';
 import { useUserStore } from '@/system/store/userStore';
 import { useFastingPipeline, useFastingElapsedSeconds, useFastingProgressPercentage, useFastingTimerTick } from '../../hooks/useFastingPipeline';
 import {
@@ -52,7 +53,7 @@ function getUrgencyConfig(
       animation: 'breathing'
     };
   }
-  
+
   // Pas de session mais protocole configuré : priorité moyenne
   if (hasPreferredProtocol) {
     return {
@@ -62,7 +63,7 @@ function getUrgencyConfig(
       animation: 'breathing'
     };
   }
-  
+
   // Aucune configuration : haute priorité pour encourager
   return {
     priority: 'high',
@@ -91,11 +92,11 @@ function getCTAMessage(
       encouragement: 'Continuez votre excellent travail !'
     };
   }
-  
+
   if (hasPreferredProtocol && preferredProtocol) {
     const protocol = getProtocolById(preferredProtocol);
     const protocolName = protocol?.name || preferredProtocol;
-    
+
     return {
       title: 'Prêt à jeûner',
       subtitle: `Démarrez votre protocole ${protocolName}`,
@@ -103,7 +104,7 @@ function getCTAMessage(
       encouragement: 'Votre protocole est configuré et prêt'
     };
   }
-  
+
   return {
     title: 'Forgez votre métabolisme !',
     subtitle: 'Commencez votre première session de jeûne intermittent',
@@ -122,23 +123,23 @@ function getContextualMetrics(
   currentPhase?: any
 ): string[] {
   const metrics: string[] = [];
-  
+
   if (isActive) {
     if (elapsedHours > 0) {
       const hours = Math.floor(elapsedHours);
       const minutes = Math.floor((elapsedHours - hours) * 60);
       metrics.push(`${hours}h ${minutes}m écoulées`);
     }
-    
+
     if (targetHours > 0) {
       metrics.push(`Objectif ${targetHours}h`);
     }
-    
+
     if (currentPhase) {
       metrics.push(`Phase ${currentPhase.name}`);
     }
   }
-  
+
   return metrics;
 }
 
@@ -150,6 +151,7 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
   const navigate = useNavigate();
   const { click } = useFeedback();
   const reduceMotion = usePreferredMotion() === 'reduced';
+  const { isPerformanceMode } = usePerformanceMode();
   const { profile } = useUserStore();
   const { isActive, session } = useFastingPipeline();
 
@@ -159,19 +161,22 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
   // Use dynamic selectors for real-time updates
   const elapsedSeconds = useFastingElapsedSeconds();
   const progressPercentage = useFastingProgressPercentage();
-  
+
   // Déterminer l'état du jeûne
   const elapsedHours = elapsedSeconds / 3600;
   const targetHours = session?.targetHours || 16;
   const preferredProtocol = profile?.nutrition?.fastingWindow?.protocol;
   const hasPreferredProtocol = !!(preferredProtocol && preferredProtocol !== '');
-  
+
   // Obtenir la phase métabolique actuelle si session active
   const currentPhase = isActive ? getCurrentFastingPhase(elapsedHours) : null;
-  
+
   const urgencyConfig = getUrgencyConfig(isActive, hasPreferredProtocol, elapsedHours);
   const message = getCTAMessage(isActive, hasPreferredProtocol, preferredProtocol, elapsedHours, currentPhase);
   const contextualMetrics = getContextualMetrics(isActive, elapsedHours, targetHours, currentPhase);
+
+  // Conditional motion components
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   const handleFastingAction = () => {
     click();
@@ -185,40 +190,48 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
       var(--glass-opacity)
     `,
     borderColor: `color-mix(in srgb, ${urgencyConfig.color} 25%, transparent)`,
-    boxShadow: `
-      0 12px 40px rgba(0, 0, 0, 0.25),
-      0 0 30px color-mix(in srgb, ${urgencyConfig.color} 15%, transparent),
-      inset 0 2px 0 rgba(255, 255, 255, 0.15)
-    `,
-    backdropFilter: 'blur(20px) saturate(160%)'
+    boxShadow: isPerformanceMode
+      ? `0 12px 40px rgba(0, 0, 0, 0.25)`
+      : `
+        0 12px 40px rgba(0, 0, 0, 0.25),
+        0 0 30px color-mix(in srgb, ${urgencyConfig.color} 15%, transparent),
+        inset 0 2px 0 rgba(255, 255, 255, 0.15)
+      `,
+    backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(160%)'
   };
 
   const iconStyles = {
-    background: `
-      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-      radial-gradient(circle at 70% 70%, color-mix(in srgb, ${urgencyConfig.color} 15%, transparent) 0%, transparent 50%),
-      linear-gradient(135deg, color-mix(in srgb, ${urgencyConfig.color} 35%, transparent), color-mix(in srgb, ${urgencyConfig.color} 25%, transparent))
-    `,
+    background: isPerformanceMode
+      ? `linear-gradient(135deg, color-mix(in srgb, ${urgencyConfig.color} 35%, transparent), color-mix(in srgb, ${urgencyConfig.color} 25%, transparent))`
+      : `
+          radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+          radial-gradient(circle at 70% 70%, color-mix(in srgb, ${urgencyConfig.color} 15%, transparent) 0%, transparent 50%),
+          linear-gradient(135deg, color-mix(in srgb, ${urgencyConfig.color} 35%, transparent), color-mix(in srgb, ${urgencyConfig.color} 25%, transparent))
+        `,
     border: `2px solid color-mix(in srgb, ${urgencyConfig.color} 50%, transparent)`,
-    boxShadow: `
-      0 0 30px color-mix(in srgb, ${urgencyConfig.color} 40%, transparent),
-      0 0 60px color-mix(in srgb, ${urgencyConfig.color} 25%, transparent),
-      inset 0 2px 0 rgba(255,255,255,0.3)
-    `
+    boxShadow: isPerformanceMode
+      ? 'none'
+      : `
+          0 0 30px color-mix(in srgb, ${urgencyConfig.color} 40%, transparent),
+          0 0 60px color-mix(in srgb, ${urgencyConfig.color} 25%, transparent),
+          inset 0 2px 0 rgba(255,255,255,0.3)
+        `
   };
 
   const buttonStyles = {
-    background: `linear-gradient(135deg, 
-      color-mix(in srgb, ${urgencyConfig.color} 80%, transparent), 
+    background: `linear-gradient(135deg,
+      color-mix(in srgb, ${urgencyConfig.color} 80%, transparent),
       color-mix(in srgb, ${urgencyConfig.color} 60%, transparent)
     )`,
     border: `2px solid color-mix(in srgb, ${urgencyConfig.color} 60%, transparent)`,
-    boxShadow: `
-      0 12px 40px color-mix(in srgb, ${urgencyConfig.color} 40%, transparent),
-      0 0 60px color-mix(in srgb, ${urgencyConfig.color} 30%, transparent),
-      inset 0 3px 0 rgba(255,255,255,0.4)
-    `,
-    backdropFilter: 'blur(20px) saturate(160%)',
+    boxShadow: isPerformanceMode
+      ? `0 12px 40px color-mix(in srgb, ${urgencyConfig.color} 40%, transparent)`
+      : `
+          0 12px 40px color-mix(in srgb, ${urgencyConfig.color} 40%, transparent),
+          0 0 60px color-mix(in srgb, ${urgencyConfig.color} 30%, transparent),
+          inset 0 3px 0 rgba(255,255,255,0.4)
+        `,
+    backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(160%)',
     color: '#fff',
     transition: 'all 0.2s ease'
   };
@@ -226,7 +239,7 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
   return (
     <div className={`dynamic-fasting-cta w-full ${className}`}>
       <GlassCard
-        className="p-6 md:p-8 text-center relative overflow-visible cursor-pointer w-full"
+        className="p-6 md:p-8 pb-10 md:pb-12 text-center relative overflow-visible cursor-pointer w-full"
         onClick={handleFastingAction}
         interactive
         style={cardStyles}
@@ -234,40 +247,43 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
         {/* Carrés tournants aux coins */}
         <div className="training-hero-corners" aria-hidden="true">
           {[0, 1, 2, 3].map((i) => (
-            <motion.div
+            <MotionDiv
               key={i}
               className="corner-particle"
               style={{
                 position: 'absolute',
-                width: '8px',
-                height: '8px',
+                width: '12px',
+                height: '12px',
                 borderRadius: '2px',
                 background: `linear-gradient(135deg, ${urgencyConfig.color}, rgba(255, 255, 255, 0.8))`,
-                boxShadow: `0 0 20px ${urgencyConfig.color}`,
+                boxShadow: isPerformanceMode ? 'none' : `0 0 20px ${urgencyConfig.color}`,
                 top: i < 2 ? '12px' : 'auto',
                 bottom: i >= 2 ? '12px' : 'auto',
                 left: i % 2 === 0 ? '12px' : 'auto',
-                right: i % 2 === 1 ? '12px' : 'auto'
+                right: i % 2 === 1 ? '12px' : 'auto',
+                willChange: isPerformanceMode ? 'auto' : 'transform, opacity'
               }}
-              initial={{
-                rotate: i % 2 === 0 ? 45 : -45
-              }}
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.6, 1, 0.6],
-                rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                delay: i * 0.2,
-                ease: [0.4, 0, 0.2, 1]
-              }}
+              {...(!isPerformanceMode && {
+                initial: {
+                  rotate: i % 2 === 0 ? 45 : -45
+                },
+                animate: {
+                  scale: [1, 1.3, 1],
+                  opacity: [0.6, 1, 0.6],
+                  rotate: i % 2 === 0 ? [45, 60, 45] : [-45, -60, -45]
+                },
+                transition: {
+                  duration: 3,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: [0.4, 0, 0.2, 1]
+                }
+              })}
             />
           ))}
         </div>
 
-        {urgencyConfig.priority === 'high' && !reduceMotion && (
+        {urgencyConfig.priority === 'high' && !isPerformanceMode && !reduceMotion && (
           <div
             className="absolute inset-0 rounded-inherit pointer-events-none urgent-forge-glow-css"
             style={{
@@ -282,8 +298,8 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
         <div className="relative z-10 space-y-4 md:space-y-6">
           <div
             className={`w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full flex items-center justify-center relative ${
-              urgencyConfig.animation === 'pulse' && !reduceMotion ? 'icon-pulse-css' :
-              urgencyConfig.animation === 'breathing' && !reduceMotion ? 'icon-breathing-css' : ''
+              !isPerformanceMode && urgencyConfig.animation === 'pulse' && !reduceMotion ? 'icon-pulse-css' :
+              !isPerformanceMode && urgencyConfig.animation === 'breathing' && !reduceMotion ? 'icon-breathing-css' : ''
             }`}
             style={iconStyles}
           >
@@ -294,7 +310,7 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
             />
 
             {/* Particules de Forge Spatiale autour de l'icône pour les états actifs */}
-            {(urgencyConfig.priority === 'high' || isActive) && !reduceMotion &&
+            {!isPerformanceMode && (urgencyConfig.priority === 'high' || isActive) && !reduceMotion &&
               [...Array(isActive ? 4 : 6)].map((_, i) => (
                 <div
                   key={i}
@@ -314,7 +330,7 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
             <h2 className="text-2xl md:text-3xl font-bold text-white">
               {message.title}
             </h2>
-            
+
             {isActive && session && (
               <div className="space-y-3">
                 <div className="text-center">
@@ -325,41 +341,45 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
                     Objectif : {session.targetHours}h • {Math.round(progressPercentage)}% accompli
                   </div>
                 </div>
-                
+
                 {/* Progress Bar for Active Session */}
                 <div className="max-w-md mx-auto">
                   <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
-                    <motion.div
+                    <MotionDiv
                       className="h-3 rounded-full relative overflow-hidden"
                       style={{
                         background: `linear-gradient(90deg, ${urgencyConfig.color}, color-mix(in srgb, ${urgencyConfig.color} 80%, white))`,
-                        boxShadow: `0 0 12px color-mix(in srgb, ${urgencyConfig.color} 60%, transparent)`,
+                        boxShadow: isPerformanceMode ? 'none' : `0 0 12px color-mix(in srgb, ${urgencyConfig.color} 60%, transparent)`,
                         width: `${progressPercentage}%`
                       }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${progressPercentage}%` }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      {...(!isPerformanceMode && {
+                        initial: { width: 0 },
+                        animate: { width: `${progressPercentage}%` },
+                        transition: { duration: 0.8, ease: "easeOut" }
+                      })}
                     >
-                      <div
-                        className="absolute inset-0 rounded-full"
-                        style={{
-                          background: `linear-gradient(90deg, 
-                            transparent 0%, 
-                            rgba(255,255,255,0.4) 50%, 
-                            transparent 100%
-                          )`,
-                          animation: 'progressShimmer 2s ease-in-out infinite'
-                        }}
-                      />
-                    </motion.div>
+                      {!isPerformanceMode && (
+                        <div
+                          className="absolute inset-0 rounded-full"
+                          style={{
+                            background: `linear-gradient(90deg,
+                              transparent 0%,
+                              rgba(255,255,255,0.4) 50%,
+                              transparent 100%
+                            )`,
+                            animation: 'progressShimmer 2s ease-in-out infinite'
+                          }}
+                        />
+                      )}
+                    </MotionDiv>
                   </div>
                 </div>
               </div>
             )}
-            
+
             <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-md mx-auto">
-              {isActive && currentPhase ? 
-                `Phase ${currentPhase.name} • ${currentPhase.metabolicState}` : 
+              {isActive && currentPhase ?
+                `Phase ${currentPhase.name} • ${currentPhase.metabolicState}` :
                 message.subtitle
               }
             </p>
@@ -381,7 +401,7 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
                     background: `color-mix(in srgb, ${urgencyConfig.color} 15%, transparent)`,
                     border: `1px solid color-mix(in srgb, ${urgencyConfig.color} 25%, transparent)`,
                     color: urgencyConfig.color,
-                    backdropFilter: 'blur(8px) saturate(120%)',
+                    backdropFilter: isPerformanceMode ? 'none' : 'blur(8px) saturate(120%)',
                     animationDelay: `${index * 0.1}s`
                   }}
                 >
@@ -396,7 +416,7 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
             <button
               onClick={handleFastingAction}
               className={`px-6 md:px-8 py-3 md:py-4 text-lg md:text-xl font-bold relative overflow-hidden rounded-full ${
-                urgencyConfig.animation === 'pulse' && !reduceMotion ? 'btn-breathing-css' : ''
+                !isPerformanceMode && urgencyConfig.animation === 'pulse' && !reduceMotion ? 'btn-breathing-css' : ''
               }`}
               style={buttonStyles}
             >
@@ -409,7 +429,7 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
                 <span>{message.buttonText}</span>
               </div>
 
-              {urgencyConfig.priority === 'medium' && !reduceMotion && (
+              {!isPerformanceMode && urgencyConfig.priority === 'medium' && !reduceMotion && (
                 <div
                   className="absolute inset-0 rounded-inherit pointer-events-none dynamic-shimmer-css"
                   style={{
@@ -423,6 +443,15 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
               )}
             </button>
           </div>
+
+          {/* Résumé contextuel sous le bouton */}
+          {!isActive && (
+            <div className="text-center mt-2">
+              <p className="text-white/60 text-sm">
+                Prêt à forger votre métabolisme
+              </p>
+            </div>
+          )}
 
           {/* Métriques principales de la session active */}
           {isActive && currentPhase && session && (
@@ -501,23 +530,25 @@ const DynamicFastingCTA: React.FC<FastingCTAProps> = ({ className = '' }) => {
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {currentPhase.benefits.slice(0, 4).map((benefit: string, index: number) => (
-                    <motion.div
+                    <MotionDiv
                       key={index}
                       className="flex items-center gap-2 p-2 rounded-lg"
                       style={{
                         background: `color-mix(in srgb, ${currentPhase.color} 6%, transparent)`,
                         border: `1px solid color-mix(in srgb, ${currentPhase.color} 15%, transparent)`
                       }}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                      {...(!isPerformanceMode && {
+                        initial: { opacity: 0, x: -10 },
+                        animate: { opacity: 1, x: 0 },
+                        transition: { duration: 0.4, delay: index * 0.1 }
+                      })}
                     >
                       <div
                         className="w-2 h-2 rounded-full flex-shrink-0"
                         style={{ background: currentPhase.color }}
                       />
                       <span className="text-white/80 text-xs">{benefit}</span>
-                    </motion.div>
+                    </MotionDiv>
                   ))}
                 </div>
               </div>

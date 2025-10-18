@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -32,6 +33,10 @@ const FastingStreakDiagram: React.FC<FastingStreakDiagramProps> = ({
   periodDays,
   className = ''
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
+  // Conditional motion components
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   // Calculer les streaks
   const calculateStreaks = React.useMemo(() => {
     if (!sessions || sessions.length === 0) return [];
@@ -123,10 +128,12 @@ const FastingStreakDiagram: React.FC<FastingStreakDiagramProps> = ({
   const averageStreakLength = calculateStreaks.reduce((sum, s) => sum + s.length, 0) / totalStreaks;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.3 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.6, delay: 0.3 }
+      })}
       className={className}
     >
       <GlassCard
@@ -143,7 +150,7 @@ const FastingStreakDiagram: React.FC<FastingStreakDiagramProps> = ({
             0 0 30px color-mix(in srgb, #8B5CF6 15%, transparent),
             inset 0 2px 0 rgba(255, 255, 255, 0.15)
           `,
-          backdropFilter: 'blur(20px) saturate(160%)'
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(160%)'
         }}
       >
         <div className="space-y-6">
@@ -245,7 +252,7 @@ const FastingStreakDiagram: React.FC<FastingStreakDiagramProps> = ({
                 const isRecord = streak === longestStreak;
 
                 return (
-                  <motion.div
+                  <MotionDiv
                     key={`${streak.startDate}-${index}`}
                     className="relative p-4 rounded-xl"
                     style={{
@@ -256,9 +263,11 @@ const FastingStreakDiagram: React.FC<FastingStreakDiagramProps> = ({
                         ? '1px solid color-mix(in srgb, #22C55E 20%, transparent)'
                         : '1px solid rgba(255, 255, 255, 0.05)'
                     }}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    {...(!isPerformanceMode && {
+                      initial: { opacity: 0, x: -20 },
+                      animate: { opacity: 1, x: 0 },
+                      transition: { duration: 0.4, delay: index * 0.1 }
+                    })}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -312,7 +321,7 @@ const FastingStreakDiagram: React.FC<FastingStreakDiagramProps> = ({
                         />
                       </div>
                     </div>
-                  </motion.div>
+                  </MotionDiv>
                 );
               })}
             </div>
@@ -326,7 +335,7 @@ const FastingStreakDiagram: React.FC<FastingStreakDiagramProps> = ({
             border: currentStreak
               ? '1px solid color-mix(in srgb, #22C55E 18%, transparent)'
               : '1px solid color-mix(in srgb, #8B5CF6 18%, transparent)',
-            backdropFilter: 'blur(8px) saturate(120%)'
+            backdropFilter: isPerformanceMode ? 'none' : 'blur(8px) saturate(120%)'
           }}>
             <div className="flex items-start gap-2">
               <SpatialIcon
@@ -357,7 +366,7 @@ const FastingStreakDiagram: React.FC<FastingStreakDiagramProps> = ({
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

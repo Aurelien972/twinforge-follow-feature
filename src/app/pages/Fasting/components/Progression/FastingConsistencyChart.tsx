@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import { format, parseISO } from 'date-fns';
 import type { FastingConsistencyData } from '../../hooks/useFastingProgressionData';
 
@@ -45,6 +46,10 @@ const FastingConsistencyChart: React.FC<FastingConsistencyChartProps> = ({
   periodDays,
   className = ''
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
+  // Conditional motion components
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   // Calculate weekly consistency if period is long enough
   const weeklyData = React.useMemo(() => {
     if (periodDays < 14) return null;
@@ -94,10 +99,12 @@ const FastingConsistencyChart: React.FC<FastingConsistencyChartProps> = ({
   }, [data]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.6 }
+      })}
       className={className}
     >
       <GlassCard
@@ -114,7 +121,7 @@ const FastingConsistencyChart: React.FC<FastingConsistencyChartProps> = ({
             0 0 30px color-mix(in srgb, #06B6D4 15%, transparent),
             inset 0 2px 0 rgba(255, 255, 255, 0.15)
           `,
-          backdropFilter: 'blur(20px) saturate(160%)'
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(160%)'
         }}
       >
         <div className="space-y-6">
@@ -166,16 +173,18 @@ const FastingConsistencyChart: React.FC<FastingConsistencyChartProps> = ({
                 const opacity = day.outcome === 'none' ? 0.3 : 0.8;
                 
                 return (
-                  <motion.div
+                  <MotionDiv
                     key={day.date}
                     className="aspect-square rounded-lg flex items-center justify-center relative group cursor-pointer"
                     style={{
                       backgroundColor: color,
                       opacity
                     }}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity }}
-                    transition={{ duration: 0.3, delay: index * 0.02 }}
+                    {...(!isPerformanceMode && {
+                      initial: { scale: 0, opacity: 0 },
+                      animate: { scale: 1, opacity },
+                      transition: { duration: 0.3, delay: index * 0.02 }
+                    })}
                     title={`${format(parseISO(day.date), 'dd/MM')} - ${getOutcomeLabel(day.outcome)} ${
                       day.totalHours > 0 ? `(${day.totalHours}h)` : ''
                     }`}
@@ -191,7 +200,7 @@ const FastingConsistencyChart: React.FC<FastingConsistencyChartProps> = ({
                       {format(parseISO(day.date), 'dd MMM')} - {getOutcomeLabel(day.outcome)}
                       {day.totalHours > 0 && ` (${day.totalHours}h)`}
                     </div>
-                  </motion.div>
+                  </MotionDiv>
                 );
               })}
             </div>
@@ -227,12 +236,14 @@ const FastingConsistencyChart: React.FC<FastingConsistencyChartProps> = ({
               
               <div className="space-y-2">
                 {weeklyData.slice(-4).map((week, index) => ( // Show last 4 weeks
-                  <motion.div
+                  <MotionDiv
                     key={week.weekStart}
                     className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    {...(!isPerformanceMode && {
+                      initial: { opacity: 0, x: -20 },
+                      animate: { opacity: 1, x: 0 },
+                      transition: { duration: 0.4, delay: index * 0.1 }
+                    })}
                   >
                     <div>
                       <div className="text-white font-medium text-sm">
@@ -257,7 +268,7 @@ const FastingConsistencyChart: React.FC<FastingConsistencyChartProps> = ({
                         {week.successRate}% succès
                       </div>
                     </div>
-                  </motion.div>
+                  </MotionDiv>
                 ))}
               </div>
             </div>
@@ -304,7 +315,7 @@ const FastingConsistencyChart: React.FC<FastingConsistencyChartProps> = ({
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import { format, parseISO } from 'date-fns';
 import type { FastingDurationTrend } from '../../hooks/useFastingProgressionData';
 
@@ -21,6 +22,10 @@ const FastingDurationTrendChart: React.FC<FastingDurationTrendChartProps> = ({
   periodDays,
   className = ''
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
+  // Conditional motion components
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   // Filter data to show only days with sessions for cleaner visualization
   const filteredData = data.filter(d => d.sessionsCount > 0);
   
@@ -112,10 +117,12 @@ const FastingDurationTrendChart: React.FC<FastingDurationTrendChartProps> = ({
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.2 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.6, delay: 0.2 }
+      })}
       className={className}
     >
       <GlassCard
@@ -132,7 +139,7 @@ const FastingDurationTrendChart: React.FC<FastingDurationTrendChartProps> = ({
             0 0 30px color-mix(in srgb, ${trendTheme.color} 15%, transparent),
             inset 0 2px 0 rgba(255, 255, 255, 0.15)
           `,
-          backdropFilter: 'blur(20px) saturate(160%)'
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(160%)'
         }}
       >
         <div className="space-y-6">
@@ -190,13 +197,15 @@ const FastingDurationTrendChart: React.FC<FastingDurationTrendChartProps> = ({
                     (point.averageDuration / stats.maxDuration) * 100 : 0;
                   
                   return (
-                    <motion.div
+                    <MotionDiv
                       key={point.date}
                       className="flex flex-col items-center group cursor-pointer"
                       style={{ width: `${100 / Math.min(filteredData.length, 14)}%` }}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      transition={{ duration: 0.5, delay: index * 0.05 }}
+                      {...(!isPerformanceMode && {
+                        initial: { height: 0, opacity: 0 },
+                        animate: { height: 'auto', opacity: 1 },
+                        transition: { duration: 0.5, delay: index * 0.05 }
+                      })}
                     >
                       <div
                         className="w-2 bg-gradient-to-t from-cyan-500 to-purple-400 rounded-full mb-1 transition-all duration-200 group-hover:w-3"
@@ -211,7 +220,7 @@ const FastingDurationTrendChart: React.FC<FastingDurationTrendChartProps> = ({
                         {format(parseISO(point.date), 'dd MMM')} - {point.averageDuration}h
                         {point.sessionsCount > 1 && ` (${point.sessionsCount} sessions)`}
                       </div>
-                    </motion.div>
+                    </MotionDiv>
                   );
                 })}
               </div>
@@ -252,7 +261,7 @@ const FastingDurationTrendChart: React.FC<FastingDurationTrendChartProps> = ({
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

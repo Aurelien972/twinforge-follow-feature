@@ -4,6 +4,7 @@ import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import { useExitModalStore } from '@/system/store/exitModalStore';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import { useFastingTimerTick } from '../../hooks/useFastingPipeline';
 
 interface FastingSession {
@@ -46,12 +47,16 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
   useFastingTimerTick();
 
   const { showModal: showExitModal } = useExitModalStore();
+  const { isPerformanceMode } = usePerformanceMode();
+
+  // Conditional motion components
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   const handleStopFasting = () => {
     const elapsedHours = Math.floor(elapsedSeconds / 3600);
     const elapsedMinutes = Math.floor((elapsedSeconds % 3600) / 60);
     const elapsedTimeDisplay = `${elapsedHours}h ${elapsedMinutes.toString().padStart(2, '0')}m`;
-    
+
     showExitModal({
       title: "Terminer votre jeûne ?",
       message: `Vous avez jeûné pendant ${elapsedTimeDisplay}. Voulez-vous vraiment terminer votre session maintenant ?`,
@@ -75,13 +80,15 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
           var(--glass-opacity)
         `,
         borderColor: 'color-mix(in srgb, #EF4444 30%, transparent)',
-        boxShadow: `
-          0 20px 60px rgba(0, 0, 0, 0.4),
-          0 0 40px color-mix(in srgb, #EF4444 20%, transparent),
-          0 0 80px color-mix(in srgb, #F59E0B 15%, transparent),
-          inset 0 2px 0 rgba(255, 255, 255, 0.2)
-        `,
-        backdropFilter: 'blur(28px) saturate(170%)'
+        boxShadow: isPerformanceMode
+          ? `0 20px 60px rgba(0, 0, 0, 0.4)`
+          : `
+            0 20px 60px rgba(0, 0, 0, 0.4),
+            0 0 40px color-mix(in srgb, #EF4444 20%, transparent),
+            0 0 80px color-mix(in srgb, #F59E0B 15%, transparent),
+            inset 0 2px 0 rgba(255, 255, 255, 0.2)
+          `,
+        backdropFilter: isPerformanceMode ? 'none' : 'blur(28px) saturate(170%)'
       }}
     >
       <div className="space-y-6">
@@ -89,11 +96,11 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
-              className="w-12 h-12 rounded-full flex items-center justify-center breathing-icon"
+              className={`w-12 h-12 rounded-full flex items-center justify-center ${!isPerformanceMode ? 'breathing-icon' : ''}`}
               style={{
                 background: `linear-gradient(135deg, color-mix(in srgb, #EF4444 40%, transparent), color-mix(in srgb, #F59E0B 30%, transparent))`,
                 border: `2px solid color-mix(in srgb, #EF4444 60%, transparent)`,
-                boxShadow: `0 0 25px color-mix(in srgb, #EF4444 50%, transparent)`
+                boxShadow: isPerformanceMode ? 'none' : `0 0 25px color-mix(in srgb, #EF4444 50%, transparent)`
               }}
             >
               <SpatialIcon
@@ -113,10 +120,10 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
 
           <div className="flex items-center gap-2">
             <div
-              className="w-3 h-3 rounded-full animate-pulse"
+              className={`w-3 h-3 rounded-full ${!isPerformanceMode ? 'animate-pulse' : ''}`}
               style={{
                 background: '#EF4444',
-                boxShadow: '0 0 8px #EF444460'
+                boxShadow: isPerformanceMode ? 'none' : '0 0 8px #EF444460'
               }}
             />
             <span className="text-red-300 text-sm font-medium">En cours</span>
@@ -135,29 +142,33 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
           {/* Barre de Progression */}
           <div className="max-w-md mx-auto">
             <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
-              <motion.div
+              <MotionDiv
                 className="h-3 rounded-full relative overflow-hidden"
                 style={{
                   background: `linear-gradient(90deg, #EF4444, #F59E0B)`,
-                  boxShadow: `0 0 12px color-mix(in srgb, #EF4444 60%, transparent)`,
+                  boxShadow: isPerformanceMode ? 'none' : `0 0 12px color-mix(in srgb, #EF4444 60%, transparent)`,
                   width: `${progressPercentage || 0}%`
                 }}
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPercentage || 0}%` }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                {...(!isPerformanceMode && {
+                  initial: { width: 0 },
+                  animate: { width: `${progressPercentage || 0}%` },
+                  transition: { duration: 0.8, ease: "easeOut" }
+                })}
               >
-                <div
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background: `linear-gradient(90deg,
-                      transparent 0%,
-                      rgba(255,255,255,0.4) 50%,
-                      transparent 100%
-                    )`,
-                    animation: 'progressShimmer 2s ease-in-out infinite'
-                  }}
-                />
-              </motion.div>
+                {!isPerformanceMode && (
+                  <div
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background: `linear-gradient(90deg,
+                        transparent 0%,
+                        rgba(255,255,255,0.4) 50%,
+                        transparent 100%
+                      )`,
+                      animation: 'progressShimmer 2s ease-in-out infinite'
+                    }}
+                  />
+                )}
+              </MotionDiv>
             </div>
           </div>
         </div>
@@ -193,12 +204,14 @@ const FastingActiveStage: React.FC<FastingActiveStageProps> = ({
                 color-mix(in srgb, #F59E0B 60%, transparent)
               )`,
               border: '3px solid color-mix(in srgb, #EF4444 60%, transparent)',
-              boxShadow: `
-                0 16px 50px color-mix(in srgb, #EF4444 50%, transparent),
-                0 0 80px color-mix(in srgb, #EF4444 40%, transparent),
-                inset 0 4px 0 rgba(255,255,255,0.5)
-              `,
-              backdropFilter: 'blur(24px) saturate(170%)',
+              boxShadow: isPerformanceMode
+                ? `0 16px 50px color-mix(in srgb, #EF4444 50%, transparent)`
+                : `
+                  0 16px 50px color-mix(in srgb, #EF4444 50%, transparent),
+                  0 0 80px color-mix(in srgb, #EF4444 40%, transparent),
+                  inset 0 4px 0 rgba(255,255,255,0.5)
+                `,
+              backdropFilter: isPerformanceMode ? 'none' : 'blur(24px) saturate(170%)',
               color: '#fff',
               transition: 'all 0.2s ease'
             }}
