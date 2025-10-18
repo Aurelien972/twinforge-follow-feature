@@ -23,36 +23,32 @@ export const BackgroundManager: React.FC = () => {
   const particlesInitialized = useRef(false);
 
   useEffect(() => {
-    // Appliquer la classe de mode performance sur le body
+    // Apply performance mode classes to body and html
     const body = document.body;
     const html = document.documentElement;
 
+    // Remove all mode classes first
+    body.classList.remove('performance-mode', 'mobile-performance-mode', 'mode-quality', 'mode-balanced');
+    html.classList.remove('performance-mode');
+
+    // Apply appropriate classes based on current mode
     if (isPerformanceMode) {
-      body.classList.add('performance-mode');
-      body.classList.add('mobile-performance-mode');
+      body.classList.add('performance-mode', 'mobile-performance-mode');
       body.setAttribute('data-performance-mode', 'true');
       html.classList.add('performance-mode');
-
-      // S'assurer que les classes quality/balanced sont retirées
-      body.classList.remove('mode-quality', 'mode-balanced');
     } else {
-      body.classList.remove('performance-mode');
-      body.classList.remove('mobile-performance-mode');
       body.removeAttribute('data-performance-mode');
-      html.classList.remove('performance-mode');
 
-      // Appliquer la classe du mode actuel
+      // Apply the specific mode class
       if (mode === 'quality') {
         body.classList.add('mode-quality');
-        body.classList.remove('mode-balanced');
       } else if (mode === 'balanced') {
         body.classList.add('mode-balanced');
-        body.classList.remove('mode-quality');
       }
     }
 
     return () => {
-      // Cleanup au démontage
+      // Cleanup on unmount
       body.classList.remove('performance-mode', 'mobile-performance-mode', 'mode-quality', 'mode-balanced');
       body.removeAttribute('data-performance-mode');
       html.classList.remove('performance-mode');
@@ -60,13 +56,26 @@ export const BackgroundManager: React.FC = () => {
   }, [isPerformanceMode, mode]);
 
   useEffect(() => {
-    // Initialiser les particules uniquement en mode quality/balanced
-    // et uniquement une fois
+    // Initialize particles only in quality/balanced mode
     if (!isPerformanceMode && !particlesInitialized.current) {
-      initializeForgeParticles();
-      particlesInitialized.current = true;
+      // Small delay to ensure DOM is ready
+      const timeoutId = setTimeout(() => {
+        initializeForgeParticles(mode);
+        particlesInitialized.current = true;
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
     }
-  }, [isPerformanceMode]);
+
+    // Clean up particles when switching to performance mode
+    if (isPerformanceMode && particlesInitialized.current) {
+      const container = document.getElementById('cosmic-forge-particles-container');
+      if (container) {
+        container.innerHTML = '';
+      }
+      particlesInitialized.current = false;
+    }
+  }, [isPerformanceMode, mode]);
 
   // En mode performance, ne rien render (pas de particules dans le DOM)
   if (isPerformanceMode) {
@@ -100,23 +109,42 @@ export const BackgroundManager: React.FC = () => {
  * Initialise les particules de forge avec positions aléatoires
  * Appelé uniquement en mode quality/balanced
  */
-function initializeForgeParticles() {
+function initializeForgeParticles(mode: 'high-performance' | 'balanced' | 'quality') {
   const container = document.getElementById('cosmic-forge-particles-container');
   if (!container) return;
 
-  // Déterminer le nombre de particules selon la taille de l'écran
+  // Clear existing particles first
+  container.innerHTML = '';
+
+  // Déterminer le nombre de particules selon la taille de l'écran ET le mode performance
   const isMobile = window.innerWidth <= 768;
   const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
 
-  let particleCount = 12; // Desktop par défaut
-  let animationSpeed = 22; // Desktop par défaut
+  let particleCount = 12; // Desktop quality mode par défaut
+  let animationSpeed = 22; // Desktop quality mode par défaut
 
-  if (isMobile) {
-    particleCount = 6;
-    animationSpeed = 35;
-  } else if (isTablet) {
-    particleCount = 8;
-    animationSpeed = 28;
+  // Adjust for performance mode
+  if (mode === 'balanced') {
+    // Balanced: reduce particles by 50%
+    if (isMobile) {
+      particleCount = 3;
+      animationSpeed = 40;
+    } else if (isTablet) {
+      particleCount = 4;
+      animationSpeed = 32;
+    } else {
+      particleCount = 6;
+      animationSpeed = 26;
+    }
+  } else {
+    // Quality mode: full particle count
+    if (isMobile) {
+      particleCount = 6;
+      animationSpeed = 35;
+    } else if (isTablet) {
+      particleCount = 8;
+      animationSpeed = 28;
+    }
   }
 
   // Créer les particules

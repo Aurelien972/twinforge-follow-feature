@@ -1,10 +1,10 @@
 /**
  * useActivityPerformance Hook
  * Activity-specific performance adaptations for the Energy Forge
- * Extends usePerformanceMode with Activity module specific parameters
+ * Extends useLegacyPerformanceMode with Activity module specific parameters
  */
 
-import { usePerformanceMode } from '../../../../hooks/usePerformanceMode';
+import { useLegacyPerformanceMode } from '../../../../hooks/useLegacyPerformanceMode';
 
 export interface ActivityPerformanceSettings {
   mode: 'high' | 'medium' | 'low';
@@ -25,7 +25,7 @@ export interface ActivityPerformanceSettings {
 }
 
 export const useActivityPerformance = (): ActivityPerformanceSettings => {
-  const baseMetrics = usePerformanceMode();
+  const baseMetrics = useLegacyPerformanceMode();
 
   const activitySettings: ActivityPerformanceSettings = {
     mode: baseMetrics.mode,

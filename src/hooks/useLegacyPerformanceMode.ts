@@ -1,6 +1,17 @@
 /**
- * usePerformanceMode Hook
+ * @deprecated This hook is deprecated. Use `usePerformanceMode` from PerformanceModeContext instead.
+ *
+ * useLegacyPerformanceMode Hook
  * Detects device performance and adapts UI accordingly
+ *
+ * MIGRATION NOTE:
+ * This is the legacy performance mode hook that has been superseded by the
+ * centralized PerformanceModeContext system. It should only be used during
+ * the migration period. All new code should use the context-based hook.
+ *
+ * To migrate:
+ * 1. Import from: `import { usePerformanceMode } from '@/system/context/PerformanceModeContext'`
+ * 2. Update usage to use new API: `{ isPerformanceMode, mode, isGlassEffectsEnabled }`
  */
 
 import { useState, useEffect } from 'react';
@@ -14,7 +25,10 @@ interface PerformanceMetrics {
   calendarDays: number;
 }
 
-export const usePerformanceMode = (): PerformanceMetrics => {
+/**
+ * @deprecated Use usePerformanceMode from PerformanceModeContext instead
+ */
+export const useLegacyPerformanceMode = (): PerformanceMetrics => {
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
     mode: 'high',
     enableAnimations: true,
@@ -25,6 +39,13 @@ export const usePerformanceMode = (): PerformanceMetrics => {
   });
 
   useEffect(() => {
+    // Log deprecation warning once
+    console.warn(
+      '[DEPRECATED] useLegacyPerformanceMode is deprecated. ' +
+      'Please use usePerformanceMode from PerformanceModeContext instead. ' +
+      'See migration guide in file header.'
+    );
+
     const detectPerformance = () => {
       const userAgent = navigator.userAgent.toLowerCase();
       const isMobile = /mobile|android|iphone|ipad|tablet/.test(userAgent);
