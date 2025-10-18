@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useFastingPipeline } from '../../hooks/useFastingPipeline';
 import { useUserStore } from '@/system/store/userStore';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import DynamicFastingCTA from '../Cards/DynamicFastingCTA';
 import FastingDailySummaryCard from '../Cards/FastingDailySummaryCard';
 import FastingTipsCard from '../Cards/FastingTipsCard';
@@ -20,12 +21,18 @@ interface FastingDailyTabProps {
 const FastingDailyTab: React.FC<FastingDailyTabProps> = ({ onLoadingChange }) => {
   const { profile } = useUserStore();
   const { isActive, session: fastingSession } = useFastingPipeline();
+  const { isPerformanceMode } = usePerformanceMode();
+
+  // Conditional motion component
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5, ease: 'easeOut' }
+      })}
       className="space-y-6"
     >
       {/*
@@ -49,7 +56,7 @@ const FastingDailyTab: React.FC<FastingDailyTabProps> = ({ onLoadingChange }) =>
 
       {/* Conseils de Jeûne */}
       <FastingTipsCard />
-    </motion.div>
+    </MotionDiv>
   );
 };
 

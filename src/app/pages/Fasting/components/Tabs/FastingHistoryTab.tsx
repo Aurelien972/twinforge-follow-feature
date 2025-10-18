@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useFastingHistory, type FastingHistoryFilters } from '../../hooks/useFastingHistory';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
@@ -15,8 +16,12 @@ import FastingHistoryLoadingSkeleton from '../History/FastingHistoryLoadingSkele
  * Historique complet des sessions de jeûne
  */
 const FastingHistoryTab: React.FC = () => {
+  const { isPerformanceMode } = usePerformanceMode();
   const [filters, setFilters] = useState<FastingHistoryFilters>({});
   const [showFilters, setShowFilters] = useState(false);
+
+  // Conditional motion component
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   
   // Fetch history data with filters
   const { 
@@ -30,10 +35,12 @@ const FastingHistoryTab: React.FC = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5, ease: 'easeOut' }
+      })}
       className="space-y-6"
     >
       {/* Filters Toggle */}
@@ -154,11 +161,13 @@ const FastingHistoryTab: React.FC = () => {
                 var(--glass-opacity)
               `,
               borderColor: 'color-mix(in srgb, #8B5CF6 30%, transparent)',
-              boxShadow: `
-                0 12px 40px rgba(0, 0, 0, 0.25),
-                0 0 30px color-mix(in srgb, #8B5CF6 20%, transparent),
-                inset 0 2px 0 rgba(255, 255, 255, 0.15)
-              `
+              boxShadow: isPerformanceMode
+                ? '0 12px 40px rgba(0, 0, 0, 0.25)'
+                : `
+                  0 12px 40px rgba(0, 0, 0, 0.25),
+                  0 0 30px color-mix(in srgb, #8B5CF6 20%, transparent),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.15)
+                `
             }}>
               <div className="space-y-4">
                 <div className="flex items-center justify-center gap-4 mb-6">
@@ -170,7 +179,7 @@ const FastingHistoryTab: React.FC = () => {
                         linear-gradient(135deg, color-mix(in srgb, #8B5CF6 30%, transparent), color-mix(in srgb, #8B5CF6 20%, transparent))
                       `,
                       border: '2px solid color-mix(in srgb, #8B5CF6 40%, transparent)',
-                      boxShadow: '0 0 30px color-mix(in srgb, #8B5CF6 30%, transparent)'
+                      boxShadow: isPerformanceMode ? 'none' : '0 0 30px color-mix(in srgb, #8B5CF6 30%, transparent)'
                     }}
                   >
                     <SpatialIcon Icon={ICONS.History} size={40} style={{ color: '#8B5CF6' }} />
@@ -201,8 +210,11 @@ const FastingHistoryTab: React.FC = () => {
                     style={{
                       background: 'linear-gradient(135deg, color-mix(in srgb, #8B5CF6 80%, transparent), color-mix(in srgb, #8B5CF6 60%, transparent))',
                       border: '2px solid color-mix(in srgb, #8B5CF6 60%, transparent)',
-                      boxShadow: `0 12px 40px color-mix(in srgb, #8B5CF6 40%, transparent), 0 0 60px color-mix(in srgb, #8B5CF6 30%, transparent)`,
-                      color: '#fff'
+                      boxShadow: isPerformanceMode
+                        ? '0 12px 40px rgba(0, 0, 0, 0.3)'
+                        : `0 12px 40px color-mix(in srgb, #8B5CF6 40%, transparent), 0 0 60px color-mix(in srgb, #8B5CF6 30%, transparent)`,
+                      color: '#fff',
+                      transition: isPerformanceMode ? 'all 0.15s ease' : 'all 0.2s ease'
                     }}
                   >
                     <div className="flex items-center gap-2">
@@ -216,7 +228,7 @@ const FastingHistoryTab: React.FC = () => {
           )}
         </div>
       )}
-    </motion.div>
+    </MotionDiv>
   );
 };
 

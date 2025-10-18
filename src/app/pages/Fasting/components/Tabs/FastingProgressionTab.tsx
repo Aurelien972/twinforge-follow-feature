@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '@/system/store/userStore';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import { useFastingProgressionData } from '../../hooks/useFastingProgressionData';
 import { useTodayFastingSessions } from '../../hooks/useTodayFastingSessions';
 import GlassCard from '@/ui/cards/GlassCard';
@@ -32,8 +33,12 @@ const getProgressionMinSessions = (period: number): number => {
  */
 const FastingProgressionTab: React.FC = () => {
   const { profile, session } = useUserStore();
+  const { isPerformanceMode } = usePerformanceMode();
   const navigate = useNavigate();
   const [selectedPeriod, setSelectedPeriod] = useState(7);
+
+  // Conditional motion component
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   
   // Get total sessions count for period selector
   const { data: todayData } = useTodayFastingSessions();
@@ -50,10 +55,12 @@ const FastingProgressionTab: React.FC = () => {
   const availableSessionsCount = progressionData?.metrics?.totalSessions || 0;
   
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5, ease: 'easeOut' }
+      })}
       className="space-y-6"
     >
       {/* Period Selector with Cyan Color for Progression Tab */}
@@ -61,7 +68,7 @@ const FastingProgressionTab: React.FC = () => {
         <div className="inline-flex gap-2 p-1 rounded-lg" style={{
           background: 'rgba(255, 255, 255, 0.05)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(10px)'
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(10px)'
         }}>
           {[7, 30, 90].map((period) => {
             const isSelected = selectedPeriod === period;
@@ -78,14 +85,15 @@ const FastingProgressionTab: React.FC = () => {
                   }
                 }}
                 disabled={!isAvailable}
-                className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200"
+                className="px-6 py-2.5 rounded-lg text-sm font-medium"
                 style={{
                   background: isSelected ? `${accentColor}33` : 'transparent',
                   color: isSelected ? accentColor : isAvailable ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)',
                   border: isSelected ? `1px solid ${accentColor}66` : '1px solid transparent',
-                  boxShadow: isSelected ? `0 0 20px ${accentColor}4D` : 'none',
+                  boxShadow: isPerformanceMode ? 'none' : (isSelected ? `0 0 20px ${accentColor}4D` : 'none'),
                   opacity: isAvailable ? 1 : 0.5,
-                  cursor: isAvailable ? 'pointer' : 'not-allowed'
+                  cursor: isAvailable ? 'pointer' : 'not-allowed',
+                  transition: isPerformanceMode ? 'all 0.15s ease' : 'all 0.2s ease'
                 }}
               >
                 {period === 7 ? '7 jours' : period === 30 ? '30 jours' : '90 jours'}
@@ -130,12 +138,14 @@ const FastingProgressionTab: React.FC = () => {
               rgba(0, 0, 0, 0.4) 100%)
           `,
           borderColor: 'color-mix(in srgb, #06B6D4 30%, transparent)',
-          boxShadow: `
-            0 0 30px rgba(6, 182, 212, 0.2),
-            0 8px 32px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1)
-          `,
-          backdropFilter: 'blur(20px) saturate(1.2)'
+          boxShadow: isPerformanceMode
+            ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+            : `
+              0 0 30px rgba(6, 182, 212, 0.2),
+              0 8px 32px rgba(0, 0, 0, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1)
+            `,
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(1.2)'
         }}>
           <div className="space-y-6 flex flex-col items-center">
             {/* Icon */}
@@ -147,11 +157,13 @@ const FastingProgressionTab: React.FC = () => {
                   rgba(34, 211, 238, 0.15) 70%,
                   transparent 100%)`,
                 border: '1px solid rgba(6, 182, 212, 0.4)',
-                boxShadow: `
-                  0 0 25px rgba(6, 182, 212, 0.3),
-                  0 4px 20px rgba(0, 0, 0, 0.2),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                `
+                boxShadow: isPerformanceMode
+                  ? '0 4px 20px rgba(0, 0, 0, 0.2)'
+                  : `
+                    0 0 25px rgba(6, 182, 212, 0.3),
+                    0 4px 20px rgba(0, 0, 0, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                  `
               }}
             >
               <SpatialIcon
@@ -159,8 +171,10 @@ const FastingProgressionTab: React.FC = () => {
                 size={48}
                 className="text-cyan-400"
                 style={{
-                  filter: `drop-shadow(0 0 12px rgba(6, 182, 212, 0.8))
-                           drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))`
+                  filter: isPerformanceMode
+                    ? 'none'
+                    : `drop-shadow(0 0 12px rgba(6, 182, 212, 0.8))
+                       drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))`
                 }}
               />
             </div>
@@ -186,11 +200,13 @@ const FastingProgressionTab: React.FC = () => {
                       rgba(34, 211, 238, 0.1) 70%,
                       transparent 100%)`,
                     border: '1px solid rgba(6, 182, 212, 0.4)',
-                    boxShadow: `
-                      0 0 20px rgba(6, 182, 212, 0.3),
-                      0 4px 15px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `
+                    boxShadow: isPerformanceMode
+                      ? '0 4px 15px rgba(0, 0, 0, 0.2)'
+                      : `
+                        0 0 20px rgba(6, 182, 212, 0.3),
+                        0 4px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                      `
                   }}
                 >
                   <SpatialIcon
@@ -198,8 +214,10 @@ const FastingProgressionTab: React.FC = () => {
                     size={24}
                     className="text-cyan-400"
                     style={{
-                      filter: `drop-shadow(0 0 8px rgba(6, 182, 212, 0.6))
-                               drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))`
+                      filter: isPerformanceMode
+                        ? 'none'
+                        : `drop-shadow(0 0 8px rgba(6, 182, 212, 0.6))
+                           drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))`
                     }}
                   />
                 </div>
@@ -218,11 +236,13 @@ const FastingProgressionTab: React.FC = () => {
                       rgba(34, 211, 238, 0.1) 70%,
                       transparent 100%)`,
                     border: '1px solid rgba(6, 182, 212, 0.4)',
-                    boxShadow: `
-                      0 0 20px rgba(6, 182, 212, 0.3),
-                      0 4px 15px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `
+                    boxShadow: isPerformanceMode
+                      ? '0 4px 15px rgba(0, 0, 0, 0.2)'
+                      : `
+                        0 0 20px rgba(6, 182, 212, 0.3),
+                        0 4px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                      `
                   }}
                 >
                   <SpatialIcon
@@ -230,8 +250,10 @@ const FastingProgressionTab: React.FC = () => {
                     size={24}
                     className="text-cyan-400"
                     style={{
-                      filter: `drop-shadow(0 0 8px rgba(6, 182, 212, 0.6))
-                               drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))`
+                      filter: isPerformanceMode
+                        ? 'none'
+                        : `drop-shadow(0 0 8px rgba(6, 182, 212, 0.6))
+                           drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))`
                     }}
                   />
                 </div>
@@ -250,11 +272,13 @@ const FastingProgressionTab: React.FC = () => {
                       rgba(34, 211, 238, 0.1) 70%,
                       transparent 100%)`,
                     border: '1px solid rgba(6, 182, 212, 0.4)',
-                    boxShadow: `
-                      0 0 20px rgba(6, 182, 212, 0.3),
-                      0 4px 15px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `
+                    boxShadow: isPerformanceMode
+                      ? '0 4px 15px rgba(0, 0, 0, 0.2)'
+                      : `
+                        0 0 20px rgba(6, 182, 212, 0.3),
+                        0 4px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                      `
                   }}
                 >
                   <SpatialIcon
@@ -262,8 +286,10 @@ const FastingProgressionTab: React.FC = () => {
                     size={24}
                     className="text-cyan-400"
                     style={{
-                      filter: `drop-shadow(0 0 8px rgba(6, 182, 212, 0.6))
-                               drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))`
+                      filter: isPerformanceMode
+                        ? 'none'
+                        : `drop-shadow(0 0 8px rgba(6, 182, 212, 0.6))
+                           drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))`
                     }}
                   />
                 </div>
@@ -278,44 +304,52 @@ const FastingProgressionTab: React.FC = () => {
             <div className="pt-4">
               <button
                 onClick={() => navigate('/fasting/input')}
-                className="group relative px-8 py-4 text-white font-semibold rounded-2xl transform hover:scale-105 transition-all duration-300"
+                className="group relative px-8 py-4 text-white font-semibold rounded-2xl"
                 style={{
                   background: `linear-gradient(135deg,
                     rgba(6, 182, 212, 0.8) 0%,
                     rgba(34, 211, 238, 0.9) 100%)`,
                   border: '2px solid rgba(6, 182, 212, 0.6)',
-                  boxShadow: `
-                    0 0 30px rgba(6, 182, 212, 0.4),
-                    0 8px 25px rgba(0, 0, 0, 0.3),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                    inset 0 -1px 0 rgba(0, 0, 0, 0.2)
-                  `,
-                  backdropFilter: 'blur(10px) saturate(1.2)'
+                  boxShadow: isPerformanceMode
+                    ? '0 8px 25px rgba(0, 0, 0, 0.3)'
+                    : `
+                      0 0 30px rgba(6, 182, 212, 0.4),
+                      0 8px 25px rgba(0, 0, 0, 0.3),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+                    `,
+                  backdropFilter: isPerformanceMode ? 'none' : 'blur(10px) saturate(1.2)',
+                  transform: isPerformanceMode ? 'none' : undefined,
+                  transition: isPerformanceMode ? 'all 0.15s ease' : 'all 0.3s ease'
                 }}
               >
                 <div className="flex items-center gap-3">
                   <SpatialIcon
                     Icon={ICONS.Timer}
                     size={24}
-                    className="group-hover:rotate-12 transition-transform duration-300"
+                    className={!isPerformanceMode ? 'group-hover:rotate-12 transition-transform duration-300' : ''}
                     style={{
                       color: 'white',
-                      filter: `drop-shadow(0 0 10px rgba(6, 182, 212, 0.8))
-                               drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3))`
+                      filter: isPerformanceMode
+                        ? 'none'
+                        : `drop-shadow(0 0 10px rgba(6, 182, 212, 0.8))
+                           drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3))`
                     }}
                   />
                   <span className="text-lg">Ajouter des Sessions de Jeûne</span>
                 </div>
 
                 {/* 3D Effect */}
-                <div
-                  className="absolute inset-0 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300 -z-10"
-                  style={{
-                    background: `linear-gradient(135deg,
-                      rgba(6, 182, 212, 0.6) 0%,
-                      rgba(34, 211, 238, 0.6) 100%)`
-                  }}
-                ></div>
+                {!isPerformanceMode && (
+                  <div
+                    className="absolute inset-0 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300 -z-10"
+                    style={{
+                      background: `linear-gradient(135deg,
+                        rgba(6, 182, 212, 0.6) 0%,
+                        rgba(34, 211, 238, 0.6) 100%)`
+                    }}
+                  ></div>
+                )}
               </button>
             </div>
 
@@ -327,7 +361,7 @@ const FastingProgressionTab: React.FC = () => {
                   rgba(6, 182, 212, 0.1) 0%,
                   transparent 70%)`,
                 border: '1px solid rgba(6, 182, 212, 0.2)',
-                boxShadow: `0 0 15px rgba(6, 182, 212, 0.1)`
+                boxShadow: isPerformanceMode ? 'none' : `0 0 15px rgba(6, 182, 212, 0.1)`
               }}
             >
               <div className="flex items-center justify-center gap-2">
@@ -336,7 +370,7 @@ const FastingProgressionTab: React.FC = () => {
                   size={16}
                   className="text-cyan-400"
                   style={{
-                    filter: `drop-shadow(0 0 6px rgba(6, 182, 212, 0.6))`
+                    filter: isPerformanceMode ? 'none' : `drop-shadow(0 0 6px rgba(6, 182, 212, 0.6))`
                   }}
                 />
                 <span>
@@ -382,7 +416,7 @@ const FastingProgressionTab: React.FC = () => {
           )}
         </div>
       )}
-    </motion.div>
+    </MotionDiv>
   );
 };
 

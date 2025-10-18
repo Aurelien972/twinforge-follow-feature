@@ -34,8 +34,12 @@ const FastingInsightsTab: React.FC = () => {
   const { profile } = useUserStore();
   const { showModal: showExitModal } = useExitModalStore();
   const { showToast } = useToast();
+  const { isPerformanceMode } = usePerformanceMode();
   const navigate = useNavigate();
   const [selectedPeriod, setSelectedPeriod] = useState(7);
+
+  // Conditional motion component
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
   
   // Get available sessions count for the selected period
   const { data: historyData } = useFastingHistory(100, {
@@ -83,10 +87,12 @@ const FastingInsightsTab: React.FC = () => {
 
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5, ease: 'easeOut' }
+      })}
       className="space-y-6"
     >
       {/* Period Selector */}
@@ -384,7 +390,7 @@ const FastingInsightsTab: React.FC = () => {
           </div>
         </GlassCard>
       )}
-    </motion.div>
+    </MotionDiv>
   );
 };
 
