@@ -105,7 +105,7 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
   return (
     <div className="dynamic-activity-cta activity-capture-enter">
       <GlassCard
-        className="p-6 md:p-8 text-center relative overflow-hidden cursor-pointer activity-card-base"
+        className="p-6 md:p-8 pb-8 md:pb-10 text-center relative overflow-hidden cursor-pointer activity-card-base"
         onClick={handleActivityInput}
         interactive
         style={cardStyles}
@@ -212,26 +212,6 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
             )}
           </div>
 
-          {contextualMetrics.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
-              {contextualMetrics.map((metric, index) => (
-                <div
-                  key={index}
-                  className="px-3 py-1.5 rounded-full metric-badge-enter"
-                  style={{
-                    background: `color-mix(in srgb, #3B82F6 15%, transparent)`,
-                    border: `1px solid color-mix(in srgb, #3B82F6 25%, transparent)`,
-                    color: '#3B82F6',
-                    backdropFilter: 'blur(8px) saturate(120%)',
-                    animationDelay: `${index * 0.1}s`
-                  }}
-                >
-                  <span className="font-medium">{metric}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -324,6 +304,27 @@ const DynamicActivityCTA: React.FC<ActivityCTAProps> = ({ todayStats, profile })
               </motion.button>
             )}
           </motion.div>
+
+          {/* Métriques Contextuelles - Placées après les boutons */}
+          {contextualMetrics.length > 0 && (
+            <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
+              {contextualMetrics.map((metric, index) => (
+                <div
+                  key={index}
+                  className="px-3 py-1.5 rounded-full metric-badge-enter"
+                  style={{
+                    background: `color-mix(in srgb, #3B82F6 15%, transparent)`,
+                    border: `1px solid color-mix(in srgb, #3B82F6 25%, transparent)`,
+                    color: '#3B82F6',
+                    backdropFilter: 'blur(8px) saturate(120%)',
+                    animationDelay: `${index * 0.1}s`
+                  }}
+                >
+                  <span className="font-medium">{metric}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </GlassCard>
     </div>

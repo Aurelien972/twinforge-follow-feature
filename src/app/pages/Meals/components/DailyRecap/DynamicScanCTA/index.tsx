@@ -101,7 +101,7 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
   return (
     <div className="dynamic-scan-cta meal-capture-enter">
       <GlassCard
-        className="p-6 md:p-8 text-center relative overflow-hidden cursor-pointer"
+        className="p-6 md:p-8 pb-8 md:pb-10 text-center relative overflow-hidden cursor-pointer"
         onClick={handleScanMeal}
         interactive
         style={cardStyles}
@@ -210,7 +210,7 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
             <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-md mx-auto">
               {message.subtitle}
             </p>
-            
+
             {/* Encouragement contextuel */}
             {message.encouragement && (
               <p className="text-white/60 text-sm italic">
@@ -219,28 +219,7 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
             )}
           </div>
 
-          {/* Métriques Contextuelles */}
-          {contextualMetrics.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
-              {contextualMetrics.map((metric, index) => (
-                <div
-                  key={index}
-                  className="px-3 py-1.5 rounded-full metric-badge-enter"
-                  style={{
-                    background: `color-mix(in srgb, ${urgencyConfig.color} 15%, transparent)`,
-                    border: `1px solid color-mix(in srgb, ${urgencyConfig.color} 25%, transparent)`,
-                    color: urgencyConfig.color,
-                    ...(isPerformanceMode ? {} : { backdropFilter: 'blur(8px) saturate(120%)' }),
-                    animationDelay: `${index * 0.1}s`
-                  }}
-                >
-                  <span className="font-medium">{metric}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Bouton Principal Dynamique */}
+          {/* Bouton Principal Dynamique - Placé avant les métriques */}
           <div className="flex justify-center">
             <button
               onClick={handleScanMeal}
@@ -250,10 +229,10 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
               style={buttonStyles}
             >
               <div className="flex items-center justify-center gap-3">
-                <SpatialIcon 
-                  Icon={ICONS[urgencyConfig.icon as keyof typeof ICONS]} 
-                  size={24} 
-                  className="text-white" 
+                <SpatialIcon
+                  Icon={ICONS[urgencyConfig.icon as keyof typeof ICONS]}
+                  size={24}
+                  className="text-white"
                 />
                 <span>{message.buttonText}</span>
               </div>
@@ -273,6 +252,27 @@ const DynamicScanCTA: React.FC<DynamicScanCTAProps> = ({
               )}
             </button>
           </div>
+
+          {/* Métriques Contextuelles - Placées après le bouton */}
+          {contextualMetrics.length > 0 && (
+            <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
+              {contextualMetrics.map((metric, index) => (
+                <div
+                  key={index}
+                  className="px-3 py-1.5 rounded-full metric-badge-enter"
+                  style={{
+                    background: `color-mix(in srgb, ${urgencyConfig.color} 15%, transparent)`,
+                    border: `1px solid color-mix(in srgb, ${urgencyConfig.color} 25%, transparent)`,
+                    color: urgencyConfig.color,
+                    ...(isPerformanceMode ? {} : { backdropFilter: 'blur(8px) saturate(120%)' }),
+                    animationDelay: `${index * 0.1}s`
+                  }}
+                >
+                  <span className="font-medium">{metric}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </GlassCard>
     </div>
