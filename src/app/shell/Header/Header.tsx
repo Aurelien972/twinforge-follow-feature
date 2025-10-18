@@ -1,6 +1,7 @@
 // src/app/shell/Header/Header.tsx
 import React from 'react';
 import { motion } from 'framer-motion';
+import { OptimizedMotion } from '../../../lib/motion/OptimizedMotion';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import { useShell } from '../../../ui/shell/useShell';
@@ -54,7 +55,8 @@ export const Header = React.memo(() => {
           {/* Right */}
           <div className="flex items-center gap-2 md:gap-3">
             {/* Bouton Zap - Outils du Forgeron */}
-            <motion.button
+            <OptimizedMotion
+              as="button"
               type="button"
               className="user-panel-toggle relative central-action-button"
               style={{
@@ -166,10 +168,11 @@ export const Header = React.memo(() => {
                 }}
                 aria-hidden="true"
               />
-            </motion.button>
+            </OptimizedMotion>
 
             {/* Bouton Hamburger - Menu de navigation - MASQUÉ sur desktop */}
-            <motion.button
+            <OptimizedMotion
+              as="button"
               type="button"
               className="user-panel-toggle relative lg:hidden"
               style={{
@@ -253,7 +256,7 @@ export const Header = React.memo(() => {
                 }}
                 aria-hidden="true"
               />
-            </motion.button>
+            </OptimizedMotion>
           </div>
         </div>
       </header>

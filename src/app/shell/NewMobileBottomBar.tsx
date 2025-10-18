@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { OptimizedMotion } from '../../lib/motion/OptimizedMotion';
 import SpatialIcon from '../../ui/icons/SpatialIcon';
 import { ICONS } from '../../ui/icons/registry';
 import { useFeedback } from '../../hooks/useFeedback';
@@ -84,7 +84,8 @@ function BarButton({
   const iconSize = 20;
 
   return (
-    <motion.button
+    <OptimizedMotion
+      as="button"
       onClick={handleClick}
       className="new-bottom-bar-button"
       style={{
@@ -108,7 +109,7 @@ function BarButton({
       <div className={`new-bottom-bar-label ${active ? 'new-bottom-bar-label--active' : ''}`}>
         {button.label}
       </div>
-    </motion.button>
+    </OptimizedMotion>
   );
 }
 
