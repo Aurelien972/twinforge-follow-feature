@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
-import { usePreferredMotion } from '../../../../../system/device/DeviceProvider';
+import { useActivityPerformance } from '../../hooks/useActivityPerformance';
+import { ConditionalMotionActivity } from '../shared/ConditionalMotionActivity';
 import React from 'react';
 
 interface ActivityDistribution {
@@ -46,78 +46,6 @@ function getPeriodDisplayLabel(period: 'week' | 'month' | 'quarter'): string {
   }
 }
 
-/**
- * Custom Tooltip pour les graphiques d'activité
- */
-const CustomTooltip: React.FC<{ active?: boolean; payload?: any; label?: string }> = ({ 
-  active, 
-  payload, 
-  label 
-}) => {
-  if (!active || !payload || !payload.length) return null;
-
-  const data = payload[0].payload;
-
-  return (
-    <div
-      className="p-4 rounded-xl border backdrop-blur-xl"
-      style={{
-        background: `
-          radial-gradient(circle at 30% 20%, color-mix(in srgb, ${data.color} 15%, transparent) 0%, transparent 60%),
-          rgba(11, 14, 23, 0.95)
-        `,
-        borderColor: `color-mix(in srgb, ${data.color} 30%, transparent)`,
-        boxShadow: `0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px color-mix(in srgb, ${data.color} 20%, transparent)`
-      }}
-    >
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <div
-            className="w-3 h-3 rounded-full"
-            style={{ backgroundColor: data.color }}
-          />
-          <span className="text-white font-semibold text-sm">{data.name}</span>
-        </div>
-        <div className="text-white/80 text-sm">
-          <div>{data.percentage}% ({data.total_minutes || data.sessions_count || data.activity_count})</div>
-          <div className="text-white/60 text-xs">
-            {data.total_calories ? `${data.total_calories} kcal` : 
-             data.avg_calories ? `${data.avg_calories} kcal moy.` : 
-             `${data.sessions_count || data.activity_count} sessions`}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/**
- * Custom Legend pour les graphiques d'activité
- */
-const CustomLegend: React.FC<{ payload?: any }> = ({ payload }) => {
-  return (
-    <div className="flex justify-center gap-6 mt-4 flex-wrap">
-      {payload?.map((entry: any, index: number) => (
-        <motion.div
-          key={index}
-          className="flex items-center gap-2"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: index * 0.1 }}
-        >
-          <div
-            className="w-3 h-3 rounded-full"
-            style={{
-              backgroundColor: entry.color,
-              boxShadow: `0 0 8px color-mix(in srgb, ${entry.color} 60%, transparent)`
-            }}
-          />
-          <span className="text-white/80 text-sm font-medium">{entry.value}</span>
-        </motion.div>
-      ))}
-    </div>
-  );
-};
 
 /**
  * Activity Distribution Chart - Graphique de Distribution des Activités
@@ -129,7 +57,7 @@ const ActivityDistributionChart: React.FC<ActivityDistributionChartProps> = ({
   period,
   apiPeriod
 }) => {
-  const reduceMotion = usePreferredMotion() === 'reduced';
+  const perf = useActivityPerformance();
   
   // Early return if no data is available
   if (!data || !data.activity_types || data.activity_types.length === 0) {
@@ -260,18 +188,49 @@ const ActivityDistributionChart: React.FC<ActivityDistributionChartProps> = ({
             </h4>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {data.activity_types.map((activity, index) => (
-                <motion.div
+              {data.activity_types.slice(0, perf.mode === 'low' ? 3 : perf.mode === 'medium' ? 5 : data.activity_types.length).map((activity, index) => (
+                <ConditionalMotionActivity
                   key={activity.name}
                   className="text-center p-4 rounded-xl"
                   style={{
                     background: `color-mix(in srgb, ${activity.color} 8%, transparent)`,
-                    border: `1px solid color-mix(in srgb, ${activity.color} 20%, transparent)`,
-                    animationDelay: `${0.6 + index * 0.1}s`
+                    border: `1px solid color-mix(in srgb, ${activity.color} 20%, transparent)`
                   }}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  transition={{ duration: perf.transitionDuration, delay: index * perf.staggerDelay }}
+                  fallback={
+                    <div
+                      className="text-center p-4 rounded-xl"
+                      style={{
+                        background: `color-mix(in srgb, ${activity.color} 8%, transparent)`,
+                        border: `1px solid color-mix(in srgb, ${activity.color} 20%, transparent)`
+                      }}
+                    >
+                      <div className="flex items-center justify-center gap-1 mb-2">
+                        <div
+                          className="w-6 h-6 rounded-full flex items-center justify-center"
+                          style={{
+                            background: `color-mix(in srgb, ${activity.color} 15%, transparent)`,
+                            border: `1px solid color-mix(in srgb, ${activity.color} 25%, transparent)`
+                          }}
+                        >
+                          <SpatialIcon
+                            Icon={ICONS.Activity}
+                            size={12}
+                            style={{ color: activity.color }}
+                          />
+                        </div>
+                      </div>
+                      <div className="text-lg font-bold" style={{ color: activity.color }}>
+                        {activity.percentage}%
+                      </div>
+                      <div className="text-sm font-medium text-white">{activity.name}</div>
+                      <div className="text-xs text-white/60 mt-1">
+                        {activity.total_minutes} min • {activity.total_calories} kcal
+                      </div>
+                    </div>
+                  }
                 >
                   <div className="flex items-center justify-center gap-1 mb-2">
                     <div
@@ -295,7 +254,7 @@ const ActivityDistributionChart: React.FC<ActivityDistributionChartProps> = ({
                   <div className="text-xs text-white/60 mt-1">
                     {activity.total_minutes} min • {activity.total_calories} kcal
                   </div>
-                </motion.div>
+                </ConditionalMotionActivity>
               ))}
             </div>
           </div>
@@ -311,7 +270,7 @@ const ActivityDistributionChart: React.FC<ActivityDistributionChartProps> = ({
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {data.intensity_levels.map((intensity, index) => (
-                <motion.div
+                <ConditionalMotionActivity
                   key={intensity.level}
                   className="text-center p-4 rounded-xl"
                   style={{
@@ -320,7 +279,24 @@ const ActivityDistributionChart: React.FC<ActivityDistributionChartProps> = ({
                   }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                  transition={{ duration: perf.transitionDuration, delay: index * perf.staggerDelay }}
+                  fallback={
+                    <div
+                      className="text-center p-4 rounded-xl"
+                      style={{
+                        background: `color-mix(in srgb, ${intensity.color} 8%, transparent)`,
+                        border: `1px solid color-mix(in srgb, ${intensity.color} 20%, transparent)`
+                      }}
+                    >
+                      <div className="text-xl font-bold" style={{ color: intensity.color }}>
+                        {intensity.percentage}%
+                      </div>
+                      <div className="text-sm font-medium text-white">{intensity.level}</div>
+                      <div className="text-xs text-white/60 mt-1">
+                        {intensity.sessions_count} sessions
+                      </div>
+                    </div>
+                  }
                 >
                   <div className="text-xl font-bold" style={{ color: intensity.color }}>
                     {intensity.percentage}%
@@ -329,7 +305,7 @@ const ActivityDistributionChart: React.FC<ActivityDistributionChartProps> = ({
                   <div className="text-xs text-white/60 mt-1">
                     {intensity.sessions_count} sessions
                   </div>
-                </motion.div>
+                </ConditionalMotionActivity>
               ))}
             </div>
           </div>
@@ -345,7 +321,7 @@ const ActivityDistributionChart: React.FC<ActivityDistributionChartProps> = ({
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {data.time_patterns.map((pattern, index) => (
-                <motion.div
+                <ConditionalMotionActivity
                   key={pattern.period}
                   className="text-center p-4 rounded-xl"
                   style={{
@@ -354,7 +330,24 @@ const ActivityDistributionChart: React.FC<ActivityDistributionChartProps> = ({
                   }}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
+                  transition={{ duration: perf.transitionDuration, delay: index * perf.staggerDelay }}
+                  fallback={
+                    <div
+                      className="text-center p-4 rounded-xl"
+                      style={{
+                        background: `color-mix(in srgb, ${pattern.color} 8%, transparent)`,
+                        border: `1px solid color-mix(in srgb, ${pattern.color} 20%, transparent)`
+                      }}
+                    >
+                      <div className="text-lg font-bold" style={{ color: pattern.color }}>
+                        {pattern.activity_count}
+                      </div>
+                      <div className="text-sm font-medium text-white">{pattern.period}</div>
+                      <div className="text-xs text-white/60 mt-1">
+                        {pattern.avg_calories} kcal moy.
+                      </div>
+                    </div>
+                  }
                 >
                   <div className="text-lg font-bold" style={{ color: pattern.color }}>
                     {pattern.activity_count}
@@ -363,7 +356,7 @@ const ActivityDistributionChart: React.FC<ActivityDistributionChartProps> = ({
                   <div className="text-xs text-white/60 mt-1">
                     {pattern.avg_calories} kcal moy.
                   </div>
-                </motion.div>
+                </ConditionalMotionActivity>
               ))}
             </div>
           </div>

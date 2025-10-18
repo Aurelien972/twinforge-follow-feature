@@ -1,9 +1,10 @@
-import { motion } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import GlassCard from '../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../ui/icons/registry';
+import { useActivityPerformance } from '../../hooks/useActivityPerformance';
+import { ConditionalMotionActivity } from '../shared/ConditionalMotionActivity';
 import React from 'react';
 
 interface Activity {
@@ -73,13 +74,22 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
   period,
   apiPeriod
 }) => {
+  const perf = useActivityPerformance();
   // Guard against undefined activities
   const safeActivities = activities || [];
 
   // Process activities data to create heatmap structure
   const processActivitiesData = () => {
     const today = new Date();
-    const daysToShow = getDaysToShow(period);
+    let daysToShow = getDaysToShow(period);
+
+    // Limiter les jours en fonction du mode performance
+    if (perf.mode === 'low') {
+      daysToShow = Math.min(daysToShow, 14); // Max 14 jours en low
+    } else if (perf.mode === 'medium') {
+      daysToShow = Math.min(daysToShow, 30); // Max 30 jours en medium
+    }
+
     const startDate = new Date(today);
     startDate.setDate(today.getDate() - daysToShow + 1);
 
@@ -259,7 +269,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="grid grid-cols-7 gap-2">
                 {week.map((day, dayIndex) => (
-                  <motion.div
+                  <ConditionalMotionActivity
                     key={day.date}
                     className="aspect-square rounded-lg border cursor-pointer group relative overflow-hidden min-w-0"
                     style={{
@@ -272,15 +282,47 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{
-                      duration: 0.3,
-                      delay: (weekIndex * 7 + dayIndex) * 0.02
+                      duration: perf.transitionDuration,
+                      delay: (weekIndex * 7 + dayIndex) * perf.staggerDelay
                     }}
-                    whileHover={{
+                    whileHover={perf.mode !== 'low' ? {
                       scale: 1.1,
                       zIndex: 10,
                       transition: { duration: 0.2 }
-                    }}
+                    } : undefined}
                     title={`${day.dayName} ${day.dayNumber} ${day.monthName} - ${day.calories} kcal (${day.activitiesCount} activités, ${day.duration} min)`}
+                    fallback={
+                      <div
+                        className="aspect-square rounded-lg border cursor-pointer group relative overflow-hidden min-w-0"
+                        style={{
+                          backgroundColor: getStatusColor(day.status, day.intensity),
+                          borderColor: day.status !== 'none' ?
+                            `color-mix(in srgb, ${getStatusColor(day.status, 1)} 40%, transparent)` :
+                            'rgba(255, 255, 255, 0.1)',
+                          backdropFilter: 'blur(4px) saturate(120%)'
+                        }}
+                        title={`${day.dayName} ${day.dayNumber} ${day.monthName} - ${day.calories} kcal (${day.activitiesCount} activités, ${day.duration} min)`}
+                      >
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-0.5">
+                          <div className="text-white text-xs font-bold leading-none">
+                            {day.dayNumber}
+                          </div>
+                          {day.activitiesCount > 0 && (
+                            <div className="text-white/80 text-xxs leading-none mt-0.5">
+                              {day.activitiesCount}
+                            </div>
+                          )}
+                        </div>
+                        {perf.mode !== 'low' && (
+                          <div
+                            className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-30 transition-opacity duration-200"
+                            style={{
+                              background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)'
+                            }}
+                          />
+                        )}
+                      </div>
+                    }
                   >
                     {/* Contenu de la cellule */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-0.5">
@@ -295,13 +337,15 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
                     </div>
 
                     {/* Effet de brillance au hover */}
-                    <div
-                      className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-30 transition-opacity duration-200"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)'
-                      }}
-                    />
-                  </motion.div>
+                    {perf.mode !== 'low' && (
+                      <div
+                        className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-30 transition-opacity duration-200"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)'
+                        }}
+                      />
+                    )}
+                  </ConditionalMotionActivity>
                 ))}
               </div>
             ))}
