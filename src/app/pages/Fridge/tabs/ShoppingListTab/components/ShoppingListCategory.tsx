@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 import ShoppingListItem from './ShoppingListItem';
 import logger from '../../../../../../lib/utils/logger';
 
@@ -23,6 +24,9 @@ const ShoppingListCategory: React.FC<ShoppingListCategoryProps> = ({
   onToggleItem,
   index
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   logger.debug('ShoppingListCategory rendering', {
     categoryName: category.category,
     itemsCount: category.items?.length || 0,
@@ -35,10 +39,12 @@ const ShoppingListCategory: React.FC<ShoppingListCategoryProps> = ({
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: index * 0.1 }
+      })}
       className="mb-6"
     >
       <div className="flex items-center justify-between mb-3">
@@ -66,7 +72,7 @@ const ShoppingListCategory: React.FC<ShoppingListCategoryProps> = ({
           );
         })}
       </div>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

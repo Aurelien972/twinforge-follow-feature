@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
 import { useFeedback } from '../../../../hooks/useFeedback';
@@ -52,6 +53,7 @@ const ReviewEditStage: React.FC<ReviewEditStageProps> = ({
   const { click } = useFeedback();
   const { showToast } = useToast();
   const { saveRecipeSession } = useFridgeScanPipeline();
+  const { isPerformanceMode } = usePerformanceMode();
 
   // Function to scroll to the action buttons
   const scrollToActions = () => {
@@ -246,8 +248,9 @@ const ReviewEditStage: React.FC<ReviewEditStageProps> = ({
 
       {/* Liste des Ingrédients */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <AnimatePresence>
-          {filteredInventory.map((item, index) => (
+        {isPerformanceMode ? (
+          // Version simplifiée sans AnimatePresence pour performance mode
+          filteredInventory.map((item, index) => (
             <InventoryItem
               key={item.id}
               item={item}
@@ -258,8 +261,24 @@ const ReviewEditStage: React.FC<ReviewEditStageProps> = ({
               onStartEdit={setEditingItem}
               onStopEdit={() => setEditingItem(null)}
             />
-          ))}
-        </AnimatePresence>
+          ))
+        ) : (
+          // Version animée pour desktop/performance normale
+          <AnimatePresence>
+            {filteredInventory.map((item, index) => (
+              <InventoryItem
+                key={item.id}
+                item={item}
+                index={index}
+                isEditing={editingItem === item.id}
+                onEdit={handleItemEdit}
+                onRemove={handleRemoveItem}
+                onStartEdit={setEditingItem}
+                onStopEdit={() => setEditingItem(null)}
+              />
+            ))}
+          </AnimatePresence>
+        )}
       </div>
 
       {/* Suggested Items Card - Collapsible and relocated */}

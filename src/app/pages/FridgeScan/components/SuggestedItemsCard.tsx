@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { usePerformanceMode } from '../../../../system/context/PerformanceModeContext';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -17,6 +18,7 @@ export const SuggestedItemsCard: React.FC<SuggestedItemsCardProps> = ({
   onSelectionChange
 }) => {
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+  const { isPerformanceMode } = usePerformanceMode();
 
   const toggleItem = (index: number) => {
     const newSelected = new Set(selectedItems);
@@ -132,7 +134,7 @@ export const SuggestedItemsCard: React.FC<SuggestedItemsCardProps> = ({
           {suggestedItems.map((item, index) => (
             <GlassCard
               key={item.id}
-              className={`no-scale-hover flex items-center gap-3 p-2 transition-all cursor-pointer ${
+              className={`no-scale-hover flex items-center gap-3 p-2 ${!isPerformanceMode ? 'transition-all' : ''} cursor-pointer ${
                 selectedItems.has(index)
                   ? 'ring-2 ring-blue-400/50 bg-blue-50/5'
                   : ''
@@ -176,13 +178,13 @@ export const SuggestedItemsCard: React.FC<SuggestedItemsCardProps> = ({
       <div className="flex items-center justify-center gap-4 mb-4">
         <button
           onClick={selectAllItems}
-          className="px-3 py-2 text-sm text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg"
+          className={`px-3 py-2 text-sm text-white/70 hover:text-white ${!isPerformanceMode ? 'transition-colors' : ''} bg-white/10 rounded-lg`}
         >
           Tout sélectionner
         </button>
         <button
           onClick={deselectAllItems}
-          className="px-3 py-2 text-sm text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg"
+          className={`px-3 py-2 text-sm text-white/70 hover:text-white ${!isPerformanceMode ? 'transition-colors' : ''} bg-white/10 rounded-lg`}
         >
           Tout désélectionner
         </button>

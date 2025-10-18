@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
 import { cssSupports } from './shoppingListUtils';
@@ -24,6 +25,9 @@ const ShoppingListItem: React.FC<ShoppingListItemProps> = ({
   onToggle,
   index
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   logger.debug('ShoppingListItem rendering', {
     itemName: item.name,
     itemKey,
@@ -32,12 +36,14 @@ const ShoppingListItem: React.FC<ShoppingListItemProps> = ({
   });
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 10 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: index * 0.05 },
+        whileHover: { scale: 1.01 },
+        whileTap: { scale: 0.99 }
+      })}
       className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-300 ${
         isChecked 
           ? 'bg-green-500/20 border border-green-500/40 shadow-lg' 
@@ -104,7 +110,7 @@ const ShoppingListItem: React.FC<ShoppingListItemProps> = ({
           )}
         </div>
       </div>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

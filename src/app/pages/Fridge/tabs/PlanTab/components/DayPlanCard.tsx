@@ -391,6 +391,9 @@ const DayPlanCard: React.FC<DayPlanCardProps> = ({
   onGenerateDetailedRecipe,
   onGenerateAllDetailedRecipesForDay
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   // Show skeleton if day is loading
   if (day.status === 'loading') {
     return <DayPlanSkeleton dayName={day.dayName} date={day.date} index={index} />;
@@ -406,7 +409,7 @@ const DayPlanCard: React.FC<DayPlanCardProps> = ({
       date: day.date,
       hasFunction: !!onGenerateAllDetailedRecipesForDay
     });
-    
+
     if (onGenerateAllDetailedRecipesForDay) {
       console.log('🚀 CALLING onGenerateAllDetailedRecipesForDay with dayIndex:', index);
       onGenerateAllDetailedRecipesForDay(index);
@@ -416,10 +419,12 @@ const DayPlanCard: React.FC<DayPlanCardProps> = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        transition: { duration: 0.4, delay: index * 0.05 }
+      })}
       className="relative group"
     >
       <GlassCard
@@ -647,7 +652,7 @@ const DayPlanCard: React.FC<DayPlanCardProps> = ({
           </button>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

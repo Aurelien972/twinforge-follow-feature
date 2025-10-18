@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
@@ -9,12 +10,17 @@ import { ICONS } from '../../../../../../ui/icons/registry';
  * Displays during recipe generation process with spinning animation
  */
 const RecipeGenerationLoader: React.FC = () => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -20 },
+        transition: { duration: 0.5 }
+      })}
       className="mb-6"
     >
       <GlassCard
@@ -85,19 +91,21 @@ const RecipeGenerationLoader: React.FC = () => {
           {/* Animated Dots */}
           <div className="flex justify-center gap-2">
             {[0, 1, 2].map((index) => (
-              <motion.div
+              <MotionDiv
                 key={index}
-                className="w-3 h-3 bg-white/80 rounded-full"
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.5, 1, 0.5]
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  delay: index * 0.2,
-                  ease: "easeInOut"
-                }}
+                className={`w-3 h-3 bg-white/80 rounded-full ${isPerformanceMode ? 'animate-pulse' : ''}`}
+                {...(!isPerformanceMode && {
+                  animate: {
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 1, 0.5]
+                  },
+                  transition: {
+                    duration: 1.5,
+                    repeat: Infinity,
+                    delay: index * 0.2,
+                    ease: "easeInOut"
+                  }
+                })}
               />
             ))}
           </div>
@@ -115,23 +123,25 @@ const RecipeGenerationLoader: React.FC = () => {
             
             {/* Animated Progress Bar */}
             <div className="w-full max-w-xs mx-auto h-2 bg-white/10 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full"
-                animate={{
-                  x: ['-100%', '100%']
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
+              <MotionDiv
+                className={`h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full ${isPerformanceMode ? 'animate-pulse' : ''}`}
+                {...(!isPerformanceMode && {
+                  animate: {
+                    x: ['-100%', '100%']
+                  },
+                  transition: {
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }
+                })}
                 style={{ width: '50%' }}
               />
             </div>
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

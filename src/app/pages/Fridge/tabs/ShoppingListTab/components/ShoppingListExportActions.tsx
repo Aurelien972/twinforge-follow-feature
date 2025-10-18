@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
@@ -15,6 +16,8 @@ export interface ShoppingListExportActionsProps {
  * Shopping List Export Actions Component
  */
 const ShoppingListExportActions: React.FC<ShoppingListExportActionsProps> = ({ shoppingList }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionButton = isPerformanceMode ? 'button' : motion.button;
   const handleExportPdf = () => {
     logger.info('PDF export requested', { shoppingListId: shoppingList.id });
     
@@ -122,22 +125,26 @@ const ShoppingListExportActions: React.FC<ShoppingListExportActionsProps> = ({ s
             <span className="text-white/80 text-base font-medium">Exporter votre liste</span>
           </div>
           <div className="flex gap-2">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <MotionButton
+              {...(!isPerformanceMode && {
+                whileHover: { scale: 1.05 },
+                whileTap: { scale: 0.95 }
+              })}
               onClick={handleExportPdf}
-              className="px-2 py-1 bg-white/10 hover:bg-orange-500/20 rounded-lg text-white/70 hover:text-orange-200 transition-all duration-300 text-xs border border-white/20 hover:border-orange-400/30"
+              className={`px-2 py-1 bg-white/10 hover:bg-orange-500/20 rounded-lg text-white/70 hover:text-orange-200 ${!isPerformanceMode ? 'transition-all duration-300' : ''} text-xs border border-white/20 hover:border-orange-400/30`}
             >
               PDF
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            </MotionButton>
+            <MotionButton
+              {...(!isPerformanceMode && {
+                whileHover: { scale: 1.05 },
+                whileTap: { scale: 0.95 }
+              })}
               onClick={handleExportText}
-              className="px-2 py-1 bg-white/10 hover:bg-orange-500/20 rounded-lg text-white/70 hover:text-orange-200 transition-all duration-300 text-xs border border-white/20 hover:border-orange-400/30"
+              className={`px-2 py-1 bg-white/10 hover:bg-orange-500/20 rounded-lg text-white/70 hover:text-orange-200 ${!isPerformanceMode ? 'transition-all duration-300' : ''} text-xs border border-white/20 hover:border-orange-400/30`}
             >
               Texte
-            </motion.button>
+            </MotionButton>
           </div>
         </div>
       </div>

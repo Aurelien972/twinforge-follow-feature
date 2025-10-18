@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
@@ -19,8 +20,11 @@ const ShoppingListMainLoader: React.FC<ShoppingListMainLoaderProps> = ({
   currentLoadingSubtitle,
   simulatedProgressPercentage
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   return (
-    <GlassCard 
+    <GlassCard
       className="border-orange-500/30"
       style={{
         background: `
@@ -41,10 +45,12 @@ const ShoppingListMainLoader: React.FC<ShoppingListMainLoaderProps> = ({
         {/* Animated Icon */}
         <div className="relative">
           <div className="absolute inset-0 w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-orange-400/50 to-orange-600/30 blur-xl"></div>
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="relative w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-2xl"
+          <MotionDiv
+            {...(!isPerformanceMode && {
+              animate: { rotate: 360 },
+              transition: { duration: 2, repeat: Infinity, ease: "linear" }
+            })}
+            className={`relative w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-2xl ${isPerformanceMode ? 'animate-spin' : ''}`}
             style={{
               background: `
                 radial-gradient(circle at 30% 30%, rgba(251, 146, 60, 0.6) 0%, rgba(249, 115, 22, 0.4) 40%, rgba(234, 88, 12, 0.2) 100%)
@@ -61,14 +67,16 @@ const ShoppingListMainLoader: React.FC<ShoppingListMainLoaderProps> = ({
           >
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-300/30 to-transparent blur-sm"></div>
             <SpatialIcon Icon={ICONS.ShoppingCart} size={32} className="relative text-orange-100 drop-shadow-2xl" />
-          </motion.div>
-          
+          </MotionDiv>
+
           {/* Pulsing Ring */}
-          <motion.div
-            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="absolute inset-0 w-20 h-20 mx-auto rounded-full border-2 border-orange-500/50"
-          />
+          {!isPerformanceMode && (
+            <MotionDiv
+              animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute inset-0 w-20 h-20 mx-auto rounded-full border-2 border-orange-500/50"
+            />
+          )}
         </div>
 
         {/* Progress Info */}
@@ -84,11 +92,14 @@ const ShoppingListMainLoader: React.FC<ShoppingListMainLoaderProps> = ({
         {/* Progress Bar */}
         <div className="space-y-2">
           <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-            <motion.div
+            <MotionDiv
               className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full shadow-lg"
-              initial={{ width: 0 }}
-              animate={{ width: `${simulatedProgressPercentage}%` }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              {...(!isPerformanceMode && {
+                initial: { width: 0 },
+                animate: { width: `${simulatedProgressPercentage}%` },
+                transition: { duration: 0.5, ease: "easeOut" }
+              })}
+              style={isPerformanceMode ? { width: `${simulatedProgressPercentage}%` } : undefined}
             />
           </div>
           <span className="text-orange-200 text-sm font-semibold">{Math.round(simulatedProgressPercentage)}%</span>

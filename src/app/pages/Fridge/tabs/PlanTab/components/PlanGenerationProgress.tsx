@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { usePerformanceMode } from '../../../../../../system/context/PerformanceModeContext';
 import GlassCard from '../../../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../../../ui/icons/registry';
@@ -25,11 +26,16 @@ const PlanGenerationProgress: React.FC<PlanGenerationProgressProps> = ({
   currentLoadingTitle,
   currentLoadingSubtitle
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5 }
+      })}
     >
       <GlassCard 
         className="p-8 text-center"
@@ -49,8 +55,8 @@ const PlanGenerationProgress: React.FC<PlanGenerationProgressProps> = ({
       >
         <div className="space-y-6">
           {/* Icône de Génération */}
-          <motion.div
-            className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
+          <MotionDiv
+            className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${isPerformanceMode ? 'animate-pulse' : ''}`}
             style={{
               background: `
                 radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
@@ -59,53 +65,61 @@ const PlanGenerationProgress: React.FC<PlanGenerationProgressProps> = ({
               border: '2px solid color-mix(in srgb, #8B5CF6 50%, transparent)',
               boxShadow: '0 0 30px color-mix(in srgb, #8B5CF6 40%, transparent)'
             }}
-            animate={{ 
-              scale: [1, 1.05, 1],
-              opacity: [0.8, 1, 0.8]
-            }}
-            transition={{ 
-              duration: 2, 
-              repeat: Infinity 
-            }}
+            {...(!isPerformanceMode && {
+              animate: {
+                scale: [1, 1.05, 1],
+                opacity: [0.8, 1, 0.8]
+              },
+              transition: {
+                duration: 2,
+                repeat: Infinity
+              }
+            })}
           >
             <SpatialIcon Icon={ICONS.Calendar} size={40} style={{ color: '#8B5CF6' }} />
-          </motion.div>
+          </MotionDiv>
 
           {/* Titre et Message */}
           <div>
-            <motion.h3 
+            <MotionDiv
               className="text-3xl font-bold text-white mb-3"
               key={currentLoadingTitle}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              {...(!isPerformanceMode && {
+                initial: { opacity: 0, y: 10 },
+                animate: { opacity: 1, y: 0 },
+                transition: { duration: 0.4 }
+              })}
               style={{
                 textShadow: '0 0 20px color-mix(in srgb, #8B5CF6 60%, transparent)'
               }}
             >
               {currentLoadingTitle || 'Génération du Plan Nutritionnel'}
-            </motion.h3>
-            
-            <motion.p 
+            </MotionDiv>
+
+            <MotionDiv
               className="text-white/90 text-xl mb-2"
               key={currentLoadingSubtitle}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
+              {...(!isPerformanceMode && {
+                initial: { opacity: 0, y: 5 },
+                animate: { opacity: 1, y: 0 },
+                transition: { duration: 0.3, delay: 0.1 }
+              })}
             >
               {currentLoadingSubtitle || 'Préparation de votre plan personnalisé'}
-            </motion.p>
-            
+            </MotionDiv>
+
             {loadingMessage && (
-              <motion.p 
+              <MotionDiv
                 className="text-white/70 text-sm"
                 key={loadingMessage}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
+                {...(!isPerformanceMode && {
+                  initial: { opacity: 0 },
+                  animate: { opacity: 1 },
+                  transition: { duration: 0.2 }
+                })}
               >
                 {loadingMessage}
-              </motion.p>
+              </MotionDiv>
             )}
           </div>
 
@@ -116,12 +130,12 @@ const PlanGenerationProgress: React.FC<PlanGenerationProgressProps> = ({
               <span>{Math.round(progress)}%</span>
             </div>
             <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
-              <motion.div
+              <MotionDiv
                 className="h-3 rounded-full relative overflow-hidden"
                 style={{
-                  background: `linear-gradient(90deg, 
-                    #8B5CF6, 
-                    #A855F7, 
+                  background: `linear-gradient(90deg,
+                    #8B5CF6,
+                    #A855F7,
                     #C084FC
                   )`,
                   boxShadow: `
@@ -130,23 +144,25 @@ const PlanGenerationProgress: React.FC<PlanGenerationProgressProps> = ({
                   `,
                   width: `${progress}%`
                 }}
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
+                {...(!isPerformanceMode && {
+                  initial: { width: 0 },
+                  animate: { width: `${progress}%` },
+                  transition: { duration: 0.3, ease: "easeOut" }
+                })}
               >
                 {/* Shimmer Effect */}
                 <div
                   className="absolute inset-0 rounded-full"
                   style={{
-                    background: `linear-gradient(90deg, 
-                      transparent 0%, 
-                      rgba(255,255,255,0.6) 50%, 
+                    background: `linear-gradient(90deg,
+                      transparent 0%,
+                      rgba(255,255,255,0.6) 50%,
                       transparent 100%
                     )`,
                     animation: 'progressShimmer 2s ease-in-out infinite'
                   }}
                 />
-              </motion.div>
+              </MotionDiv>
             </div>
           </div>
 
@@ -159,7 +175,7 @@ const PlanGenerationProgress: React.FC<PlanGenerationProgressProps> = ({
           </div>
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 
