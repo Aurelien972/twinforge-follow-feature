@@ -263,7 +263,7 @@
 }
 
 /* =========================================
-   PAGE HEADER ICONS - Simplified but functional
+   PAGE HEADER ICONS - Keep visible with simplified effects
    ========================================= */
 
 .performance-mode header .breathing-icon,
@@ -271,35 +271,34 @@
   /* Keep icon container visible */
   opacity: 1 !important;
   display: flex !important;
+  animation: none !important;
 }
 
 .performance-mode header .breathing-icon > div {
-  /* Simplified icon background - solid with subtle gradient */
-  background: linear-gradient(135deg, #1A2332 0%, #0F1927 100%) !important;
+  /* Keep inline styles but disable expensive effects */
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 
-  /* Clean Apple-like shadow - no colored glow */
+  /* Simplify shadow but KEEP background from inline styles */
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
 
-  /* Subtle border for definition */
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  /* Note: background is NOT overridden - uses inline styles */
+  /* Note: border is NOT overridden - uses inline styles */
 }
 
-/* Page header icon itself - keep visible */
+/* Page header icon itself - keep colored with reduced glow */
 .performance-mode header .spatial-icon {
-  /* Remove filters but keep icon visible */
-  filter: none !important;
+  /* Simplify drop-shadow but keep it visible */
+  filter: drop-shadow(0 0 12px currentColor) !important;
   background: transparent !important;
 
-  /* Ensure icon color is visible */
-  color: currentColor !important;
-  opacity: 0.95 !important;
+  /* Keep icon color from inline styles */
+  opacity: 1 !important;
 }
 
-/* Icon SVG elements - ensure visibility */
+/* Icon SVG elements - ensure full visibility */
 .performance-mode header .spatial-icon svg,
 .performance-mode header .spatial-icon path {
   opacity: 1 !important;
@@ -507,13 +506,23 @@
    DÉSACTIVATIONS SPÉCIFIQUES - Animations Décoratives
    ========================================= */
 
-/* BREATHING - Toutes désactivées */
+/* BREATHING - Toutes désactivées mais gardent leur visibilité */
 .performance-mode [class*="breathing"],
 .performance-mode [class*="breathe"],
 .performance-mode .guide-breathing,
 .performance-mode .breathing-icon {
   animation: none !important;
   opacity: 1 !important;
+  /* IMPORTANT: Garde tous les styles inline pour visibilité */
+  display: flex !important;
+}
+
+/* Page header icon container - TOUJOURS visible */
+.performance-mode header .breathing-icon,
+.performance-mode header .breathing-icon > div {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* PULSE COMPLEXES - Toutes désactivées */
@@ -782,14 +791,17 @@
 }
 
 /* =========================================
-   FILTERS - All removed
+   FILTERS - All removed (with exceptions)
    ========================================= */
 
-.performance-mode [style*="filter:"],
+/* Remove filters globally EXCEPT for page header icons */
+.performance-mode [style*="filter:"]:not(header .spatial-icon):not(header [class*="logo"] *),
 .performance-mode [class*="blur"],
 .performance-mode [class*="saturate"] {
   filter: none !important;
 }
+
+/* Page header spatial icon keeps simplified filter (defined above line 294) */
 
 /* =========================================
    OPACITY ANIMATIONS - Static
