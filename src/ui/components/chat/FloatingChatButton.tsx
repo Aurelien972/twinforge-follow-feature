@@ -100,28 +100,27 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
         height: isDesktop ? '60px' : '56px',
         background: hasUnreadMessages
           ? `
-              radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 30%, transparent) 0%, transparent 50%),
-              radial-gradient(circle at 70% 70%, rgba(255,255,255,0.25) 0%, transparent 60%),
+              radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 20%, transparent) 0%, transparent 50%),
+              radial-gradient(circle at 70% 70%, rgba(255,255,255,0.15) 0%, transparent 60%),
               var(--liquid-pill-bg)
             `
           : `
-              radial-gradient(circle at 30% 30%, rgba(255,255,255,0.20) 0%, transparent 50%),
+              radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18) 0%, transparent 50%),
               var(--liquid-pill-bg)
             `,
         border: hasUnreadMessages
-          ? `1.5px solid color-mix(in srgb, ${modeColor} 40%, transparent)`
-          : '1.5px solid rgba(255,255,255,0.22)',
+          ? `1.5px solid color-mix(in srgb, ${modeColor} 30%, transparent)`
+          : '1px solid rgba(255,255,255,0.2)',
         backdropFilter: 'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
         WebkitBackdropFilter: 'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
         boxShadow: hasUnreadMessages
           ? `
               var(--liquid-pill-shadow),
-              0 0 40px color-mix(in srgb, ${modeColor} 30%, transparent),
-              0 0 60px color-mix(in srgb, ${modeColor} 15%, transparent)
+              0 0 24px color-mix(in srgb, ${modeColor} 25%, transparent),
+              0 0 48px color-mix(in srgb, ${modeColor} 12%, transparent)
             `
           : `
-              var(--liquid-pill-shadow),
-              0 0 32px color-mix(in srgb, ${modeColor} 15%, transparent)
+              var(--liquid-pill-shadow)
             `,
         cursor: 'pointer',
         transition: 'right 400ms cubic-bezier(0.25, 0.1, 0.25, 1), transform var(--liquid-transition-medium), background var(--liquid-transition-fast), box-shadow var(--liquid-transition-fast), border-color var(--liquid-transition-fast)',
@@ -148,20 +147,22 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
       aria-label={isOpen ? 'Fermer le chat' : 'Ouvrir le chat'}
       aria-expanded={isOpen}
     >
-      {/* Corner highlight effect matching bottom bar pills */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '2px',
-          left: '2px',
-          right: '50%',
-          bottom: '50%',
-          borderRadius: 'inherit',
-          background: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 60%)',
-          opacity: 0.6,
-          pointerEvents: 'none'
-        }}
-      />
+      {/* Corner highlight effect matching bottom bar pills - Desktop only for performance */}
+      {isDesktop && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '2px',
+            left: '2px',
+            right: '50%',
+            bottom: '50%',
+            borderRadius: 'inherit',
+            background: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 60%)',
+            opacity: 0.6,
+            pointerEvents: 'none'
+          }}
+        />
+      )}
 
       {/* Icon with mode color */}
       <motion.div
@@ -178,10 +179,12 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
           Icon={ICONS.MessageSquare}
           size={isDesktop ? 28 : 24}
           style={{
-            color: modeColor,
+            color: hasUnreadMessages ? modeColor : 'rgba(255, 255, 255, 0.9)',
             filter: isStep2Active
-              ? `drop-shadow(0 0 16px rgba(59, 130, 246, 0.8))`
-              : `drop-shadow(0 0 14px color-mix(in srgb, ${modeColor} 60%, transparent))`
+              ? `drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))`
+              : (hasUnreadMessages
+                  ? `drop-shadow(0 0 10px color-mix(in srgb, ${modeColor} 50%, transparent))`
+                  : `drop-shadow(0 0 6px rgba(247, 147, 30, 0.3))`)
           }}
         />
       </motion.div>

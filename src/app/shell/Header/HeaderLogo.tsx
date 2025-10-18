@@ -43,6 +43,11 @@ export const HeaderLogo: React.FC = () => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           className="focus-ring rounded-lg transition-colors cursor-pointer flex items-center justify-center h-full"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            padding: 0
+          }}
           aria-label="Retour au tableau de bord"
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {

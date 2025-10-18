@@ -4,7 +4,8 @@
    ========================================= */
 
 /* Neutralize stacking context & keep containers breathable */
-:where(.space-y-6, .space-y-4, .space-y-8, .grid){
+/* CRITICAL: Exclude fixed navigation elements from neutralization */
+:where(.space-y-6, .space-y-4, .space-y-8, .grid):not(.header-liquid-glass):not(.new-mobile-bottom-bar){
   position: static;
   transform: none;
   filter: none;
@@ -82,7 +83,8 @@ button,[role="button"],.glass-card[data-interactive]{touch-action:manipulation;}
 }
 
 /* Children defaults: stay neutral (avoid clipping hover glows) */
-:where(.space-y-6, .space-y-4, .space-y-8, .grid) > *{
+/* CRITICAL: Exclude fixed navigation elements from neutralization */
+:where(.space-y-6, .space-y-4, .space-y-8, .grid) > *:not(.header-liquid-glass):not(.new-mobile-bottom-bar){
   position:static !important;
   z-index:auto !important;
   transform:none !important;

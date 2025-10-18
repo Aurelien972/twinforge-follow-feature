@@ -147,3 +147,39 @@
     right: -4px !important;
   }
 }
+
+/* ============================================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   ============================================================ */
+
+/* Mobile device optimizations - Disable heavy effects */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .floating-chat-button {
+    /* Simplified background - solid color */
+    background: rgba(255, 255, 255, 0.1) !important;
+
+    /* No blur on mobile */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    /* Simple shadow */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+
+    /* No transitions */
+    transition: none !important;
+
+    /* No will-change */
+    will-change: auto !important;
+  }
+}
+
+/* Mobile device class enforcement */
+.mobile-device .floating-chat-button,
+body.mobile-device .floating-chat-button {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  transition: none !important;
+  will-change: auto !important;
+}

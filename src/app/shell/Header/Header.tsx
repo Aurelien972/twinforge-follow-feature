@@ -27,7 +27,7 @@ export const Header = React.memo(() => {
           ...(isMobile ? {
             // Mobile: Minimal styles, position fixed enforced by CSS
             position: 'fixed',
-            top: '6px',
+            top: '4px',
             left: '8px',
             right: '8px',
             zIndex: 9999,
