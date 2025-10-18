@@ -247,8 +247,11 @@
    FOND STATIQUE PROFESSIONNEL
    Conserve l'identité visuelle sans coût GPU
    ========================================= */
+
+/* PRIORITÉ ABSOLUE : Désactiver cosmic-forge-pulse en mode performance */
+body.performance-mode .bg-twinforge-visionos,
 .performance-mode .bg-twinforge-visionos {
-  /* Multi-couches statiques avec nébuleuses subtiles */
+  /* Multi-couches statiques avec nébuleuses subtiles - FIXE */
   background:
     /* Nébuleuse chaude statique (opacité réduite pour profondeur) */
     radial-gradient(ellipse 400% 300% at 20% 80%,
@@ -263,8 +266,13 @@
     /* Gradient cosmique de base */
     radial-gradient(circle at 50% 50%, var(--forge-medium) 0%, var(--forge-deep) 40%, var(--forge-void) 100%) !important;
 
-  /* Désactiver toutes les animations */
+  /* Background size FIXE - pas d'animation */
+  background-size: 400% 300%, 350% 250%, 100% 100% !important;
+
+  /* DÉSACTIVER TOUTES ANIMATIONS - cosmic-forge-pulse inclus */
   animation: none !important;
+  animation-name: none !important;
+  animation-play-state: paused !important;
 
   /* Supprimer les optimisations GPU coûteuses */
   transform: none !important;
@@ -297,27 +305,48 @@
   mix-blend-mode: overlay;
 }
 
-/* Désactiver la distorsion thermique */
+/* Désactiver la distorsion thermique - thermal-distortion */
+body.performance-mode .bg-twinforge-visionos::before,
 .performance-mode .bg-twinforge-visionos::before {
   display: none !important;
+  animation: none !important;
+  animation-name: none !important;
+  animation-play-state: paused !important;
+  opacity: 0 !important;
 }
 
 /* =========================================
    DÉSACTIVATION COMPLÈTE DES PARTICULES
+   Ember-rise animation must be stopped
    ========================================= */
+
+/* Conteneur particules - COMPLÈTEMENT CACHÉ */
+body.performance-mode .cosmic-forge-particles,
 .performance-mode .cosmic-forge-particles {
   /* Cacher complètement le conteneur */
   display: none !important;
   opacity: 0 !important;
   visibility: hidden !important;
+  pointer-events: none !important;
 }
 
+/* Chaque particule - COMPLÈTEMENT DÉSACTIVÉE */
+body.performance-mode .forge-particle,
 .performance-mode .forge-particle {
   /* S'assurer que les particules sont complètement désactivées */
   display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+
+  /* Désactiver ember-rise animation */
   animation: none !important;
+  animation-name: none !important;
+  animation-play-state: paused !important;
+
+  /* Supprimer toute transformation */
   transform: none !important;
   will-change: auto !important;
+  pointer-events: none !important;
 }
 
 /* =========================================
