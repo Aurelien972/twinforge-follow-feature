@@ -4,6 +4,7 @@ import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import GlassCard from '@/ui/cards/GlassCard';
 import logger from '@/lib/utils/logger';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import { useFastingElapsedSeconds, useFastingProgressPercentage, useFastingTimerTick } from '../../hooks/useFastingPipeline';
 
 // Types pour la pipeline de jeûne
@@ -56,7 +57,11 @@ const FastingProgressHeaderInner: React.FC<FastingProgressHeaderProps> = ({
   targetHours,
 }) => {
   const isMobile = useIsMobile();
+  const { isPerformanceMode } = usePerformanceMode();
   const lastLoggedRef = useRef<{ step: string; progress: number } | null>(null);
+
+  // Conditional motion components
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   // Enable real-time timer updates
   useFastingTimerTick();
@@ -147,15 +152,17 @@ const FastingProgressHeaderInner: React.FC<FastingProgressHeaderProps> = ({
             rgba(11, 14, 23, 0.75)
           `,
           borderColor: `color-mix(in srgb, ${forgeColors.primary} 35%, transparent)`,
-          boxShadow: `
-            0 20px 60px rgba(0, 0, 0, 0.4),
-            0 0 40px color-mix(in srgb, ${forgeColors.primary} 20%, transparent),
-            0 0 80px color-mix(in srgb, ${forgeColors.secondary} 18%, transparent),
-            inset 0 2px 0 rgba(255, 255, 255, 0.25),
-            inset 0 -2px 0 rgba(0, 0, 0, 0.15)
-          `,
-          backdropFilter: 'blur(28px) saturate(170%)',
-          WebkitBackdropFilter: 'blur(28px) saturate(170%)'
+          boxShadow: isPerformanceMode
+            ? '0 20px 60px rgba(0, 0, 0, 0.4)'
+            : `
+              0 20px 60px rgba(0, 0, 0, 0.4),
+              0 0 40px color-mix(in srgb, ${forgeColors.primary} 20%, transparent),
+              0 0 80px color-mix(in srgb, ${forgeColors.secondary} 18%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.25),
+              inset 0 -2px 0 rgba(0, 0, 0, 0.15)
+            `,
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(28px) saturate(170%)',
+          WebkitBackdropFilter: isPerformanceMode ? 'none' : 'blur(28px) saturate(170%)'
         }}
       >
         {/* Icône + contenu — centrés verticalement */}
@@ -163,7 +170,7 @@ const FastingProgressHeaderInner: React.FC<FastingProgressHeaderProps> = ({
           {/* Colonne gauche : Icône de la Forge du Temps */}
           <div className="relative flex-shrink-0" style={{ width: 'fit-content' }}>
             <div
-              className="relative rounded-full flex items-center justify-center breathing-icon"
+              className={`relative rounded-full flex items-center justify-center ${!isPerformanceMode ? 'breathing-icon' : ''}`}
               style={{
                 width: iconContainerSize,
                 height: iconContainerSize,
@@ -173,14 +180,16 @@ const FastingProgressHeaderInner: React.FC<FastingProgressHeaderProps> = ({
                   linear-gradient(135deg, color-mix(in srgb, ${forgeColors.primary} 45%, transparent), color-mix(in srgb, ${forgeColors.secondary} 35%, transparent))
                 `,
                 border: `3px solid color-mix(in srgb, ${forgeColors.primary} 70%, transparent)`,
-                boxShadow: `
-                  0 0 ${isMobile ? '24px' : '36px'} color-mix(in srgb, ${forgeColors.primary} 60%, transparent),
-                  0 0 ${isMobile ? '40px' : '64px'} color-mix(in srgb, ${forgeColors.primary} 40%, transparent),
-                  inset 0 3px 0 rgba(255,255,255,0.4),
-                  inset 0 -2px 0 rgba(0,0,0,0.2)
-                `,
-                backdropFilter: 'blur(18px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(18px) saturate(160%)'
+                boxShadow: isPerformanceMode
+                  ? 'none'
+                  : `
+                    0 0 ${isMobile ? '24px' : '36px'} color-mix(in srgb, ${forgeColors.primary} 60%, transparent),
+                    0 0 ${isMobile ? '40px' : '64px'} color-mix(in srgb, ${forgeColors.primary} 40%, transparent),
+                    inset 0 3px 0 rgba(255,255,255,0.4),
+                    inset 0 -2px 0 rgba(0,0,0,0.2)
+                  `,
+                backdropFilter: isPerformanceMode ? 'none' : 'blur(18px) saturate(160%)',
+                WebkitBackdropFilter: isPerformanceMode ? 'none' : 'blur(18px) saturate(160%)'
               }}
             >
               <SpatialIcon
@@ -188,10 +197,12 @@ const FastingProgressHeaderInner: React.FC<FastingProgressHeaderProps> = ({
                 size={iconSize}
                 style={{
                   color: forgeColors.primary,
-                  filter: `
-                    drop-shadow(0 0 8px color-mix(in srgb, ${forgeColors.primary} 80%, transparent))
-                    drop-shadow(0 0 16px color-mix(in srgb, ${forgeColors.primary} 60%, transparent))
-                  `
+                  filter: isPerformanceMode
+                    ? 'none'
+                    : `
+                      drop-shadow(0 0 8px color-mix(in srgb, ${forgeColors.primary} 80%, transparent))
+                      drop-shadow(0 0 16px color-mix(in srgb, ${forgeColors.primary} 60%, transparent))
+                    `
                 }}
                 glowColor={forgeColors.primary}
                 variant="pure"
@@ -209,7 +220,7 @@ const FastingProgressHeaderInner: React.FC<FastingProgressHeaderProps> = ({
                   fontSize: isMobile ? 18 : 20,
                   color: 'var(--text-primary)',
                   letterSpacing: '-0.01em',
-                  textShadow: `0 0 6px color-mix(in srgb, ${forgeColors.primary} 14%, transparent)`
+                  textShadow: isPerformanceMode ? 'none' : `0 0 6px color-mix(in srgb, ${forgeColors.primary} 14%, transparent)`
                 }}
               >
                 {message}
@@ -254,7 +265,9 @@ const FastingProgressHeaderInner: React.FC<FastingProgressHeaderProps> = ({
                           : `1px solid color-mix(in srgb, ${forgeColors.primary} 50%, transparent)`,
                         position: 'relative',
                         transition: 'all 220ms cubic-bezier(0.2, 0.8, 0.2, 1)',
-                        boxShadow: isCurrent
+                        boxShadow: isPerformanceMode
+                          ? 'none'
+                          : isCurrent
                           ? `0 0 10px color-mix(in srgb, ${forgeColors.primary} 55%, transparent)`
                           : isCompleted
                           ? `0 0 9px color-mix(in srgb, ${forgeColors.secondary} 45%, transparent)`
@@ -295,7 +308,9 @@ const FastingProgressHeaderInner: React.FC<FastingProgressHeaderProps> = ({
                 )`,
                 mask: 'radial-gradient(circle at center, transparent 70%, black 75%, black 100%)',
                 WebkitMask: 'radial-gradient(circle at center, transparent 70%, black 75%, black 100%)',
-                boxShadow: `0 0 18px color-mix(in srgb, ${forgeColors.primary} 48%, transparent), 0 0 36px color-mix(in srgb, ${forgeColors.primary} 28%, transparent)`,
+                boxShadow: isPerformanceMode
+                  ? 'none'
+                  : `0 0 18px color-mix(in srgb, ${forgeColors.primary} 48%, transparent), 0 0 36px color-mix(in srgb, ${forgeColors.primary} 28%, transparent)`,
               }}
             />
             <div className="absolute inset-0 flex items-center justify-center" style={{ color: forgeColors.primary, fontSize: 15, fontWeight: 800 }}>

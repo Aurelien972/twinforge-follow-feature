@@ -2,6 +2,7 @@ import React from 'react';
 import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 
 interface FastingSetupStageProps {
   targetHours: number;
@@ -18,8 +19,10 @@ const FastingSetupStage: React.FC<FastingSetupStageProps> = ({
   setTargetHours,
   onStartFasting
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
   return (
-    <GlassCard 
+    <GlassCard
       className="p-8 text-center"
       style={{
         background: `
@@ -28,13 +31,15 @@ const FastingSetupStage: React.FC<FastingSetupStageProps> = ({
           var(--glass-opacity)
         `,
         borderColor: 'color-mix(in srgb, #F59E0B 30%, transparent)',
-        boxShadow: `
-          0 20px 60px rgba(0, 0, 0, 0.4),
-          0 0 40px color-mix(in srgb, #F59E0B 20%, transparent),
-          0 0 80px color-mix(in srgb, #EF4444 15%, transparent),
-          inset 0 2px 0 rgba(255, 255, 255, 0.2)
-        `,
-        backdropFilter: 'blur(28px) saturate(170%)'
+        boxShadow: isPerformanceMode
+          ? '0 20px 60px rgba(0, 0, 0, 0.4)'
+          : `
+            0 20px 60px rgba(0, 0, 0, 0.4),
+            0 0 40px color-mix(in srgb, #F59E0B 20%, transparent),
+            0 0 80px color-mix(in srgb, #EF4444 15%, transparent),
+            inset 0 2px 0 rgba(255, 255, 255, 0.2)
+          `,
+        backdropFilter: isPerformanceMode ? 'none' : 'blur(28px) saturate(170%)'
       }}
     >
       <div className="space-y-6">
@@ -49,15 +54,17 @@ const FastingSetupStage: React.FC<FastingSetupStageProps> = ({
                 linear-gradient(135deg, color-mix(in srgb, #F59E0B 45%, transparent), color-mix(in srgb, #EF4444 35%, transparent))
               `,
               border: `4px solid color-mix(in srgb, #F59E0B 70%, transparent)`,
-              boxShadow: `
-                0 0 40px color-mix(in srgb, #F59E0B 70%, transparent),
-                0 0 80px color-mix(in srgb, #F59E0B 50%, transparent),
-                0 0 120px color-mix(in srgb, #EF4444 40%, transparent),
-                inset 0 4px 0 rgba(255,255,255,0.5),
-                inset 0 -3px 0 rgba(0,0,0,0.2)
-              `,
-              backdropFilter: 'blur(20px) saturate(170%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(170%)',
+              boxShadow: isPerformanceMode
+                ? 'none'
+                : `
+                  0 0 40px color-mix(in srgb, #F59E0B 70%, transparent),
+                  0 0 80px color-mix(in srgb, #F59E0B 50%, transparent),
+                  0 0 120px color-mix(in srgb, #EF4444 40%, transparent),
+                  inset 0 4px 0 rgba(255,255,255,0.5),
+                  inset 0 -3px 0 rgba(0,0,0,0.2)
+                `,
+              backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(170%)',
+              WebkitBackdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(170%)',
               transition: 'all 0.3s ease',
               margin: '0 auto'
             }}
@@ -67,11 +74,13 @@ const FastingSetupStage: React.FC<FastingSetupStageProps> = ({
               size={64}
               style={{
                 color: '#F59E0B',
-                filter: `
-                  drop-shadow(0 0 16px color-mix(in srgb, #F59E0B 90%, transparent))
-                  drop-shadow(0 0 32px color-mix(in srgb, #F59E0B 70%, transparent))
-                  drop-shadow(0 0 48px color-mix(in srgb, #EF4444 50%, transparent))
-                `
+                filter: isPerformanceMode
+                  ? 'none'
+                  : `
+                    drop-shadow(0 0 16px color-mix(in srgb, #F59E0B 90%, transparent))
+                    drop-shadow(0 0 32px color-mix(in srgb, #F59E0B 70%, transparent))
+                    drop-shadow(0 0 48px color-mix(in srgb, #EF4444 50%, transparent))
+                  `
               }}
               variant="pure"
             />
@@ -121,12 +130,14 @@ const FastingSetupStage: React.FC<FastingSetupStageProps> = ({
                 color-mix(in srgb, #10B981 60%, transparent)
               )`,
               border: '3px solid color-mix(in srgb, #22C55E 60%, transparent)',
-              boxShadow: `
-                0 16px 50px color-mix(in srgb, #22C55E 50%, transparent),
-                0 0 80px color-mix(in srgb, #22C55E 40%, transparent),
-                inset 0 4px 0 rgba(255,255,255,0.5)
-              `,
-              backdropFilter: 'blur(24px) saturate(170%)',
+              boxShadow: isPerformanceMode
+                ? '0 16px 50px color-mix(in srgb, #22C55E 50%, transparent)'
+                : `
+                  0 16px 50px color-mix(in srgb, #22C55E 50%, transparent),
+                  0 0 80px color-mix(in srgb, #22C55E 40%, transparent),
+                  inset 0 4px 0 rgba(255,255,255,0.5)
+                `,
+              backdropFilter: isPerformanceMode ? 'none' : 'blur(24px) saturate(170%)',
               color: '#fff',
               transition: 'all 0.2s ease'
             }}

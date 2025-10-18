@@ -1,5 +1,6 @@
 import React from 'react';
 import { useFeedback } from '@/hooks/useFeedback';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 import logger from '@/lib/utils/logger';
 
 interface FastingPeriodSelectorProps {
@@ -46,6 +47,7 @@ const FastingPeriodSelector: React.FC<FastingPeriodSelectorProps> = ({
   className = ''
 }) => {
   const { click } = useFeedback();
+  const { isPerformanceMode } = usePerformanceMode();
 
   const periods = [
     { value: 7, label: getPeriodLabel(7) },
@@ -75,7 +77,7 @@ const FastingPeriodSelector: React.FC<FastingPeriodSelectorProps> = ({
       <div className="inline-flex gap-2 p-1 rounded-lg" style={{
         background: 'rgba(255, 255, 255, 0.05)',
         border: '1px solid rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(10px)'
+        backdropFilter: isPerformanceMode ? 'none' : 'blur(10px)'
       }}>
         {periods.map((period) => {
           const isAvailable = isPeriodAvailable(period.value);
@@ -107,14 +109,15 @@ const FastingPeriodSelector: React.FC<FastingPeriodSelectorProps> = ({
                 }
               }}
               disabled={!isAvailable}
-              className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200"
+              className="px-6 py-2.5 rounded-lg text-sm font-medium"
               style={{
                 background: isSelected ? `${accentColor}33` : 'transparent',
                 color: isSelected ? accentColor : isAvailable ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)',
                 border: isSelected ? `1px solid ${accentColor}66` : '1px solid transparent',
-                boxShadow: isSelected ? `0 0 20px ${accentColor}4D` : 'none',
+                boxShadow: isPerformanceMode ? 'none' : (isSelected ? `0 0 20px ${accentColor}4D` : 'none'),
                 opacity: isAvailable ? 1 : 0.5,
-                cursor: isAvailable ? 'pointer' : 'not-allowed'
+                cursor: isAvailable ? 'pointer' : 'not-allowed',
+                transition: isPerformanceMode ? 'all 0.15s ease' : 'all 0.2s ease'
               }}
             >
               {period.label}

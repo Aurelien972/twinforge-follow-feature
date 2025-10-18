@@ -5,6 +5,7 @@ import GlassCard from '@/ui/cards/GlassCard';
 import SpatialIcon from '@/ui/icons/SpatialIcon';
 import { ICONS } from '@/ui/icons/registry';
 import { useFeedback } from '@/hooks/useFeedback';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 
 interface FastingDataCompletenessAlertProps {
   missingData: string[];
@@ -25,6 +26,10 @@ const FastingDataCompletenessAlert: React.FC<FastingDataCompletenessAlertProps> 
 }) => {
   const navigate = useNavigate();
   const { click } = useFeedback();
+  const { isPerformanceMode } = usePerformanceMode();
+
+  // Conditional motion components
+  const MotionDiv = isPerformanceMode ? 'div' : motion.div;
 
   if (missingData.length === 0) return null;
 
@@ -39,11 +44,13 @@ const FastingDataCompletenessAlert: React.FC<FastingDataCompletenessAlertProps> 
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-      transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+    <MotionDiv
+      {...(!isPerformanceMode && {
+        initial: { opacity: 0, y: -10, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, y: -10, scale: 0.95 },
+        transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }
+      })}
       className={className}
     >
       <GlassCard 
@@ -55,12 +62,14 @@ const FastingDataCompletenessAlert: React.FC<FastingDataCompletenessAlertProps> 
             var(--glass-opacity)
           `,
           borderColor: 'color-mix(in srgb, #F59E0B 30%, transparent)',
-          boxShadow: `
-            0 12px 40px rgba(0, 0, 0, 0.25),
-            0 0 30px color-mix(in srgb, #F59E0B 20%, transparent),
-            inset 0 2px 0 rgba(255, 255, 255, 0.15)
-          `,
-          backdropFilter: 'blur(20px) saturate(160%)'
+          boxShadow: isPerformanceMode
+            ? '0 12px 40px rgba(0, 0, 0, 0.25)'
+            : `
+              0 12px 40px rgba(0, 0, 0, 0.25),
+              0 0 30px color-mix(in srgb, #F59E0B 20%, transparent),
+              inset 0 2px 0 rgba(255, 255, 255, 0.15)
+            `,
+          backdropFilter: isPerformanceMode ? 'none' : 'blur(20px) saturate(160%)'
         }}
       >
         <div className="flex items-start gap-4">
@@ -72,7 +81,7 @@ const FastingDataCompletenessAlert: React.FC<FastingDataCompletenessAlertProps> 
                 linear-gradient(135deg, color-mix(in srgb, #F59E0B 35%, transparent), color-mix(in srgb, #F59E0B 25%, transparent))
               `,
               border: '2px solid color-mix(in srgb, #F59E0B 50%, transparent)',
-              boxShadow: '0 0 20px color-mix(in srgb, #F59E0B 30%, transparent)'
+              boxShadow: isPerformanceMode ? 'none' : '0 0 20px color-mix(in srgb, #F59E0B 30%, transparent)'
             }}
           >
             <SpatialIcon Icon={ICONS.AlertTriangle} size={20} style={{ color: '#F59E0B' }} />
@@ -110,6 +119,9 @@ const FastingDataCompletenessAlert: React.FC<FastingDataCompletenessAlertProps> 
                 <button
                   onClick={handleDismiss}
                   className="btn-glass--secondary-nav px-3 py-2 text-sm"
+                  style={{
+                    transition: isPerformanceMode ? 'all 0.15s ease' : 'all 0.2s ease'
+                  }}
                 >
                   <span>Plus tard</span>
                 </button>
@@ -120,7 +132,10 @@ const FastingDataCompletenessAlert: React.FC<FastingDataCompletenessAlertProps> 
           {onDismiss && (
             <button
               onClick={handleDismiss}
-              className="p-2 rounded-full hover:bg-white/10 transition-colors flex-shrink-0"
+              className="p-2 rounded-full hover:bg-white/10 flex-shrink-0"
+              style={{
+                transition: isPerformanceMode ? 'all 0.15s ease' : 'all 0.2s ease'
+              }}
               aria-label="Fermer l'alerte"
             >
               <SpatialIcon Icon={ICONS.X} size={14} className="text-white/60" />
@@ -128,7 +143,7 @@ const FastingDataCompletenessAlert: React.FC<FastingDataCompletenessAlertProps> 
           )}
         </div>
       </GlassCard>
-    </motion.div>
+    </MotionDiv>
   );
 };
 
