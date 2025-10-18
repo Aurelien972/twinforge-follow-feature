@@ -78,6 +78,46 @@
 }
 
 /* =========================================
+   MODE ÉQUILIBRÉ - Fond statique avec particules
+   Désactive l'animation du fond mais conserve les particules
+   ========================================= */
+
+body.mode-balanced .bg-twinforge-visionos,
+.mode-balanced .bg-twinforge-visionos,
+html.mode-balanced .bg-twinforge-visionos {
+  /* Fond identique au défaut MAIS sans animation */
+  animation: none !important;
+  animation-name: none !important;
+  animation-play-state: paused !important;
+
+  /* Background size FIXE pour éviter le clignotement */
+  background-size: 400% 300%, 350% 250%, 100% 100% !important;
+
+  /* Désactiver will-change pour économie GPU */
+  will-change: auto !important;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* En mode Équilibré, les particules restent actives */
+body.mode-balanced .cosmic-forge-particles,
+.mode-balanced .cosmic-forge-particles,
+html.mode-balanced .cosmic-forge-particles {
+  display: block !important;
+  opacity: 0.4 !important;
+  visibility: visible !important;
+}
+
+body.mode-balanced .forge-particle,
+.mode-balanced .forge-particle,
+html.mode-balanced .forge-particle {
+  display: block !important;
+  animation: ember-rise var(--duration, 20s) linear infinite !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* =========================================
    CONTENEUR PARTICULES
    ========================================= */
 
@@ -355,17 +395,16 @@ html.performance-mode .bg-twinforge-visionos,
 .bg-twinforge-visionos.performance-mode,
 [data-performance-mode="true"] .bg-twinforge-visionos,
 .mobile-performance-mode .bg-twinforge-visionos {
-  /* Background simplifié 2 couches - PERFORMANCE MAXIMALE */
-  background:
-    /* Nébuleuse chaude statique ultra-réduite */
-    radial-gradient(ellipse 400% 300% at 20% 80%,
-      var(--nebula-performance-hot) 0%,
-      transparent 50%),
-    /* Gradient cosmique de base simplifié */
-    radial-gradient(circle at 50% 50%, var(--bg-performance-gradient-start) 0%, var(--bg-performance-gradient-end) 50%, var(--bg-performance-mobile-dark) 100%) !important;
+  /* Background UNI simplifié - PERFORMANCE MAXIMALE - PAS de radiaux cyan/orange */
+  background: radial-gradient(circle at 50% 50%,
+    var(--forge-medium) 0%,
+    var(--forge-deep) 50%,
+    var(--forge-void) 100%) !important;
 
   /* Background size FIXE - pas d'animation */
-  background-size: 400% 300%, 350% 250%, 100% 100% !important;
+  background-size: 100% 100% !important;
+  background-position: center center !important;
+  background-attachment: scroll !important;
 
   /* DÉSACTIVER TOUTES ANIMATIONS - cosmic-forge-pulse inclus */
   animation: none !important;

@@ -207,7 +207,7 @@ const PerformanceModeCard: React.FC<PerformanceModeCardProps> = ({
         </div>
       </div>
 
-      {isSelected && (
+      {isSelected && mode !== 'high-performance' && (
         <motion.div
           layoutId="selected-indicator"
           className="absolute inset-0 pointer-events-none"

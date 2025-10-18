@@ -88,6 +88,13 @@
   box-shadow: var(--mobile-shadow-card) !important;
 }
 
+/* Fix: Alléger les GlassCard en mode performance pour éviter le layer sombre */
+.mode-high-performance .settings-tabs .glass-card,
+.mode-high-performance [class*="settings"] .glass-card {
+  background: rgba(11, 14, 23, 0.75) !important;
+  opacity: 1 !important;
+}
+
 .mode-high-performance .new-bottom-bar-icon-container,
 .mode-high-performance .glass-orb-button {
   background: rgba(255, 255, 255, 0.08) !important;
