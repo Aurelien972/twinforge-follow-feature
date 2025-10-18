@@ -375,17 +375,11 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
   return (
     <aside
       className={`hidden lg:flex flex-col ${className}
-        fixed top-[88px] left-6
+        sticky top-[88px] left-0
         h-[calc(100dvh-104px)]
-        w-[240px] xl:w-[260px]
+        w-full
         sidebar-glass-enhanced rounded-2xl visionos-grid
       `}
-      style={{
-        position: 'fixed',
-        zIndex: 9998,
-        transform: 'translate3d(0, 0, 0)',
-        willChange: 'transform'
-      }}
       role="complementary"
       aria-label="Main navigation"
     >

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useIsMobile } from '../../../../system/device/DeviceProvider';
 import GlassCard from '../../../../ui/cards/GlassCard';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
@@ -25,7 +24,6 @@ interface RecipeSession {
 const RecentScansCard: React.FC = () => {
   const navigate = useNavigate();
   const { click } = useFeedback();
-  const isMobile = useIsMobile();
   const [displaySessions, setDisplaySessions] = useState<RecipeSession[]>([]);
 
   // Charger les sessions récentes depuis Supabase
@@ -99,7 +97,7 @@ const RecentScansCard: React.FC = () => {
               border: '2px solid color-mix(in srgb, #EC4899 60%, transparent)',
               boxShadow: '0 0 20px color-mix(in srgb, #EC4899 40%, transparent)'
             }}
-            animate={isMobile ? {} : {
+            animate={{
               scale: [1, 1.05, 1],
               boxShadow: [
                 '0 0 20px color-mix(in srgb, #EC4899 40%, transparent)',
@@ -107,7 +105,7 @@ const RecentScansCard: React.FC = () => {
                 '0 0 20px color-mix(in srgb, #EC4899 40%, transparent)'
               ]
             }}
-            transition={isMobile ? { duration: 0 } : { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
           >
             <SpatialIcon Icon={ICONS.History} size={20} className="text-pink-300" />
           </motion.div>
@@ -179,7 +177,7 @@ const RecentScansCard: React.FC = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              whileHover={isMobile ? {} : {
+              whileHover={{
                 scale: 1.02,
                 background: 'rgba(236, 72, 153, 0.08)',
                 borderColor: 'color-mix(in srgb, #EC4899 30%, transparent)',

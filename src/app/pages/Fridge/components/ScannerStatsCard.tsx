@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '../../../../ui/cards/GlassCard';
-import { useIsMobile } from '../../../../system/device/DeviceProvider';
 import SpatialIcon from '../../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../../ui/icons/registry';
 import { supabase } from '../../../../system/supabase/client';
@@ -20,7 +19,6 @@ interface StatMetric {
  * Avec jauges circulaires animées, graphiques sparkline et badges
  */
 const ScannerStatsCard: React.FC = () => {
-  const isMobile = useIsMobile();
   const [animatedValues, setAnimatedValues] = useState<Record<string, number>>({});
   const [totalScans, setTotalScans] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
@@ -160,7 +158,7 @@ const ScannerStatsCard: React.FC = () => {
             border: '2px solid color-mix(in srgb, #EC4899 60%, transparent)',
             boxShadow: '0 0 20px color-mix(in srgb, #EC4899 40%, transparent)'
           }}
-          animate={isMobile ? {} : {
+          animate={{
             scale: [1, 1.05, 1],
             boxShadow: [
               '0 0 20px color-mix(in srgb, #EC4899 40%, transparent)',
@@ -168,7 +166,7 @@ const ScannerStatsCard: React.FC = () => {
               '0 0 20px color-mix(in srgb, #EC4899 40%, transparent)'
             ]
           }}
-          transition={isMobile ? { duration: 0 } : { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
         >
           <SpatialIcon Icon={ICONS.BarChart3} size={20} className="text-pink-300" />
         </motion.div>
@@ -218,7 +216,7 @@ const ScannerStatsCard: React.FC = () => {
                     animate={{
                       strokeDashoffset: 2 * Math.PI * 40 * (1 - (stat.unit === '%' ? displayValue / 100 : Math.min(percentage / 100, 1)))
                     }}
-                    transition={isMobile ? { duration: 0 } : { duration: 1, ease: 'easeOut' }}
+                    transition={{ duration: 1, ease: 'easeOut' }}
                     style={{
                       filter: `drop-shadow(0 0 8px ${stat.color}80)`
                     }}
@@ -264,12 +262,11 @@ const ScannerStatsCard: React.FC = () => {
               className="flex-1 rounded-t-lg"
               style={{
                 background: `linear-gradient(180deg, ${ICONS ? '#EC4899' : '#F472B6'}, ${ICONS ? '#F472B6' : '#DB2777'})`,
-                boxShadow: `0 0 10px color-mix(in srgb, #EC4899 40%, transparent)`,
-                height: isMobile ? `${(value / 10) * 100}%` : undefined
+                boxShadow: `0 0 10px color-mix(in srgb, #EC4899 40%, transparent)`
               }}
-              initial={isMobile ? {} : { height: 0 }}
-              animate={isMobile ? {} : { height: `${(value / 10) * 100}%` }}
-              transition={isMobile ? { duration: 0 } : { duration: 0.5, delay: index * 0.05 }}
+              initial={{ height: 0 }}
+              animate={{ height: `${(value / 10) * 100}%` }}
+              transition={{ duration: 0.5, delay: index * 0.05 }}
             />
           ))}
         </div>

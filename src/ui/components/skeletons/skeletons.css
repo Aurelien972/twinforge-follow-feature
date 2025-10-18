@@ -15,25 +15,6 @@
   animation: shimmer 2s ease-in-out infinite;
 }
 
-/* MOBILE: Disable all skeleton animations */
-@media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  .skeleton-shimmer,
-  .animate-pulse-subtle,
-  .skeleton-glow,
-  .skeleton-glow::after {
-    animation: none !important;
-    background: rgba(255, 255, 255, 0.06) !important;
-  }
-}
-
-.mobile-device .skeleton-shimmer,
-.mobile-device .animate-pulse-subtle,
-.mobile-device .skeleton-glow,
-.mobile-device .skeleton-glow::after {
-  animation: none !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-}
-
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -43,7 +24,7 @@
   }
 }
 
-/* Subtle pulse animation - DISABLED ON MOBILE */
+/* Subtle pulse animation */
 .animate-pulse-subtle {
   animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -57,7 +38,7 @@
   }
 }
 
-/* Skeleton with glow - DISABLED ON MOBILE */
+/* Skeleton with glow */
 .skeleton-glow {
   position: relative;
   overflow: hidden;
@@ -86,53 +67,6 @@
   100% {
     left: 100%;
   }
-}
-
-/* =========================================
-   MOBILE OPTIMIZATIONS - ZERO ANIMATIONS
-   ========================================= */
-
-@media (max-width: 768px), (hover: none), (pointer: coarse) {
-  /* Désactiver TOUTES les animations skeleton sur mobile */
-  .skeleton-shimmer,
-  .animate-pulse-subtle,
-  .skeleton-glow,
-  .skeleton-glow::after {
-    animation: none !important;
-  }
-
-  /* Remplacer par des états statiques */
-  .skeleton-shimmer {
-    background: rgba(255, 255, 255, 0.08) !important;
-  }
-
-  .animate-pulse-subtle {
-    opacity: 0.95 !important;
-  }
-
-  .skeleton-glow::after {
-    display: none !important;
-  }
-}
-
-/* Mobile-device class targeting (from DeviceProvider) */
-.mobile-device .skeleton-shimmer,
-.mobile-device .animate-pulse-subtle,
-.mobile-device .skeleton-glow,
-.mobile-device .skeleton-glow::after {
-  animation: none !important;
-}
-
-.mobile-device .skeleton-shimmer {
-  background: rgba(255, 255, 255, 0.08) !important;
-}
-
-.mobile-device .animate-pulse-subtle {
-  opacity: 0.95 !important;
-}
-
-.mobile-device .skeleton-glow::after {
-  display: none !important;
 }
 
 /* Skeleton variants for different content types */

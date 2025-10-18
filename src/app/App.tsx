@@ -41,46 +41,30 @@ function AppContent() {
   React.useEffect(() => {
     const anyOverlayOpen = isAnyOpen();
     if (anyOverlayOpen) {
-      // CRITICAL: On mobile, overflow:hidden on body breaks position:fixed
-      // Use touch-action instead to prevent scroll
-      const isMobile = window.innerWidth <= 1024;
+      const originalOverflow = document.body.style.overflow;
+      const originalPosition = document.body.style.position;
+      const originalWidth = document.body.style.width;
+      const originalHeight = document.body.style.height;
 
-      if (isMobile) {
-        const originalTouchAction = document.body.style.touchAction;
-        const originalPosition = document.body.style.position;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
 
-        document.body.style.touchAction = 'none';
-        document.body.style.position = 'relative';
+      logger.debug('OVERLAY_BODY_LOCK', 'Body scroll locked', {
+        anyOverlayOpen,
+        timestamp: new Date().toISOString(),
+      });
 
-        logger.debug('OVERLAY_BODY_LOCK', 'Body scroll locked (mobile)', {
-          anyOverlayOpen,
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.position = originalPosition;
+        document.body.style.width = originalWidth;
+        document.body.style.height = originalHeight;
+        logger.debug('OVERLAY_BODY_UNLOCK', 'Body scroll unlocked', {
           timestamp: new Date().toISOString(),
         });
-
-        return () => {
-          document.body.style.touchAction = originalTouchAction;
-          document.body.style.position = originalPosition;
-          logger.debug('OVERLAY_BODY_UNLOCK', 'Body scroll unlocked (mobile)', {
-            timestamp: new Date().toISOString(),
-          });
-        };
-      } else {
-        // Desktop: safe to use overflow hidden
-        const originalOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-
-        logger.debug('OVERLAY_BODY_LOCK', 'Body scroll locked (desktop)', {
-          anyOverlayOpen,
-          timestamp: new Date().toISOString(),
-        });
-
-        return () => {
-          document.body.style.overflow = originalOverflow;
-          logger.debug('OVERLAY_BODY_UNLOCK', 'Body scroll unlocked (desktop)', {
-            timestamp: new Date().toISOString(),
-          });
-        };
-      }
+      };
     }
   }, [isAnyOpen]);
 
@@ -194,42 +178,17 @@ function AppContent() {
 
   return (
     <div
-      className="min-h-screen flex flex-col"
-      style={{
-        position: 'relative',
-        zIndex: 0,
-        // CRITICAL: No transforms on root to prevent breaking position:fixed on mobile
-        transform: 'none',
-        transformStyle: 'flat',
-        perspective: 'none',
-        filter: 'none',
-        isolation: 'auto',
-        contain: 'none'
-      }}
+      className="min-h-screen flex flex-col z-auto-important will-change-auto-important position-static-important transform-none-important filter-none-important perspective-none-important contain-none-important isolation-auto-important overflow-visible-important"
+      style={{ position: 'relative', zIndex: 0 }}
     >
       <Header />
 
-      {/* Fixed Sidebar - Rendered outside of flex layout */}
-      <Sidebar />
-
       {/* Parent flex : on autorise la contraction des enfants */}
-      <div
-        className="flex-1 flex min-w-0"
-        style={{
-          // CRITICAL: No transforms to prevent breaking position:fixed
-          position: 'static',
-          overflow: 'visible',
-          transform: 'none',
-          transformStyle: 'flat',
-          filter: 'none',
-          perspective: 'none',
-          contain: 'none',
-          isolation: 'auto',
-          zIndex: 'auto'
-        }}
-      >
-        {/* Sidebar spacer (hidden on mobile) - maintains layout spacing */}
-        <div className="hidden lg:block lg:w-[240px] xl:w-[260px] shrink-0" aria-hidden="true" />
+      <div className="flex-1 flex min-w-0 position-static-important overflow-visible-important transform-none-important filter-none-important perspective-none-important contain-none-important isolation-auto-important z-auto-important">
+        {/* Sidebar (hidden on mobile) */}
+        <div className="hidden lg:flex lg:flex-col lg:w-[240px] xl:w-[260px] shrink-0 ml-6 mr-3 pt-20">
+          <Sidebar />
+        </div>
 
         {/* MAIN — fix mobile: min-w-0 pour éviter le rognage à droite */}
         <main
@@ -239,11 +198,10 @@ function AppContent() {
           }`}
           style={{
             position: 'relative',
-            overflow: 'visible',
+            overflow: 'visible',          // laisse passer les glows
             minHeight: '100dvh',
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
-            marginLeft: 0,
           }}
           role="main"
           aria-label="Contenu principal de l'application"

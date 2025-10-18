@@ -9,7 +9,6 @@ import { useOverlayStore } from '../../system/store/overlayStore';
 import { useGlobalChatStore } from '../../system/store/globalChatStore';
 import { Haptics } from '../../utils/haptics';
 import CentralActionsMenu from './CentralActionsMenu';
-import { useIsMobile } from '../../system/device/DeviceProvider';
 
 /**
  * Configuration des boutons de la nouvelle barre inférieure
@@ -68,14 +67,12 @@ function BarButton({
   button,
   active,
   onClick,
-  isMobile,
   hasUnread,
   unreadCount,
 }: {
   button: typeof BOTTOM_BAR_BUTTONS[0];
   active: boolean;
   onClick: () => void;
-  isMobile: boolean;
   hasUnread?: boolean;
   unreadCount?: number;
 }) {
@@ -86,22 +83,16 @@ function BarButton({
 
   const iconSize = 20;
 
-  // Use button element directly on mobile to avoid Framer Motion overhead
-  const ButtonComponent = isMobile ? 'button' : motion.button;
-  const animationProps = isMobile ? {} : {
-    whileHover: { scale: 1.03 },
-    whileTap: { scale: 0.98 },
-  };
-
   return (
-    <ButtonComponent
+    <motion.button
       onClick={handleClick}
       className="new-bottom-bar-button"
       style={{
         '--button-color': button.color,
         '--button-active': active ? '1' : '0'
       } as React.CSSProperties}
-      {...animationProps}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
       aria-current={active ? 'page' : undefined}
       aria-label={`Aller à ${button.label}`}
     >
@@ -117,7 +108,7 @@ function BarButton({
       <div className={`new-bottom-bar-label ${active ? 'new-bottom-bar-label--active' : ''}`}>
         {button.label}
       </div>
-    </ButtonComponent>
+    </motion.button>
   );
 }
 
@@ -130,7 +121,6 @@ const NewMobileBottomBar: React.FC = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { close } = useOverlayStore();
-  const isMobile = useIsMobile();
 
   const handleButtonClick = (button: typeof BOTTOM_BAR_BUTTONS[0]) => {
     if (button.route) {
@@ -145,20 +135,15 @@ const NewMobileBottomBar: React.FC = () => {
 
   return (
     <>
-      <nav
-        className="new-mobile-bottom-bar"
+      <nav 
+        className="new-mobile-bottom-bar" 
         aria-label="Navigation principale mobile"
         style={{
-          // CRITICAL: NO transforms - they break position:fixed on iOS
           position: 'fixed',
           bottom: 'var(--new-bottom-bar-bottom-offset)',
           left: '8px',
           right: '8px',
           zIndex: 9996,
-          backfaceVisibility: 'hidden',
-          WebkitBackfaceVisibility: 'hidden',
-          isolation: 'isolate',
-          contain: 'layout style paint',
         }}
       >
         <div className="new-mobile-bottom-bar-container">
@@ -169,7 +154,6 @@ const NewMobileBottomBar: React.FC = () => {
                 button={button}
                 active={isButtonActive(button)}
                 onClick={() => handleButtonClick(button)}
-                isMobile={isMobile}
               />
             ))}
           </div>

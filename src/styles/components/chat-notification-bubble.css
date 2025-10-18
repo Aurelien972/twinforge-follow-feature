@@ -30,33 +30,13 @@
 
   isolation: isolate;
   transform: translateZ(0);
+  will-change: transform, opacity;
 
   transition:
     transform var(--liquid-transition-medium),
     background var(--liquid-transition-fast),
     box-shadow var(--liquid-transition-fast),
     border-color var(--liquid-transition-fast);
-}
-
-/* Mobile - Disable animations and reduce effects */
-@media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  .chat-notification-bubble {
-    will-change: auto !important;
-    transition: none !important;
-    transform: none !important;
-    backdrop-filter: blur(8px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
-  }
-
-  .chat-notification-bubble::before {
-    opacity: 0.5 !important;
-  }
-
-  .chat-notification-bubble:hover,
-  .chat-notification-bubble:active {
-    transform: none !important;
-    scale: 1 !important;
-  }
 }
 
 /* Desktop version - popup à gauche du bouton de chat */
@@ -208,13 +188,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   .chat-notification-bubble {
-    transition: none !important;
-    will-change: auto !important;
+    transition: none;
   }
 
-  .chat-notification-bubble:hover,
-  .chat-notification-bubble:active {
-    transform: none !important;
+  .chat-notification-bubble:hover {
+    transform: none;
   }
 }
 

@@ -99,10 +99,6 @@
 @import './optimizations/pipeline-animations.css';
 @import './mobile/touch.css';
 
-/* CRITICAL: Mobile Optimizations - Surgical approach to preserve liquid glass identity */
-@import './optimizations/mobile-animations-only.css';
-@import './optimizations/mobile-blur-selective.css';
-
 /* =========================================
    PHASE 8: FORGE PIPELINE STYLES
    ========================================= */
@@ -130,36 +126,6 @@
 @import './effects/motion.css';
 @import './utilities/inline-style-overrides.css';
 @import './utilities/debug.css';
-
-/* =========================================
-   PHASE 11: MOBILE PERFORMANCE (CRITICAL - MUST BE LAST)
-   ========================================= */
-@import './optimizations/mobile-performance-strict.css';
-
-/* =========================================
-   PHASE 12: MOBILE RADICAL OPTIMIZATIONS (ULTRA-CRITICAL - ABSOLUTE LAST)
-   Applied after all other styles to ensure mobile stability
-   ========================================= */
-@import './optimizations/mobile-radical.css';
-
-/* =========================================
-   PHASE 13: MOBILE ICON VISIBILITY FIX (CRITICAL - MUST BE ABSOLUTE LAST)
-   Forces icon visibility after all other optimizations
-   ========================================= */
-@import './optimizations/mobile-icon-visibility-fix.css';
-
-/* =========================================
-   PHASE 14: MOBILE SCROLL FIX (ULTRA-CRITICAL - FINAL OVERRIDE)
-   Restores scroll functionality on mobile after all optimizations
-   ========================================= */
-@import './optimizations/mobile-scroll-fix.css';
-
-/* =========================================
-   PHASE 15: MOBILE CRITICAL FIXES (ABSOLUTE FINAL - MUST BE LAST)
-   Fixes position:fixed sticky issues and removes ALL performance-heavy effects
-   This MUST be the last import to override everything else
-   ========================================= */
-@import './optimizations/mobile-critical-fixes.css';
 
 /* =========================================
    ENFORCEMENT GLOBAL - ÉLÉMENTS CRITIQUES

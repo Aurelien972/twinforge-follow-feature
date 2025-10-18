@@ -4,8 +4,7 @@
    ========================================= */
 
 /* Neutralize stacking context & keep containers breathable */
-/* CRITICAL: Exclude fixed navigation elements from neutralization */
-:where(.space-y-6, .space-y-4, .space-y-8, .grid):not(.header-liquid-glass):not(.new-mobile-bottom-bar){
+:where(.space-y-6, .space-y-4, .space-y-8, .grid){
   position: static;
   transform: none;
   filter: none;
@@ -48,17 +47,14 @@ button,[role="button"],.glass-card[data-interactive]{touch-action:manipulation;}
 
 /* iOS swipe-back & fixed-positioning hardening */
 @supports (-webkit-touch-callout: none){
-  /* CRITICAL: body must NOT have overflow or height:100% - it breaks position:fixed on iOS */
-  html{
-    height:100% !important;
-  }
-  body{
+  html,body{
     position:static !important;
-    overflow:visible !important;
-    overflow-x:visible !important;
-    overflow-y:visible !important;
-    min-height:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    height:100% !important;
     -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-x:none !important;
+    overscroll-behavior-y:auto !important;
   }
   #root{
     position:static !important;
@@ -67,25 +63,26 @@ button,[role="button"],.glass-card[data-interactive]{touch-action:manipulation;}
     min-height:100dvh !important;
   }
   .header-liquid-glass,
-  .new-mobile-bottom-bar,
   .fab-nexus-forge,
   .quick-action-menu,
   .user-action-panel{
     position:fixed !important;
-    /* CRITICAL: NO transforms - they break position:fixed on iOS */
-    will-change:contents !important;
+    transform:translate3d(0,0,0) !important;
+    -webkit-transform:translate3d(0,0,0) !important;
+    will-change:transform !important;
     backface-visibility:hidden !important;
     -webkit-backface-visibility:hidden !important;
-    -webkit-transform-style:flat !important;
-    transform-style:flat !important;
+    -webkit-transform-style:preserve-3d !important;
+    transform-style:preserve-3d !important;
+    -webkit-perspective:1000px !important;
+    perspective:1000px !important;
     contain:layout style paint !important;
     isolation:isolate !important;
   }
 }
 
 /* Children defaults: stay neutral (avoid clipping hover glows) */
-/* CRITICAL: Exclude fixed navigation elements from neutralization */
-:where(.space-y-6, .space-y-4, .space-y-8, .grid) > *:not(.header-liquid-glass):not(.new-mobile-bottom-bar){
+:where(.space-y-6, .space-y-4, .space-y-8, .grid) > *{
   position:static !important;
   z-index:auto !important;
   transform:none !important;

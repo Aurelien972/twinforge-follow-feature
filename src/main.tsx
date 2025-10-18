@@ -13,7 +13,6 @@ import { supabase } from './system/supabase/client';
 import { AuthForm } from './app/components/AuthForm';
 import { LoadingFallback } from './app/components/LoadingFallback';
 import { useUserStore } from './system/store/userStore';
-import { initializeMobileOptimizations } from './lib/device/mobileDetector';
 
 const Home = lazy(() => import('./app/pages/Home'));
 const Profile = lazy(() => import('./app/pages/Profile'));
@@ -209,11 +208,6 @@ const router = createBrowserRouter([
   }
 ]);
 
-// Initialize mobile optimizations BEFORE React rendering
-const mobileConfig = initializeMobileOptimizations();
-
-logger.info('APP', 'Mobile configuration initialized', { mobileConfig });
-
 const enableStrictMode = import.meta.env.DEV && import.meta.env.VITE_ENABLE_STRICT_MODE !== 'false';
 
 const app = (
@@ -228,6 +222,5 @@ createRoot(document.getElementById('root')!).render(
 
 logger.info('APP', 'React app initialized', {
   strictMode: enableStrictMode,
-  env: import.meta.env.MODE,
-  mobileOptimized: mobileConfig.isMobile
+  env: import.meta.env.MODE
 });

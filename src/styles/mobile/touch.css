@@ -6,14 +6,9 @@
 html{
   -webkit-tap-highlight-color:transparent;
   -webkit-touch-callout:none;
-  /* DO NOT disable user-select globally - breaks scroll */
-}
-
-button, [role="button"] {
   -webkit-user-select:none;
   user-select:none;
 }
-
 input, textarea, [contenteditable]{ -webkit-user-select:auto; user-select:auto; }
 
 /* Touch feedback (CSS-only) - Réduit pour mobile */
@@ -45,22 +40,6 @@ input[type="submit"],input[type="button"]{
   touch-action:manipulation;
 }
 
-/* CRITICAL: Ensure body and main containers allow scroll WITHOUT animations */
-body, #root, [class*="route-container"], main {
-  touch-action: pan-y pinch-zoom !important;
-  -webkit-overflow-scrolling: touch !important;
-  overscroll-behavior-y: auto !important;
-}
-
-/* Mobile - Optimize scrollable elements without breaking content */
-@media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  body,
-  #root,
-  main {
-    will-change: auto !important;
-  }
-}
-
 /* Expansion halos */
 .touch-extend::before,.touch-target-expanded::before{
   content:""; position:absolute; inset:-8px; border-radius:inherit; z-index:-1;
@@ -75,15 +54,10 @@ body, #root, [class*="route-container"], main {
 .momentum-scroll-enhanced{
   -webkit-overflow-scrolling:touch;
   scroll-behavior:smooth;
-  overscroll-behavior-y:auto;
-  /* REMOVED: scroll-snap-type causing scroll issues */
+  overscroll-behavior:contain;
+  scroll-snap-type:y proximity;
 }
-.modal-scroll-lock{
-  overscroll-behavior:none;
-  -webkit-overflow-scrolling:auto;
-  /* PREVENT body scroll when modal open */
-  touch-action: none;
-}
+.modal-scroll-lock{ overscroll-behavior:none; -webkit-overflow-scrolling:auto; }
 
 /* iOS */
 @supports (-webkit-touch-callout: none){
@@ -131,24 +105,31 @@ body, #root, [class*="route-container"], main {
   }
 }
 
-/* Mobile feedback for glass cards - COMPLETELY DISABLED */
+/* Mobile feedback for glass cards - FORGE HAMMER IMPACT REDUIT */
 @media (max-width:640px), (hover: none), (pointer: coarse){
-  /* Désactiver complètement TOUS les effets sur mobile */
-  .glass-card:hover,
-  .glass-card:active {
+  /* Désactiver complètement les effets hover sur mobile */
+  .glass-card:hover{
     background: initial !important;
     transform: none !important;
     box-shadow: none !important;
-    opacity: 1 !important;
-    scale: 1 !important;
-    transition: none !important;
   }
 
-  /* Supprimer tous les pseudo-éléments d'animation */
-  .glass-card::before,
-  .glass-card::after {
-    display: none !important;
-    animation: none !important;
+  /* Lueur orange réduite uniquement au tap sur mobile */
+  .glass-card:active{
+    background:
+      radial-gradient(circle at center,
+        var(--color-ember-copper,#FF7A45) 6%,
+        rgba(255, 122, 69, 0.3) 20%,
+        transparent 60%
+      ),
+      rgba(255,255,255,.12) !important;
+    transform:scale(.98) translateZ(0) !important;
+    box-shadow:
+      inset 0 2px 6px rgba(0,0,0,.25) !important,
+      0 0 15px rgba(255, 122, 69, 0.4) !important,
+      0 0 30px rgba(255, 122, 69, 0.2) !important;
+    opacity:.95 !important;
+    transition:all 80ms ease-out !important;
   }
   .tab-content{
     max-height:calc(100vh - var(--header-height,80px) - var(--tabs-height,60px));
@@ -159,32 +140,11 @@ body, #root, [class*="route-container"], main {
 
 /* Mobile full-width */
 @media (max-width:768px){
-  .responsive-content-container{
-    padding:0 !important;
-    /* ALLOW SCROLL - do not use position:static with transforms */
-  }
+  .responsive-content-container{padding:0 !important; position:static !important; transform:none !important; filter:none !important;}
   .space-y-6 > *:not(.header-liquid-glass):not(.fab-nexus-forge){
-    margin-left:0 !important;
-    margin-right:0 !important;
+    margin-left:0 !important; margin-right:0 !important; position:static !important; transform:none !important;
   }
-  .route-container{
-    padding-left:0 !important;
-    padding-right:0 !important;
-  }
-
-  /* Ensure body can scroll WITHOUT flickering */
-  body {
-    overflow-y: auto !important;
-    touch-action: pan-y pinch-zoom !important;
-    -webkit-overflow-scrolling: touch !important;
-    will-change: auto !important;
-    transform: none !important;
-  }
-
-  /* Disable all transforms and animations during scroll */
-  body *:not(.loader-essential):not([class*="spinner"]):not([class*="loading"]) {
-    will-change: auto !important;
-  }
+  .route-container{padding-left:0 !important; padding-right:0 !important; position:static !important; transform:none !important;}
 
   /* IMPORTANT: garder les particules actives et visibles sur mobile */
   .cosmic-forge-particles{ display:block !important; opacity:.8 !important; }
@@ -219,9 +179,9 @@ body, #root, [class*="route-container"], main {
 
 /* Gestures */
 .swipe-container{ touch-action:pan-x; -webkit-overflow-scrolling:touch; overscroll-behavior-x:none; }
-.swipe-vertical{ touch-action:pan-y; -webkit-overflow-scrolling:touch; overscroll-behavior-y:auto; }
+.swipe-vertical{ touch-action:pan-y; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; }
 .pinch-zoom-enabled{ touch-action:pinch-zoom; }
-/* REMOVED: .touch-action-none to prevent scroll blocking */
+.touch-action-none{ touch-action:none; }
 
 /* Scrollbars */
 .touch-scroll-optimized{
@@ -234,21 +194,6 @@ body, #root, [class*="route-container"], main {
   background:rgba(255,255,255,.2); border-radius:4px; border:1px solid rgba(255,255,255,.1);
 }
 .touch-scroll-optimized::-webkit-scrollbar-thumb:active{ background:rgba(255,255,255,.3); }
-
-/* Mobile - Disable scroll-linked animations */
-@media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  .touch-scroll-optimized {
-    scroll-behavior: auto !important;
-  }
-
-  /* Disable position: fixed animations during scroll */
-  [style*="position: fixed"],
-  .fixed,
-  [class*="fixed"] {
-    will-change: auto !important;
-    transform: none !important;
-  }
-}
 
 /* Ripple */
 .touch-ripple{ position:relative; overflow:hidden; }
@@ -282,17 +227,10 @@ body, #root, [class*="route-container"], main {
   }
 }
 
-/* Désactiver TOUS les effets visuels sur mobile pour performance */
+/* Désactiver les sparks sur mobile pour performance */
 @media (max-width: 640px), (hover: none), (pointer: coarse) {
-  .glass-card::before,
-  .glass-card::after,
-  button::before,
-  button::after,
-  [role="button"]::before,
-  [role="button"]::after {
+  .glass-card::before{
     display: none !important;
-    opacity: 0 !important;
-    animation: none !important;
   }
 }
 

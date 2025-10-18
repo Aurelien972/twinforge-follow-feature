@@ -10,48 +10,35 @@ import { useFeedback } from '../../../hooks';
 import { BackButton } from '../../../ui/buttons';
 import { useOverlayStore } from '../../../system/store/overlayStore';
 import CentralActionsMenu from '../CentralActionsMenu';
-import { useIsMobile } from '../../../system/device/DeviceProvider';
 
 export const Header = React.memo(() => {
   const { setDrawer } = useShell();
   const { click } = useFeedback();
   const { isOpen, toggle } = useOverlayStore();
   const centralMenuOpen = isOpen('centralMenu');
-  const isMobile = useIsMobile();
 
   return (
     <>
       <header
-        className="header-liquid-glass"
+        className="
+          header-liquid-glass h-[64px] z-9997-important will-change-transform-important position-fixed-important transform-gpu-important isolation-isolate-important contain-layout-style-paint-important
+          fixed top-2 left-4 right-4 z-[9999]
+          rounded-glass-lg
+          backdrop-blur-xl
+          transition-all duration-300
+        "
         style={{
-          ...(isMobile ? {
-            // Mobile: Minimal styles, position fixed enforced by CSS
-            // CRITICAL: NO transforms - they break position:fixed on iOS
-            position: 'fixed',
-            top: '4px',
-            left: '8px',
-            right: '8px',
-            zIndex: 9999,
-            height: '64px',
-            borderRadius: '20px',
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
-            isolation: 'isolate',
-            pointerEvents: 'auto',
-          } : {
-            // Desktop: Full styles
-            left: '24px',
-            right: '24px',
-            top: '8px',
-            borderRadius: '20px',
-            overflow: 'hidden',
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
-            WebkitTransformStyle: 'preserve-3d',
-            transformStyle: 'preserve-3d',
-            WebkitPerspective: '1000px',
-            perspective: '1000px',
-          })
+          left: '24px',
+          right: '24px',
+          top: '8px',
+          borderRadius: '20px',
+          overflow: 'hidden',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          WebkitTransformStyle: 'preserve-3d',
+          transformStyle: 'preserve-3d',
+          WebkitPerspective: '1000px',
+          perspective: '1000px',
         }}
         role="banner"
         aria-label="TwinForge Pont de Commandement"
@@ -61,10 +48,7 @@ export const Header = React.memo(() => {
           <div className="flex items-center gap-1 md:gap-3">
             {/* Bouton Retour - Référence visuelle */}
             <BackButton />
-            {/* Logo visible uniquement sur desktop (>= 1024px) */}
-            <div className="hidden lg:block">
-              <HeaderLogo />
-            </div>
+            <HeaderLogo />
           </div>
 
           {/* Right */}
@@ -94,9 +78,9 @@ export const Header = React.memo(() => {
                 boxShadow: centralMenuOpen
                   ? `0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 4px 32px rgba(247, 147, 30, 0.5), 0 2px 16px rgba(0, 0, 0, 0.25)`
                   : `0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 4px 24px rgba(247, 147, 30, 0.25), 0 2px 12px rgba(0, 0, 0, 0.2)`,
-                transition: isMobile ? 'none' : 'transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1)',
+                transition: 'transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1)',
                 transform: 'translateZ(0)',
-                willChange: isMobile ? 'auto' : 'transform, filter',
+                willChange: 'transform, filter',
                 cursor: 'pointer'
               }}
               aria-label="Ouvrir les outils du forgeron"
@@ -111,14 +95,13 @@ export const Header = React.memo(() => {
                   toggle('centralMenu');
                 }
               }}
-              whileHover={isMobile ? undefined : { scale: 1.05 }}
-              whileTap={isMobile ? undefined : { scale: 0.98 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
             >
-              {/* Carrés tournants aux 4 coins - Désactivés sur mobile */}
-              {!isMobile && [0, 1, 2, 3].map((i) => (
+              {/* Carrés tournants aux 4 coins */}
+              {[0, 1, 2, 3].map((i) => (
                 <motion.div
                   key={i}
-                  className="header-corner-square"
                   style={{
                     position: 'absolute',
                     width: '6px',
@@ -161,30 +144,28 @@ export const Header = React.memo(() => {
                 aria-hidden="true"
               />
 
-              {!isMobile && (
-                <motion.div
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background: 'radial-gradient(circle at center, rgba(247, 147, 30, 0.25) 0%, transparent 70%)',
-                    filter: 'blur(10px)',
-                    zIndex: -1,
-                    pointerEvents: 'none'
-                  }}
-                  animate={centralMenuOpen ? {
-                    scale: [1, 1.4, 1.3],
-                    opacity: [0.7, 1, 0.8]
-                  } : {
-                    scale: [1, 1.15, 1],
-                    opacity: [0.4, 0.6, 0.4]
-                  }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    ease: 'easeInOut'
-                  }}
-                  aria-hidden="true"
-                />
-              )}
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: 'radial-gradient(circle at center, rgba(247, 147, 30, 0.25) 0%, transparent 70%)',
+                  filter: 'blur(10px)',
+                  zIndex: -1,
+                  pointerEvents: 'none'
+                }}
+                animate={centralMenuOpen ? {
+                  scale: [1, 1.4, 1.3],
+                  opacity: [0.7, 1, 0.8]
+                } : {
+                  scale: [1, 1.15, 1],
+                  opacity: [0.4, 0.6, 0.4]
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+                aria-hidden="true"
+              />
             </motion.button>
 
             {/* Bouton Hamburger - Menu de navigation - MASQUÉ sur desktop */}
@@ -213,9 +194,9 @@ export const Header = React.memo(() => {
                   0 2px 12px rgba(0, 0, 0, 0.18),
                   inset 0 1px 0 rgba(255, 255, 255, 0.12)
                 `,
-                transition: isMobile ? 'none' : 'transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1)',
+                transition: 'transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1)',
                 transform: 'translateZ(0)',
-                willChange: isMobile ? 'auto' : 'transform, filter',
+                willChange: 'transform, filter',
                 cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
@@ -260,8 +241,8 @@ export const Header = React.memo(() => {
                   setDrawer(true);
                 }
               }}
-              whileHover={isMobile ? undefined : { scale: 1.05 }}
-              whileTap={isMobile ? undefined : { scale: 0.98 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
             >
               <SpatialIcon
                 Icon={ICONS.Menu}

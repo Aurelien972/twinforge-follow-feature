@@ -18,14 +18,13 @@
   box-shadow: var(--liquid-shadow-elevated) !important;
 
   transition: all var(--liquid-transition-medium);
-  position: fixed !important;
+  position: relative;
   overflow: visible !important;
   isolation: isolate !important;
-  transform: translateZ(0) !important;
-  will-change: transform, filter !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-  contain: layout style paint !important;
+  transform: translateZ(0);
+  will-change: transform, filter;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 
   /* Safari rounded fix */
   -webkit-mask-image: -webkit-radial-gradient(white, black);
@@ -106,12 +105,10 @@
   overflow-y: auto;
   overflow-x: hidden;
   max-height: calc(100vh - 120px);
-  height: 100%;
   padding: 0.5rem 0.25rem 0.375rem 1rem;
   scrollbar-width: none; /* Firefox - Scrollbar invisible */
   position: relative;
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
 
   /* Effet de fade aux extrémités */
   -webkit-mask-image: linear-gradient(
@@ -534,122 +531,6 @@
   min-height: auto;
 }
 
-/* Mobile performance - Disable all animations and effects */
-@media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  /* CRITICAL: Disable ALL animations on sidebar for mobile */
-  .sidebar-glass-enhanced,
-  .sidebar-glass-enhanced::before,
-  .sidebar-glass-enhanced::after,
-  .sidebar-item,
-  .sidebar-item::before,
-  .sidebar-item::after,
-  .sidebar-item-icon-container,
-  .sidebar-item-icon,
-  .sidebar-item-label,
-  .sidebar-item-subtitle,
-  .sidebar-submenu,
-  .sidebar-submenu-item,
-  .sidebar-submenu-item-icon-container,
-  .sidebar-expand-button,
-  .sidebar-expand-icon {
-    animation: none !important;
-    transition: none !important;
-    will-change: auto !important;
-    transform: none !important;
-  }
-
-  /* Disable all hover and active effects on mobile */
-  .sidebar-item:hover,
-  .sidebar-item:active,
-  .sidebar-item:hover .sidebar-item-icon-container,
-  .sidebar-item:active .sidebar-item-icon-container,
-  .sidebar-submenu-item:hover,
-  .sidebar-submenu-item:active,
-  .sidebar-submenu-item:hover .sidebar-item-icon-container,
-  .sidebar-expand-button:hover,
-  .sidebar-expand-button:active {
-    transform: none !important;
-    box-shadow: none !important;
-    background: initial !important;
-    scale: 1 !important;
-  }
-
-  /* Disable border animations */
-  .sidebar-glass-enhanced::before {
-    animation: none !important;
-    opacity: 0.6 !important;
-  }
-
-  /* Disable glow animations */
-  .sidebar-glass-enhanced::after {
-    animation: none !important;
-    opacity: 0.4 !important;
-  }
-
-  /* Simplify backdrop-filter for mobile */
-  .sidebar-glass-enhanced {
-    backdrop-filter: blur(8px) saturate(120%) !important;
-    -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
-  }
-}
-
-/* Mobile device class - Complete animation freeze */
-.mobile-device .sidebar-glass-enhanced,
-.mobile-device .sidebar-glass-enhanced::before,
-.mobile-device .sidebar-glass-enhanced::after,
-.mobile-device .sidebar-item,
-.mobile-device .sidebar-item::before,
-.mobile-device .sidebar-item::after,
-.mobile-device .sidebar-item-icon-container,
-.mobile-device .sidebar-item-icon,
-.mobile-device .sidebar-item-label,
-.mobile-device .sidebar-item-subtitle,
-.mobile-device .sidebar-submenu,
-.mobile-device .sidebar-submenu-item,
-.mobile-device .sidebar-submenu-item-icon-container,
-.mobile-device .sidebar-expand-button,
-.mobile-device .sidebar-expand-icon {
-  animation: none !important;
-  transition: none !important;
-  will-change: auto !important;
-  transform: none !important;
-}
-
-/* Disable hover/active effects via mobile-device class */
-.mobile-device .sidebar-item:hover,
-.mobile-device .sidebar-item:active,
-.mobile-device .sidebar-item:hover .sidebar-item-icon-container,
-.mobile-device .sidebar-item:active .sidebar-item-icon-container,
-.mobile-device .sidebar-submenu-item:hover,
-.mobile-device .sidebar-submenu-item:active,
-.mobile-device .sidebar-expand-button:hover,
-.mobile-device .sidebar-expand-button:active {
-  transform: none !important;
-  box-shadow: none !important;
-  background: initial !important;
-  scale: 1 !important;
-}
-
-/* Disable pseudo-element animations via mobile-device class */
-.mobile-device .sidebar-glass-enhanced::before {
-  animation: none !important;
-  opacity: 0.5 !important;
-  background-size: 100% 100% !important;
-}
-
-.mobile-device .sidebar-glass-enhanced::after {
-  animation: none !important;
-  opacity: 0.3 !important;
-  filter: none !important;
-}
-
-/* Solid backdrop for mobile-device */
-.mobile-device .sidebar-glass-enhanced {
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
-  background: rgba(11, 14, 23, 0.95) !important;
-}
-
 /* Responsive adjustments - CORRECTIONS MOBILES */
 @media (max-width: 1024px) {
   .sidebar-content {
@@ -758,15 +639,15 @@
 
   .sidebar-item-icon,
   .sidebar-item-label {
-    transition: none !important;
+    transition: color 0.2s ease;
   }
 
   .sidebar-submenu {
-    transition: none !important;
+    transition: grid-template-rows 0.2s ease, opacity 0.2s ease;
   }
 
   .sidebar-expand-icon {
-    transition: none !important;
+    transition: transform 0.2s ease;
   }
 
   .sidebar-submenu-item:hover {
@@ -840,17 +721,6 @@
   grid-template-rows: 1fr;
   opacity: 1;
   margin-top: 0.125rem;
-}
-
-/* Mobile - Disable submenu animations completely */
-@media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  .sidebar-submenu {
-    transition: none !important;
-  }
-
-  .sidebar-submenu--expanded {
-    transition: none !important;
-  }
 }
 
 /* Inner wrapper for grid-based animation */

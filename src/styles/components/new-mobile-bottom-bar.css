@@ -12,7 +12,7 @@
   --new-bottom-bar-padding: 12px;
   --new-bottom-bar-button-size: 56px;
   --new-bottom-bar-central-button-size: 80px;
-  --new-bottom-bar-z-index: 999996;
+  --new-bottom-bar-z-index: 9996;
 
   /* Floating CTA button dimensions for stacking calculations */
   --floating-cta-button-height: 60px;
@@ -27,26 +27,16 @@
 }
 
 .new-mobile-bottom-bar {
-  position: -webkit-sticky !important;
-  position: sticky !important;
+  position: fixed !important;
   bottom: var(--new-bottom-bar-bottom-offset) !important;
-  left: 0 !important;
-  right: 0 !important;
-  margin: 0 8px !important;
+  left: 8px !important;
+  right: 8px !important;
   z-index: var(--new-bottom-bar-z-index) !important;
   height: var(--new-bottom-bar-height) !important;
+  transform: translate3d(0, 0, 0) !important;
+  will-change: transform !important;
+  contain: layout style paint !important;
   isolation: isolate !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-  pointer-events: auto !important;
-}
-
-/* Ensure position fixed is never overridden */
-.new-mobile-bottom-bar,
-.new-mobile-bottom-bar * {
-  /* CRITICAL: flat transform style to preserve position:fixed on iOS */
-  -webkit-transform-style: flat !important;
-  transform-style: flat !important;
 }
 
 .new-mobile-bottom-bar-container {
@@ -74,7 +64,8 @@
   -webkit-mask-image: -webkit-radial-gradient(white, black);
           mask-image: radial-gradient(white, black);
 
-  will-change: contents;
+  transform: translateZ(0);
+  will-change: transform, filter;
   backface-visibility: hidden;
 }
 
@@ -178,7 +169,7 @@
   box-shadow: none !important;
 }
 
-/* Hover effects (desktop/tablet) - ROUNDED glass interaction */
+/* Hover effects (desktop/tablet) - Enhanced glass interaction */
 @media (hover: hover) and (pointer: fine) {
   .new-bottom-bar-button:hover {
     background: transparent !important;
@@ -191,11 +182,10 @@
 
   .new-bottom-bar-button:hover .new-bottom-bar-icon-container {
     transform: scale(1.08) translateZ(0);
-    /* ROUNDED GLOW - pas de bords carrés */
     box-shadow:
-      0 4px 12px rgba(0,0,0,0.2),
-      0 0 16px rgba(255,255,255,0.12),
-      inset 0 1px 0 rgba(255,255,255,0.2);
+      var(--liquid-pill-shadow),
+      0 0 20px rgba(255,255,255,0.15),
+      0 4px 16px rgba(0,0,0,0.2);
     border-color: rgba(255,255,255,0.3);
   }
 
@@ -207,12 +197,11 @@
   }
 
   .new-bottom-bar-button--central:hover .new-bottom-bar-icon-container {
-    /* ROUNDED ORANGE GLOW pour bouton central */
     box-shadow:
-      0 4px 16px rgba(0,0,0,0.25),
-      0 0 24px rgba(247, 147, 30, 0.3),
-      0 0 48px rgba(253, 200, 48, 0.15),
-      inset 0 1px 0 rgba(255,255,255,0.25);
+      var(--liquid-pill-shadow),
+      0 0 35px rgba(247, 147, 30, 0.35),
+      0 0 70px rgba(253, 200, 48, 0.2),
+      0 4px 20px rgba(0,0,0,0.25);
     border-color: rgba(247, 147, 30, 0.5);
   }
 }
@@ -395,62 +384,13 @@
   }
 }
 
-/* =========================================
-   MOBILE OPTIMIZATIONS - DISABLE ANIMATIONS
-   ========================================= */
-
-@media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  /* Disable border pulse animation on mobile */
-  .new-mobile-bottom-bar-container::before {
-    animation: none !important;
-    opacity: 0.6 !important;
-  }
-
-  /* Disable glow animation on mobile */
-  .new-mobile-bottom-bar-container::after {
-    animation: none !important;
-    opacity: 0.5 !important;
-  }
-
-  /* Disable active pulse animation */
-  .new-bottom-bar-icon-container--active {
-    animation: none !important;
-  }
-
-  /* Instant transitions on mobile */
-  .new-bottom-bar-button,
-  .new-bottom-bar-icon-container {
-    transition: none !important;
-  }
-}
-
-/* Mobile device class enforcement */
-.mobile-device .new-mobile-bottom-bar-container::before {
-  animation: none !important;
-  opacity: 0.6 !important;
-}
-
-.mobile-device .new-mobile-bottom-bar-container::after {
-  animation: none !important;
-  opacity: 0.5 !important;
-}
-
-.mobile-device .new-bottom-bar-icon-container--active {
-  animation: none !important;
-}
-
-.mobile-device .new-bottom-bar-button,
-.mobile-device .new-bottom-bar-icon-container {
-  transition: none !important;
-}
-
 /* Accessibilité / fallbacks / perf */
 @media (prefers-reduced-motion: reduce) {
   .new-bottom-bar-button,
   .new-bottom-bar-icon-container {
     transition: background-color 0.2s ease, color 0.2s ease !important;
   }
-
+  
   .new-bottom-bar-button:hover,
   .new-bottom-bar-button[aria-current="page"] {
     transform: none !important;

@@ -192,7 +192,7 @@
    ========================================= */
 
 @media (max-width: 768px), (hover: none), (pointer: coarse) {
-  /* CRITICAL: Disable ALL animations and effects on mobile and touch devices */
+  /* CRITICAL: Disable icon animations on mobile and touch devices */
   .spatial-icon,
   .icon-container,
   .breathing-icon,
@@ -200,44 +200,22 @@
   .icon-breathing-css,
   .breathing-glow,
   .particle-float,
-  .particle-css,
-  button,
-  [role="button"],
-  .glass-card,
-  .sidebar-item,
-  .sidebar-item-icon-container,
-  .nav-item,
-  .hover-lift {
+  .particle-css {
     animation: none !important;
-    transform: none !important;
+    transform: translateZ(0) !important;
     transition: none !important;
-    will-change: auto !important;
+    opacity: 0.9 !important;
   }
 
-  /* Désactiver complètement hover et active states sur mobile */
+  /* Désactiver complètement hover sur mobile */
   .spatial-icon:hover,
-  .spatial-icon:active,
   .icon-container:hover,
-  .icon-container:active,
-  .hover-lift:hover,
-  .hover-lift:active,
-  button:hover,
-  button:active,
-  .glass-card:hover,
-  .glass-card:active {
+  .hover-lift:hover {
     transform: none !important;
     box-shadow: none !important;
-    background: initial !important;
-    scale: 1 !important;
-    filter: none !important;
   }
 
-  .spatial-icon:hover::after,
-  .spatial-icon:active::after,
-  .spatial-icon:hover::before,
-  .spatial-icon:active::before,
-  .icon-container::before,
-  .icon-container::after {
+  .spatial-icon:hover::after {
     opacity: 0 !important;
     display: none !important;
   }
@@ -281,17 +259,8 @@
     animation: icon-spin-css 3s linear infinite !important;
   }
   
-  /* Override transition durations for motion elements only */
-  .spatial-icon,
-  .icon-container,
-  .breathing-icon,
-  .icon-pulse-css,
-  .icon-breathing-css,
-  .glass-shimmer,
-  .hover-lift,
-  .glass-card,
-  button,
-  [role="button"] {
+  /* Override all transition durations */
+  * {
     transition-duration: 0.1s !important;
   }
 }

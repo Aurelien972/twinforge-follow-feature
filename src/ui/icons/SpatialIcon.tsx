@@ -3,7 +3,8 @@ import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Divide as LucideIcon } from 'lucide-react';
 import { useOptimizedWillChange } from '../../lib/motion/useOptimizedWillChange';
-import { usePreferredMotion, useHasTouch, useIsMobile } from '../../system/device/DeviceProvider';
+import { usePreferredMotion, useHasTouch } from '../../system/device/DeviceProvider';
+import { usePerformanceMode } from '../../system/context/PerformanceModeContext';
 import { designKernel } from '../../styles/designKernel';
 import { visionCurves } from '../../lib/motion/gpuVariants';
 
@@ -70,11 +71,11 @@ const SpatialIcon: React.FC<SpatialIconProps> = ({
 }) => {
   const preferredMotion = usePreferredMotion();
   const hasTouch = useHasTouch();
-  const isMobileDevice = useIsMobile();
+  const { isPerformanceMode } = usePerformanceMode();
   const iconRef = useRef<HTMLDivElement>(null);
 
-  // CRITICAL: Désactiver les animations sur mobile (détection automatique)
-  const shouldAnimate = !preferredMotion && animateProp && !isMobileDevice;
+  // CRITICAL: Désactiver les animations sur mobile et en mode performance
+  const shouldAnimate = !preferredMotion && animateProp && window.innerWidth > 768 && !isPerformanceMode;
   
   // TwinForge color system
   const iconColor = color ?? 'var(--text-icon-idle)'; // Default to TwinForge idle color
@@ -104,7 +105,7 @@ const SpatialIcon: React.FC<SpatialIconProps> = ({
   
   // TwinForge hover handlers with cyan glow
   const handleMouseEnter = () => {
-    if (!shouldAnimate || hasTouch || variant === 'pure' || isMobileDevice) return;
+    if (!shouldAnimate || hasTouch || variant === 'pure' || isPerformanceMode) return;
     
     if (iconRef.current) {
       // TwinForge cyan glow effect - subtle and precise
@@ -115,7 +116,7 @@ const SpatialIcon: React.FC<SpatialIconProps> = ({
   };
   
   const handleMouseLeave = () => {
-    if (!shouldAnimate || hasTouch || variant === 'pure' || isMobileDevice) return;
+    if (!shouldAnimate || hasTouch || variant === 'pure' || isPerformanceMode) return;
     
     if (iconRef.current) {
       iconRef.current.style.filter = '';
@@ -150,9 +151,9 @@ const SpatialIcon: React.FC<SpatialIconProps> = ({
     (!isInteractive && !ariaLabel && !role);
 
   // Conditional styling based on variant
-  const containerClassName = variant === 'pure'
-    ? `inline-flex items-center justify-center spatial-icon icon-container ${isInteractive ? 'cursor-pointer focus-ring' : ''} ${isMobileDevice ? 'mobile-static-icon' : ''} ${shouldAnimate ? 'will-change-transform-important' : 'will-change-auto-important'} ${className}`
-    : `inline-flex items-center justify-center spatial-icon icon-container gpu-only-transform ${isInteractive ? 'cursor-pointer focus-ring' : ''} ${isMobileDevice ? 'mobile-static-icon' : ''} ${shouldAnimate ? 'will-change-transform-important' : 'will-change-auto-important'} ${className}`;
+  const containerClassName = variant === 'pure' 
+    ? `inline-flex items-center justify-center spatial-icon icon-container ${isInteractive ? 'cursor-pointer focus-ring' : ''} ${window.innerWidth <= 768 ? 'mobile-static-icon' : ''} ${shouldAnimate ? 'will-change-transform-important' : 'will-change-auto-important'} ${className}`
+    : `inline-flex items-center justify-center spatial-icon icon-container gpu-only-transform ${isInteractive ? 'cursor-pointer focus-ring' : ''} ${window.innerWidth <= 768 ? 'mobile-static-icon' : ''} ${shouldAnimate ? 'will-change-transform-important' : 'will-change-auto-important'} ${className}`;
 
   const getBorderRadius = () => {
     if (shape === 'square') {

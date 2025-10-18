@@ -1,98 +1,116 @@
 /* =========================================
-   PERFORMANCE MODE - Balanced Optimization
-   Applied when user enables performance mode
+   PERFORMANCE MODE - iPhone 10 Optimization
+   Global CSS overrides for performance mode
    ========================================= */
 
 /* =========================================
-   GLASS EFFECTS - Simplified
+   GLASS EFFECTS - Solid backgrounds
    ========================================= */
 
 .performance-mode .glass-card,
 .performance-mode .glass-base,
 .performance-mode .glass-card-cta {
-  /* Solid background for performance */
+  /* Replace transparency with solid dark blue */
   background: #0F1927 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 
-  /* Simple shadow */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  /* Keep only simple box-shadow, remove all glows */
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
 
+  /* Remove border transparency */
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Remove decorative pseudo-elements */
+/* Remove pseudo-element glows and highlights */
 .performance-mode .glass-card::before,
-.performance-mode .glass-card::after {
+.performance-mode .glass-card::after,
+.performance-mode .glass-card-cta::before,
+.performance-mode .glass-card-cta::after {
   display: none !important;
 }
 
-/* Disable sheen */
+/* Disable sheen completely */
 .performance-mode .glass-sheen {
   display: none !important;
 }
 
 /* =========================================
-   HOVER EFFECTS - Simplified
+   HOVER EFFECTS - Disabled
    ========================================= */
 
 .performance-mode .glass-card:hover,
 .performance-mode .glass-card-cta:hover {
   transform: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: none !important;
 }
 
 /* =========================================
-   ICONS - Simplified
+   ICONS - No glows or halos
    ========================================= */
 
 .performance-mode .spatial-icon,
 .performance-mode .icon-container {
+  /* Remove all glows and filters */
   filter: none !important;
+
+  /* Solid background for interactive icons */
+  background: #1A2332 !important;
 }
 
 .performance-mode .spatial-icon:hover {
   filter: none !important;
 }
 
-/* =========================================
-   ANIMATIONS - Reduced
-   ========================================= */
-
-.performance-mode [class*="breathing"],
-.performance-mode [class*="pulse"],
-.performance-mode [class*="glow"],
-.performance-mode [class*="shimmer"] {
-  animation: none !important;
+/* Remove icon halos */
+.performance-mode .spatial-icon > div[class*="absolute"] {
+  display: none !important;
 }
 
-/* Keep tap feedback */
-.performance-mode button:active,
-.performance-mode .glass-card:active {
-  transform: scale(0.98) translateZ(0) !important;
+/* =========================================
+   ANIMATIONS - All disabled
+   ========================================= */
+
+.performance-mode * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Exception: keep tap feedback for better UX */
+.performance-mode .glass-card:active,
+.performance-mode .glass-card-cta:active,
+.performance-mode .spatial-icon:active {
+  transform: scale(0.98) !important;
   transition: transform 0.08s ease-out !important;
 }
 
 /* =========================================
-   FRAMER MOTION - Simplified
+   FRAMER MOTION - Disable animations
    ========================================= */
 
 .performance-mode [data-framer-motion] {
-  animation-duration: 0.15s !important;
-  transition-duration: 0.15s !important;
+  animation: none !important;
+  transform: none !important;
 }
 
 /* =========================================
    CIRCUITS AND EFFECTS - Disabled
    ========================================= */
 
-.performance-mode [class*="circuit"],
-.performance-mode [class*="particle"],
-.performance-mode [class*="spark"] {
+.performance-mode [class*="breathing"],
+.performance-mode [class*="pulse"],
+.performance-mode [class*="glow"],
+.performance-mode [class*="shimmer"],
+.performance-mode [class*="float"] {
   animation: none !important;
   filter: none !important;
-  opacity: 0.6 !important;
+  opacity: 1 !important;
 }
 
 /* =========================================
@@ -100,7 +118,12 @@
    ========================================= */
 
 .performance-mode [class*="shadow"] {
+  /* Remove all colored shadows and glows */
   filter: none !important;
+}
+
+.performance-mode [style*="box-shadow"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* =========================================
@@ -108,6 +131,7 @@
    ========================================= */
 
 .performance-mode .loader-essential {
+  /* Keep essential loaders but simplify */
   animation: icon-spin-css 2s linear infinite !important;
 }
 
@@ -117,6 +141,7 @@
 
 .performance-mode [style*="radial-gradient"],
 .performance-mode [style*="linear-gradient"] {
+  /* Simplify gradients to solid colors */
   background-image: none !important;
 }
 
@@ -139,36 +164,37 @@
 }
 
 /* =========================================
-   NAVIGATION - Keep identity
-   Light blur preserved for brand coherence
+   PAGE HEADER AND NAVIGATION - Keep intact
+   Do NOT apply performance mode to navigation elements
    ========================================= */
 
-.performance-mode .header-liquid-glass,
-.performance-mode .new-mobile-bottom-bar-container,
-.performance-mode .floating-chat-button,
-.performance-mode .floating-voice-coach-button {
-  /* These keep minimal blur for visual identity */
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
+/* These remain unchanged and are excluded from performance mode */
+.performance-mode header,
+.performance-mode .sidebar,
+.performance-mode .mobile-drawer,
+.performance-mode .bottom-bar,
+.performance-mode .floating-chat-button {
+  /* Navigation elements keep their original styles */
+  all: revert;
 }
 
 /* =========================================
-   BACKDROP EFFECTS - Disabled for most
+   BACKDROP EFFECTS - Disabled
    ========================================= */
 
-.performance-mode [style*="backdrop-filter"]:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.floating-chat-button),
-.performance-mode [style*="-webkit-backdrop-filter"]:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container):not(.floating-chat-button) {
+.performance-mode [style*="backdrop-filter"],
+.performance-mode [style*="-webkit-backdrop-filter"] {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
 /* =========================================
-   FILTERS - All removed except navigation
+   FILTERS - All removed
    ========================================= */
 
-.performance-mode [style*="filter:"]:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container),
-.performance-mode [class*="blur"]:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container),
-.performance-mode [class*="saturate"]:not(.header-liquid-glass):not(.new-mobile-bottom-bar-container) {
+.performance-mode [style*="filter:"],
+.performance-mode [class*="blur"],
+.performance-mode [class*="saturate"] {
   filter: none !important;
 }
 
@@ -177,6 +203,7 @@
    ========================================= */
 
 .performance-mode [style*="opacity"] {
+  /* Keep opacity but remove transitions */
   transition: none !important;
 }
 
@@ -193,6 +220,7 @@
    ========================================= */
 
 .performance-mode * {
+  /* Reset complex z-index stacks */
   isolation: auto !important;
   contain: none !important;
 }

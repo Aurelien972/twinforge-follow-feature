@@ -4,23 +4,6 @@ import { ICONS } from '../icons/registry';
 import SpatialIcon from '../icons/SpatialIcon';
 import { CIRCUIT_COLORS, type CircuitKey } from '../theme/circuits';
 
-// Hook pour détecter mobile
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = React.useState(false);
-
-  React.useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  return isMobile;
-};
-
 type Props = {
   icon?: keyof typeof ICONS;
   title: string;
@@ -31,17 +14,15 @@ type Props = {
   iconColor?: string;
 };
 
-export default function PageHeader({
-  icon = 'Home',
-  title,
-  subtitle,
-  actions,
+export default function PageHeader({ 
+  icon = 'Home', 
+  title, 
+  subtitle, 
+  actions, 
   className = '',
   circuit = 'home',
   iconColor
 }: Props) {
-  const isMobile = useIsMobile();
-
   // Gestion spéciale pour certains circuits
   const finalIcon = (() => {
     if (circuit === 'track') return ICONS.Target;
@@ -50,9 +31,6 @@ export default function PageHeader({
 
   // Utiliser la couleur spécifique ou celle du circuit
   const finalCircuitColor = iconColor || CIRCUIT_COLORS[circuit];
-
-  // Taille de l'icône: beaucoup plus grande sur mobile pour remplir le conteneur
-  const iconSize = isMobile ? 72 : 56;
   
   return (
     <header
@@ -62,14 +40,14 @@ export default function PageHeader({
     >
       <div className="flex flex-row items-center gap-6 mb-8">
         {/* Icône avec effet de glow renforcé */}
-        <div
+        <div 
           className="breathing-icon flex-shrink-0"
           style={{
             '--animation-duration-slower': '5s'
           }}
         >
           <div
-            className="w-24 h-24 md:w-28 md:h-28 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-lg"
+            className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-lg"
             style={{
               '--header-icon-radius': '24px',
               borderRadius: 'var(--header-icon-radius)',
@@ -99,7 +77,7 @@ export default function PageHeader({
           >
             <SpatialIcon
               Icon={finalIcon}
-              size={iconSize}
+              size={48}
               variant="pure"
               className="text-white relative z-10"
               style={{

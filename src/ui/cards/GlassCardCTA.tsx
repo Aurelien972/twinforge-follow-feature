@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import clsx from 'clsx';
-import { useIsMobile } from '../../system/device/DeviceProvider';
+import { usePerformanceMode } from '../../system/context/PerformanceModeContext';
 
 interface GlassCardCTAProps {
   children: React.ReactNode;
@@ -15,8 +15,9 @@ interface GlassCardCTAProps {
 const GlassCardCTA = React.forwardRef<HTMLDivElement, GlassCardCTAProps>(
   ({ children, className, color, onClick, disabled = false, style }, ref) => {
     const reduceMotion = useReducedMotion();
-    const isMobileDevice = useIsMobile();
-    const shouldAnimate = !reduceMotion && !isMobileDevice;
+    const { isPerformanceMode } = usePerformanceMode();
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    const shouldAnimate = !reduceMotion && !isMobile && !isPerformanceMode;
 
     return (
       <motion.div
@@ -66,7 +67,7 @@ const GlassCardCTA = React.forwardRef<HTMLDivElement, GlassCardCTAProps>(
         whileTap={
           !disabled && shouldAnimate
             ? {
-                scale: 0.99,
+                scale: 0.98,
                 y: 0,
                 transition: {
                   duration: 0.15,

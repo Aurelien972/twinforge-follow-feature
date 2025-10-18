@@ -5,74 +5,36 @@ import logger from '../../lib/utils/logger';
 interface PerformanceModeState {
   isPerformanceMode: boolean;
   isLoading: boolean;
-  isForcedByMobile: boolean;
   setPerformanceMode: (enabled: boolean, userId?: string) => Promise<void>;
   loadPerformanceMode: (userId?: string) => Promise<void>;
 }
 
 const STORAGE_KEY = 'twinforge-performance-mode';
 
-/**
- * CRITICAL: Detect if device is mobile
- * Mobile devices MUST have performance mode enabled
- */
-function isMobileDevice(): boolean {
-  if (typeof window === 'undefined') return false;
-
-  const isSmallScreen = window.innerWidth <= 768;
-  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  const userAgent = navigator.userAgent || '';
-  const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-  const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
-
-  return isSmallScreen || hasTouch || isMobileUA || isCoarsePointer;
-}
-
 export const usePerformanceModeStore = create<PerformanceModeState>((set, get) => ({
   isPerformanceMode: false,
   isLoading: true,
-  isForcedByMobile: false,
 
   loadPerformanceMode: async (userId?: string) => {
     try {
       set({ isLoading: true });
 
-      // CRITICAL: Check if mobile device
-      const isMobile = isMobileDevice();
-
-      // FORCE performance mode on mobile devices
-      if (isMobile) {
-        set({
-          isPerformanceMode: true,
-          isForcedByMobile: true,
-          isLoading: false
-        });
-        document.documentElement.classList.add('performance-mode');
-        document.body.classList.add('performance-mode');
-        localStorage.setItem(STORAGE_KEY, 'true');
-
-        logger.info('PERFORMANCE_MODE', 'FORCED ON for mobile device');
-        return;
-      }
-
-      // For desktop: Try localStorage first for immediate feedback
+      // Try localStorage first for immediate feedback
       const localValue = localStorage.getItem(STORAGE_KEY);
       if (localValue !== null) {
         const isEnabled = localValue === 'true';
-        set({ isPerformanceMode: isEnabled, isForcedByMobile: false, isLoading: false });
+        set({ isPerformanceMode: isEnabled, isLoading: false });
 
         // Apply performance mode class immediately
         if (isEnabled) {
           document.documentElement.classList.add('performance-mode');
-          document.body.classList.add('performance-mode');
         } else {
           document.documentElement.classList.remove('performance-mode');
-          document.body.classList.remove('performance-mode');
         }
       }
 
-      // For desktop: If user is logged in, sync with Supabase
-      if (userId && !isMobile) {
+      // If user is logged in, sync with Supabase
+      if (userId) {
         const { data, error } = await supabase
           .from('user_preferences')
           .select('performance_mode_enabled')
@@ -83,7 +45,7 @@ export const usePerformanceModeStore = create<PerformanceModeState>((set, get) =
           logger.error('PERFORMANCE_MODE', 'Failed to load from Supabase', { error });
         } else if (data) {
           const isEnabled = data.performance_mode_enabled ?? false;
-          set({ isPerformanceMode: isEnabled, isForcedByMobile: false, isLoading: false });
+          set({ isPerformanceMode: isEnabled, isLoading: false });
 
           // Update localStorage to match Supabase
           localStorage.setItem(STORAGE_KEY, String(isEnabled));
@@ -91,10 +53,8 @@ export const usePerformanceModeStore = create<PerformanceModeState>((set, get) =
           // Apply performance mode class
           if (isEnabled) {
             document.documentElement.classList.add('performance-mode');
-            document.body.classList.add('performance-mode');
           } else {
             document.documentElement.classList.remove('performance-mode');
-            document.body.classList.remove('performance-mode');
           }
 
           logger.info('PERFORMANCE_MODE', 'Loaded from Supabase', { isEnabled });
@@ -110,14 +70,7 @@ export const usePerformanceModeStore = create<PerformanceModeState>((set, get) =
 
   setPerformanceMode: async (enabled: boolean, userId?: string) => {
     try {
-      // CRITICAL: Prevent disabling performance mode on mobile
-      const isMobile = isMobileDevice();
-      if (isMobile && !enabled) {
-        logger.warn('PERFORMANCE_MODE', 'Cannot disable on mobile device');
-        return;
-      }
-
-      set({ isPerformanceMode: enabled, isForcedByMobile: isMobile });
+      set({ isPerformanceMode: enabled });
 
       // Update localStorage immediately
       localStorage.setItem(STORAGE_KEY, String(enabled));
@@ -125,13 +78,11 @@ export const usePerformanceModeStore = create<PerformanceModeState>((set, get) =
       // Apply or remove performance mode class
       if (enabled) {
         document.documentElement.classList.add('performance-mode');
-        document.body.classList.add('performance-mode');
       } else {
         document.documentElement.classList.remove('performance-mode');
-        document.body.classList.remove('performance-mode');
       }
 
-      logger.info('PERFORMANCE_MODE', 'Mode changed', { enabled, isMobile });
+      logger.info('PERFORMANCE_MODE', 'Mode changed', { enabled });
 
       // If user is logged in, persist to Supabase
       if (userId) {

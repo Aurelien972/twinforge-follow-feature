@@ -7,42 +7,39 @@ import { ToastProvider } from '../../ui/components/ToastProvider';
 import { DeviceProvider } from '../../system/device/DeviceProvider';
 import { ErrorBoundary } from './ErrorBoundary';
 import { IllustrationCacheProvider } from '../../system/context/IllustrationCacheContext';
+import { PerformanceModeProvider } from '../../system/context/PerformanceModeContext';
 import { useDevicePerformance } from '../../hooks/useDevicePerformance';
 import { useAutoSync } from '../../hooks/useAutoSync';
 import { useUserStore } from '../../system/store/userStore';
 import logger from '../../lib/utils/logger';
 
-// Detect mobile for optimized cache configuration
-const isMobile = window.innerWidth <= 1024 || 'ontouchstart' in window;
-
-// Create QueryClient with mobile-optimized cache configuration
+// Create QueryClient with enhanced cache configuration for persistence
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: isMobile ? 5 * 60 * 1000 : 10 * 60 * 1000, // 5min mobile, 10min desktop
-      gcTime: isMobile ? 5 * 60 * 1000 : 24 * 60 * 60 * 1000, // 5min mobile, 24h desktop
-      retry: isMobile ? 0 : 1, // No retries on mobile to prevent hanging
+      staleTime: 10 * 60 * 1000, // 10 minutes - increased for better persistence
+      gcTime: 24 * 60 * 60 * 1000, // 24 hours - keep data longer in cache
+      retry: 1,
       refetchOnWindowFocus: false, // Prevent unnecessary refetches
       refetchOnMount: (query) => {
-        // CRITICAL: Limit refetches on mobile
-        if (isMobile) {
-          return false; // Never refetch on mobile to save resources
-        }
-
+        // CRITICAL: Allow refetch on mount for real-time data that changes frequently
         const queryKey = query.queryKey;
 
-        // Desktop: Allow refetch for real-time data
+        // Always refetch meals data on mount (user just saved a meal)
         if (queryKey.includes('meals-today')) return true;
         if (queryKey.includes('meals-week')) return true;
         if (queryKey.includes('meals-recent')) return true;
+
+        // Always refetch daily summaries (depends on meals data)
         if (queryKey.includes('daily-ai-summary')) return true;
 
+        // Don't refetch other queries on mount
         return false;
       },
       refetchOnReconnect: false, // Prevent refetch on network reconnect
     },
     mutations: {
-      retry: isMobile ? 0 : 1, // No retries on mobile
+      retry: 1,
     },
   },
 });
@@ -108,14 +105,7 @@ let persistenceInitialized = false;
 
 const initializeCachePersistence = async () => {
   if (persistenceInitialized) return;
-
-  // MOBILE: Disable cache persistence to prevent freezes and white screens
-  if (isMobile) {
-    logger.info('REACT_QUERY_PERSISTENCE', 'Cache persistence disabled on mobile for stability');
-    persistenceInitialized = true;
-    return;
-  }
-
+  
   try {
     logger.info('REACT_QUERY_PERSISTENCE', 'Initializing cache persistence', {
       persisterKey: 'twinforge-react-query-cache',
@@ -165,14 +155,14 @@ const initializeCachePersistence = async () => {
         },
       },
     });
-
+    
     persistenceInitialized = true;
-
+    
     logger.info('REACT_QUERY_PERSISTENCE', 'Cache persistence initialized successfully', {
       cacheSize: Object.keys(localStorage).filter(key => key.startsWith('twinforge-react-query')).length,
       timestamp: new Date().toISOString()
     });
-
+    
   } catch (error) {
     logger.error('REACT_QUERY_PERSISTENCE', 'Failed to initialize cache persistence', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -203,15 +193,17 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <DataProvider>
           <DeviceProvider>
-            <IllustrationCacheProvider>
-              <ToastProvider>
-                <PerformanceInitializer>
-                  <AutoSyncInitializer>
-                    {children}
-                  </AutoSyncInitializer>
-                </PerformanceInitializer>
-              </ToastProvider>
-            </IllustrationCacheProvider>
+            <PerformanceModeProvider>
+              <IllustrationCacheProvider>
+                <ToastProvider>
+                  <PerformanceInitializer>
+                    <AutoSyncInitializer>
+                      {children}
+                    </AutoSyncInitializer>
+                  </PerformanceInitializer>
+                </ToastProvider>
+              </IllustrationCacheProvider>
+            </PerformanceModeProvider>
           </DeviceProvider>
         </DataProvider>
       </QueryClientProvider>
