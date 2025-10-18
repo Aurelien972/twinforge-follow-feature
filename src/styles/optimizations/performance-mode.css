@@ -182,14 +182,12 @@
 }
 
 /* =========================================
-   GRADIENTS - Simplified
+   GRADIENTS - Optimized in gradient-optimizations.css
+   Gradients are now handled in dedicated file for better control
    ========================================= */
 
-.performance-mode [style*="radial-gradient"],
-.performance-mode [style*="linear-gradient"] {
-  /* Simplify gradients to solid colors */
-  background-image: none !important;
-}
+/* Gradient optimizations moved to src/styles/optimizations/gradient-optimizations.css
+   for comprehensive mapping of all 647 gradient occurrences */
 
 /* =========================================
    WILL-CHANGE - Remove all

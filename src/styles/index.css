@@ -99,6 +99,7 @@
 @import './optimizations/performance-modes.css';
 @import './optimizations/responsive.css';
 @import './optimizations/performance.css';
+@import './optimizations/gradient-optimizations.css';
 @import './optimizations/pipeline-animations.css';
 @import './mobile/touch.css';
 
