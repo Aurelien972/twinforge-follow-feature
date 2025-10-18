@@ -5,12 +5,11 @@
  */
 
 import logger from '../../lib/utils/logger';
-import { useVoiceCoachStore } from '../store/voiceCoachStore';
-import { useGlobalChatStore } from '../store/globalChatStore';
+import { useUnifiedCoachStore } from '../store/unifiedCoachStore';
+import type { VoiceState } from '../store/unifiedCoachStore';
 import { openaiRealtimeService } from './openaiRealtimeService';
 import { audioInputService } from './audioInputService';
 import { audioOutputService } from './audioOutputService';
-import type { VoiceState } from '../store/voiceCoachStore';
 
 class VoiceCoachOrchestrator {
   private isInitialized = false;
@@ -72,10 +71,10 @@ class VoiceCoachOrchestrator {
    * Démarrer une session vocale
    */
   async startVoiceSession(mode: string): Promise<void> {
-    const store = useVoiceCoachStore.getState();
+    const store = useUnifiedCoachStore.getState();
 
     try {
-      logger.info('VOICE_ORCHESTRATOR', 'Starting voice session', { mode });
+      logger.info('VOICE_ORCHESTRATOR', '🚀 Starting voice session', { mode });
 
       // Vérifier l'état actuel
       if (store.voiceState === 'listening' || store.voiceState === 'speaking') {
@@ -84,30 +83,30 @@ class VoiceCoachOrchestrator {
       }
 
       // Passer en état connecting
+      logger.info('VOICE_ORCHESTRATOR', '📡 Setting voice state to connecting');
       store.setVoiceState('connecting');
 
-      const globalStore = useGlobalChatStore.getState();
-
-      // Récupérer la configuration du mode
-      const modeConfig = globalStore.modeConfigs[mode as any];
+      // Récupérer la configuration du mode depuis unifiedCoachStore
+      const modeConfig = store.modeConfigs[mode as any];
 
       if (!modeConfig) {
         throw new Error(`Invalid mode: ${mode}`);
       }
 
       // Vérifier les permissions micro
+      logger.info('VOICE_ORCHESTRATOR', '🎤 Checking microphone permissions');
       try {
-        const hasPermission = await store.requestMicrophonePermission();
-        if (!hasPermission) {
-          throw new Error('Microphone permission denied');
-        }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop());
+        logger.info('VOICE_ORCHESTRATOR', '✅ Microphone permission granted');
       } catch (permError) {
+        logger.error('VOICE_ORCHESTRATOR', '❌ Microphone permission denied', { error: permError });
         throw new Error('Microphone access required for voice sessions');
       }
 
       // Initialiser l'audio input si pas déjà fait
       if (!audioInputService.initialized) {
-        logger.info('VOICE_ORCHESTRATOR', 'Initializing audio input service');
+        logger.info('VOICE_ORCHESTRATOR', '🔊 Initializing audio input service');
         await audioInputService.initialize({
           sampleRate: 24000,
           channelCount: 1,
@@ -115,39 +114,46 @@ class VoiceCoachOrchestrator {
           noiseSuppression: true,
           autoGainControl: true
         });
+        logger.info('VOICE_ORCHESTRATOR', '✅ Audio input service initialized');
       }
 
       // Connexion à l'API Realtime via notre edge function
-      logger.info('VOICE_ORCHESTRATOR', 'Connecting to Realtime API');
+      logger.info('VOICE_ORCHESTRATOR', '🌐 Connecting to Realtime API via edge function');
 
       await openaiRealtimeService.connect({
         model: 'gpt-4o-realtime-preview-2024-10-01',
-        voice: store.preferences.preferredVoice,
+        voice: 'alloy',
         temperature: 0.8,
         maxTokens: 4096
       });
+      logger.info('VOICE_ORCHESTRATOR', '✅ Connected to Realtime API');
 
       // Configurer la session avec le system prompt
-      logger.info('VOICE_ORCHESTRATOR', 'Configuring session');
+      logger.info('VOICE_ORCHESTRATOR', '⚙️ Configuring session with system prompt');
       openaiRealtimeService.configureSession(modeConfig.systemPrompt, mode as any);
+      logger.info('VOICE_ORCHESTRATOR', '✅ Session configured');
 
       // Démarrer une conversation dans le store
-      await store.startConversation(mode as any);
+      logger.info('VOICE_ORCHESTRATOR', '💬 Starting conversation in store');
+      store.startConversation(mode as any);
 
       // Démarrer l'enregistrement audio
-      logger.info('VOICE_ORCHESTRATOR', 'Starting audio recording');
+      logger.info('VOICE_ORCHESTRATOR', '🎙️ Starting audio recording');
       audioInputService.startRecording();
+      logger.info('VOICE_ORCHESTRATOR', '✅ Audio recording started');
 
       // Passer en état listening
+      logger.info('VOICE_ORCHESTRATOR', '👂 Setting voice state to listening');
       store.setVoiceState('listening');
 
-      logger.info('VOICE_ORCHESTRATOR', 'Voice session started successfully');
+      logger.info('VOICE_ORCHESTRATOR', '✅✅✅ Voice session started successfully - STATE = LISTENING ✅✅✅');
     } catch (error) {
       logger.error('VOICE_ORCHESTRATOR', 'Failed to start voice session', {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined
       });
 
+      logger.error('VOICE_ORCHESTRATOR', '❌ CRITICAL: Voice session failed to start');
       store.setVoiceState('error');
 
       // Message d'erreur détaillé
@@ -155,13 +161,14 @@ class VoiceCoachOrchestrator {
       if (error instanceof Error) {
         if (error.message.includes('permission')) {
           errorMessage = 'Microphone permission required';
-        } else if (error.message.includes('connect')) {
+        } else if (error.message.includes('connect') || error.message.includes('WebSocket')) {
           errorMessage = 'Unable to connect to voice service';
         } else {
           errorMessage = error.message;
         }
       }
 
+      logger.error('VOICE_ORCHESTRATOR', '💥 Error message for user', { errorMessage });
       store.setError(errorMessage);
 
       throw error;
@@ -195,8 +202,8 @@ class VoiceCoachOrchestrator {
       audioInputService.cleanup();
 
       // Terminer la conversation
-      const store = useVoiceCoachStore.getState();
-      await store.endConversation();
+      const store = useUnifiedCoachStore.getState();
+      store.endConversation();
 
       // Reset état
       store.setVoiceState('idle');
@@ -218,21 +225,21 @@ class VoiceCoachOrchestrator {
 
     // Handler pour les erreurs
     openaiRealtimeService.onError((error) => {
-      logger.error('VOICE_ORCHESTRATOR', 'Realtime API error', { error });
+      logger.error('VOICE_ORCHESTRATOR', '❌ Realtime API error', { error: error.message, stack: error.stack });
 
-      const store = useVoiceCoachStore.getState();
+      const store = useUnifiedCoachStore.getState();
       store.setVoiceState('error');
       store.setError(error.message);
     });
 
     // Handler pour la connexion
     openaiRealtimeService.onConnect(() => {
-      logger.info('VOICE_ORCHESTRATOR', 'Realtime API connected');
+      logger.info('VOICE_ORCHESTRATOR', '✅ Realtime API WebSocket connected successfully');
     });
 
     // Handler pour la déconnexion
     openaiRealtimeService.onDisconnect(() => {
-      logger.info('VOICE_ORCHESTRATOR', 'Realtime API disconnected');
+      logger.info('VOICE_ORCHESTRATOR', '🔌 Realtime API disconnected');
     });
   }
 
@@ -249,7 +256,7 @@ class VoiceCoachOrchestrator {
 
     // Handler pour le niveau audio (pour visualisation)
     audioInputService.onAudioLevel((level) => {
-      const store = useVoiceCoachStore.getState();
+      const store = useUnifiedCoachStore.getState();
 
       // Mettre à jour la visualisation
       store.updateVisualization({
@@ -257,21 +264,19 @@ class VoiceCoachOrchestrator {
         isSpeaking: level.isSpeaking
       });
 
-      // Gérer la détection automatique de silence
-      if (store.preferences.defaultMode === 'auto' || store.preferences.defaultMode === 'continuous') {
-        if (level.isSpeaking) {
+      // Gérer la détection automatique de silence (mode auto)
+      if (level.isSpeaking) {
           // Réinitialiser le timer de silence
           if (this.silenceTimer) {
             clearTimeout(this.silenceTimer);
             this.silenceTimer = null;
           }
-        } else if (store.voiceState === 'listening' && this.audioBuffer.length > 0) {
-          // Démarrer le timer de silence si pas déjà actif
-          if (!this.silenceTimer) {
-            this.silenceTimer = setTimeout(() => {
-              this.handleSilenceDetected();
-            }, this.silenceDuration);
-          }
+      } else if (store.voiceState === 'listening' && this.audioBuffer.length > 0) {
+        // Démarrer le timer de silence si pas déjà actif
+        if (!this.silenceTimer) {
+          this.silenceTimer = setTimeout(() => {
+            this.handleSilenceDetected();
+          }, this.silenceDuration);
         }
       }
     });
@@ -287,7 +292,7 @@ class VoiceCoachOrchestrator {
     // Mettre à jour les fréquences pour visualisation
     const frequencies = audioInputService.getFrequencyData();
     if (frequencies) {
-      const store = useVoiceCoachStore.getState();
+      const store = useUnifiedCoachStore.getState();
       store.updateVisualization({
         frequencies: Array.from(frequencies.slice(0, 32))
       });
@@ -337,7 +342,8 @@ class VoiceCoachOrchestrator {
       this.audioBuffer = [];
 
       // Mettre à jour l'état
-      const store = useVoiceCoachStore.getState();
+      const store = useUnifiedCoachStore.getState();
+      logger.info('VOICE_ORCHESTRATOR', '🔄 Audio buffer flushed, setting state to processing');
       store.setVoiceState('processing');
 
       this.isProcessingAudio = false;
@@ -351,21 +357,36 @@ class VoiceCoachOrchestrator {
    * Traiter les messages de l'API Realtime
    */
   private handleRealtimeMessage(message: any): void {
-    const store = useVoiceCoachStore.getState();
+    const store = useUnifiedCoachStore.getState();
+
+    logger.debug('VOICE_ORCHESTRATOR', '📨 Received Realtime message', {
+      type: message.type,
+      hasContent: !!message.delta || !!message.transcript
+    });
 
     switch (message.type) {
       // Transcription de l'utilisateur en cours (delta)
       case 'conversation.item.input_audio_transcription.delta':
         if (message.delta) {
-          store.updateTranscription(store.currentTranscription + message.delta);
+          logger.info('VOICE_ORCHESTRATOR', '📝 User transcription delta', { delta: message.delta });
+          store.setCurrentTranscription(store.currentTranscription + message.delta);
         }
         break;
 
       // Transcription de l'utilisateur complète
       case 'conversation.item.input_audio_transcription.completed':
         if (message.transcript) {
-          store.updateTranscription(message.transcript);
-          store.finalizeTranscription();
+          logger.info('VOICE_ORCHESTRATOR', '✅ User transcription completed', { transcript: message.transcript });
+          store.setCurrentTranscription(message.transcript);
+
+          // Ajouter le message utilisateur
+          store.addMessage({
+            role: 'user',
+            content: message.transcript
+          });
+
+          // Réinitialiser la transcription courante
+          store.setCurrentTranscription('');
         }
         break;
 
@@ -373,7 +394,9 @@ class VoiceCoachOrchestrator {
       case 'response.audio.delta':
         // Changer l'état en speaking dès le premier chunk audio
         if (store.voiceState !== 'speaking') {
+          logger.info('VOICE_ORCHESTRATOR', '🔊 Coach audio started, setting state to speaking');
           store.setVoiceState('speaking');
+          store.setSpeaking(true);
         }
 
         // Jouer l'audio reçu
@@ -385,22 +408,27 @@ class VoiceCoachOrchestrator {
       // Transcription de la réponse du coach (delta)
       case 'response.audio_transcript.delta':
         if (message.delta) {
+          logger.info('VOICE_ORCHESTRATOR', '💬 Coach transcript delta', { delta: message.delta.substring(0, 50) });
           this.currentCoachMessage += message.delta;
 
           // Mettre à jour le dernier message ou en créer un nouveau
           const messages = store.messages;
           const lastMessage = messages[messages.length - 1];
 
-          if (lastMessage && lastMessage.role === 'coach' && !lastMessage.content.includes('[COMPLETE]')) {
-            // Mettre à jour le message existant
-            // Note: Zustand nécessite une nouvelle référence
-            const updatedMessages = [...messages];
-            updatedMessages[updatedMessages.length - 1] = {
-              ...lastMessage,
+          if (lastMessage && lastMessage.role === 'coach') {
+            // Mettre à jour via le store (Zustand handle l'immutabilité)
+            logger.debug('VOICE_ORCHESTRATOR', '🔄 Updating existing coach message');
+            // On ne peut pas modifier directement, il faut recréer le tableau
+            const updatedMessages = messages.slice(0, -1);
+            store.clearMessages();
+            updatedMessages.forEach(msg => store.addMessage(msg));
+            store.addMessage({
+              role: 'coach',
               content: this.currentCoachMessage
-            };
+            });
           } else {
             // Créer un nouveau message du coach
+            logger.info('VOICE_ORCHESTRATOR', '➕ Creating new coach message');
             store.addMessage({
               role: 'coach',
               content: this.currentCoachMessage
@@ -412,17 +440,9 @@ class VoiceCoachOrchestrator {
       // Transcription du coach complète
       case 'response.audio_transcript.done':
         if (this.currentCoachMessage) {
-          // Finaliser le message du coach
-          const messages = store.messages;
-          const lastMessage = messages[messages.length - 1];
-
-          if (lastMessage && lastMessage.role === 'coach') {
-            const updatedMessages = [...messages];
-            updatedMessages[updatedMessages.length - 1] = {
-              ...lastMessage,
-              content: this.currentCoachMessage + '[COMPLETE]'
-            };
-          }
+          logger.info('VOICE_ORCHESTRATOR', '✅ Coach transcript completed', {
+            fullMessage: this.currentCoachMessage.substring(0, 100) + '...'
+          });
 
           // Réinitialiser l'accumulation
           this.currentCoachMessage = '';
@@ -431,26 +451,25 @@ class VoiceCoachOrchestrator {
 
       // Fin de réponse audio
       case 'response.audio.done':
-        logger.debug('VOICE_ORCHESTRATOR', 'Audio response completed');
+        logger.info('VOICE_ORCHESTRATOR', '✅ Audio response completed');
+        store.setSpeaking(false);
         break;
 
       // Fin de réponse complète
       case 'response.done':
-        store.setVoiceState('idle');
-
-        // Redémarrer l'écoute en mode continu
-        if (store.preferences.defaultMode === 'continuous') {
-          setTimeout(() => {
-            if (store.voiceState === 'idle') {
-              this.startVoiceSession(store.currentMode);
-            }
-          }, 500);
-        }
+        logger.info('VOICE_ORCHESTRATOR', '✅ Response done, setting state back to listening');
+        store.setVoiceState('listening');
+        store.setProcessing(false);
+        store.setSpeaking(false);
         break;
 
       // Erreur
       case 'error':
-        logger.error('VOICE_ORCHESTRATOR', 'Realtime API error', { message });
+        logger.error('VOICE_ORCHESTRATOR', '❌ Realtime API error from server', {
+          errorMessage: message.error?.message,
+          errorType: message.error?.type,
+          fullMessage: message
+        });
         store.setVoiceState('error');
         store.setError(message.error?.message || 'Unknown error');
         audioOutputService.stop();
@@ -458,17 +477,18 @@ class VoiceCoachOrchestrator {
 
       // Session mise à jour
       case 'session.updated':
-        logger.info('VOICE_ORCHESTRATOR', 'Session configuration updated');
+        logger.info('VOICE_ORCHESTRATOR', '⚙️ Session configuration updated');
         break;
 
       // Début de création de réponse
       case 'response.created':
-        logger.debug('VOICE_ORCHESTRATOR', 'Response creation started');
+        logger.info('VOICE_ORCHESTRATOR', '🎯 Response creation started by server');
         store.setVoiceState('processing');
+        store.setProcessing(true);
         break;
 
       default:
-        logger.debug('VOICE_ORCHESTRATOR', 'Unhandled message type', { type: message.type });
+        logger.debug('VOICE_ORCHESTRATOR', '❓ Unhandled message type', { type: message.type });
     }
   }
 

@@ -414,9 +414,74 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
     }
   };
 
+  // Surveillance d'état vocal pour détecter les blocages
+  useEffect(() => {
+    if (communicationMode !== 'voice') return;
+
+    let timeoutId: NodeJS.Timeout | null = null;
+    const stateStartTime = Date.now();
+
+    // Timeouts différents selon l'état
+    const timeouts = {
+      connecting: 15000, // 15 secondes max pour la connexion
+      processing: 30000, // 30 secondes max pour le traitement
+      speaking: 60000    // 60 secondes max pour la réponse vocale
+    };
+
+    const timeoutDuration = timeouts[voiceState as keyof typeof timeouts];
+
+    if (timeoutDuration) {
+      logger.info('UNIFIED_COACH_DRAWER', `⏱️ Starting timeout monitor for state: ${voiceState}`, {
+        timeoutMs: timeoutDuration,
+        state: voiceState
+      });
+
+      timeoutId = setTimeout(() => {
+        const elapsedTime = Date.now() - stateStartTime;
+        logger.error('UNIFIED_COACH_DRAWER', `❌ STATE TIMEOUT DETECTED`, {
+          state: voiceState,
+          elapsedMs: elapsedTime,
+          maxMs: timeoutDuration
+        });
+
+        // Afficher une erreur à l'utilisateur
+        setError(`La session vocale semble bloquée (état: ${voiceState}). Veuillez réessayer ou passer en mode texte.`);
+        setVoiceState('error');
+
+        // Proposer de basculer en mode texte
+        setTimeout(() => {
+          setCommunicationMode('text');
+          setVoiceState('idle');
+          clearError();
+        }, 5000);
+      }, timeoutDuration);
+    }
+
+    return () => {
+      if (timeoutId) {
+        logger.debug('UNIFIED_COACH_DRAWER', `✅ Clearing timeout monitor for state: ${voiceState}`);
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [voiceState, communicationMode, setCommunicationMode, setVoiceState, setError, clearError]);
+
+  // Logger tous les changements d'état vocal
+  useEffect(() => {
+    if (communicationMode === 'voice') {
+      logger.info('UNIFIED_COACH_DRAWER', `🔄 Voice state changed to: ${voiceState}`, {
+        state: voiceState,
+        timestamp: new Date().toISOString(),
+        isProcessing,
+        isSpeaking
+      });
+    }
+  }, [voiceState, communicationMode, isProcessing, isSpeaking]);
+
   const handleStartVoiceSession = async () => {
+    logger.info('UNIFIED_COACH_DRAWER', '🚀 handleStartVoiceSession called');
+
     if (!caps.canUseVoiceMode) {
-      logger.error('UNIFIED_COACH_DRAWER', 'Voice mode not available in this environment');
+      logger.error('UNIFIED_COACH_DRAWER', '❌ Voice mode not available in this environment');
 
       const errorMessage = environmentDetectionService.getVoiceModeUnavailableMessage();
       setError(errorMessage);
@@ -432,26 +497,33 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
     }
 
     try {
+      logger.info('UNIFIED_COACH_DRAWER', '⏳ Setting state to connecting...');
       setVoiceState('connecting');
       setShowReadyPrompt(false);
 
       if (!voiceCoachOrchestrator.initialized) {
+        logger.info('UNIFIED_COACH_DRAWER', '🔧 Initializing voiceCoachOrchestrator...');
         await voiceCoachOrchestrator.initialize();
+        logger.info('UNIFIED_COACH_DRAWER', '✅ voiceCoachOrchestrator initialized');
       }
 
+      logger.info('UNIFIED_COACH_DRAWER', '🎤 Starting voice session...', { mode: currentMode });
       await voiceCoachOrchestrator.startVoiceSession(currentMode);
 
-      logger.info('UNIFIED_COACH_DRAWER', 'Voice session started successfully');
+      logger.info('UNIFIED_COACH_DRAWER', '✅✅✅ Voice session started successfully ✅✅✅');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to start voice session';
-      logger.error('UNIFIED_COACH_DRAWER', 'Failed to start voice session', { error: errorMessage });
+      logger.error('UNIFIED_COACH_DRAWER', '❌ Failed to start voice session', {
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined
+      });
 
       setVoiceState('error');
       setError(errorMessage);
       setShowReadyPrompt(true);
 
       if (errorMessage.includes('StackBlitz') || errorMessage.includes('WebContainer') || errorMessage.includes('WebSocket')) {
-        logger.warn('UNIFIED_COACH_DRAWER', 'Suggesting text mode as fallback');
+        logger.warn('UNIFIED_COACH_DRAWER', '💡 Suggesting text mode as fallback');
 
         setTimeout(() => {
           setCommunicationMode('text');

@@ -43,16 +43,18 @@ class OpenAIRealtimeService {
    */
   async connect(config: RealtimeConfig): Promise<void> {
     if (this.isConnected && this.ws) {
-      logger.debug('REALTIME_API', 'Already connected');
+      logger.info('REALTIME_API', '✅ Already connected, skipping');
       return;
     }
 
     this.config = config;
 
     try {
-      logger.info('REALTIME_API', 'Initiating connection via edge function', {
+      logger.info('REALTIME_API', '🚀 STARTING CONNECTION TO REALTIME API via edge function', {
         model: config.model,
-        voice: config.voice
+        voice: config.voice,
+        temperature: config.temperature,
+        maxTokens: config.maxTokens
       });
 
       // Récupérer le token Supabase pour l'authentification
@@ -72,44 +74,86 @@ class OpenAIRealtimeService {
         .replace('/rest/v1', '') // Retirer le path REST si présent
         + `/functions/v1/voice-coach-realtime?model=${encodeURIComponent(config.model)}&apikey=${supabaseAnonKey}`;
 
-      logger.info('REALTIME_API', 'WebSocket URL constructed', {
+      logger.info('REALTIME_API', '🌐 WebSocket URL constructed', {
         originalUrl: supabaseUrl,
         wsUrl: wsUrl.replace(supabaseAnonKey, '[REDACTED]'),
         model: config.model
       });
 
       // Créer la connexion WebSocket via notre edge function
-      logger.info('REALTIME_API', 'Creating WebSocket connection...');
+      logger.info('REALTIME_API', '🔌 Creating WebSocket connection to edge function...');
       this.ws = new WebSocket(wsUrl);
+      logger.info('REALTIME_API', '✅ WebSocket object created');
 
       // Note: WebSocket ne supporte pas les headers custom dans le constructeur
       // L'authentification Supabase se fait via le paramètre apikey dans l'URL
 
       this.ws.binaryType = 'arraybuffer';
-      logger.info('REALTIME_API', 'WebSocket instance created, waiting for connection...');
+      logger.info('REALTIME_API', '⏳ WebSocket instance created, setting up event handlers...');
 
-      this.ws.onopen = () => this.handleOpen();
-      this.ws.onmessage = (event) => this.handleMessage(event);
-      this.ws.onerror = (event) => this.handleError(event);
-      this.ws.onclose = (event) => this.handleClose(event);
+      this.ws.onopen = () => {
+        logger.info('REALTIME_API', '📡 WebSocket.onopen triggered');
+        this.handleOpen();
+      };
+      this.ws.onmessage = (event) => {
+        logger.debug('REALTIME_API', '📨 WebSocket.onmessage triggered');
+        this.handleMessage(event);
+      };
+      this.ws.onerror = (event) => {
+        logger.error('REALTIME_API', '❌ WebSocket.onerror triggered', { event });
+        this.handleError(event);
+      };
+      this.ws.onclose = (event) => {
+        logger.info('REALTIME_API', '🔌 WebSocket.onclose triggered', {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean
+        });
+        this.handleClose(event);
+      };
+
+      logger.info('REALTIME_API', '✅ Event handlers attached, waiting for connection...');
 
       // Attendre la connexion
+      logger.info('REALTIME_API', '⏳ Waiting for WebSocket connection (timeout: 10s)...');
       await new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(() => {
-          reject(new Error('Connection timeout'));
+          logger.error('REALTIME_API', '❌ CONNECTION TIMEOUT after 10 seconds');
+          logger.error('REALTIME_API', 'WebSocket state at timeout', {
+            readyState: this.ws?.readyState,
+            readyStateNames: {
+              0: 'CONNECTING',
+              1: 'OPEN',
+              2: 'CLOSING',
+              3: 'CLOSED'
+            }[this.ws?.readyState ?? 3]
+          });
+          reject(new Error('Connection timeout - WebSocket did not open within 10 seconds'));
         }, 10000);
 
         const onConnect = () => {
+          logger.info('REALTIME_API', '✅ Connection promise resolved');
           clearTimeout(timeout);
           this.connectHandlers.delete(onConnect);
           resolve();
         };
 
         this.connectHandlers.add(onConnect);
+        logger.info('REALTIME_API', '👂 Listening for connection event...');
       });
+
+      logger.info('REALTIME_API', '✅✅✅ SUCCESSFULLY CONNECTED TO REALTIME API ✅✅✅');
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      logger.error('REALTIME_API', '❌❌❌ CONNECTION FAILED ❌❌❌', {
+        errorMessage,
+        errorStack,
+        wsState: this.ws?.readyState,
+        isConnected: this.isConnected
+      });
 
       // Détecter si on est dans StackBlitz (WebContainer)
       const isStackBlitz = window.location.hostname.includes('stackblitz') ||
@@ -152,15 +196,25 @@ class OpenAIRealtimeService {
    */
   private sendMessage(message: RealtimeMessage): void {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      logger.error('REALTIME_API', 'Cannot send message: not connected');
+      logger.error('REALTIME_API', '❌ Cannot send message: not connected', {
+        hasWs: !!this.ws,
+        readyState: this.ws?.readyState,
+        messageType: message.type
+      });
       return;
     }
 
     try {
       this.ws.send(JSON.stringify(message));
-      logger.debug('REALTIME_API', 'Message sent', { type: message.type });
+      logger.info('REALTIME_API', '📤 Message sent to server', {
+        type: message.type,
+        keys: Object.keys(message)
+      });
     } catch (error) {
-      logger.error('REALTIME_API', 'Error sending message', { error });
+      logger.error('REALTIME_API', '❌ Error sending message', {
+        error: error instanceof Error ? error.message : String(error),
+        messageType: message.type
+      });
     }
   }
 
@@ -168,6 +222,12 @@ class OpenAIRealtimeService {
    * Configurer la session avec le système prompt
    */
   configureSession(systemPrompt: string, mode: ChatMode): void {
+    logger.info('REALTIME_API', '⚙️ Configuring session...', {
+      mode,
+      voice: this.config?.voice || 'alloy',
+      systemPromptLength: systemPrompt.length
+    });
+
     this.sendMessage({
       type: 'session.update',
       session: {
@@ -190,7 +250,7 @@ class OpenAIRealtimeService {
       }
     });
 
-    logger.info('REALTIME_API', 'Session configured', { mode });
+    logger.info('REALTIME_API', '✅ Session configuration sent to server', { mode });
   }
 
   /**
@@ -198,9 +258,14 @@ class OpenAIRealtimeService {
    */
   sendAudio(audioData: ArrayBuffer): void {
     if (!this.isConnected) {
-      logger.warn('REALTIME_API', 'Cannot send audio: not connected');
+      logger.warn('REALTIME_API', '⚠️ Cannot send audio: not connected');
       return;
     }
+
+    logger.debug('REALTIME_API', '🎙️ Audio data added to queue', {
+      bytesLength: audioData.byteLength,
+      queueLength: this.audioQueue.length + 1
+    });
 
     this.audioQueue.push(audioData);
     this.processAudioQueue();
@@ -243,11 +308,11 @@ class OpenAIRealtimeService {
    * Valider l'input audio buffer pour traitement
    */
   commitAudioBuffer(): void {
+    logger.info('REALTIME_API', '✅ Committing audio buffer for processing');
     this.sendMessage({
       type: 'input_audio_buffer.commit'
     });
-
-    logger.debug('REALTIME_API', 'Audio buffer committed');
+    logger.info('REALTIME_API', '🚀 Audio buffer commit sent to server');
   }
 
   /**
@@ -291,24 +356,68 @@ class OpenAIRealtimeService {
    * Handlers d'événements
    */
   private handleOpen(): void {
-    logger.info('REALTIME_API', 'WebSocket connected');
+    logger.info('REALTIME_API', '✅✅✅ WebSocket OPEN event - Connection established ✅✅✅');
     this.isConnected = true;
     this.reconnectAttempts = 0;
 
-    this.connectHandlers.forEach(handler => handler());
+    logger.info('REALTIME_API', '📢 Notifying connection handlers', {
+      handlerCount: this.connectHandlers.size
+    });
+    this.connectHandlers.forEach(handler => {
+      try {
+        handler();
+        logger.debug('REALTIME_API', '✅ Connection handler executed');
+      } catch (error) {
+        logger.error('REALTIME_API', '❌ Error in connection handler', { error });
+      }
+    });
   }
 
   private handleMessage(event: MessageEvent): void {
     try {
       const message = JSON.parse(event.data) as RealtimeMessage;
 
-      logger.debug('REALTIME_API', 'Message received', { type: message.type });
+      // Log détaillé pour les types importants
+      const importantTypes = [
+        'session.updated',
+        'conversation.item.input_audio_transcription.delta',
+        'conversation.item.input_audio_transcription.completed',
+        'response.audio.delta',
+        'response.audio_transcript.delta',
+        'response.done',
+        'error'
+      ];
+
+      if (importantTypes.includes(message.type)) {
+        logger.info('REALTIME_API', `📨 Important message received: ${message.type}`, {
+          type: message.type,
+          hasContent: !!message.delta || !!message.transcript || !!message.audio
+        });
+      } else {
+        logger.debug('REALTIME_API', '📨 Message received', { type: message.type });
+      }
 
       // Dispatcher le message à tous les handlers
-      this.messageHandlers.forEach(handler => handler(message));
+      logger.debug('REALTIME_API', '📢 Dispatching to handlers', {
+        handlerCount: this.messageHandlers.size,
+        messageType: message.type
+      });
+      this.messageHandlers.forEach(handler => {
+        try {
+          handler(message);
+        } catch (error) {
+          logger.error('REALTIME_API', '❌ Error in message handler', {
+            error: error instanceof Error ? error.message : String(error),
+            messageType: message.type
+          });
+        }
+      });
 
     } catch (error) {
-      logger.error('REALTIME_API', 'Error parsing message', { error });
+      logger.error('REALTIME_API', '❌ Error parsing message', {
+        error: error instanceof Error ? error.message : String(error),
+        data: typeof event.data === 'string' ? event.data.substring(0, 200) : 'binary data'
+      });
     }
   }
 
@@ -318,32 +427,83 @@ class OpenAIRealtimeService {
       type: event.type,
       target: event.target ? {
         readyState: (event.target as WebSocket).readyState,
+        readyStateNames: {
+          0: 'CONNECTING',
+          1: 'OPEN',
+          2: 'CLOSING',
+          3: 'CLOSED'
+        }[(event.target as WebSocket).readyState],
         url: (event.target as WebSocket).url
       } : null
     };
 
     const error = new Error(`WebSocket error: ${JSON.stringify(errorDetails)}`);
-    logger.error('REALTIME_API', 'WebSocket error', errorDetails);
+    logger.error('REALTIME_API', '❌❌❌ WebSocket ERROR event ❌❌❌', errorDetails);
 
-    this.errorHandlers.forEach(handler => handler(error));
+    logger.info('REALTIME_API', '📢 Notifying error handlers', {
+      handlerCount: this.errorHandlers.size
+    });
+    this.errorHandlers.forEach(handler => {
+      try {
+        handler(error);
+      } catch (handlerError) {
+        logger.error('REALTIME_API', '❌ Error in error handler', { handlerError });
+      }
+    });
   }
 
   private handleClose(event: CloseEvent): void {
-    logger.info('REALTIME_API', 'WebSocket closed', {
+    logger.info('REALTIME_API', '🔌🔌🔌 WebSocket CLOSED 🔌🔌🔌', {
       code: event.code,
-      reason: event.reason,
-      wasClean: event.wasClean
+      reason: event.reason || 'No reason provided',
+      wasClean: event.wasClean,
+      closeCodeMeaning: this.getCloseCodeMeaning(event.code)
     });
 
     this.isConnected = false;
     this.ws = null;
 
-    this.disconnectHandlers.forEach(handler => handler());
+    logger.info('REALTIME_API', '📢 Notifying disconnect handlers', {
+      handlerCount: this.disconnectHandlers.size
+    });
+    this.disconnectHandlers.forEach(handler => {
+      try {
+        handler();
+      } catch (error) {
+        logger.error('REALTIME_API', '❌ Error in disconnect handler', { error });
+      }
+    });
 
     // Tentative de reconnexion si ce n'était pas une fermeture propre
     if (!event.wasClean && this.reconnectAttempts < this.maxReconnectAttempts) {
+      logger.info('REALTIME_API', '🔄 Will attempt reconnection (unclean close)');
       this.attemptReconnect();
+    } else if (event.wasClean) {
+      logger.info('REALTIME_API', '✅ Clean close, no reconnection needed');
+    } else {
+      logger.warn('REALTIME_API', '⚠️ Max reconnection attempts reached, giving up');
     }
+  }
+
+  /**
+   * Obtenir la signification d'un code de fermeture WebSocket
+   */
+  private getCloseCodeMeaning(code: number): string {
+    const meanings: Record<number, string> = {
+      1000: 'Normal Closure',
+      1001: 'Going Away',
+      1002: 'Protocol Error',
+      1003: 'Unsupported Data',
+      1005: 'No Status Received',
+      1006: 'Abnormal Closure',
+      1007: 'Invalid Frame Payload Data',
+      1008: 'Policy Violation',
+      1009: 'Message Too Big',
+      1010: 'Mandatory Extension',
+      1011: 'Internal Server Error',
+      1015: 'TLS Handshake'
+    };
+    return meanings[code] || `Unknown (${code})`;
   }
 
   /**
