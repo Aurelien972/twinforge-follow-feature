@@ -3,7 +3,7 @@
  * Drawer de chat contextuel qui slide depuis la droite de l'écran
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SpatialIcon from '../../icons/SpatialIcon';
@@ -16,6 +16,7 @@ import { Haptics } from '../../../utils/haptics';
 import logger from '../../../lib/utils/logger';
 import { chatAIService } from '../../../system/services/chatAiService';
 import { chatConversationService } from '../../../system/services/chatConversationService';
+import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 
 interface GlobalChatDrawerProps {
   chatButtonRef?: React.RefObject<HTMLButtonElement>;
@@ -45,9 +46,19 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
   const previousPathRef = useRef(location.pathname);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const { mode } = usePerformanceMode();
 
   const modeConfig = modeConfigs[currentMode];
   const modeColor = modeConfig.color;
+
+  // Performance-aware backdrop filters
+  const overlayBackdrop = useMemo(() => {
+    return mode === 'high-performance' ? 'none' : 'blur(4px)';
+  }, [mode]);
+
+  const headerBackdrop = useMemo(() => {
+    return mode === 'high-performance' ? 'none' : mode === 'balanced' ? 'blur(8px)' : 'blur(16px)';
+  }, [mode]);
 
   const handleClose = () => {
     const lastMessage = messages[messages.length - 1];
@@ -281,7 +292,7 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
               position: 'fixed',
               inset: 0,
               background: 'rgba(0, 0, 0, 0.5)',
-              backdropFilter: 'blur(4px)',
+              backdropFilter: overlayBackdrop,
               zIndex: 9993
             }}
           />
@@ -371,7 +382,7 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
                     rgba(11, 14, 23, 0.3) 100%
                   )
                 `,
-                backdropFilter: 'blur(16px)',
+                backdropFilter: headerBackdrop,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',

@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { ConditionalMotion } from '../../../lib/motion/ConditionalMotion';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
+import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 import logger from '../../../lib/utils/logger';
 
 export interface ProjectionParams {
@@ -36,6 +37,44 @@ export const ProjectionControlPanel: React.FC<ProjectionControlPanelProps> = ({
 
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isUpdatingRef = useRef(false);
+  const { mode } = usePerformanceMode();
+
+  // Performance-aware styles
+  const cardStyles = useMemo(() => {
+    const isHighPerf = mode === 'high-performance';
+    const isBalanced = mode === 'balanced';
+
+    return {
+      background: isHighPerf
+        ? 'var(--glass-opacity-base)'
+        : isBalanced
+        ? `
+            radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+            var(--glass-opacity-base)
+          `
+        : `
+            radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
+            var(--glass-opacity-base)
+          `,
+      borderColor: isHighPerf ? 'rgba(255, 255, 255, 0.15)' : 'rgba(16, 185, 129, 0.3)',
+      boxShadow: isHighPerf
+        ? 'var(--glass-shadow-sm)'
+        : `var(--glass-shadow-sm), 0 0 16px rgba(16, 185, 129, 0.15)`
+    };
+  }, [mode]);
+
+  const iconStyles = useMemo(() => {
+    return {
+      background: mode === 'high-performance'
+        ? 'rgba(16, 185, 129, 0.25)'
+        : `
+            radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
+            linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(16, 185, 129, 0.25))
+          `,
+      border: '2px solid rgba(16, 185, 129, 0.5)',
+      boxShadow: mode === 'quality' ? '0 0 20px rgba(16, 185, 129, 0.3)' : '0 0 12px rgba(16, 185, 129, 0.25)'
+    };
+  }, [mode]);
 
   // Notify parent of parameter changes with optimized debouncing
   const notifyParent = useCallback(() => {
@@ -94,33 +133,17 @@ export const ProjectionControlPanel: React.FC<ProjectionControlPanelProps> = ({
   };
 
   return (
-    <motion.div
+    <ConditionalMotion
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       className="glass-card p-6 space-y-6 rounded-2xl"
-      style={{
-        background: `
-          radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
-          var(--glass-opacity-base)
-        `,
-        borderColor: 'rgba(16, 185, 129, 0.3)',
-        boxShadow: `
-          var(--glass-shadow-sm),
-          0 0 16px rgba(16, 185, 129, 0.15)
-        `
-      }}
+      style={cardStyles}
     >
       <div className="flex items-start gap-3">
         <div
           className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{
-            background: `
-              radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-              linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(16, 185, 129, 0.25))
-            `,
-            border: '2px solid rgba(16, 185, 129, 0.5)',
-            boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)'
-          }}
+          style={iconStyles}
         >
           <SpatialIcon Icon={ICONS.Sliders} size={20} style={{ color: '#10B981' }} variant="pure" />
         </div>
@@ -354,6 +377,6 @@ export const ProjectionControlPanel: React.FC<ProjectionControlPanelProps> = ({
           </p>
         </div>
       </div>
-    </motion.div>
+    </ConditionalMotion>
   );
 };

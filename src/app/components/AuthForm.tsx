@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../system/supabase/client';
@@ -10,6 +10,7 @@ import { ICONS } from '../../ui/icons/registry';
 import TwinForgeLogo from '../../ui/components/branding/TwinForgeLogo';
 import ForgeHammerIcon from '../../ui/icons/ForgeHammerIcon';
 import logger from '../../lib/utils/logger';
+import { usePerformanceMode } from '../../system/context/PerformanceModeContext';
 
 interface AuthFormProps {
   onSuccess?: () => void;
@@ -23,10 +24,70 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { setSession, fetchProfile } = useUserStore();
   const { formSubmit, error: errorSound, click, success } = useFeedback();
   const navigate = useNavigate();
+  const { mode } = usePerformanceMode();
+
+  // Performance-aware styles
+  const authCardStyles = useMemo(() => {
+    const isHighPerf = mode === 'high-performance';
+    const isBalanced = mode === 'balanced';
+
+    return {
+      // Blur: 32px → 8px → 0px selon le mode
+      backdropFilter: isHighPerf ? 'none' : isBalanced ? 'blur(8px) saturate(140%)' : 'blur(32px) saturate(180%)',
+      // Gradients: simplifiés en high-perf, complets en quality
+      background: isHighPerf
+        ? 'rgba(255, 255, 255, 0.08)'
+        : isBalanced
+        ? `
+            radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent) 0%, transparent 60%),
+            rgba(255, 255, 255, 0.07)
+          `
+        : `
+            radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-plasma-cyan) 14%, transparent) 0%, transparent 60%),
+            radial-gradient(circle at 70% 80%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(61, 19, 179, 0.06) 0%, transparent 70%),
+            rgba(255, 255, 255, 0.06)
+          `,
+      // Shadows: 6 ombres → 3 ombres → 1 ombre
+      boxShadow: isHighPerf
+        ? '0 16px 48px rgba(0, 0, 0, 0.4)'
+        : isBalanced
+        ? `
+            0 20px 56px rgba(0, 0, 0, 0.45),
+            0 0 32px color-mix(in srgb, var(--color-plasma-cyan) 15%, transparent),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2)
+          `
+        : `
+            0 24px 64px rgba(0, 0, 0, 0.5),
+            0 0 48px color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent),
+            0 0 96px color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent),
+            0 0 120px rgba(255, 107, 53, 0.08),
+            inset 0 2px 0 rgba(255, 255, 255, 0.25),
+            inset 0 -2px 0 rgba(0, 0, 0, 0.15)
+          `,
+      borderColor: isHighPerf
+        ? 'rgba(255, 255, 255, 0.2)'
+        : 'color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent)',
+    };
+  }, [mode]);
+
+  const buttonBackdropFilter = useMemo(() => {
+    return mode === 'high-performance' ? 'none' : mode === 'balanced' ? 'blur(12px) saturate(140%)' : 'blur(20px) saturate(160%)';
+  }, [mode]);
+
+  const errorCardBackdrop = useMemo(() => {
+    return mode === 'high-performance' ? 'none' : mode === 'balanced' ? 'blur(8px) saturate(120%)' : 'blur(12px) saturate(130%)';
+  }, [mode]);
+
+  const animationDuration = useMemo(() => {
+    return mode === 'high-performance' ? 0.3 : mode === 'balanced' ? 0.5 : 0.8;
+  }, [mode]);
+
+  const shouldAnimate = mode !== 'high-performance';
 
   const handleGoogleAuth = async () => {
     setGoogleLoading(true);
@@ -167,10 +228,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
         }}
       >
         <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.95 }}
+          initial={shouldAnimate ? { opacity: 0, y: 30, scale: 0.95 } : false}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ 
-            duration: 0.8, 
+          transition={{
+            duration: animationDuration,
             ease: "easeOut"
           }}
           style={{
@@ -189,30 +250,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
               isolation: 'isolate',
               transform: 'translateZ(0)',
               pointerEvents: 'auto',
-              background: `
-                radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-plasma-cyan) 14%, transparent) 0%, transparent 60%),
-                radial-gradient(circle at 70% 80%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(61, 19, 179, 0.06) 0%, transparent 70%),
-                rgba(255, 255, 255, 0.06)
-              `,
-              borderColor: 'color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent)',
-              boxShadow: `
-                0 24px 64px rgba(0, 0, 0, 0.5),
-                0 0 48px color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent),
-                0 0 96px color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent),
-                0 0 120px rgba(255, 107, 53, 0.08),
-                inset 0 2px 0 rgba(255, 255, 255, 0.25),
-                inset 0 -2px 0 rgba(0, 0, 0, 0.15)
-              `,
-              backdropFilter: 'blur(32px) saturate(180%)'
+              ...authCardStyles
             }}
           >
             {/* Logo TwinForge avec T stylisé */}
             <motion.div
               className="flex flex-col items-center justify-center mb-6 gap-3"
-              initial={{ opacity: 0, y: -20 }}
+              initial={shouldAnimate ? { opacity: 0, y: -20 } : false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: animationDuration * 0.75, delay: shouldAnimate ? 0.15 : 0 }}
               style={{
                 position: 'relative',
                 zIndex: 103,
@@ -221,11 +267,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
             >
               {/* T stylisé (ForgeHammerIcon) */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
+                initial={shouldAnimate ? { opacity: 0, scale: 0.8 } : false}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
+                transition={{ duration: animationDuration * 0.875, delay: shouldAnimate ? 0.2 : 0, ease: "easeOut" }}
                 style={{
-                  filter: 'drop-shadow(0 0 20px rgba(253, 200, 48, 0.4)) drop-shadow(0 0 12px rgba(247, 147, 30, 0.3))'
+                  filter: mode === 'quality' ? 'drop-shadow(0 0 20px rgba(253, 200, 48, 0.4)) drop-shadow(0 0 12px rgba(247, 147, 30, 0.3))' : 'drop-shadow(0 0 12px rgba(253, 200, 48, 0.3))'
                 }}
               >
                 <ForgeHammerIcon
@@ -237,11 +283,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
 
               {/* Texte TWINFORGE */}
               <motion.div
-                initial={{ opacity: 0 }}
+                initial={shouldAnimate ? { opacity: 0 } : false}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
+                transition={{ duration: animationDuration * 0.75, delay: shouldAnimate ? 0.35 : 0 }}
                 style={{
-                  filter: 'drop-shadow(0 0 16px color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.1))'
+                  filter: mode === 'quality' ? 'drop-shadow(0 0 16px color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.1))' : 'drop-shadow(0 0 8px color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent))'
                 }}
               >
                 <TwinForgeLogo variant="desktop" isHovered={false} />
@@ -270,9 +316,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
               }}
             >
               <motion.div
-                initial={{ opacity: 0 }}
+                initial={shouldAnimate ? { opacity: 0 } : false}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
+                transition={{ duration: animationDuration * 0.75, delay: shouldAnimate ? 0.3 : 0 }}
                 style={{
                   position: 'relative',
                   zIndex: 105,
@@ -284,10 +330,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     <motion.div
                       key="displayName"
                       className="mb-4"
-                      initial={{ opacity: 0, height: 0, y: -10 }}
+                      initial={shouldAnimate ? { opacity: 0, height: 0, y: -10 } : false}
                       animate={{ opacity: 1, height: 'auto', y: 0 }}
-                      exit={{ opacity: 0, height: 0, y: -10 }}
-                      transition={{ duration: 0.3 }}
+                      exit={shouldAnimate ? { opacity: 0, height: 0, y: -10 } : undefined}
+                      transition={{ duration: animationDuration * 0.375 }}
                       style={{
                         position: 'relative',
                         zIndex: 106,
@@ -384,23 +430,23 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                   {error && (
                     <motion.div
                       className="mb-4"
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      initial={shouldAnimate ? { opacity: 0, y: -10, scale: 0.95 } : false}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      transition={{ duration: 0.3 }}
+                      exit={shouldAnimate ? { opacity: 0, y: -10, scale: 0.95 } : undefined}
+                      transition={{ duration: animationDuration * 0.375 }}
                       style={{
                         position: 'relative',
                         zIndex: 106,
                         pointerEvents: 'auto'
                       }}
                     >
-                      <GlassCard 
+                      <GlassCard
                         className="p-3"
                         style={{
                           background: 'rgba(239, 68, 68, 0.15)',
                           borderColor: 'rgba(239, 68, 68, 0.4)',
-                          backdropFilter: 'blur(12px) saturate(130%)',
-                          boxShadow: '0 0 20px rgba(239, 68, 68, 0.3)',
+                          backdropFilter: errorCardBackdrop,
+                          boxShadow: mode === 'high-performance' ? '0 0 12px rgba(239, 68, 68, 0.25)' : '0 0 20px rgba(239, 68, 68, 0.3)',
                           position: 'relative',
                           zIndex: 107,
                           pointerEvents: 'auto'
@@ -430,18 +476,26 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     pointerEvents: 'auto',
                     cursor: 'pointer',
                     background: `
-                      linear-gradient(135deg, 
-                        color-mix(in srgb, var(--brand-primary) 80%, transparent), 
+                      linear-gradient(135deg,
+                        color-mix(in srgb, var(--brand-primary) 80%, transparent),
                         color-mix(in srgb, var(--color-plasma-cyan) 60%, transparent)
                       )
                     `,
-                    backdropFilter: 'blur(20px) saturate(160%)',
-                    boxShadow: `
-                      0 12px 40px color-mix(in srgb, var(--brand-primary) 40%, transparent),
-                      0 0 60px color-mix(in srgb, var(--brand-primary) 30%, transparent),
-                      0 0 100px color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent),
-                      inset 0 3px 0 rgba(255,255,255,0.4)
-                    `,
+                    backdropFilter: buttonBackdropFilter,
+                    boxShadow: mode === 'high-performance'
+                      ? '0 8px 24px color-mix(in srgb, var(--brand-primary) 30%, transparent), inset 0 2px 0 rgba(255,255,255,0.3)'
+                      : mode === 'balanced'
+                      ? `
+                          0 10px 32px color-mix(in srgb, var(--brand-primary) 35%, transparent),
+                          0 0 48px color-mix(in srgb, var(--brand-primary) 25%, transparent),
+                          inset 0 2px 0 rgba(255,255,255,0.35)
+                        `
+                      : `
+                          0 12px 40px color-mix(in srgb, var(--brand-primary) 40%, transparent),
+                          0 0 60px color-mix(in srgb, var(--brand-primary) 30%, transparent),
+                          0 0 100px color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent),
+                          inset 0 3px 0 rgba(255,255,255,0.4)
+                        `,
                     border: '2px solid color-mix(in srgb, var(--brand-primary) 60%, transparent)',
                     borderRadius: '999px',
                     padding: '0.75rem 1.5rem',
@@ -506,17 +560,21 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     pointerEvents: 'auto',
                     cursor: 'pointer',
                     background: `
-                      linear-gradient(135deg, 
-                        rgba(255, 255, 255, 0.95), 
+                      linear-gradient(135deg,
+                        rgba(255, 255, 255, 0.95),
                         rgba(248, 250, 252, 0.9)
                       )
                     `,
-                    backdropFilter: 'blur(20px) saturate(160%)',
-                    boxShadow: `
-                      0 8px 32px rgba(0, 0, 0, 0.15),
-                      0 0 40px rgba(255, 255, 255, 0.1),
-                      inset 0 2px 0 rgba(255,255,255,0.8)
-                    `,
+                    backdropFilter: buttonBackdropFilter,
+                    boxShadow: mode === 'high-performance'
+                      ? '0 6px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.7)'
+                      : mode === 'balanced'
+                      ? '0 7px 28px rgba(0, 0, 0, 0.135), 0 0 32px rgba(255, 255, 255, 0.08), inset 0 1.5px 0 rgba(255,255,255,0.75)'
+                      : `
+                          0 8px 32px rgba(0, 0, 0, 0.15),
+                          0 0 40px rgba(255, 255, 255, 0.1),
+                          inset 0 2px 0 rgba(255,255,255,0.8)
+                        `,
                     border: '2px solid rgba(255, 255, 255, 0.3)',
                     borderRadius: '999px',
                     padding: '0.75rem 1.5rem',

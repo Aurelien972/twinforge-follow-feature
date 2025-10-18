@@ -16,13 +16,13 @@ type ConditionalMotionProps = HTMLMotionProps<'div'> & {
 
 export const ConditionalMotion = React.forwardRef<HTMLDivElement, ConditionalMotionProps>(
   ({ children, as = 'div', className = '', whileHover, whileTap, animate, initial, exit, variants, transition, ...props }, ref) => {
-    const { isPerformanceMode } = usePerformanceMode();
+    const { mode, isPerformanceMode } = usePerformanceMode();
 
+    // High-performance mode: Use plain HTML with CSS classes
     if (isPerformanceMode) {
-      // MODE PERFORMANCE: HTML standard avec classes CSS
       const Component = as as any;
 
-      // Mapper les props Framer Motion vers des classes CSS
+      // Map Framer Motion props to CSS classes
       const performanceClasses = [
         className,
         whileHover && 'motion-hover-mobile',
@@ -37,7 +37,34 @@ export const ConditionalMotion = React.forwardRef<HTMLDivElement, ConditionalMot
       );
     }
 
-    // MODE QUALITY: Framer Motion complet
+    // Balanced mode: Use Framer Motion but with simplified animations
+    if (mode === 'balanced') {
+      const MotionComponent = motion[as] as any;
+
+      // Simplified transition for balanced mode
+      const balancedTransition = transition
+        ? { ...transition, duration: (transition as any).duration ? (transition as any).duration * 0.6 : 0.3 }
+        : { duration: 0.3, ease: 'easeOut' };
+
+      return (
+        <MotionComponent
+          ref={ref}
+          className={className}
+          whileHover={whileHover}
+          whileTap={whileTap}
+          animate={animate}
+          initial={initial}
+          exit={exit}
+          variants={variants}
+          transition={balancedTransition}
+          {...props}
+        >
+          {children}
+        </MotionComponent>
+      );
+    }
+
+    // Quality mode: Full Framer Motion with all effects
     const MotionComponent = motion[as] as any;
 
     return (
@@ -73,22 +100,22 @@ type ConditionalAnimatePresenceProps = AnimatePresenceProps & {
 
 export const ConditionalAnimatePresence: React.FC<ConditionalAnimatePresenceProps> = ({
   children,
-  mode,
+  mode: presenceMode,
   initial = true,
   ...props
 }) => {
-  const { isPerformanceMode } = usePerformanceMode();
+  const { mode, isPerformanceMode } = usePerformanceMode();
 
+  // High-performance mode: No AnimatePresence, just render children
   if (isPerformanceMode) {
-    // MODE PERFORMANCE: Pas d'AnimatePresence, juste un Fragment
     return <>{children}</>;
   }
 
-  // MODE QUALITY: AnimatePresence complet
+  // Balanced and Quality modes: Use AnimatePresence
   const { AnimatePresence } = require('framer-motion');
 
   return (
-    <AnimatePresence mode={mode} initial={initial} {...props}>
+    <AnimatePresence mode={presenceMode} initial={initial} {...props}>
       {children}
     </AnimatePresence>
   );
