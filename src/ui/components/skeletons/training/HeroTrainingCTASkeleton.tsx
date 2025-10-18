@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion/PerformanceMotion';
 import { SkeletonCard, SkeletonBar, SkeletonCircle, SkeletonButton } from '../SkeletonUtilities';
 
 interface HeroTrainingCTASkeletonProps {

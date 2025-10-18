@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion/PerformanceMotion';
+import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
 
 interface SkeletonBaseProps {
   width?: string | number;
@@ -20,6 +21,8 @@ const SkeletonBase: React.FC<SkeletonBaseProps> = ({
   shimmer = true,
   pulse = false
 }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
   const baseStyle: React.CSSProperties = {
     width,
     height,
@@ -29,6 +32,16 @@ const SkeletonBase: React.FC<SkeletonBaseProps> = ({
     overflow: 'hidden',
     ...style
   };
+
+  // In performance mode, use simple CSS class instead of animations
+  if (isPerformanceMode) {
+    return (
+      <div
+        className={`${className} skeleton-glass-performance`}
+        style={baseStyle}
+      />
+    );
+  }
 
   const shimmerAnimation = shimmer ? {
     animate: {
