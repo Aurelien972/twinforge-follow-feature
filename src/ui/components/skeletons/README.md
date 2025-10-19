@@ -182,10 +182,44 @@ The stepColor is used to:
 
 ## Performance Considerations
 
-- Skeletons use CSS transforms for animations (GPU-accelerated)
-- Shimmer effects use `backgroundPosition` animation
+All skeleton components are fully synchronized with the performance mode system and adapt their behavior based on device capabilities:
+
+### Performance Mode Integration
+
+**High-Performance Mode (Mobile/Low-end devices)**
+- Zero GPU usage: All animations disabled
+- Static gradients replace animated effects
+- No backdrop-filter or box-shadow
+- Simple CSS backgrounds only
+- Optimized for 60fps on constrained devices
+
+**Balanced Mode (Mid-range devices)**
+- Simplified Framer Motion animations
+- Reduced animation durations (60% of full)
+- Moderate GPU usage
+- Balance between smoothness and performance
+
+**Quality Mode (Desktop/High-end devices)**
+- Full Framer Motion animations
+- Rich visual effects (radial gradients, box-shadows)
+- Complex stagger and reveal animations
+- Maximum visual quality
+
+### Technical Implementation
+
+- All complex skeletons use `ConditionalMotion` wrapper
+- `usePerformanceMode()` hook determines active mode
+- GPU-heavy effects conditionally rendered
+- CSS-only fallbacks for high-performance mode
+- Shimmer effects use `background-position` (GPU-accelerated when available)
+
+### Animation Guidelines
+
+- Use ConditionalMotion instead of direct motion.div
+- Check isPerformanceMode for GPU-heavy effects
+- Provide static fallbacks for all animations
 - Minimize layout shifts between skeleton and real content
-- Use `will-change` sparingly and only when needed
+- Test on actual mobile devices, not just emulators
 
 ## Accessibility
 

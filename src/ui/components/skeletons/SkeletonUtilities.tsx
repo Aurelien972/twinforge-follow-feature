@@ -1,5 +1,6 @@
 import React from 'react';
 import SkeletonBase from './SkeletonBase';
+import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 
 export const SkeletonBar: React.FC<{
   width?: string | number;
@@ -112,41 +113,65 @@ export const SkeletonCard: React.FC<{
   children,
   stepColor = '#18E3FF',
   className = ''
-}) => (
-  <div
-    className={className}
-    style={{
-      width,
-      height,
-      padding,
-      background: `
-        radial-gradient(ellipse at 20% 10%, color-mix(in srgb, ${stepColor} 8%, transparent) 0%, transparent 50%),
-        var(--liquid-glass-bg-elevated)
-      `,
-      border: `1.5px solid color-mix(in srgb, ${stepColor} 18%, rgba(255, 255, 255, 0.12))`,
-      borderRadius: '20px',
-      backdropFilter: 'blur(20px) saturate(180%)',
-      WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-      overflow: 'hidden',
-      position: 'relative'
-    }}
-  >
+}) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
+  if (isPerformanceMode) {
+    return (
+      <div
+        className={className}
+        style={{
+          width,
+          height,
+          padding,
+          background: `rgba(255, 255, 255, 0.06)`,
+          border: `1.5px solid rgba(255, 255, 255, 0.12)`,
+          borderRadius: '20px',
+          overflow: 'hidden',
+          position: 'relative'
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
+
+  return (
     <div
-      className="skeleton-shimmer"
+      className={className}
       style={{
-        position: 'absolute',
-        top: 0,
-        left: '-100%',
-        width: '100%',
-        height: '100%',
-        background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent)',
-        animation: 'shimmer 2s infinite',
-        pointerEvents: 'none'
+        width,
+        height,
+        padding,
+        background: `
+          radial-gradient(ellipse at 20% 10%, color-mix(in srgb, ${stepColor} 8%, transparent) 0%, transparent 50%),
+          var(--liquid-glass-bg-elevated)
+        `,
+        border: `1.5px solid color-mix(in srgb, ${stepColor} 18%, rgba(255, 255, 255, 0.12))`,
+        borderRadius: '20px',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        overflow: 'hidden',
+        position: 'relative'
       }}
-    />
-    {children}
-  </div>
-);
+    >
+      <div
+        className="skeleton-shimmer"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: '-100%',
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent)',
+          animation: 'shimmer 2s infinite',
+          pointerEvents: 'none'
+        }}
+      />
+      {children}
+    </div>
+  );
+};
 
 export const SkeletonStatBox: React.FC<{
   stepColor?: string;

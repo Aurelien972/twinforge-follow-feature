@@ -1,20 +1,18 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { ConditionalMotion } from '../../../lib/motion';
 import GlassCard from '../../cards/GlassCard';
 import SkeletonBase from './SkeletonBase';
+import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 
 interface TrainingProgressTabSkeletonProps {
   className?: string;
 }
 
-/**
- * TrainingProgressTabSkeleton - Skeleton animé pour le chargement de l'onglet Progression
- * Affiche des placeholders pour ProgressionStatsCard, VolumeProgressionChartV2, ConsistencyCalendarSection, etc.
- */
 const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = ({ className = '' }) => {
+  const { isPerformanceMode } = usePerformanceMode();
+
   return (
     <div className={`space-y-6 w-full ${className}`}>
-      {/* Period Selector Skeleton */}
       <div className="flex justify-center">
         <div className="inline-flex gap-2 p-1 rounded-lg" style={{
           background: 'rgba(255, 255, 255, 0.05)',
@@ -32,7 +30,6 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
         </div>
       </div>
 
-      {/* Progression Stats Card Skeleton */}
       <GlassCard className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -56,10 +53,9 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
           />
         </div>
 
-        {/* Stats Grid Skeleton */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[...Array(4)].map((_, index) => (
-            <motion.div
+            <ConditionalMotion
               key={index}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -76,14 +72,13 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
               </div>
               <SkeletonBase width="80px" height="28px" shimmer className="mb-2" />
               <SkeletonBase width="60px" height="14px" shimmer />
-            </motion.div>
+            </ConditionalMotion>
           ))}
         </div>
 
-        {/* Trend indicators skeleton */}
         <div className="grid grid-cols-2 gap-4">
           {[...Array(2)].map((_, index) => (
-            <motion.div
+            <ConditionalMotion
               key={index}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -98,12 +93,11 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
                 <SkeletonBase width="20px" height="20px" borderRadius="4px" shimmer />
                 <SkeletonBase width="120px" height="12px" shimmer />
               </div>
-            </motion.div>
+            </ConditionalMotion>
           ))}
         </div>
       </GlassCard>
 
-      {/* AI Insights Card Skeleton */}
       <GlassCard className="p-6">
         <div className="flex items-center gap-3 mb-4">
           <SkeletonBase
@@ -119,7 +113,7 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
           />
         </div>
 
-        <motion.div
+        <ConditionalMotion
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -129,14 +123,13 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
           <SkeletonBase width="95%" height="16px" shimmer />
           <SkeletonBase width="88%" height="16px" shimmer />
           <SkeletonBase width="92%" height="16px" shimmer />
-        </motion.div>
+        </ConditionalMotion>
 
         <div className="mt-4 pt-4 border-t border-white/10">
           <SkeletonBase width="140px" height="12px" shimmer />
         </div>
       </GlassCard>
 
-      {/* Volume Progression Chart Skeleton */}
       <GlassCard className="p-6">
         <div className="flex items-center gap-3 mb-6">
           <SkeletonBase
@@ -152,56 +145,75 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
           />
         </div>
 
-        {/* Chart Area Skeleton */}
         <div className="relative h-[300px] rounded-xl overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.03))',
+            background: isPerformanceMode
+              ? 'rgba(59, 130, 246, 0.05)'
+              : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.03))',
             border: '1px solid rgba(59, 130, 246, 0.15)'
           }}
         >
-          {/* Animated chart bars */}
-          <div className="absolute bottom-0 left-0 right-0 flex items-end justify-around px-8 pb-8 gap-2">
-            {[...Array(8)].map((_, index) => {
-              const randomHeight = 40 + Math.random() * 60;
-              return (
-                <motion.div
-                  key={index}
-                  className="flex-1 rounded-t-lg"
-                  style={{
-                    background: 'linear-gradient(to top, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.15))',
-                    border: '1px solid rgba(59, 130, 246, 0.2)',
-                    height: `${randomHeight}%`
-                  }}
-                  initial={{ scaleY: 0 }}
-                  animate={{ scaleY: 1 }}
-                  transition={{
-                    duration: 0.6,
-                    delay: 0.2 + index * 0.1,
-                    ease: 'easeOut'
-                  }}
-                />
-              );
-            })}
-          </div>
+          {isPerformanceMode ? (
+            <div className="absolute bottom-0 left-0 right-0 flex items-end justify-around px-8 pb-8 gap-2">
+              {[...Array(8)].map((_, index) => {
+                const randomHeight = 40 + Math.random() * 60;
+                return (
+                  <div
+                    key={index}
+                    className="flex-1 rounded-t-lg"
+                    style={{
+                      background: 'rgba(59, 130, 246, 0.2)',
+                      border: '1px solid rgba(59, 130, 246, 0.2)',
+                      height: `${randomHeight}%`
+                    }}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <>
+              <div className="absolute bottom-0 left-0 right-0 flex items-end justify-around px-8 pb-8 gap-2">
+                {[...Array(8)].map((_, index) => {
+                  const randomHeight = 40 + Math.random() * 60;
+                  return (
+                    <ConditionalMotion
+                      key={index}
+                      className="flex-1 rounded-t-lg"
+                      style={{
+                        background: 'linear-gradient(to top, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.15))',
+                        border: '1px solid rgba(59, 130, 246, 0.2)',
+                        height: `${randomHeight}%`
+                      }}
+                      initial={{ scaleY: 0 }}
+                      animate={{ scaleY: 1 }}
+                      transition={{
+                        duration: 0.6,
+                        delay: 0.2 + index * 0.1,
+                        ease: 'easeOut'
+                      }}
+                    />
+                  );
+                })}
+              </div>
 
-          {/* Animated shimmer overlay */}
-          <motion.div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%)'
-            }}
-            animate={{
-              x: ['-100%', '200%']
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'linear'
-            }}
-          />
+              <ConditionalMotion
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%)'
+                }}
+                animate={{
+                  x: ['-100%', '200%']
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'linear'
+                }}
+              />
+            </>
+          )}
         </div>
 
-        {/* Chart Legend Skeleton */}
         <div className="flex justify-center gap-6 mt-4">
           {[...Array(2)].map((_, index) => (
             <div key={index} className="flex items-center gap-2">
@@ -212,7 +224,6 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
         </div>
       </GlassCard>
 
-      {/* Training Load Chart Skeleton */}
       <GlassCard className="p-6">
         <div className="flex items-center gap-3 mb-6">
           <SkeletonBase
@@ -228,51 +239,49 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
           />
         </div>
 
-        {/* Chart Area with line graph effect */}
         <div className="relative h-[280px] rounded-xl overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(34, 197, 94, 0.03))',
+            background: isPerformanceMode
+              ? 'rgba(16, 185, 129, 0.05)'
+              : 'linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(34, 197, 94, 0.03))',
             border: '1px solid rgba(16, 185, 129, 0.15)'
           }}
         >
-          {/* Animated line path */}
-          <motion.svg
-            className="absolute inset-0 w-full h-full"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.path
-              d="M 50 200 Q 100 150, 150 180 T 300 140 T 450 160 T 600 120 T 750 150"
-              stroke="rgba(16, 185, 129, 0.3)"
-              strokeWidth="3"
-              fill="none"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 1.5, ease: "easeInOut" }}
-            />
-          </motion.svg>
+          {!isPerformanceMode && (
+            <>
+              <svg className="absolute inset-0 w-full h-full">
+                <ConditionalMotion
+                  as="path"
+                  d="M 50 200 Q 100 150, 150 180 T 300 140 T 450 160 T 600 120 T 750 150"
+                  stroke="rgba(16, 185, 129, 0.3)"
+                  strokeWidth="3"
+                  fill="none"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                />
+              </svg>
 
-          {/* Animated shimmer overlay */}
-          <motion.div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%)'
-            }}
-            animate={{
-              x: ['-100%', '200%']
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'linear',
-              delay: 0.5
-            }}
-          />
+              <ConditionalMotion
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%)'
+                }}
+                animate={{
+                  x: ['-100%', '200%']
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'linear',
+                  delay: 0.5
+                }}
+              />
+            </>
+          )}
         </div>
       </GlassCard>
 
-      {/* Consistency Calendar Skeleton */}
       <GlassCard className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -296,10 +305,9 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
           />
         </div>
 
-        {/* Stats row skeleton */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {[...Array(3)].map((_, index) => (
-            <motion.div
+            <ConditionalMotion
               key={index}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -312,13 +320,11 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
             >
               <SkeletonBase width="60px" height="24px" shimmer className="mx-auto mb-2" />
               <SkeletonBase width="80px" height="12px" shimmer className="mx-auto" />
-            </motion.div>
+            </ConditionalMotion>
           ))}
         </div>
 
-        {/* Calendar Grid Skeleton */}
         <div className="space-y-2">
-          {/* Week labels */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => (
               <div key={index} className="text-center">
@@ -327,9 +333,8 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
             ))}
           </div>
 
-          {/* Calendar days grid */}
           {[...Array(5)].map((_, weekIndex) => (
-            <motion.div
+            <ConditionalMotion
               key={weekIndex}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -337,30 +342,20 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
               className="grid grid-cols-7 gap-1"
             >
               {[...Array(7)].map((_, dayIndex) => (
-                <motion.div
+                <div
                   key={dayIndex}
                   className="aspect-square rounded-lg"
                   style={{
                     background: 'rgba(255, 255, 255, 0.03)',
                     border: '1px solid rgba(255, 255, 255, 0.08)'
                   }}
-                  animate={{
-                    opacity: [0.3, 0.6, 0.3]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: (weekIndex * 7 + dayIndex) * 0.05,
-                    ease: 'easeInOut'
-                  }}
                 />
               ))}
-            </motion.div>
+            </ConditionalMotion>
           ))}
         </div>
       </GlassCard>
 
-      {/* Personal Records Link Skeleton */}
       <GlassCard className="p-6 text-center">
         <div className="flex justify-center mb-3">
           <SkeletonBase
@@ -375,7 +370,6 @@ const TrainingProgressTabSkeleton: React.FC<TrainingProgressTabSkeletonProps> = 
         <SkeletonBase width="180px" height="40px" borderRadius="8px" shimmer className="mx-auto" />
       </GlassCard>
 
-      {/* Conseils Link Skeleton */}
       <GlassCard className="p-6">
         <div className="flex items-center justify-center gap-3">
           <SkeletonBase width="16px" height="16px" borderRadius="4px" shimmer />
