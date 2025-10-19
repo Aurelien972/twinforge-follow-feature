@@ -12,6 +12,7 @@ import { ICONS } from '../../icons/registry';
 import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
 import { Z_INDEX, useOverlayStore } from '../../../system/store/overlayStore';
 import CoachChatInterface from '../coach/CoachChatInterface';
+import VoiceSessionMinimal from './VoiceSessionMinimal';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
 import logger from '../../../lib/utils/logger';
@@ -40,7 +41,8 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
     setTyping,
     conversationId,
     incrementUnread,
-    voiceState
+    voiceState,
+    isVoiceOnlyMode
   } = useUnifiedCoachStore();
 
   const { navClose } = useFeedback();
@@ -297,6 +299,17 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
       });
     }
   };
+
+  // Si en mode voice-only, afficher l'interface minimale au lieu du drawer
+  if (isVoiceOnlyMode) {
+    return (
+      <AnimatePresence>
+        {isOpen && (
+          <VoiceSessionMinimal onClose={close} />
+        )}
+      </AnimatePresence>
+    );
+  }
 
   return (
     <AnimatePresence>

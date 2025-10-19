@@ -130,6 +130,9 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
 
   const isRealtimeActive = realtimeState !== 'idle' && realtimeState !== 'error';
 
+  // Bloquer l'input texte complètement en mode Realtime pour forcer voice-only
+  const isTextInputBlocked = isRealtimeActive;
+
   return (
     <div
       className="chat-input-bar-container"
@@ -456,13 +459,22 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
               onKeyDown={handleKeyDown}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder={isRecording ? 'Enregistrement en cours...' : isTranscribing ? 'Transcription...' : placeholder}
-              disabled={disabled || isRecording || isTranscribing}
+              placeholder={
+                isTextInputBlocked
+                  ? 'Mode vocal actif - Texte désactivé'
+                  : isRecording
+                  ? 'Enregistrement en cours...'
+                  : isTranscribing
+                  ? 'Transcription...'
+                  : placeholder
+              }
+              disabled={disabled || isRecording || isTranscribing || isTextInputBlocked}
               rows={1}
               className="chat-textarea w-full resize-none bg-transparent border-none outline-none text-white placeholder-white/40 text-sm leading-relaxed py-1.5 px-1.5"
               style={{
                 maxHeight: '90px',
-                minHeight: '32px'
+                minHeight: '32px',
+                opacity: isTextInputBlocked ? 0.4 : 1
               }}
             />
           </div>

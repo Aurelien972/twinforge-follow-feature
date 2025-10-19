@@ -49,6 +49,7 @@ interface UnifiedCoachState {
   // Panel state
   isPanelOpen: boolean;
   communicationMode: CommunicationMode;
+  isVoiceOnlyMode: boolean; // New: Track if in voice-only minimal UI mode
 
   // Chat mode
   currentMode: ChatMode;
@@ -138,6 +139,10 @@ interface UnifiedCoachState {
   // Actions - Notification
   showNotification: (notification: Omit<ChatNotification, 'isVisible'>) => void;
   hideNotification: () => void;
+
+  // Actions - Voice Only Mode
+  enterVoiceOnlyMode: () => void;
+  exitVoiceOnlyMode: () => void;
 }
 
 const DEFAULT_MODE_CONFIGS: Record<ChatMode, ChatModeConfig> = {
@@ -208,6 +213,7 @@ export const useUnifiedCoachStore = create<UnifiedCoachState>()(
       // Initial state
       isPanelOpen: false,
       communicationMode: 'text',
+      isVoiceOnlyMode: false,
 
       currentMode: 'general',
       modeConfigs: DEFAULT_MODE_CONFIGS,
@@ -577,6 +583,30 @@ export const useUnifiedCoachStore = create<UnifiedCoachState>()(
             timestamp: new Date().toISOString()
           });
         }
+      },
+
+      // Voice Only Mode actions
+      enterVoiceOnlyMode: () => {
+        set({
+          isVoiceOnlyMode: true,
+          isPanelOpen: false, // Close the chat drawer
+          communicationMode: 'voice'
+        });
+
+        logger.info('UNIFIED_COACH', 'Entered voice-only mode', {
+          timestamp: new Date().toISOString()
+        });
+      },
+
+      exitVoiceOnlyMode: () => {
+        set({
+          isVoiceOnlyMode: false,
+          isPanelOpen: true // Reopen chat drawer to show conversation
+        });
+
+        logger.info('UNIFIED_COACH', 'Exited voice-only mode', {
+          timestamp: new Date().toISOString()
+        });
       }
     }),
     {

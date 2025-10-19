@@ -37,7 +37,9 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
     hasUnreadMessages,
     unreadCount,
     isInStep2,
-    voiceState
+    voiceState,
+    isVoiceOnlyMode,
+    exitVoiceOnlyMode
   } = useUnifiedCoachStore();
 
   const { click } = useFeedback();
@@ -86,8 +88,15 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
   const handleClick = () => {
     click();
     Haptics.press();
-    // Le toggle du chat gère automatiquement les autres overlays via overlayStore
-    toggle();
+
+    // Si en mode voice-only, sortir du mode et ouvrir le chat avec l'historique
+    if (isVoiceOnlyMode) {
+      logger.info('FLOATING_CHAT_BUTTON', 'Exiting voice-only mode to view conversation');
+      exitVoiceOnlyMode();
+    } else {
+      // Le toggle du chat gère automatiquement les autres overlays via overlayStore
+      toggle();
+    }
   };
 
   const buttonElement = (
@@ -205,7 +214,7 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
         }}
       >
         <AnimatePresence mode="wait">
-          {isVoiceActive && !isOpen ? (
+          {(isVoiceActive || isVoiceOnlyMode) && !isOpen ? (
             <motion.div
               key="voice-active-icon"
               initial={{ scale: 0.8, opacity: 0, rotate: -10 }}

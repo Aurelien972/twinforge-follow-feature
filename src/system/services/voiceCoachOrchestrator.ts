@@ -131,6 +131,10 @@ class VoiceCoachOrchestrator {
       logger.info('VOICE_ORCHESTRATOR', '💬 Starting conversation in store');
       store.startConversation(mode as any);
 
+      // IMPORTANT: Passer en mode voice-only pour l'interface minimale mobile
+      logger.info('VOICE_ORCHESTRATOR', '📱 Entering voice-only mode for minimal UI');
+      store.enterVoiceOnlyMode();
+
       // Envoyer un message de bienvenue automatique pour démarrer la conversation
       logger.info('VOICE_ORCHESTRATOR', '👋 Triggering welcome message from coach');
       openaiRealtimeService.sendTextMessage('Bonjour! Je suis ton coach personnel. Comment puis-je t\'aider aujourd\'hui?');
@@ -187,6 +191,10 @@ class VoiceCoachOrchestrator {
 
       // Reset état
       store.setVoiceState('idle');
+
+      // NOTE: Ne pas sortir du mode voice-only ici
+      // C'est fait par exitVoiceOnlyMode() dans VoiceSessionMinimal
+      // qui ouvre automatiquement le chat avec l'historique
 
       logger.info('VOICE_ORCHESTRATOR', 'Voice session stopped');
     } catch (error) {
