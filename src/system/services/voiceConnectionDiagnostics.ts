@@ -198,34 +198,54 @@ export class VoiceConnectionDiagnostics {
     }
 
     try {
-      // Test with a simple HTTP request first (not WebSocket)
-      const httpUrl = `${supabaseUrl}/functions/v1/voice-coach-realtime`;
+      // Test health check endpoint first
+      const healthUrl = `${supabaseUrl}/functions/v1/voice-coach-realtime/health`;
 
-      logger.info('VOICE_DIAGNOSTICS', 'Making HTTP OPTIONS request to edge function', {
-        url: httpUrl
+      logger.info('VOICE_DIAGNOSTICS', 'Making HTTP GET request to health endpoint', {
+        url: healthUrl
       });
 
-      const response = await fetch(httpUrl, {
-        method: 'OPTIONS',
+      const response = await fetch(healthUrl, {
+        method: 'GET',
         headers: {
           'apikey': supabaseAnonKey,
           'Authorization': `Bearer ${supabaseAnonKey}`
         }
       });
 
-      const passed = response.ok || response.status === 426; // 426 = Upgrade Required is expected for WebSocket endpoints
+      let healthData: any = null;
+      let passed = response.ok;
+
+      if (response.ok) {
+        try {
+          healthData = await response.json();
+          logger.info('VOICE_DIAGNOSTICS', 'Health check response received', healthData);
+
+          // Check if OpenAI key is configured
+          if (!healthData.hasOpenAIKey) {
+            passed = false;
+          }
+        } catch (jsonError) {
+          logger.warn('VOICE_DIAGNOSTICS', 'Could not parse health check response as JSON');
+        }
+      }
 
       return {
         passed,
         test: 'Edge Function Reachability',
         message: passed
-          ? `Edge function is reachable (HTTP ${response.status})`
+          ? healthData?.hasOpenAIKey
+            ? `Edge function is ready with OpenAI key configured (${healthData.openaiKeyPrefix})`
+            : 'Edge function is reachable but OPENAI_API_KEY is NOT configured'
           : `Edge function returned error: HTTP ${response.status}`,
         details: {
           status: response.status,
           statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries()),
-          url: httpUrl
+          healthData,
+          url: healthUrl,
+          recommendation: !healthData?.hasOpenAIKey
+            ? 'Go to Supabase Dashboard > Edge Functions > voice-coach-realtime > Secrets and add OPENAI_API_KEY'
+            : undefined
         }
       };
     } catch (error) {

@@ -194,6 +194,33 @@ Deno.serve(async (req: Request) => {
     });
   }
 
+  // Add a simple HTTP GET endpoint for health check and diagnostics
+  if (req.method === 'GET') {
+    const url = new URL(req.url);
+
+    // Health check endpoint
+    if (url.pathname.includes('/health')) {
+      const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+
+      return new Response(
+        JSON.stringify({
+          status: 'ok',
+          timestamp: new Date().toISOString(),
+          hasOpenAIKey: !!openaiApiKey,
+          openaiKeyLength: openaiApiKey?.length || 0,
+          openaiKeyPrefix: openaiApiKey ? `${openaiApiKey.substring(0, 7)}...` : 'NOT_SET',
+          message: openaiApiKey
+            ? 'Edge function is configured and ready'
+            : 'OPENAI_API_KEY is not configured'
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+  }
+
   try {
     const url = new URL(req.url);
 
