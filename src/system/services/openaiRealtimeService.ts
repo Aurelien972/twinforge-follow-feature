@@ -527,16 +527,58 @@ class OpenAIRealtimeService {
   }
 
   /**
-   * Configurer la session (pas nécessaire avec WebRTC, tout est dans le SDP)
-   * Gardé pour compatibilité mais ne fait rien
+   * Configurer la session - CRITIQUE pour activer la détection vocale et les réponses
+   * Cette fonction doit être appelée après la connexion WebRTC pour activer:
+   * - La détection automatique de fin de parole (VAD)
+   * - La transcription automatique de l'audio
+   * - Les réponses automatiques du coach
    */
   configureSession(systemPrompt: string, mode: ChatMode): void {
-    logger.info('REALTIME_WEBRTC', '⚙️ Session configuration handled by backend during connection', {
+    logger.info('REALTIME_WEBRTC', '⚙️ Configuring session with turn detection and transcription', {
       mode,
       promptLength: systemPrompt.length
     });
-    // Avec WebRTC + interface unifiée, la config est faite lors du POST /session
-    // Pas besoin d'envoyer session.update
+
+    // Configuration complète de la session pour activer les réponses vocales
+    this.sendMessage({
+      type: 'session.update',
+      session: {
+        // Instructions système (prompt du coach)
+        instructions: systemPrompt,
+
+        // Modalités d'entrée et sortie
+        modalities: ['text', 'audio'],
+
+        // Configuration de la voix
+        voice: this.config?.voice || 'alloy',
+
+        // Format audio d'entrée (automatique avec WebRTC)
+        input_audio_format: 'pcm16',
+
+        // Format audio de sortie (automatique avec WebRTC)
+        output_audio_format: 'pcm16',
+
+        // CRITIQUE: Activer la transcription automatique de l'audio d'entrée
+        input_audio_transcription: {
+          model: 'whisper-1'
+        },
+
+        // CRITIQUE: Activer la détection automatique de fin de parole
+        // C'est ce qui permet au coach de répondre automatiquement
+        turn_detection: {
+          type: 'server_vad',
+          threshold: 0.5,          // Sensibilité de détection (0.0 à 1.0)
+          prefix_padding_ms: 300,  // Garder 300ms avant la parole détectée
+          silence_duration_ms: 500 // Attendre 500ms de silence avant de considérer la fin
+        },
+
+        // Configuration du modèle
+        temperature: this.config?.temperature || 0.8,
+        max_response_output_tokens: this.config?.maxTokens || 4096
+      }
+    });
+
+    logger.info('REALTIME_WEBRTC', '✅ Session configuration sent - VAD and transcription enabled');
   }
 
   /**

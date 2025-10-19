@@ -113,9 +113,21 @@ class VoiceCoachOrchestrator {
       });
       logger.info('VOICE_ORCHESTRATOR', '✅ Connected to Realtime API via WebRTC');
 
+      // CRITIQUE: Configurer la session pour activer la détection vocale et les réponses
+      logger.info('VOICE_ORCHESTRATOR', '⚙️ Configuring session with VAD and transcription');
+      openaiRealtimeService.configureSession(modeConfig.systemPrompt, mode as any);
+
+      // Attendre un court instant pour que la configuration soit prise en compte
+      await new Promise(resolve => setTimeout(resolve, 500));
+      logger.info('VOICE_ORCHESTRATOR', '✅ Session configuration applied');
+
       // Démarrer une conversation dans le store
       logger.info('VOICE_ORCHESTRATOR', '💬 Starting conversation in store');
       store.startConversation(mode as any);
+
+      // Envoyer un message de bienvenue automatique pour démarrer la conversation
+      logger.info('VOICE_ORCHESTRATOR', '👋 Triggering welcome message from coach');
+      openaiRealtimeService.sendTextMessage('Bonjour! Je suis ton coach personnel. Comment puis-je t\'aider aujourd\'hui?');
 
       // Note: Avec WebRTC, l'audio est géré automatiquement via les tracks
       // Pas besoin de démarrer manuellement l'enregistrement
@@ -214,9 +226,14 @@ class VoiceCoachOrchestrator {
   private handleRealtimeMessage(message: any): void {
     const store = useUnifiedCoachStore.getState();
 
-    logger.debug('VOICE_ORCHESTRATOR', '📨 Received Realtime message', {
+    // Logger TOUS les messages pour diagnostic
+    logger.info('VOICE_ORCHESTRATOR', `📨 Received Realtime message: ${message.type}`, {
       type: message.type,
-      hasContent: !!message.delta || !!message.transcript
+      hasContent: !!message.delta || !!message.transcript,
+      hasDelta: !!message.delta,
+      hasTranscript: !!message.transcript,
+      hasAudio: !!message.audio,
+      fullMessage: message
     });
 
     switch (message.type) {

@@ -81,8 +81,14 @@ const PreferencesSettingsTab: React.FC = () => {
   const stopAudio = () => {
     if (audioSourceRef.current) {
       try {
-        audioSourceRef.current.stop();
-        audioSourceRef.current.disconnect();
+        // Handle both AudioBufferSourceNode and HTMLAudioElement
+        if ('stop' in audioSourceRef.current) {
+          audioSourceRef.current.stop();
+          audioSourceRef.current.disconnect();
+        } else if ('pause' in audioSourceRef.current) {
+          (audioSourceRef.current as HTMLAudioElement).pause();
+          (audioSourceRef.current as HTMLAudioElement).currentTime = 0;
+        }
       } catch (e) {
         // Already stopped
       }
@@ -100,58 +106,73 @@ const PreferencesSettingsTab: React.FC = () => {
     setIsPlaying(voiceId);
 
     try {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AudioContext();
+      // Utiliser l'API OpenAI TTS pour un vrai aperçu de la voix
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+      if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error('Supabase configuration missing');
       }
-
-      const sampleRate = 24000;
-      const duration = 3;
-      const numSamples = sampleRate * duration;
-      const audioBuffer = audioContextRef.current.createBuffer(1, numSamples, sampleRate);
-      const channelData = audioBuffer.getChannelData(0);
-
-      const frequencies = voiceId === 'onyx' ? [120, 240] :
-                         voiceId === 'echo' ? [180, 360] :
-                         voiceId === 'fable' ? [140, 280] :
-                         voiceId === 'shimmer' ? [220, 440] :
-                         voiceId === 'nova' ? [260, 520] :
-                         [160, 320];
-
-      for (let i = 0; i < numSamples; i++) {
-        const t = i / sampleRate;
-        const envelope = Math.exp(-t * 0.8);
-        channelData[i] = envelope * (
-          0.4 * Math.sin(2 * Math.PI * frequencies[0] * t) +
-          0.3 * Math.sin(2 * Math.PI * frequencies[1] * t) +
-          0.2 * Math.sin(2 * Math.PI * frequencies[0] * 1.5 * t) +
-          0.1 * Math.sin(2 * Math.PI * frequencies[1] * 1.5 * t)
-        ) * 0.3;
-      }
-
-      const source = audioContextRef.current.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(audioContextRef.current.destination);
-
-      source.onended = () => {
-        setIsPlaying(null);
-      };
-
-      audioSourceRef.current = source;
-      source.start();
 
       showToast({
         type: 'info',
         title: `Aperçu: ${voice.name}`,
-        message: voice.sampleText,
-        duration: 3000,
+        message: 'Génération de l\'aperçu vocal...',
+        duration: 2000,
       });
+
+      // Appeler une edge function pour générer l'audio avec OpenAI TTS
+      const response = await fetch(`${supabaseUrl}/functions/v1/generate-voice-preview`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'apikey': supabaseAnonKey
+        },
+        body: JSON.stringify({
+          voice: voiceId,
+          text: voice.sampleText
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate voice preview');
+      }
+
+      // Récupérer l'audio en tant que blob
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      // Créer et jouer l'élément audio
+      const audio = new Audio(audioUrl);
+      audio.volume = 1.0;
+
+      audio.onended = () => {
+        setIsPlaying(null);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      audio.onerror = () => {
+        setIsPlaying(null);
+        URL.revokeObjectURL(audioUrl);
+        showToast({
+          type: 'error',
+          title: 'Erreur',
+          message: 'Erreur lors de la lecture de l\'aperçu',
+          duration: 3000,
+        });
+      };
+
+      await audio.play();
+      audioSourceRef.current = audio as any; // Pour permettre l'arrêt
+
     } catch (error) {
       console.error('Error playing voice preview:', error);
       setIsPlaying(null);
       showToast({
         type: 'error',
         title: 'Erreur',
-        message: 'Impossible de lire l\'aperçu audio',
+        message: 'Impossible de générer l\'aperçu audio. Vérifiez votre connexion.',
         duration: 3000,
       });
     }

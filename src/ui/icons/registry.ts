@@ -222,7 +222,6 @@ export const ICONS = {
   Navigation: L.Navigation,
   Compass: L.Compass,
   Radar: L.Radar,
-  Radio: L.Radio,
   Webhook: L.Webhook,
   FastForward: L.FastForward,
   Rewind: L.Rewind,
