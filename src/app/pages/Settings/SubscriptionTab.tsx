@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '../../../ui/cards/GlassCard';
+import TokenIcon from '../../../ui/icons/TokenIcon';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import { useToast } from '../../../ui/components/ToastProvider';
@@ -87,7 +88,9 @@ const SubscriptionTab: React.FC = () => {
     <div className="space-y-6">
       <GlassCard className="p-6">
         <div className="flex items-start gap-4 mb-6">
-          <SpatialIcon Icon={ICONS.Coins} size={28} color="#10B981" variant="pure" />
+          <div className="flex-shrink-0">
+            <TokenIcon size={40} variant="normal" withGlow={true} />
+          </div>
           <div className="flex-1">
             <h3 className="text-xl font-bold text-white mb-1">Solde de Tokens</h3>
             <p className="text-sm text-slate-400">
@@ -97,33 +100,45 @@ const SubscriptionTab: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-slate-500">Tokens Disponibles</span>
-              <SpatialIcon Icon={ICONS.Zap} size={16} color="#10B981" variant="pure" />
+          <div
+            className="rounded-xl p-5 border"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(253, 200, 48, 0.05))',
+              borderColor: 'rgba(247, 147, 30, 0.3)',
+              boxShadow: '0 4px 16px rgba(247, 147, 30, 0.1)'
+            }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-slate-400 font-medium">Tokens Disponibles</span>
+              <TokenIcon size={24} variant="success" withGlow={false} />
             </div>
-            <div className="text-3xl font-bold text-white">
+            <div className="text-4xl font-bold mb-1" style={{
+              background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
               {tokenBalance ? TokenService.formatTokenAmount(tokenBalance.balance) : '0'}
             </div>
-            <div className="text-xs text-slate-500 mt-1">
+            <div className="text-xs text-slate-500">
               Votre réserve d'énergie numérique
             </div>
           </div>
 
-          <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-slate-500">Statut</span>
+          <div className="bg-slate-800/50 rounded-xl p-5 border border-slate-700/50">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-slate-400 font-medium">Statut</span>
               <SpatialIcon
                 Icon={ICONS.Check}
-                size={16}
+                size={20}
                 color="#10B981"
                 variant="pure"
               />
             </div>
-            <div className="text-2xl font-bold text-emerald-400">
+            <div className="text-3xl font-bold text-emerald-400 mb-1">
               Essai Gratuit
             </div>
-            <div className="text-xs text-slate-500 mt-1">
+            <div className="text-xs text-slate-500">
               15 000 tokens offerts pour découvrir l'app
             </div>
           </div>
@@ -136,8 +151,8 @@ const SubscriptionTab: React.FC = () => {
           <div className="max-w-md mx-auto">
             <GlassCard className="p-6">
               <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 mb-4">
-                  <SpatialIcon Icon={ICONS.Coins} size={32} color="#10B981" variant="pure" />
+                <div className="inline-flex items-center justify-center mb-4">
+                  <TokenIcon size={64} variant="normal" withGlow={true} />
                 </div>
                 <h4 className="text-2xl font-bold text-white mb-2">Pack Standard</h4>
                 <p className="text-sm text-slate-400 mb-4">
@@ -145,20 +160,32 @@ const SubscriptionTab: React.FC = () => {
                 </p>
               </div>
 
-              <div className="mb-6 py-4 px-5 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-                <div className="flex items-baseline justify-center gap-2 mb-1">
-                  <span className="text-4xl font-bold text-emerald-400">
+              <div
+                className="mb-6 py-5 px-6 rounded-xl border"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(253, 200, 48, 0.08))',
+                  borderColor: 'rgba(247, 147, 30, 0.35)',
+                  boxShadow: '0 4px 20px rgba(247, 147, 30, 0.15)'
+                }}
+              >
+                <div className="flex items-baseline justify-center gap-2 mb-2">
+                  <span className="text-5xl font-bold" style={{
+                    background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}>
                     {TokenService.formatTokenAmount(pack19.tokens)}
                   </span>
-                  <span className="text-lg text-slate-400">tokens</span>
+                  <span className="text-lg text-slate-400 font-medium">tokens</span>
                 </div>
-                <div className="text-xs text-center text-slate-500">
+                <div className="text-xs text-center text-slate-400 font-medium">
                   ≈ 100 analyses complètes ou 8 générations de plan repas
                 </div>
               </div>
 
               <div className="text-center mb-6">
-                <div className="text-3xl font-bold text-white mb-1">
+                <div className="text-4xl font-bold text-white mb-1">
                   {TokenService.formatCurrency(pack19.price_eur)}
                 </div>
                 <div className="text-xs text-slate-500">
@@ -169,9 +196,26 @@ const SubscriptionTab: React.FC = () => {
               <button
                 onClick={() => handlePurchaseTokens('pack_19')}
                 disabled={isCreatingSession}
-                className="w-full px-6 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/25"
+                className="w-full px-6 py-4 rounded-xl font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base"
+                style={{
+                  background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)',
+                  boxShadow: '0 8px 24px rgba(247, 147, 30, 0.35)',
+                  transform: isCreatingSession ? 'scale(0.98)' : 'scale(1)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isCreatingSession) {
+                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(247, 147, 30, 0.45)';
+                    e.currentTarget.style.transform = 'scale(1.02)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isCreatingSession) {
+                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(247, 147, 30, 0.35)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }
+                }}
               >
-                {isCreatingSession ? 'Chargement...' : 'Reforger mes Tokens'}
+                {isCreatingSession ? 'Chargement...' : 'Recharger mes Tokens'}
               </button>
 
               <div className="mt-4 text-center text-xs text-slate-500">
@@ -195,12 +239,19 @@ const SubscriptionTab: React.FC = () => {
                 key={tx.id}
                 className="flex items-center justify-between py-3 px-4 bg-slate-800/30 rounded-lg border border-slate-700/30"
               >
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-white mb-1">
-                    {tx.operationType ? TokenService.getOperationTypeLabel(tx.operationType) : tx.source || 'Transaction'}
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    {format(new Date(tx.createdAt), 'dd MMM yyyy HH:mm', { locale: fr })}
+                <div className="flex items-center gap-3 flex-1">
+                  <TokenIcon
+                    size={28}
+                    variant={tx.transactionType === 'consume' ? 'warning' : 'success'}
+                    withGlow={false}
+                  />
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-white mb-1">
+                      {tx.operationType ? TokenService.getOperationTypeLabel(tx.operationType) : tx.source || 'Transaction'}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {format(new Date(tx.createdAt), 'dd MMM yyyy HH:mm', { locale: fr })}
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
@@ -232,8 +283,8 @@ const SubscriptionTab: React.FC = () => {
 
         <div className="space-y-4">
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-              <SpatialIcon Icon={ICONS.Zap} size={16} color="#60A5FA" variant="pure" />
+            <div className="flex-shrink-0">
+              <TokenIcon size={32} variant="normal" withGlow={false} />
             </div>
             <div className="flex-1">
               <h5 className="text-sm font-semibold text-white mb-1">Carburant de vos fonctionnalités</h5>
@@ -244,8 +295,8 @@ const SubscriptionTab: React.FC = () => {
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-              <SpatialIcon Icon={ICONS.Coins} size={16} color="#10B981" variant="pure" />
+            <div className="flex-shrink-0">
+              <TokenIcon size={32} variant="success" withGlow={false} />
             </div>
             <div className="flex-1">
               <h5 className="text-sm font-semibold text-white mb-1">Démarrage gratuit généreux</h5>
@@ -268,8 +319,8 @@ const SubscriptionTab: React.FC = () => {
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
-              <SpatialIcon Icon={ICONS.BarChart} size={16} color="#FBBF24" variant="pure" />
+            <div className="flex-shrink-0">
+              <TokenIcon size={32} variant="warning" withGlow={false} />
             </div>
             <div className="flex-1">
               <h5 className="text-sm font-semibold text-white mb-1">Consommation optimisée et transparente</h5>
