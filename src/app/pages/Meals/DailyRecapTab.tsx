@@ -7,7 +7,7 @@ import { mealsRepo } from '../../../system/data/repositories/mealsRepo';
 import { useUserStore } from '../../../system/store/userStore';
 import { format } from 'date-fns';
 import logger from '../../../lib/utils/logger';
-import ProfileCompletenessAlert from './components/DailyRecap/ProfileCompletenessAlert';
+import ProfileCompletenessAlert from '../../../ui/components/profile/ProfileCompletenessAlert';
 import DynamicScanCTA from './components/DailyRecap/DynamicScanCTA';
 import DailyStatsGrid from './components/DailyRecap/DailyStatsGrid';
 import CalorieProgressCard from './components/DailyRecap/CalorieProgressCard';
@@ -277,9 +277,10 @@ const DailyRecapTab: React.FC<DailyRecapTabProps> = ({ onLoadingChange }) => {
         className="space-y-6 w-full"
       >
       {/* Profile Completeness Alert - CRITICAL FIX: Add debugging key */}
-      <ProfileCompletenessAlert 
+      <ProfileCompletenessAlert
         key={`profile-alert-${profile?._immutabilityMarker || 'no-marker'}`}
         profile={profile}
+        forgeContext="meals"
       />
 
       {/* CTA Principal Dynamique - Remonté en haut */}

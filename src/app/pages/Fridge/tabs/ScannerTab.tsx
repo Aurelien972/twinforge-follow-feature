@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useUserStore } from '../../../../system/store/userStore';
+import ProfileCompletenessAlert from '../../../../ui/components/profile/ProfileCompletenessAlert';
 import FridgeScanMainCTA from '../components/FridgeScanMainCTA';
 import RecentScansCard from '../components/RecentScansCard';
 import ScannerStatsCard from '../components/ScannerStatsCard';
@@ -10,6 +12,7 @@ import { useFridgeScanPipeline } from '../../../../system/store/fridgeScan';
  * Affiche le CTA principal pour scanner un frigo et les composants illustratifs
  */
 const ScannerTab: React.FC = () => {
+  const { profile } = useUserStore();
   const { loadRecentSessions } = useFridgeScanPipeline();
 
   // Charger les sessions récentes au montage du composant
@@ -24,6 +27,12 @@ const ScannerTab: React.FC = () => {
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className="space-y-6"
     >
+      {/* Alerte de profil incomplet pour les recommandations culinaires */}
+      <ProfileCompletenessAlert
+        profile={profile}
+        forgeContext="culinary"
+      />
+
       {/* CTA Principal de Scanner */}
       <FridgeScanMainCTA />
 

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useFastingPipeline } from '../../hooks/useFastingPipeline';
 import { useUserStore } from '@/system/store/userStore';
 import { usePerformanceMode } from '@/system/context/PerformanceModeContext';
+import ProfileCompletenessAlert from '@/ui/components/profile/ProfileCompletenessAlert';
 import DynamicFastingCTA from '../Cards/DynamicFastingCTA';
 import FastingDailySummaryCard from '../Cards/FastingDailySummaryCard';
 import FastingTipsCard from '../Cards/FastingTipsCard';
@@ -35,6 +36,12 @@ const FastingDailyTab: React.FC<FastingDailyTabProps> = ({ onLoadingChange }) =>
       })}
       className="space-y-6"
     >
+      {/* Alerte de profil incomplet pour le jeûne */}
+      <ProfileCompletenessAlert
+        profile={profile}
+        forgeContext="fasting"
+      />
+
       {/*
         CTA Dynamique Enrichi pour le Jeûne
         Affiche toutes les informations de la session active:

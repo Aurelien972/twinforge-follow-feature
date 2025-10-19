@@ -7,7 +7,7 @@ import { useTodayActivities, useTodayActivityStats, useDeleteActivity, useRecent
 import { useToast } from '../../../ui/components/ToastProvider';
 import { useFeedback } from '../../../hooks/useFeedback';
 import logger from '../../../lib/utils/logger';
-import ProfileCompletenessAlert from './components/DailyRecap/ProfileCompletenessAlert';
+import ProfileCompletenessAlert from '../../../ui/components/profile/ProfileCompletenessAlert';
 import DynamicActivityCTA from './components/DailyRecap/DynamicActivityCTA';
 import DailyStatsGrid from './components/DailyRecap/DailyStatsGrid';
 import CalorieProgressCard from './components/DailyRecap/CalorieProgressCard';
@@ -118,8 +118,8 @@ const ActivityDailyTab: React.FC = () => {
   if (statsLoading) {
     return (
       <div className="space-y-6">
-        <ProfileCompletenessAlert profile={profile} />
-        
+        <ProfileCompletenessAlert profile={profile} forgeContext="activity" />
+
         {/* Skeleton pour le chargement */}
         <div className="space-y-4">
           <div className="h-32 bg-white/5 rounded-xl animate-pulse" />
@@ -143,6 +143,7 @@ const ActivityDailyTab: React.FC = () => {
     >
       <ProfileCompletenessAlert
         profile={profile}
+        forgeContext="activity"
       />
 
       <DynamicActivityCTA
