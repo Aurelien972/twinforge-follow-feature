@@ -1,6 +1,5 @@
 import React, { useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useShell } from './useShell';
 import { Link } from '../../app/nav/Link';
 import { ICONS } from '../icons/registry';
 import SpatialIcon from '../icons/SpatialIcon';
@@ -9,6 +8,8 @@ import { useUserStore } from '../../system/store/userStore';
 import { getCircuitColor } from '../theme/circuits';
 import { navFor } from '../../app/shell/navigation';
 import { supabase } from '../../system/supabase/client';
+import { useOverlayStore, Z_INDEX } from '../../system/store/overlayStore';
+import logger from '../../lib/utils/logger';
 
 const Section = React.memo(({ title, children, type }: { title: string; children: React.ReactNode; type?: 'primary' | 'twin' | 'forge-category' }) => {
   const shouldHaveTopSpace = type === 'forge-category';
@@ -36,7 +37,8 @@ const Section = React.memo(({ title, children, type }: { title: string; children
 Section.displayName = 'Section';
 
 const MobileDrawer = React.memo(() => {
-  const { drawerOpen, setDrawer } = useShell();
+  const { isOpen, close } = useOverlayStore();
+  const drawerOpen = isOpen('mobileDrawer');
   const location = useLocation();
   const navigate = useNavigate();
   const navRef = React.useRef<HTMLElement>(null);
@@ -137,7 +139,7 @@ const MobileDrawer = React.memo(() => {
       useUserStore.getState().setProfile(null);
 
       // Close drawer
-      setDrawer(false);
+      close();
 
       // Navigate to login page
       navigate('/', { replace: true });
@@ -155,28 +157,33 @@ const MobileDrawer = React.memo(() => {
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            style={{ zIndex: Z_INDEX.BACKDROP }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            onClick={() => setDrawer(false)}
+            onClick={() => {
+              logger.debug('MOBILE_DRAWER', 'Backdrop clicked - closing drawer');
+              close();
+            }}
           />
 
           {/* Drawer */}
           <motion.nav
             ref={navRef}
-            className="mobile-drawer fixed top-0 left-0 h-full w-[85vw] max-w-[340px] z-[9999] overflow-y-auto"
+            className="mobile-drawer fixed top-0 left-0 h-full w-[85vw] max-w-[340px] overflow-y-auto"
+            style={{
+              zIndex: Z_INDEX.MOBILE_DRAWER,
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             role="navigation"
             aria-label="Navigation mobile"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
-            }}
           >
             <div className="py-3 pl-3 pr-2.5 space-y-2">
               {/* Navigation Sections */}
@@ -200,7 +207,7 @@ const MobileDrawer = React.memo(() => {
                         e.preventDefault();
                         handleToggleExpand(item.to);
                       } else {
-                        setDrawer(false);
+                        close();
                       }
                     };
 
@@ -283,7 +290,7 @@ const MobileDrawer = React.memo(() => {
                                       ${isSubActive || isPrimaryAndPageActive ? 'sidebar-submenu-item--active' : ''}
                                       focus-ring
                                     `}
-                                    onClick={() => setDrawer(false)}
+                                    onClick={() => close()}
                                     aria-current={isSubActive ? 'page' : undefined}
                                     style={{ '--item-circuit-color': subItem.color || item.circuitColor } as React.CSSProperties}
                                   >
@@ -331,7 +338,7 @@ const MobileDrawer = React.memo(() => {
                       sidebar-item group focus-ring
                       ${isActive('/profile') ? 'text-white shadow-sm' : 'text-white/70 hover:text-white'}
                     `}
-                    onClick={() => setDrawer(false)}
+                    onClick={() => close()}
                     style={{ '--item-circuit-color': '#FDC830' } as React.CSSProperties}
                   >
                     <div className={`sidebar-item-icon-container ${isActive('/profile') ? 'sidebar-item-icon-container--active' : ''}`}>
@@ -362,7 +369,7 @@ const MobileDrawer = React.memo(() => {
                       sidebar-item group focus-ring
                       ${isActive('/settings') ? 'text-white shadow-sm' : 'text-white/70 hover:text-white'}
                     `}
-                    onClick={() => setDrawer(false)}
+                    onClick={() => close()}
                     style={{ '--item-circuit-color': '#FDC830' } as React.CSSProperties}
                   >
                     <div className={`sidebar-item-icon-container ${isActive('/settings') ? 'sidebar-item-icon-container--active' : ''}`}>

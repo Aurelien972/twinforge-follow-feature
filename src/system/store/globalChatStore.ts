@@ -11,6 +11,7 @@ import type { ChatMessage } from '../../domain/coachChat';
 import type { ChatState } from './chatStateMachine';
 import { initialChatState } from './chatStateMachine';
 import type { NotificationId } from '../services/unifiedNotificationService';
+import { useOverlayStore } from './overlayStore';
 
 export type ChatMode = 'training' | 'nutrition' | 'fasting' | 'general' | 'body-scan';
 
@@ -204,6 +205,10 @@ export const useGlobalChatStore = create<GlobalChatState>()(
       open: (mode?: ChatMode) => {
         const currentMode = mode || get().currentMode;
 
+        // Ouvrir le chat via l'overlayStore (qui gère automatiquement la fermeture des autres)
+        const overlayStore = useOverlayStore.getState();
+        overlayStore.open('chatDrawer');
+
         set({
           isOpen: true,
           currentMode
@@ -220,6 +225,12 @@ export const useGlobalChatStore = create<GlobalChatState>()(
 
       close: () => {
         set({ isOpen: false });
+
+        // Close overlay if chat is active
+        const overlayStore = useOverlayStore.getState();
+        if (overlayStore.activeOverlayId === 'chatDrawer') {
+          overlayStore.close();
+        }
 
         logger.info('GLOBAL_CHAT', 'Chat closed', {
           mode: get().currentMode,

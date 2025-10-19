@@ -3,16 +3,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
-import { useShell } from '../../../ui/shell/useShell';
 import MobileDrawer from '../../../ui/shell/MobileDrawer';
 import { HeaderLogo } from './HeaderLogo';
 import { useFeedback } from '../../../hooks';
 import { BackButton } from '../../../ui/buttons';
 import { useOverlayStore } from '../../../system/store/overlayStore';
 import CentralActionsMenu from '../CentralActionsMenu';
+import logger from '../../../lib/utils/logger';
 
 export const Header = React.memo(() => {
-  const { setDrawer } = useShell();
   const { click } = useFeedback();
   const { isOpen, toggle } = useOverlayStore();
   const centralMenuOpen = isOpen('centralMenu');
@@ -230,15 +229,19 @@ export const Header = React.memo(() => {
                 }
               }}
               aria-label="Ouvrir le menu de navigation principal"
-              aria-expanded="false"
+              aria-expanded={isOpen('mobileDrawer')}
               aria-haspopup="menu"
               onPointerDown={() => click()}
-              onClick={() => setDrawer(true)}
+              onClick={() => {
+                logger.debug('HEADER', 'Mobile drawer toggle clicked');
+                toggle('mobileDrawer');
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   click();
-                  setDrawer(true);
+                  logger.debug('HEADER', 'Mobile drawer toggle via keyboard');
+                  toggle('mobileDrawer');
                 }
               }}
               whileHover={{ scale: 1.08 }}

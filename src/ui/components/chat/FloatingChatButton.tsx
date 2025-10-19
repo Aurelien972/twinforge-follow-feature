@@ -9,12 +9,13 @@ import { useLocation } from 'react-router-dom';
 import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
 import { useGlobalChatStore } from '../../../system/store/globalChatStore';
-import { Z_INDEX } from '../../../system/store/overlayStore';
+import { Z_INDEX, useOverlayStore } from '../../../system/store/overlayStore';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
 import ContextualTooltip from '../ContextualTooltip';
 import ChatNotificationBubble from './ChatNotificationBubble';
 import { unifiedNotificationService } from '../../../system/services/unifiedNotificationService';
+import logger from '../../../lib/utils/logger';
 import '../../../styles/components/floating-chat-button.css';
 import '../../../styles/components/floating-chat-button-step2.css';
 
@@ -67,6 +68,7 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
   const handleClick = () => {
     click();
     Haptics.press();
+    // Le toggle du chat gère automatiquement les autres overlays via overlayStore
     toggle();
   };
 

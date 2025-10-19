@@ -5,6 +5,7 @@
 
 import { create } from 'zustand';
 import logger from '../../lib/utils/logger';
+import { overlayTransitionManager } from './overlayTransitionManager';
 
 export type OverlayId = 'none' | 'mobileDrawer' | 'centralMenu' | 'userPanel' | 'sidebar' | 'chatDrawer';
 
@@ -47,7 +48,7 @@ export const useOverlayStore = create<OverlayState>((set, get) => ({
 
   open: (overlayId: Exclude<OverlayId, 'none'>) => {
     const currentState = get();
-    
+
     logger.debug('OVERLAY_STORE', 'Opening overlay', {
       overlayId,
       currentActiveOverlay: currentState.activeOverlayId,
@@ -55,25 +56,49 @@ export const useOverlayStore = create<OverlayState>((set, get) => ({
       timestamp: new Date().toISOString()
     });
 
-    // Si un autre panneau est ouvert, le fermer d'abord
+    // Si un autre panneau est ouvert, utiliser le transition manager pour une transition fluide
     if (currentState.activeOverlayId !== 'none' && currentState.activeOverlayId !== overlayId) {
       logger.info('OVERLAY_STORE', 'Closing existing overlay before opening new one', {
         closingOverlay: currentState.activeOverlayId,
         openingOverlay: overlayId,
         timestamp: new Date().toISOString()
       });
+
+      // Utiliser le transition manager pour une transition optimisée
+      overlayTransitionManager.executeTransition(
+        // Fermer le panneau actuel
+        () => {
+          set({
+            previousOverlayId: currentState.activeOverlayId,
+            activeOverlayId: 'none',
+          });
+        },
+        // Ouvrir le nouveau panneau
+        () => {
+          set({
+            previousOverlayId: 'none',
+            activeOverlayId: overlayId,
+          });
+
+          logger.info('OVERLAY_STORE', 'Overlay opened successfully after transition', {
+            overlayId,
+            timestamp: new Date().toISOString()
+          });
+        }
+      );
+    } else {
+      // Ouverture directe si aucun panneau n'est ouvert
+      set({
+        previousOverlayId: currentState.activeOverlayId,
+        activeOverlayId: overlayId,
+      });
+
+      logger.info('OVERLAY_STORE', 'Overlay opened successfully', {
+        overlayId,
+        previousOverlay: currentState.activeOverlayId,
+        timestamp: new Date().toISOString()
+      });
     }
-
-    set({
-      previousOverlayId: currentState.activeOverlayId,
-      activeOverlayId: overlayId,
-    });
-
-    logger.info('OVERLAY_STORE', 'Overlay opened successfully', {
-      overlayId,
-      previousOverlay: currentState.activeOverlayId,
-      timestamp: new Date().toISOString()
-    });
   },
 
   close: () => {

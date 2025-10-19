@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
 import { useGlobalChatStore } from '../../../system/store/globalChatStore';
-import { Z_INDEX } from '../../../system/store/overlayStore';
+import { Z_INDEX, useOverlayStore } from '../../../system/store/overlayStore';
 import CoachChatInterface from '../coach/CoachChatInterface';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
@@ -59,6 +59,28 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
   const headerBackdrop = useMemo(() => {
     return mode === 'high-performance' ? 'none' : mode === 'balanced' ? 'blur(8px)' : 'blur(16px)';
   }, [mode]);
+
+  const overlayStore = useOverlayStore();
+
+  // Sync chat state with overlay store
+  useEffect(() => {
+    const unsubscribe = useOverlayStore.subscribe(
+      (state) => state.activeOverlayId,
+      (activeOverlayId) => {
+        // If another overlay opens, close the chat
+        if (activeOverlayId !== 'chatDrawer' && activeOverlayId !== 'none' && isOpen) {
+          logger.debug('GLOBAL_CHAT_DRAWER', 'Another overlay opened - closing chat', {
+            newOverlay: activeOverlayId,
+            currentMode,
+            timestamp: new Date().toISOString()
+          });
+          close();
+        }
+      }
+    );
+
+    return unsubscribe;
+  }, [isOpen, currentMode, close]);
 
   const handleClose = () => {
     const lastMessage = messages[messages.length - 1];

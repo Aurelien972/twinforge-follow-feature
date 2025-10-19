@@ -16,19 +16,29 @@ export const useGlobalEscapeKey = () => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
 
-      // Priority: Close chat first if it's open (highest priority)
-      if (isChatOpen) {
-        logger.debug('ESCAPE_KEY', 'Closing chat drawer');
-        closeChat();
+      // Priority system: close the currently active overlay
+      // Chat drawer has same priority as other overlays now
+      if (activeOverlayId === 'chatDrawer' && isChatOpen) {
+        logger.debug('ESCAPE_KEY', 'Closing chat drawer via overlay system');
+        closeChat(); // This will also close the overlay
         event.preventDefault();
         event.stopPropagation();
         return;
       }
 
-      // Then close any other overlay
+      // Close any other overlay
       if (activeOverlayId !== 'none') {
         logger.debug('ESCAPE_KEY', 'Closing overlay', { overlayId: activeOverlayId });
         close();
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
+      // Fallback: if chat is open but not tracked by overlay (shouldn't happen)
+      if (isChatOpen) {
+        logger.warn('ESCAPE_KEY', 'Chat open but not tracked by overlay - closing directly');
+        closeChat();
         event.preventDefault();
         event.stopPropagation();
         return;
