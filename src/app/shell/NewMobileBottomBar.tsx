@@ -9,6 +9,7 @@ import { useOverlayStore } from '../../system/store/overlayStore';
 import { useGlobalChatStore } from '../../system/store/globalChatStore';
 import { Haptics } from '../../utils/haptics';
 import CentralActionsMenu from './CentralActionsMenu';
+import { usePerformanceMode } from '../../system/context/PerformanceModeContext';
 
 /**
  * Configuration des boutons de la nouvelle barre inférieure
@@ -121,6 +122,7 @@ const NewMobileBottomBar: React.FC = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { close } = useOverlayStore();
+  const { isPerformanceMode } = usePerformanceMode();
 
   const handleButtonClick = (button: typeof BOTTOM_BAR_BUTTONS[0]) => {
     if (button.route) {
@@ -135,8 +137,8 @@ const NewMobileBottomBar: React.FC = () => {
 
   return (
     <>
-      <nav 
-        className="new-mobile-bottom-bar" 
+      <nav
+        className="new-mobile-bottom-bar"
         aria-label="Navigation principale mobile"
         style={{
           position: 'fixed',
@@ -144,6 +146,8 @@ const NewMobileBottomBar: React.FC = () => {
           left: '8px',
           right: '8px',
           zIndex: 9996,
+          background: isPerformanceMode ? 'rgb(11, 14, 23)' : undefined,
+          backdropFilter: isPerformanceMode ? 'none' : undefined,
         }}
       >
         <div className="new-mobile-bottom-bar-container">

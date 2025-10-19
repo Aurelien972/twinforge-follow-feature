@@ -8,6 +8,7 @@ import { HeaderLogo } from './HeaderLogo';
 import { useFeedback } from '../../../hooks';
 import { BackButton } from '../../../ui/buttons';
 import { useOverlayStore } from '../../../system/store/overlayStore';
+import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 import CentralActionsMenu from '../CentralActionsMenu';
 import logger from '../../../lib/utils/logger';
 
@@ -15,6 +16,7 @@ export const Header = React.memo(() => {
   const { click } = useFeedback();
   const { isOpen, toggle } = useOverlayStore();
   const centralMenuOpen = isOpen('centralMenu');
+  const { isPerformanceMode } = usePerformanceMode();
 
   return (
     <>
@@ -38,6 +40,8 @@ export const Header = React.memo(() => {
           transformStyle: 'preserve-3d',
           WebkitPerspective: '1000px',
           perspective: '1000px',
+          background: isPerformanceMode ? 'rgb(11, 14, 23)' : undefined,
+          backdropFilter: isPerformanceMode ? 'none' : undefined,
         }}
         role="banner"
         aria-label="TwinForge Pont de Commandement"
