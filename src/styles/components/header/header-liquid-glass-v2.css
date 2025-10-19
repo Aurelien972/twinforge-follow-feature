@@ -317,35 +317,25 @@
 
 /* High-performance mode: FULLY OPAQUE header, no transparency */
 .mode-high-performance .header-liquid-glass {
+  /* CRITICAL: Direct opaque background - highest priority */
   background: rgb(11, 14, 23) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   opacity: 1 !important;
+  /* Force layer isolation */
+  isolation: isolate !important;
+  /* Remove any inherited transparency */
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
 }
 
-/* CRITICAL: Add SOLID backdrop layer with MAXIMUM z-index to completely block ALL transparency */
+/* CRITICAL: Disable border gradient in performance mode - it was causing transparency */
 .mode-high-performance .header-liquid-glass::before {
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: rgb(11, 14, 23) !important;
-  border-radius: 20px !important;
-  z-index: -1 !important;
-  display: block !important;
-  pointer-events: none !important;
-  opacity: 1 !important;
-  /* Force complete opacity - CRITICAL */
-  -webkit-transform: translateZ(0) !important;
-  transform: translateZ(0) !important;
-  /* Force animation override */
-  animation: none !important;
-  padding: 0 !important;
-  -webkit-mask: none !important;
-  mask: none !important;
-  /* Additional layer for bulletproof opacity */
-  box-shadow: inset 0 0 0 1000px rgb(11, 14, 23) !important;
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
 }
 
 /* Remove decorative glow pseudo-element in performance mode */

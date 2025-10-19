@@ -76,6 +76,12 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
     Haptics.press();
   };
 
+  const handleLiveVoice = () => {
+    console.log('Live voice communication');
+    click();
+    Haptics.press();
+  };
+
   return (
     <div
       className="chat-input-bar-container"
@@ -89,6 +95,48 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
         padding: '0'
       }}
     >
+      {/* Processing Status Bar - En haut avec marge réduite */}
+      <AnimatePresence>
+        {isProcessing && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            style={{
+              padding: '6px 16px',
+              marginBottom: '8px',
+              borderRadius: '12px',
+              background: `
+                linear-gradient(180deg,
+                  rgba(11, 14, 23, 0.8) 0%,
+                  rgba(11, 14, 23, 0.6) 100%
+                )
+              `,
+              backdropFilter: 'blur(16px)',
+              border: `1px solid color-mix(in srgb, ${stepColor} 20%, transparent)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              style={{
+                width: '12px',
+                height: '12px',
+                border: `2px solid ${stepColor}`,
+                borderTopColor: 'transparent',
+                borderRadius: '50%'
+              }}
+            />
+            <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>
+              Traitement en cours...
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div
         className={`chat-input-bar ${isFocused ? 'chat-input-bar--focused' : ''}`}
         style={{
@@ -173,6 +221,78 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
                   </motion.div>
                 )}
               </AnimatePresence>
+              {/* Animation de pulsation pendant l'enregistrement */}
+              {isRecording && (
+                <>
+                  <motion.div
+                    style={{
+                      position: 'absolute',
+                      inset: -4,
+                      borderRadius: '50%',
+                      border: '2px solid rgba(239, 68, 68, 0.6)',
+                      pointerEvents: 'none'
+                    }}
+                    animate={{
+                      scale: [1, 1.3, 1],
+                      opacity: [0.8, 0, 0.8]
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut'
+                    }}
+                  />
+                  <motion.div
+                    style={{
+                      position: 'absolute',
+                      inset: -8,
+                      borderRadius: '50%',
+                      border: '2px solid rgba(239, 68, 68, 0.4)',
+                      pointerEvents: 'none'
+                    }}
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.6, 0, 0.6]
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: 0.3
+                    }}
+                  />
+                </>
+              )}
+            </motion.button>
+          )}
+
+          {/* Live Voice Button */}
+          {voiceEnabled && (
+            <motion.button
+              onClick={handleLiveVoice}
+              className="chat-input-button flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+              style={{
+                background: `
+                  radial-gradient(circle at 30% 30%, color-mix(in srgb, ${stepColor} 30%, transparent) 0%, transparent 70%),
+                  rgba(255, 255, 255, 0.1)
+                `,
+                border: `2px solid color-mix(in srgb, ${stepColor} 40%, transparent)`,
+                boxShadow: `0 0 20px color-mix(in srgb, ${stepColor} 25%, transparent), var(--liquid-pill-shadow)`,
+                position: 'relative',
+                overflow: 'visible'
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={disabled || isProcessing}
+            >
+              <SpatialIcon
+                Icon={ICONS.Phone}
+                size={18}
+                style={{
+                  color: stepColor,
+                  filter: `drop-shadow(0 0 8px ${stepColor})`
+                }}
+              />
             </motion.button>
           )}
 
