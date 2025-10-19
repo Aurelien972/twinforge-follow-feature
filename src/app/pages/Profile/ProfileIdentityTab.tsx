@@ -97,17 +97,17 @@ const ProfileIdentityTab = React.memo(() => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Display Name */}
+            {/* First Name */}
             <div>
               <label htmlFor="displayName" className="block text-white/90 text-sm font-medium mb-3">
-                Nom d'affichage *
+                Prénom *
               </label>
               <input
                 {...register('displayName')}
                 type="text"
                 id="displayName"
                 className="glass-input"
-                placeholder="Votre nom"
+                placeholder="Votre prénom"
               />
               {errors.displayName && (
                 <p className="text-red-300 text-xs mt-2 flex items-center gap-1">

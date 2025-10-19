@@ -9,6 +9,7 @@ import logger from '../../lib/utils/logger';
 import { useUnifiedCoachStore } from '../store/unifiedCoachStore';
 import type { VoiceState } from '../store/unifiedCoachStore';
 import { openaiRealtimeService } from './openaiRealtimeService';
+import { useUserStore } from '../store/userStore';
 
 class VoiceCoachOrchestrator {
   private isInitialized = false;
@@ -92,12 +93,21 @@ class VoiceCoachOrchestrator {
 
       logger.info('VOICE_ORCHESTRATOR', '✅ All diagnostics passed');
 
+      // Récupérer le prénom de l'utilisateur
+      const userProfile = useUserStore.getState().profile;
+      const firstName = userProfile?.displayName || 'champion';
+
       // Récupérer la configuration du mode depuis unifiedCoachStore
       const modeConfig = store.modeConfigs[mode as any];
 
       if (!modeConfig) {
         throw new Error(`Invalid mode: ${mode}`);
       }
+
+      // Enrichir le system prompt avec le prénom de l'utilisateur
+      const personalizedSystemPrompt = `${modeConfig.systemPrompt}\n\nIMPORTANT: L'utilisateur s'appelle ${firstName}. Adresse-toi à lui par son prénom pour créer une relation plus chaleureuse et personnelle.`;
+
+      logger.info('VOICE_ORCHESTRATOR', '👤 Personalized system prompt', { firstName, mode });
 
       // Connexion à l'API Realtime WebRTC via l'interface unifiée
       // Note: La demande de permissions micro est faite automatiquement par openaiRealtimeService
@@ -109,14 +119,14 @@ class VoiceCoachOrchestrator {
         voice: 'alloy',
         temperature: 0.8,
         maxTokens: 4096,
-        instructions: modeConfig.systemPrompt // Directement dans la config WebRTC
+        instructions: personalizedSystemPrompt // System prompt personnalisé avec le prénom
       });
       logger.info('VOICE_ORCHESTRATOR', '✅ Realtime API WebRTC connected successfully');
 
       // CRITIQUE: Configurer la session pour activer la détection vocale et les réponses
       // Le data channel est maintenant garanti d'être ouvert, donc cette configuration sera envoyée avec succès
       logger.info('VOICE_ORCHESTRATOR', '⚙️ Configuring session with VAD and transcription');
-      await openaiRealtimeService.configureSession(modeConfig.systemPrompt, mode as any);
+      await openaiRealtimeService.configureSession(personalizedSystemPrompt, mode as any);
       logger.info('VOICE_ORCHESTRATOR', '✅ Session configuration confirmed by server');
 
       // Logger les diagnostics de connexion
@@ -135,9 +145,22 @@ class VoiceCoachOrchestrator {
       logger.info('VOICE_ORCHESTRATOR', '📱 Entering voice-only mode for minimal UI');
       store.enterVoiceOnlyMode();
 
-      // Envoyer un message de bienvenue automatique pour démarrer la conversation
-      logger.info('VOICE_ORCHESTRATOR', '👋 Triggering welcome message from coach');
-      openaiRealtimeService.sendTextMessage('Bonjour! Je suis ton coach personnel. Comment puis-je t\'aider aujourd\'hui?');
+      // Le prénom a déjà été récupéré plus haut
+
+      // Construire le message de bienvenue personnalisé selon le mode
+      const modeWelcomeMessages: Record<string, string> = {
+        training: `Salut ${firstName}! Je suis ton coach sportif personnel. Prêt à donner le meilleur de toi-même aujourd'hui?`,
+        nutrition: `Bonjour ${firstName}! Je suis ton coach nutrition. Comment puis-je t'aider à optimiser ton alimentation aujourd'hui?`,
+        fasting: `Salut ${firstName}! Je suis ton coach jeûne. Comment se passe ta session de jeûne?`,
+        general: `Bonjour ${firstName}! Je suis ton assistant personnel TwinForge. Comment puis-je t'aider aujourd'hui?`,
+        'body-scan': `Salut ${firstName}! Je suis ton coach corps. Prêt pour analyser ta progression physique?`
+      };
+
+      const welcomeMessage = modeWelcomeMessages[mode] || `Bonjour ${firstName}! Comment puis-je t'aider aujourd'hui?`;
+
+      // Envoyer le message de bienvenue personnalisé automatique pour démarrer la conversation
+      logger.info('VOICE_ORCHESTRATOR', '👋 Triggering personalized welcome message from coach', { firstName, mode });
+      openaiRealtimeService.sendTextMessage(welcomeMessage);
 
       // Note: Avec WebRTC, l'audio est géré automatiquement via les tracks
       // Pas besoin de démarrer manuellement l'enregistrement

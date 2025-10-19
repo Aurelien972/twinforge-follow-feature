@@ -301,12 +301,11 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
   };
 
   // Si en mode voice-only, afficher l'interface minimale au lieu du drawer
+  // IMPORTANT: On n'affiche jamais les deux en même temps
   if (isVoiceOnlyMode) {
     return (
       <AnimatePresence>
-        {isOpen && (
-          <VoiceSessionMinimal onClose={close} />
-        )}
+        <VoiceSessionMinimal onClose={close} />
       </AnimatePresence>
     );
   }

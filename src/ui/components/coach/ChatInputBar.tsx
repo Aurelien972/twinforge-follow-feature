@@ -10,6 +10,7 @@ import { ICONS } from '../../icons/registry';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
 import { openaiWhisperService } from '../../../system/services/openaiWhisperService';
+import VoiceToTextOverlay from '../../components/chat/VoiceToTextOverlay';
 
 interface ChatInputBarProps {
   onSendMessage: (message: string) => void;
@@ -134,18 +135,31 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
   const isTextInputBlocked = isRealtimeActive;
 
   return (
-    <div
-      className="chat-input-bar-container"
-      style={{
-        position: 'relative',
-        width: '100%',
-        zIndex: 1,
-        pointerEvents: disabled ? 'none' : 'auto',
-        opacity: disabled ? 0.6 : 1,
-        margin: '0',
-        padding: '0'
-      }}
-    >
+    <>
+      {/* Voice to Text Overlay - Simple mobile-optimized UI */}
+      <AnimatePresence>
+        {(isRecording || isTranscribing) && (
+          <VoiceToTextOverlay
+            isRecording={isRecording}
+            isTranscribing={isTranscribing}
+            onStop={handleVoiceToggle}
+            stepColor={stepColor}
+          />
+        )}
+      </AnimatePresence>
+
+      <div
+        className="chat-input-bar-container"
+        style={{
+          position: 'relative',
+          width: '100%',
+          zIndex: 1,
+          pointerEvents: disabled ? 'none' : 'auto',
+          opacity: disabled ? 0.6 : 1,
+          margin: '0',
+          padding: '0'
+        }}
+      >
       {/* Error Banners */}
       <AnimatePresence>
         {realtimeError && (
@@ -689,6 +703,7 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
         </AnimatePresence>
       </div>
     </div>
+    </>
   );
 };
 

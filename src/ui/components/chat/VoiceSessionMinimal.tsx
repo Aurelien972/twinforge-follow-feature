@@ -73,10 +73,10 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.2 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15 }}
       style={{
         position: 'fixed',
         inset: 0,
@@ -153,17 +153,17 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px' }}>
         <motion.div
           animate={{
-            scale: isSpeaking ? [1, 1.05, 1] : 1,
+            scale: isSpeaking ? [1, 1.03, 1] : 1,
           }}
           transition={{
-            duration: 1.5,
+            duration: 1.2,
             repeat: isSpeaking ? Infinity : 0,
             ease: 'easeInOut'
           }}
           style={{
             position: 'relative',
-            width: '160px',
-            height: '160px',
+            width: '180px',
+            height: '180px',
             borderRadius: '50%',
             background: isListening || isSpeaking
               ? `linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.4))`
@@ -183,13 +183,14 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
             {isSpeaking ? (
               <motion.div
                 key="speaking"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
               >
                 <SpatialIcon
                   Icon={ICONS.Radio}
-                  size={64}
+                  size={72}
                   style={{
                     color: 'rgba(239, 68, 68, 0.95)',
                     filter: 'drop-shadow(0 0 20px rgba(239, 68, 68, 0.8))'
@@ -199,13 +200,14 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
             ) : isListening ? (
               <motion.div
                 key="listening"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
               >
                 <SpatialIcon
                   Icon={ICONS.Mic}
-                  size={64}
+                  size={72}
                   style={{
                     color: 'rgba(239, 68, 68, 0.95)',
                     filter: 'drop-shadow(0 0 20px rgba(239, 68, 68, 0.8))'
@@ -215,13 +217,14 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
             ) : (
               <motion.div
                 key="idle"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
               >
                 <SpatialIcon
                   Icon={ICONS.Loader}
-                  size={64}
+                  size={72}
                   style={{ color: 'rgba(255, 255, 255, 0.5)' }}
                 />
               </motion.div>
@@ -240,11 +243,11 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
                   pointerEvents: 'none'
                 }}
                 animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.6, 0, 0.6]
+                  scale: [1, 1.15, 1],
+                  opacity: [0.5, 0, 0.5]
                 }}
                 transition={{
-                  duration: 2,
+                  duration: 1.8,
                   repeat: Infinity,
                   ease: 'easeInOut'
                 }}
@@ -258,14 +261,14 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
                   pointerEvents: 'none'
                 }}
                 animate={{
-                  scale: [1, 1.3, 1],
-                  opacity: [0.4, 0, 0.4]
+                  scale: [1, 1.25, 1],
+                  opacity: [0.3, 0, 0.3]
                 }}
                 transition={{
-                  duration: 2,
+                  duration: 1.8,
                   repeat: Infinity,
                   ease: 'easeInOut',
-                  delay: 0.4
+                  delay: 0.3
                 }}
               />
             </>
@@ -278,9 +281,10 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
             {isConnecting && (
               <motion.div
                 key="connecting"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 style={{ fontSize: '18px', fontWeight: 600, color: '#fff' }}
               >
                 Connexion...
@@ -289,9 +293,10 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
             {isListening && (
               <motion.div
                 key="listening"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 style={{ fontSize: '18px', fontWeight: 600, color: '#EF4444' }}
               >
                 Je t'écoute
@@ -300,9 +305,10 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
             {isSpeaking && (
               <motion.div
                 key="speaking"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 style={{ fontSize: '18px', fontWeight: 600, color: '#EF4444' }}
               >
                 Coach parle...
@@ -311,9 +317,10 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
             {isProcessing && (
               <motion.div
                 key="processing"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 style={{ fontSize: '18px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.7)' }}
               >
                 Traitement...
@@ -322,9 +329,10 @@ const VoiceSessionMinimal: React.FC<VoiceSessionMinimalProps> = ({ onClose }) =>
             {hasError && (
               <motion.div
                 key="error"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 style={{ fontSize: '18px', fontWeight: 600, color: '#EF4444' }}
               >
                 Erreur
