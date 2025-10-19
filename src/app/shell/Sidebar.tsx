@@ -9,6 +9,7 @@ import { navFor } from './navigation';
 import { useFeedback } from '@/hooks';
 import logger from '../../lib/utils/logger';
 import { supabase } from '../../system/supabase/client';
+import TokenBalanceWidget from './TokenBalanceWidget';
 
 interface NavSubItem {
   to: string;
@@ -427,6 +428,11 @@ const Sidebar = React.memo(({ className = '' }: { className?: string }) => {
             Compte
           </h3>
           <div className="space-y-1">
+            {/* Token Balance Widget */}
+            <div className="mb-2">
+              <TokenBalanceWidget />
+            </div>
+
             {/* Bouton Profil */}
             <Link
               to="/profile"

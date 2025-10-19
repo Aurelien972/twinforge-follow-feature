@@ -1,4 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { checkTokenBalance, consumeTokens, createInsufficientTokensResponse } from "../_shared/tokenMiddleware.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,6 +19,8 @@ interface ChatRequest {
 }
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 function log(level: 'info' | 'warn' | 'error', message: string, requestId: string, data?: any) {
   const logEntry = {
@@ -66,6 +70,24 @@ Deno.serve(async (req: Request) => {
 
     console.log('✅ OPENAI_API_KEY is configured', { requestId });
 
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Missing authorization header" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
+
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { messages, mode, contextData, stream = false }: ChatRequest = await req.json();
 
     log('info', '✅ Request parsed successfully', requestId, {
@@ -78,6 +100,24 @@ Deno.serve(async (req: Request) => {
     if (!messages || messages.length === 0) {
       log('error', 'Empty messages array', requestId);
       throw new Error("Messages array is required");
+    }
+
+    const estimatedInputTokens = messages.reduce((sum, msg) => sum + Math.ceil(msg.content.length / 4), 0);
+    const estimatedOutputTokens = 200;
+
+    const tokenCheck = await checkTokenBalance(supabase, user.id, 20);
+    if (!tokenCheck.hasEnoughTokens) {
+      log('warn', 'Insufficient tokens', requestId, {
+        balance: tokenCheck.currentBalance,
+        required: 20,
+        isSubscribed: tokenCheck.isSubscribed
+      });
+      return createInsufficientTokensResponse(
+        tokenCheck.currentBalance,
+        20,
+        !tokenCheck.isSubscribed,
+        corsHeaders
+      );
     }
 
     log('info', 'Calling OpenAI API', requestId, {
@@ -181,11 +221,27 @@ Deno.serve(async (req: Request) => {
       tokensUsed: data.usage?.total_tokens
     });
 
+    const consumptionResult = await consumeTokens(supabase, {
+      userId: user.id,
+      edgeFunctionName: 'chat-ai',
+      operationType: 'chat-completion',
+      openaiModel: 'gpt-5-mini',
+      openaiInputTokens: data.usage?.prompt_tokens || estimatedInputTokens,
+      openaiOutputTokens: data.usage?.completion_tokens || estimatedOutputTokens,
+      metadata: { mode, requestId }
+    });
+
+    log('info', 'Tokens consumed', requestId, {
+      consumed: consumptionResult.consumed,
+      remaining: consumptionResult.remainingBalance
+    });
+
     return new Response(
       JSON.stringify({
         message: data.choices[0].message,
         usage: data.usage,
-        requestId
+        requestId,
+        tokenBalance: consumptionResult.remainingBalance
       }),
       {
         headers: {

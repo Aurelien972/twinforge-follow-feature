@@ -201,6 +201,19 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
     circuit: 'settings',
     tabs: [
       {
+        value: 'subscription',
+        label: 'Abonnement & Tokens',
+        icon: 'CreditCard',
+        description: 'Gérez votre abonnement et vos tokens pour les fonctionnalités IA',
+        features: [
+          'Abonnements mensuels avec tokens inclus',
+          'Achats ponctuels de tokens',
+          'Historique des transactions',
+          'Gestion de l\'abonnement Stripe',
+          'Suivi de consommation en temps réel'
+        ]
+      },
+      {
         value: 'performance',
         label: 'Performance',
         icon: 'Zap',

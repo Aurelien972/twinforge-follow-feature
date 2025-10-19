@@ -154,6 +154,8 @@ export const ICONS = {
   Milk: L.Milk,
   Grid3X3: L.Grid3X3,
   DollarSign: L.DollarSign,
+  CreditCard: L.CreditCard,
+  Coins: L.Coins,
 
   Syringe: L.Syringe,
   Bug: L.Bug,
