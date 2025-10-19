@@ -1,16 +1,23 @@
 /**
- * Voice Coach Realtime API - WebRTC Interface Unifiée
+ * Voice Coach Realtime API - WebRTC Interface
  *
  * Endpoints:
- * - POST /session : Crée une session WebRTC (interface unifiée OpenAI)
+ * - POST /session : Crée une session WebRTC avec OpenAI Realtime API
  * - GET /health : Health check et diagnostics
  *
  * Architecture:
  * - Le client envoie son SDP offer via POST /session
- * - Le serveur fait un POST vers OpenAI /v1/realtime/calls avec le SDP + config
+ * - Le serveur fait un POST vers OpenAI /v1/realtime avec le SDP brut
  * - OpenAI retourne un SDP answer
  * - Le serveur retourne ce SDP au client
  * - WebRTC peer-to-peer connection automatique entre client et OpenAI
+ *
+ * Format de requête vers OpenAI:
+ * - Endpoint: https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17
+ * - Method: POST
+ * - Content-Type: application/sdp
+ * - Body: SDP offer brut (pas de JSON, pas de FormData)
+ * - Header: Authorization: Bearer <OPENAI_API_KEY>
  *
  * Avantages:
  * - Pas de proxy, connexion directe client <-> OpenAI
@@ -21,7 +28,8 @@
  *
  * IMPORTANT:
  * - Cette fonction nécessite OPENAI_API_KEY dans les secrets Supabase
- * - WebRTC ne fonctionne PAS dans StackBlitz/WebContainer (production uniquement)
+ * - La clé API doit avoir accès à l'API Realtime d'OpenAI
+ * - Utilise /v1/realtime (pas /v1/realtime/calls) pour éviter les erreurs 400
  */
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
@@ -90,7 +98,7 @@ async function createRealtimeSession(
 ): Promise<string> {
   const maxRetries = 2;
 
-  log('info', 'Creating Realtime session via unified interface', {
+  log('info', 'Creating Realtime session via WebRTC endpoint', {
     model,
     voice,
     hasInstructions: !!instructions,
@@ -99,71 +107,29 @@ async function createRealtimeSession(
     maxRetries
   });
 
-  // Configuration de la session selon la spec OpenAI Realtime API
-  // Docs: https://platform.openai.com/docs/api-reference/realtime
-  const sessionConfig = {
+  // Build URL with query parameters for model
+  // Using /v1/realtime instead of /v1/realtime/calls as per OpenAI community feedback
+  const url = new URL(`${OPENAI_REALTIME_API}?model=${encodeURIComponent(model)}`);
+
+  log('info', 'Sending SDP request to OpenAI', {
+    url: url.toString(),
     model,
     voice,
-    modalities: ['text', 'audio'],
-    instructions: instructions || 'You are a helpful fitness coach assistant.',
-    input_audio_transcription: {
-      model: 'whisper-1'
-    },
-    turn_detection: {
-      type: 'server_vad',
-      threshold: 0.5,
-      prefix_padding_ms: 300,
-      silence_duration_ms: 500
-    },
-    temperature: 0.8,
-    max_response_output_tokens: 4096
-  };
-
-  // Créer le payload JSON selon la spec OpenAI
-  const payload = {
-    model,
-    voice,
-    modalities: ['text', 'audio'],
-    instructions: sessionConfig.instructions,
-    input_audio_transcription: sessionConfig.input_audio_transcription,
-    turn_detection: sessionConfig.turn_detection,
-    temperature: sessionConfig.temperature,
-    max_response_output_tokens: sessionConfig.max_response_output_tokens
-  };
-
-  log('info', 'Sending request to OpenAI', {
-    url: `${OPENAI_REALTIME_API}/calls`,
-    payload: {
-      model,
-      voice,
-      modalities: payload.modalities
-    },
     apiKeyPrefix: `${openaiApiKey.substring(0, 7)}...`,
-    apiKeyLength: openaiApiKey.length
+    apiKeyLength: openaiApiKey.length,
+    contentType: 'application/sdp'
   });
 
   try {
-    // Pour l'API WebRTC, OpenAI attend un multipart/form-data avec:
-    // - sdp: le SDP offer du client
-    // - model, voice, instructions, etc. comme champs séparés (pas dans un objet "session")
-    const formData = new FormData();
-    formData.append('sdp', sdpOffer);
-    formData.append('model', payload.model);
-    formData.append('voice', payload.voice);
-    formData.append('modalities', JSON.stringify(payload.modalities));
-    formData.append('instructions', payload.instructions);
-    formData.append('input_audio_transcription', JSON.stringify(payload.input_audio_transcription));
-    formData.append('turn_detection', JSON.stringify(payload.turn_detection));
-    formData.append('temperature', String(payload.temperature));
-    formData.append('max_response_output_tokens', String(payload.max_response_output_tokens));
-
-    const response = await fetch(`${OPENAI_REALTIME_API}/calls`, {
+    // OpenAI Realtime API expects raw SDP in body with application/sdp Content-Type
+    // NOT FormData or JSON - this is the key fix for the 400 error
+    const response = await fetch(url.toString(), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openaiApiKey}`,
-        // Ne pas définir Content-Type, fetch le fera automatiquement pour FormData
+        'Content-Type': 'application/sdp',
       },
-      body: formData,
+      body: sdpOffer,
       signal: AbortSignal.timeout(30000), // 30 second timeout
     });
 
@@ -180,6 +146,7 @@ async function createRealtimeSession(
         status: response.status,
         statusText: response.statusText,
         errorBody: errorText,
+        errorBodyLength: errorText.length,
         retryCount,
         willRetry: retryCount < maxRetries && response.status >= 500
       });
@@ -199,11 +166,41 @@ async function createRealtimeSession(
 
       // Parse error details if JSON
       let errorDetails = errorText;
+      let errorJson: any = null;
       try {
-        const errorJson = JSON.parse(errorText);
-        errorDetails = errorJson.error?.message || errorText;
+        errorJson = JSON.parse(errorText);
+        errorDetails = errorJson.error?.message || JSON.stringify(errorJson);
       } catch {
         // Not JSON, use as is
+      }
+
+      // Enhanced error logging for 400 errors with empty response
+      if (response.status === 400 && (!errorDetails || errorDetails.trim().length === 0 ||
+          (errorJson && (!errorJson.error?.message || errorJson.error.message === '')))) {
+        log('error', 'Received 400 Bad Request with empty error details', {
+          possibleCauses: [
+            'Invalid SDP format',
+            'Model not available for your API key',
+            'Missing required parameters',
+            'Endpoint incompatibility (/v1/realtime vs /v1/realtime/calls)',
+            'API key lacks Realtime API access'
+          ],
+          recommendations: [
+            'Verify OpenAI API key has Realtime API access enabled',
+            'Check if model is available in your organization',
+            'Ensure SDP offer is valid WebRTC format',
+            'Try using /v1/realtime endpoint instead of /v1/realtime/calls'
+          ],
+          debugInfo: {
+            url: url.toString(),
+            model,
+            voice,
+            sdpLength: sdpOffer.length,
+            sdpStart: sdpOffer.substring(0, 100)
+          }
+        });
+
+        throw new Error(`OpenAI API error 400: Empty error response. This usually indicates an issue with the request format or API access. Check logs for detailed diagnostics.`);
       }
 
       throw new Error(`OpenAI API error ${response.status}: ${errorDetails}`);
