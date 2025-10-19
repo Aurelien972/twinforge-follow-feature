@@ -63,7 +63,7 @@ export class TokenService {
 
       const { data, error } = await supabase
         .from('user_token_balance')
-        .select('balance, last_reset_at')
+        .select('available_tokens, last_monthly_reset')
         .eq('user_id', user.id)
         .single();
 
@@ -73,8 +73,8 @@ export class TokenService {
       }
 
       return {
-        balance: data.balance,
-        lastResetAt: data.last_reset_at,
+        balance: data.available_tokens,
+        lastResetAt: data.last_monthly_reset,
       };
     } catch (error) {
       console.error('Unexpected error fetching token balance:', error);
@@ -103,14 +103,14 @@ export class TokenService {
         id: tx.id,
         userId: tx.user_id,
         transactionType: tx.transaction_type,
-        amount: tx.amount,
+        amount: tx.token_amount,
         balanceAfter: tx.balance_after,
-        source: tx.source,
+        source: tx.metadata?.source || null,
         edgeFunctionName: tx.edge_function_name,
         operationType: tx.operation_type,
-        openaiModel: tx.openai_model,
-        openaiInputTokens: tx.openai_input_tokens,
-        openaiOutputTokens: tx.openai_output_tokens,
+        openaiModel: tx.openai_model_used,
+        openaiInputTokens: tx.openai_tokens_input,
+        openaiOutputTokens: tx.openai_tokens_output,
         openaiCostUsd: tx.openai_cost_usd,
         metadata: tx.metadata,
         createdAt: tx.created_at,
