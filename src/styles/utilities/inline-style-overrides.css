@@ -138,3 +138,46 @@
 .will-change-scroll-position-important {
   will-change: scroll-position !important;
 }
+
+/* =========================================
+   BACKGROUND PERFORMANCE MODES - ABSOLUTE PRIORITY
+   Écrase TOUT CSS précédent y compris media queries
+   ========================================= */
+
+/* Mode Ultra Performance - Fond uni absolu */
+html.mode-high-performance .bg-twinforge-visionos,
+html.performance-mode .bg-twinforge-visionos,
+body.mode-high-performance .bg-twinforge-visionos,
+body.performance-mode .bg-twinforge-visionos,
+.mode-high-performance .bg-twinforge-visionos,
+.performance-mode .bg-twinforge-visionos,
+.bg-twinforge-visionos.performance-mode,
+.bg-twinforge-visionos.mode-high-performance,
+[data-performance-mode="true"] .bg-twinforge-visionos,
+.mobile-performance-mode .bg-twinforge-visionos {
+  background: var(--forge-deep) !important;
+  background-image: none !important;
+  background-color: var(--forge-deep) !important;
+  animation: none !important;
+  animation-name: none !important;
+}
+
+/* Désactiver les pseudo-éléments en mode performance */
+html.mode-high-performance .bg-twinforge-visionos::before,
+html.mode-high-performance .bg-twinforge-visionos::after,
+html.performance-mode .bg-twinforge-visionos::before,
+html.performance-mode .bg-twinforge-visionos::after,
+body.mode-high-performance .bg-twinforge-visionos::before,
+body.mode-high-performance .bg-twinforge-visionos::after,
+body.performance-mode .bg-twinforge-visionos::before,
+body.performance-mode .bg-twinforge-visionos::after,
+.bg-twinforge-visionos.performance-mode::before,
+.bg-twinforge-visionos.performance-mode::after,
+.bg-twinforge-visionos.mode-high-performance::before,
+.bg-twinforge-visionos.mode-high-performance::after,
+[data-performance-mode="true"] .bg-twinforge-visionos::before,
+[data-performance-mode="true"] .bg-twinforge-visionos::after {
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+}
