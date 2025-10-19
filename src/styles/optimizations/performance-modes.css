@@ -16,9 +16,9 @@
   --mobile-backdrop-filter-card: none;
   --mobile-backdrop-filter-drawer: none;
 
-  /* Background: Couleurs solides avec alpha */
-  --mobile-bg-header: rgba(11, 14, 23, 0.92);
-  --mobile-bg-bottombar: rgba(11, 14, 23, 0.92);
+  /* Background: Couleurs 100% OPAQUES */
+  --mobile-bg-header: rgb(11, 14, 23);
+  --mobile-bg-bottombar: rgb(11, 14, 23);
   --mobile-bg-card: rgba(11, 14, 23, 0.85);
   --mobile-bg-drawer: rgba(11, 14, 23, 0.95);
   --mobile-bg-modal: rgba(11, 14, 23, 0.98);
@@ -113,10 +113,15 @@
   -webkit-backdrop-filter: none !important;
 }
 
-/* Remplacer backgrounds avec couleurs solides */
-.mode-high-performance .header-liquid-glass {
-  background: var(--mobile-bg-header) !important;
+/* Remplacer backgrounds avec couleurs solides - 100% OPAQUE */
+body.mode-high-performance .header-liquid-glass,
+.mode-high-performance .header-liquid-glass,
+html.mode-high-performance .header-liquid-glass {
+  background: rgb(11, 14, 23) !important;
+  background-color: rgb(11, 14, 23) !important;
+  background-image: none !important;
   box-shadow: var(--mobile-shadow-header) !important;
+  opacity: 1 !important;
 }
 
 .mode-high-performance .new-mobile-bottom-bar-container {
@@ -142,15 +147,37 @@
   box-shadow: var(--mobile-shadow-card) !important;
 }
 
-/* Supprimer tous les pseudo-elements decoratifs */
+/* Supprimer tous les pseudo-elements decoratifs SAUF ::before du header qui sert de backdrop opaque */
+body.mode-high-performance .header-liquid-glass::before,
 .mode-high-performance .header-liquid-glass::before,
+html.mode-high-performance .header-liquid-glass::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgb(11, 14, 23) !important;
+  background-color: rgb(11, 14, 23) !important;
+  background-image: none !important;
+  border-radius: inherit !important;
+  z-index: -1 !important;
+  display: block !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
+  animation: none !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+}
+
+body.mode-high-performance .header-liquid-glass::after,
 .mode-high-performance .header-liquid-glass::after,
+html.mode-high-performance .header-liquid-glass::after,
 .mode-high-performance .new-mobile-bottom-bar-container::before,
 .mode-high-performance .new-mobile-bottom-bar-container::after,
 .mode-high-performance .glass-card::before,
 .mode-high-performance .glass-card::after,
 .mode-high-performance .new-bottom-bar-icon-container::before {
   display: none !important;
+  content: none !important;
+  opacity: 0 !important;
 }
 
 /* Desactiver toutes les animations decoratives */

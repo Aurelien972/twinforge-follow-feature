@@ -316,9 +316,13 @@
    ========================================= */
 
 /* High-performance mode: FULLY OPAQUE header, no transparency */
-.mode-high-performance .header-liquid-glass {
-  /* CRITICAL: Direct opaque background - highest priority */
+body.mode-high-performance .header-liquid-glass,
+.mode-high-performance .header-liquid-glass,
+html.mode-high-performance .header-liquid-glass {
+  /* CRITICAL: Direct opaque background - ABSOLUTE PRIORITY */
   background: rgb(11, 14, 23) !important;
+  background-color: rgb(11, 14, 23) !important;
+  background-image: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
@@ -332,25 +336,45 @@
   /* Ensure no background blending */
   background-blend-mode: normal !important;
   mix-blend-mode: normal !important;
+  /* Override all CSS variables */
+  --liquid-glass-bg-base: rgb(11, 14, 23) !important;
+  --liquid-blur-intense: 0px !important;
+  --liquid-saturate-intense: 100% !important;
 }
 
 /* CRITICAL: Force solid backdrop layer with ::before instead of disabling it */
-.mode-high-performance .header-liquid-glass::before {
+body.mode-high-performance .header-liquid-glass::before,
+.mode-high-performance .header-liquid-glass::before,
+html.mode-high-performance .header-liquid-glass::before {
   content: '' !important;
   position: absolute !important;
   inset: 0 !important;
   background: rgb(11, 14, 23) !important;
+  background-color: rgb(11, 14, 23) !important;
+  background-image: none !important;
   border-radius: inherit !important;
   z-index: -1 !important;
   display: block !important;
   pointer-events: none !important;
   opacity: 1 !important;
+  animation: none !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  -webkit-mask-composite: none !important;
+  mask-composite: none !important;
+  padding: 0 !important;
 }
 
 /* Remove decorative glow pseudo-element in performance mode */
-.mode-high-performance .header-liquid-glass::after {
+body.mode-high-performance .header-liquid-glass::after,
+.mode-high-performance .header-liquid-glass::after,
+html.mode-high-performance .header-liquid-glass::after {
   display: none !important;
+  content: none !important;
   opacity: 0 !important;
+  visibility: hidden !important;
+  background: none !important;
+  animation: none !important;
 }
 
 /* Simplify Zap button (Outils du Forgeron) in performance mode - OPAQUE with solid style */

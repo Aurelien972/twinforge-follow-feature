@@ -21,13 +21,13 @@ export const Header = React.memo(() => {
   return (
     <>
       <header
-        className="
+        className={`
           header-liquid-glass h-[64px] z-9997-important will-change-transform-important position-fixed-important transform-gpu-important isolation-isolate-important contain-layout-style-paint-important
           fixed top-2 left-4 right-4 z-[9999]
           rounded-glass-lg
-          backdrop-blur-xl
+          ${isPerformanceMode ? '' : 'backdrop-blur-xl'}
           transition-all duration-300
-        "
+        `}
         style={{
           left: '24px',
           right: '24px',
@@ -41,7 +41,13 @@ export const Header = React.memo(() => {
           WebkitPerspective: '1000px',
           perspective: '1000px',
           background: isPerformanceMode
-            ? 'rgba(11, 14, 23, 1.0)'
+            ? 'rgb(11, 14, 23)'
+            : undefined,
+          backgroundColor: isPerformanceMode
+            ? 'rgb(11, 14, 23)'
+            : undefined,
+          backgroundImage: isPerformanceMode
+            ? 'none'
             : undefined,
           backdropFilter: isPerformanceMode ? 'none' : undefined,
           WebkitBackdropFilter: isPerformanceMode ? 'none' : undefined,
