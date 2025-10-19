@@ -387,7 +387,7 @@ export class VoiceConnectionDiagnostics {
           },
           body: JSON.stringify({
             sdp: offer.sdp,
-            model: 'gpt-4o-realtime-preview-2024-10-01',
+            model: 'gpt-4o-realtime-preview-2024-12-17',
             voice: 'alloy'
           })
         });

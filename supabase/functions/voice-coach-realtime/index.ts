@@ -29,13 +29,18 @@ import { corsHeaders } from '../_shared/cors.ts';
 
 const OPENAI_REALTIME_API = 'https://api.openai.com/v1/realtime';
 
-// Structured logging helper
+// Updated model - using latest stable production model
+const DEFAULT_MODEL = 'gpt-4o-realtime-preview-2024-12-17';
+const FALLBACK_MODEL = 'gpt-4o-mini-realtime-preview-2024-12-17';
+
+// Structured logging helper with enhanced context
 function log(level: 'info' | 'warn' | 'error', message: string, data?: any) {
   const timestamp = new Date().toISOString();
   const logEntry = {
     timestamp,
     level,
     service: 'voice-coach-realtime',
+    environment: 'production',
     message,
     ...data
   };
@@ -49,6 +54,23 @@ function log(level: 'info' | 'warn' | 'error', message: string, data?: any) {
   }
 }
 
+// Validation helper for API key
+function validateApiKey(apiKey: string | undefined): { valid: boolean; error?: string } {
+  if (!apiKey) {
+    return { valid: false, error: 'OPENAI_API_KEY is not set in environment' };
+  }
+
+  if (!apiKey.startsWith('sk-')) {
+    return { valid: false, error: 'OPENAI_API_KEY format is invalid (should start with sk-)' };
+  }
+
+  if (apiKey.length < 20) {
+    return { valid: false, error: 'OPENAI_API_KEY appears to be too short' };
+  }
+
+  return { valid: true };
+}
+
 /**
  * Crée une session Realtime via l'interface unifiée d'OpenAI
  * Le client envoie son SDP offer, on retourne le SDP answer d'OpenAI
@@ -56,15 +78,20 @@ function log(level: 'info' | 'warn' | 'error', message: string, data?: any) {
 async function createRealtimeSession(
   sdpOffer: string,
   openaiApiKey: string,
-  model: string = 'gpt-4o-realtime-preview-2024-10-01',
+  model: string = DEFAULT_MODEL,
   voice: string = 'alloy',
-  instructions?: string
+  instructions?: string,
+  retryCount: number = 0
 ): Promise<string> {
+  const maxRetries = 2;
+
   log('info', 'Creating Realtime session via unified interface', {
     model,
     voice,
     hasInstructions: !!instructions,
-    sdpLength: sdpOffer.length
+    sdpLength: sdpOffer.length,
+    retryCount,
+    maxRetries
   });
 
   // Configuration de la session
@@ -100,7 +127,9 @@ async function createRealtimeSession(
       model,
       voice,
       modalities: sessionConfig.modalities
-    }
+    },
+    apiKeyPrefix: `${openaiApiKey.substring(0, 7)}...`,
+    apiKeyLength: openaiApiKey.length
   });
 
   try {
@@ -110,16 +139,49 @@ async function createRealtimeSession(
         'Authorization': `Bearer ${openaiApiKey}`,
       },
       body: formData,
+      signal: AbortSignal.timeout(30000), // 30 second timeout
+    });
+
+    log('info', 'Received response from OpenAI', {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get('content-type')
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      log('error', 'OpenAI API error', {
+
+      log('error', 'OpenAI API returned error response', {
         status: response.status,
         statusText: response.statusText,
-        error: errorText
+        errorBody: errorText,
+        retryCount,
+        willRetry: retryCount < maxRetries && response.status >= 500
       });
-      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+
+      // Retry logic for server errors (5xx)
+      if (response.status >= 500 && retryCount < maxRetries) {
+        const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+        log('warn', `Retrying after ${backoffDelay}ms due to server error`, {
+          status: response.status,
+          retryCount: retryCount + 1,
+          maxRetries
+        });
+
+        await new Promise(resolve => setTimeout(resolve, backoffDelay));
+        return createRealtimeSession(sdpOffer, openaiApiKey, model, voice, instructions, retryCount + 1);
+      }
+
+      // Parse error details if JSON
+      let errorDetails = errorText;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorDetails = errorJson.error?.message || errorText;
+      } catch {
+        // Not JSON, use as is
+      }
+
+      throw new Error(`OpenAI API error ${response.status}: ${errorDetails}`);
     }
 
     // La réponse est le SDP answer en text/plain
@@ -204,14 +266,27 @@ Deno.serve(async (req: Request) => {
         );
       }
 
-      // Vérifier la clé OpenAI
+      // Vérifier la clé OpenAI avec validation améliorée
       const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-      if (!openaiApiKey) {
-        log('error', 'OPENAI_API_KEY not configured', { requestId });
+      const keyValidation = validateApiKey(openaiApiKey);
+
+      if (!keyValidation.valid) {
+        log('error', 'OPENAI_API_KEY validation failed', {
+          requestId,
+          error: keyValidation.error,
+          hasKey: !!openaiApiKey,
+          keyLength: openaiApiKey?.length || 0
+        });
         return new Response(
           JSON.stringify({
-            error: 'OpenAI API key not configured',
-            details: 'Please configure OPENAI_API_KEY in Supabase Edge Function secrets'
+            error: 'OpenAI API key not configured correctly',
+            details: keyValidation.error,
+            troubleshooting: {
+              step1: 'Verify OPENAI_API_KEY is set in Supabase Dashboard > Edge Functions > Secrets',
+              step2: 'Ensure the key starts with "sk-" and is a valid OpenAI API key',
+              step3: 'Check that the key has access to the Realtime API in your OpenAI account',
+              step4: 'Verify your OpenAI account has sufficient credits and is not rate-limited'
+            }
           }),
           {
             status: 500,
@@ -219,6 +294,12 @@ Deno.serve(async (req: Request) => {
           }
         );
       }
+
+      log('info', 'OPENAI_API_KEY validation passed', {
+        requestId,
+        keyPrefix: `${openaiApiKey!.substring(0, 7)}...`,
+        keyLength: openaiApiKey!.length
+      });
 
       // Récupérer le SDP offer du client
       const contentType = req.headers.get('content-type') || '';
@@ -291,8 +372,8 @@ Deno.serve(async (req: Request) => {
           sdpLength: sdpOffer.length
         });
 
-        // Utiliser les valeurs par défaut
-        const model = url.searchParams.get('model') || 'gpt-4o-realtime-preview-2024-10-01';
+        // Utiliser les valeurs par défaut avec le nouveau modèle
+        const model = url.searchParams.get('model') || DEFAULT_MODEL;
         const voice = url.searchParams.get('voice') || 'alloy';
 
         const sdpAnswer = await createRealtimeSession(
