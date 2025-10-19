@@ -510,21 +510,41 @@ class OpenAIRealtimeService {
 
   private handleError(event: Event): void {
     // Essayer d'extraire plus d'informations sur l'erreur
+    const ws = event.target as WebSocket;
     const errorDetails: any = {
       type: event.type,
-      target: event.target ? {
-        readyState: (event.target as WebSocket).readyState,
-        readyStateNames: {
-          0: 'CONNECTING',
-          1: 'OPEN',
-          2: 'CLOSING',
-          3: 'CLOSED'
-        }[(event.target as WebSocket).readyState],
-        url: (event.target as WebSocket).url
+      timestamp: new Date().toISOString(),
+      target: ws ? {
+        readyState: ws.readyState,
+        readyStateName: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][ws.readyState],
+        url: ws.url?.replace(this.config?.voice || '', '[REDACTED]'),
+        protocol: ws.protocol,
+        extensions: ws.extensions
+      } : null,
+      // Additional diagnostic info
+      browser: navigator.userAgent,
+      online: navigator.onLine,
+      config: this.config ? {
+        model: this.config.model,
+        voice: this.config.voice
       } : null
     };
 
-    const error = new Error(`WebSocket error: ${JSON.stringify(errorDetails)}`);
+    // Enhanced error message with troubleshooting hints
+    let errorMessage = 'WebSocket connection failed. ';
+
+    if (!navigator.onLine) {
+      errorMessage += 'No internet connection detected.';
+    } else if (ws?.url?.includes('supabase.co')) {
+      errorMessage += 'Unable to connect to Supabase Edge Function. Please verify:\n' +
+                     '1. The edge function is deployed\n' +
+                     '2. OPENAI_API_KEY is configured in Supabase secrets\n' +
+                     '3. Your network allows WebSocket connections';
+    } else {
+      errorMessage += 'Please check your network connection and try again.';
+    }
+
+    const error = new Error(errorMessage);
     logger.error('REALTIME_API', '❌❌❌ WebSocket ERROR event ❌❌❌', errorDetails);
 
     logger.info('REALTIME_API', '📢 Notifying error handlers', {

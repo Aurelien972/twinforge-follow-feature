@@ -224,3 +224,13 @@ logger.info('APP', 'React app initialized', {
   strictMode: enableStrictMode,
   env: import.meta.env.MODE
 });
+
+// Load voice diagnostics in development mode
+if (import.meta.env.DEV) {
+  import('./system/services/voiceDiagnosticRunner').then(() => {
+    console.log('%c💡 Voice Diagnostics Available', 'color: #4CAF50; font-weight: bold; font-size: 14px');
+    console.log('Run in console: runVoiceDiagnostics() or quickVoiceCheck()');
+  }).catch(err => {
+    logger.warn('APP', 'Failed to load voice diagnostics', { error: err });
+  });
+}

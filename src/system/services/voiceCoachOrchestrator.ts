@@ -86,6 +86,25 @@ class VoiceCoachOrchestrator {
       logger.info('VOICE_ORCHESTRATOR', '📡 Setting voice state to connecting');
       store.setVoiceState('connecting');
 
+      // Run diagnostics first to identify issues early
+      logger.info('VOICE_ORCHESTRATOR', '🔬 Running pre-connection diagnostics');
+      const { VoiceConnectionDiagnostics } = await import('./voiceConnectionDiagnostics');
+      const diagnostics = new VoiceConnectionDiagnostics();
+      const results = await diagnostics.runAllTests();
+
+      const failedTests = results.filter(r => !r.passed);
+      if (failedTests.length > 0) {
+        logger.error('VOICE_ORCHESTRATOR', '❌ Diagnostics failed', {
+          failedTests: failedTests.map(t => ({ test: t.test, message: t.message }))
+        });
+
+        // Show detailed error to user
+        const errorMessages = failedTests.map(t => `• ${t.test}: ${t.message}`).join('\n');
+        throw new Error(`Voice connection prerequisites failed:\n\n${errorMessages}\n\nPlease check the console for detailed diagnostics.`);
+      }
+
+      logger.info('VOICE_ORCHESTRATOR', '✅ All diagnostics passed');
+
       // Récupérer la configuration du mode depuis unifiedCoachStore
       const modeConfig = store.modeConfigs[mode as any];
 

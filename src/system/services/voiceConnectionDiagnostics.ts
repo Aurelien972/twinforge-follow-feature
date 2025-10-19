@@ -337,12 +337,19 @@ export class VoiceConnectionDiagnostics {
         resolve({
           passed: false,
           test: 'WebSocket Connection',
-          message: 'WebSocket connection error',
+          message: 'WebSocket connection error - likely OPENAI_API_KEY not configured',
           details: {
             duration,
             error: 'WebSocket error event fired',
             state: ws.readyState,
-            stateName: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][ws.readyState]
+            stateName: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][ws.readyState],
+            possibleCauses: [
+              'OPENAI_API_KEY not set in Supabase Edge Function secrets',
+              'OpenAI API key is invalid or expired',
+              'Network firewall blocking WebSocket connections',
+              'Supabase edge function internal error'
+            ],
+            solution: 'Go to Supabase Dashboard > Edge Functions > Secrets and add OPENAI_API_KEY'
           }
         });
       };
