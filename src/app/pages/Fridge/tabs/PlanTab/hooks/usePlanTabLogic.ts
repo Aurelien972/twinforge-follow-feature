@@ -280,10 +280,30 @@ export const usePlanTabLogic = () => {
 
   // Voir les détails d'une recette
   const handleViewRecipe = (meal: any) => {
-    if (meal) {
-      setSelectedRecipeForDetail(meal);
-      setShowRecipeDetailModal(true);
+    // Validate meal/recipe has required data before opening modal
+    if (!meal) {
+      showToast({
+        type: 'error',
+        title: 'Erreur',
+        message: 'Les données de la recette sont manquantes',
+        duration: 3000
+      });
+      return;
     }
+
+    // Check if meal has at least basic info
+    if (!meal.title && !meal.ingredients && !meal.instructions) {
+      showToast({
+        type: 'error',
+        title: 'Recette incomplète',
+        message: 'Cette recette ne contient pas assez d\'informations pour être affichée',
+        duration: 3000
+      });
+      return;
+    }
+
+    setSelectedRecipeForDetail(meal);
+    setShowRecipeDetailModal(true);
   };
 
   // Generate all recipes handler

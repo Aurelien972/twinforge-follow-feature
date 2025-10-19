@@ -97,13 +97,18 @@ const MealDetailModal: React.FC<MealDetailModalProps> = ({ meal, onClose, onDele
           }
         }}
       >
-        <div 
-          className="modal-content-enter" 
+        <div
+          className="modal-content-enter"
           onClick={(e) => {
             e.stopPropagation(); // Prevent backdrop click when clicking on modal content
           }}
+          style={{
+            width: '100%',
+            maxWidth: '48rem',
+            margin: '0 auto'
+          }}
         >
-          <GlassCard 
+          <GlassCard
             className="relative w-full"
             style={{
               background: `

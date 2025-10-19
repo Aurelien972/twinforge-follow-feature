@@ -8,7 +8,6 @@ import GlassCard from '../../ui/cards/GlassCard';
 import SpatialIcon from '../../ui/icons/SpatialIcon';
 import { ICONS } from '../../ui/icons/registry';
 import TwinForgeLogo from '../../ui/components/branding/TwinForgeLogo';
-import ForgeHammerIcon from '../../ui/icons/ForgeHammerIcon';
 import logger from '../../lib/utils/logger';
 import { usePerformanceMode } from '../../system/context/PerformanceModeContext';
 
@@ -253,9 +252,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
               ...authCardStyles
             }}
           >
-            {/* Logo TwinForge avec T stylisé */}
+            {/* Logo TwinForge */}
             <motion.div
-              className="flex flex-col items-center justify-center mb-6 gap-3"
+              className="flex flex-col items-center justify-center mb-6"
               initial={shouldAnimate ? { opacity: 0, y: -20 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: animationDuration * 0.75, delay: shouldAnimate ? 0.15 : 0 }}
@@ -265,27 +264,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                 pointerEvents: 'auto'
               }}
             >
-              {/* T stylisé (ForgeHammerIcon) */}
-              <motion.div
-                initial={shouldAnimate ? { opacity: 0, scale: 0.8 } : false}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: animationDuration * 0.875, delay: shouldAnimate ? 0.2 : 0, ease: "easeOut" }}
-                style={{
-                  filter: mode === 'quality' ? 'drop-shadow(0 0 20px rgba(253, 200, 48, 0.4)) drop-shadow(0 0 12px rgba(247, 147, 30, 0.3))' : 'drop-shadow(0 0 12px rgba(253, 200, 48, 0.3))'
-                }}
-              >
-                <ForgeHammerIcon
-                  width={55}
-                  height={45}
-                  isHovered={false}
-                />
-              </motion.div>
-
               {/* Texte TWINFORGE */}
               <motion.div
-                initial={shouldAnimate ? { opacity: 0 } : false}
-                animate={{ opacity: 1 }}
-                transition={{ duration: animationDuration * 0.75, delay: shouldAnimate ? 0.35 : 0 }}
+                initial={shouldAnimate ? { opacity: 0, scale: 0.95 } : false}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: animationDuration * 0.875, delay: shouldAnimate ? 0.2 : 0, ease: "easeOut" }}
                 style={{
                   filter: mode === 'quality' ? 'drop-shadow(0 0 16px color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.1))' : 'drop-shadow(0 0 8px color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent))'
                 }}

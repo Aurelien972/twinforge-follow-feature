@@ -80,38 +80,42 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({ recipe, isOpen, o
                   </div>
                 </div>
 
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-white mb-3">Ingrédients</h3>
-                  <div className="space-y-2">
-                    {recipe.ingredients.map((ingredient, index) => (
-                      <div key={`ingredient-${recipe.id}-${index}-${ingredient.name}`} className="flex items-start gap-2">
-                        <span className="text-cyan-400 mt-1">•</span>
-                        <span className="text-white/80">
-                          {ingredient.quantity} {ingredient.unit && ingredient.unit} {ingredient.name}
-                        </span>
-                      </div>
-                    ))}
+                {recipe.ingredients && recipe.ingredients.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-white mb-3">Ingrédients</h3>
+                    <div className="space-y-2">
+                      {recipe.ingredients.map((ingredient, index) => (
+                        <div key={`ingredient-${recipe.id}-${index}-${ingredient?.name || index}`} className="flex items-start gap-2">
+                          <span className="text-cyan-400 mt-1">•</span>
+                          <span className="text-white/80">
+                            {ingredient?.quantity} {ingredient?.unit && ingredient.unit} {ingredient?.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-white mb-3">Instructions</h3>
-                  <div className="space-y-4">
-                    {recipe.instructions.map((instruction) => (
-                      <div key={instruction.step} className="flex gap-4">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
-                          <span className="text-cyan-400 font-semibold text-sm">{instruction.step}</span>
+                {recipe.instructions && recipe.instructions.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-white mb-3">Instructions</h3>
+                    <div className="space-y-4">
+                      {recipe.instructions.map((instruction, index) => (
+                        <div key={instruction?.step || `step-${index}`} className="flex gap-4">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                            <span className="text-cyan-400 font-semibold text-sm">{instruction?.step || index + 1}</span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-white/80">{instruction?.instruction}</p>
+                            {instruction?.timeMin && (
+                              <p className="text-white/50 text-sm mt-1">⏱️ {instruction.timeMin} min</p>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <p className="text-white/80">{instruction.instruction}</p>
-                          {instruction.timeMin && (
-                            <p className="text-white/50 text-sm mt-1">⏱️ {instruction.timeMin} min</p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {recipe.nutritionalInfo && (
                   <div>

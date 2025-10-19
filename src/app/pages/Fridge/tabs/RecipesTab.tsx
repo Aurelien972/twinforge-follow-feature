@@ -128,6 +128,28 @@ const RecipesTab: React.FC = () => {
 
   // Handle recipe view
   const handleViewRecipe = (recipe: Recipe) => {
+    // Validate recipe has required data before opening modal
+    if (!recipe) {
+      showToast({
+        type: 'error',
+        title: 'Erreur',
+        message: 'Les données de la recette sont manquantes',
+        duration: 3000
+      });
+      return;
+    }
+
+    // Check if recipe has at least basic info
+    if (!recipe.title && !recipe.ingredients && !recipe.instructions) {
+      showToast({
+        type: 'error',
+        title: 'Recette incomplète',
+        message: 'Cette recette ne contient pas assez d\'informations pour être affichée',
+        duration: 3000
+      });
+      return;
+    }
+
     setSelectedRecipeForDetail(recipe);
     setShowRecipeDetailModal(true);
   };
