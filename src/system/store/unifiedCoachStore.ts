@@ -592,28 +592,33 @@ export const useUnifiedCoachStore = create<UnifiedCoachState>()(
       },
 
       // Voice Only Mode actions (deprecated - kept for backward compatibility)
+      // IMPORTANT: Ne plus fermer le panel en mode realtime - l'utilisateur doit voir l'interface
       enterVoiceOnlyMode: () => {
         set({
           isVoiceOnlyMode: true,
-          isPanelOpen: false,
+          // CHANGEMENT: Ne plus fermer le panel - garder isPanelOpen comme il est
+          // isPanelOpen: false, // RETIRÉ
           communicationMode: 'voice',
           currentInputMode: 'realtime'
         });
 
-        logger.info('UNIFIED_COACH', 'Entered voice-only mode (deprecated)', {
-          timestamp: new Date().toISOString()
+        logger.info('UNIFIED_COACH', 'Entered voice-only mode (keeping panel open)', {
+          timestamp: new Date().toISOString(),
+          isPanelOpen: get().isPanelOpen
         });
       },
 
       exitVoiceOnlyMode: () => {
         set({
           isVoiceOnlyMode: false,
-          isPanelOpen: true,
+          // Garder le panel ouvert si il l'était déjà
+          // isPanelOpen: true, // RETIRÉ - laissé inchangé
           currentInputMode: 'text'
         });
 
-        logger.info('UNIFIED_COACH', 'Exited voice-only mode (deprecated)', {
-          timestamp: new Date().toISOString()
+        logger.info('UNIFIED_COACH', 'Exited voice-only mode (panel state unchanged)', {
+          timestamp: new Date().toISOString(),
+          isPanelOpen: get().isPanelOpen
         });
       },
 

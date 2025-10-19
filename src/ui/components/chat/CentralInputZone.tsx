@@ -32,6 +32,7 @@ interface CentralInputZoneProps {
   isRecording: boolean;
   isTranscribing: boolean;
   onStopRecording: () => void;
+  transcribedText?: string; // Texte transcrit à afficher
 
   // Realtime mode props
   voiceState: VoiceState;
@@ -56,6 +57,7 @@ const CentralInputZone: React.FC<CentralInputZoneProps> = ({
   isRecording,
   isTranscribing,
   onStopRecording,
+  transcribedText,
   voiceState,
   onStopRealtime,
   stepColor
@@ -187,7 +189,7 @@ const CentralInputZone: React.FC<CentralInputZoneProps> = ({
         </motion.div>
 
         {/* Texte d'état */}
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', width: '100%', maxWidth: '300px' }}>
           <div
             style={{
               fontSize: '15px',
@@ -206,6 +208,32 @@ const CentralInputZone: React.FC<CentralInputZoneProps> = ({
           >
             {isTranscribing ? 'Analyse de votre message' : 'Appuyez pour terminer'}
           </div>
+
+          {/* Afficher le texte transcrit */}
+          {transcribedText && !isTranscribing && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                marginTop: '16px',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                backdropFilter: 'blur(8px)',
+                fontSize: '14px',
+                color: 'rgba(255, 255, 255, 0.9)',
+                lineHeight: '1.5',
+                textAlign: 'left'
+              }}
+            >
+              <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '6px' }}>
+                Transcription:
+              </div>
+              {transcribedText}
+            </motion.div>
+          )}
         </div>
 
         {/* Bouton Stop */}

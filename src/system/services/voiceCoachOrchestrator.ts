@@ -141,9 +141,11 @@ class VoiceCoachOrchestrator {
       logger.info('VOICE_ORCHESTRATOR', '💬 Starting conversation in store');
       store.startConversation(mode as any);
 
-      // IMPORTANT: Passer en mode voice-only pour l'interface minimale mobile
-      logger.info('VOICE_ORCHESTRATOR', '📱 Entering voice-only mode for minimal UI');
-      store.enterVoiceOnlyMode();
+      // IMPORTANT: Mettre à jour le mode de communication sans fermer le panel
+      // L'utilisateur doit rester dans la fenêtre de chat pour voir la conversation
+      logger.info('VOICE_ORCHESTRATOR', '🎙️ Setting communication mode to voice (realtime)');
+      store.setCommunicationMode('voice');
+      store.setInputMode('realtime');
 
       // Le prénom a déjà été récupéré plus haut
 

@@ -11,7 +11,9 @@ import { ICONS } from '../../icons/registry';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
 import { openaiWhisperService } from '../../../system/services/openaiWhisperService';
+import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
 import CentralInputZone from '../../components/chat/CentralInputZone';
+import logger from '../../../lib/utils/logger';
 
 type InputMode = 'text' | 'voice-to-text' | 'realtime';
 
@@ -52,22 +54,36 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcriptionError, setTranscriptionError] = useState<string | undefined>(undefined);
+  const [transcribedText, setTranscribedText] = useState<string>('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { click } = useFeedback();
+
+  // Store state
+  const setInputMode = useUnifiedCoachStore(state => state.setInputMode);
 
   // Déterminer le mode actif automatiquement
   const [currentInputMode, setCurrentInputMode] = useState<InputMode>('text');
 
   // Gérer le changement de mode automatique
   useEffect(() => {
+    let newMode: InputMode = 'text';
+
     if (isRecording || isTranscribing) {
-      setCurrentInputMode('voice-to-text');
+      newMode = 'voice-to-text';
     } else if (realtimeState !== 'idle' && realtimeState !== 'error') {
-      setCurrentInputMode('realtime');
-    } else {
-      setCurrentInputMode('text');
+      newMode = 'realtime';
     }
-  }, [isRecording, isTranscribing, realtimeState]);
+
+    setCurrentInputMode(newMode);
+    setInputMode(newMode); // Sync with store
+
+    logger.debug('CHAT_INPUT_BAR', 'Input mode changed', {
+      mode: newMode,
+      isRecording,
+      isTranscribing,
+      realtimeState
+    });
+  }, [isRecording, isTranscribing, realtimeState, setInputMode]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -101,36 +117,55 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
 
     if (isRecording) {
       // Arrêter l'enregistrement et transcrire
+      logger.info('CHAT_INPUT_BAR', 'Stopping voice recording and starting transcription');
+      onStopVoiceRecording();
+
       try {
         setTranscriptionError(undefined);
+        setTranscribedText('');
+
         const audioBlob = await openaiWhisperService.stopRecording();
+        logger.info('CHAT_INPUT_BAR', 'Audio blob captured', { size: audioBlob.size });
 
         setIsTranscribing(true);
-        const transcribedText = await openaiWhisperService.transcribe(audioBlob);
+        const result = await openaiWhisperService.transcribe(audioBlob);
         setIsTranscribing(false);
 
-        // Envoyer automatiquement le message transcrit
-        if (transcribedText.text.trim()) {
-          onSendMessage(transcribedText.text.trim());
-          Haptics.impact();
+        logger.info('CHAT_INPUT_BAR', 'Transcription completed', {
+          textLength: result.text.length,
+          text: result.text
+        });
+
+        // Afficher le texte transcrit
+        if (result.text.trim()) {
+          setTranscribedText(result.text.trim());
+          // Envoyer automatiquement après un court délai pour que l'utilisateur puisse voir
+          setTimeout(() => {
+            onSendMessage(result.text.trim());
+            setTranscribedText('');
+            Haptics.impact();
+          }, 500);
+        } else {
+          setTranscriptionError('Aucun texte détecté dans l\'enregistrement');
         }
       } catch (error) {
         setIsTranscribing(false);
         const errorMessage = error instanceof Error ? error.message : 'Erreur de transcription';
         setTranscriptionError(errorMessage);
-        console.error('Transcription error:', error);
+        logger.error('CHAT_INPUT_BAR', 'Transcription error', { error: errorMessage });
       }
-      onStopVoiceRecording();
     } else {
       // Démarrer l'enregistrement
+      logger.info('CHAT_INPUT_BAR', 'Starting voice recording');
       try {
         setTranscriptionError(undefined);
+        setTranscribedText('');
         await openaiWhisperService.startRecording();
         onStartVoiceRecording();
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Erreur microphone';
         setTranscriptionError(errorMessage);
-        console.error('Recording error:', error);
+        logger.error('CHAT_INPUT_BAR', 'Recording start error', { error: errorMessage });
       }
     }
   };
@@ -336,37 +371,55 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
-      <div
-        className={`chat-input-bar ${isFocused ? 'chat-input-bar--focused' : ''}`}
-        style={{
-          background: `
-            radial-gradient(ellipse at 50% 100%, color-mix(in srgb, ${stepColor} 12%, transparent) 0%, transparent 60%),
-            var(--liquid-reflections-multi),
-            var(--liquid-highlight-ambient),
-            var(--liquid-glass-bg-base)
-          `,
-          backdropFilter: 'blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate))',
-          WebkitBackdropFilter: 'blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate))',
-          border: isFocused || currentInputMode !== 'text'
-            ? `1.5px solid color-mix(in srgb, ${stepColor} 40%, transparent)`
-            : '1.5px solid rgba(255, 255, 255, 0.15)',
-          boxShadow: isFocused || currentInputMode !== 'text'
-            ? `
-                0 4px 24px rgba(0, 0, 0, 0.25),
-                0 0 32px color-mix(in srgb, ${stepColor} 20%, transparent),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15)
-              `
-            : `
-                0 4px 20px rgba(0, 0, 0, 0.2),
-                0 0 24px rgba(255, 255, 255, 0.05),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1)
-              `,
-          borderRadius: '18px',
-          padding: currentInputMode === 'text' ? '6px 8px' : '0',
-          transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
-          overflow: 'hidden'
-        }}
-      >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentInputMode}
+          initial={{ opacity: 0.8, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0.8, scale: 0.98 }}
+          transition={{
+            duration: 0.2,
+            ease: 'easeInOut'
+          }}
+          className={`chat-input-bar ${isFocused ? 'chat-input-bar--focused' : ''}`}
+          style={{
+            background: currentInputMode !== 'text'
+              ? `
+                  radial-gradient(ellipse at 50% 100%, color-mix(in srgb, ${stepColor} 20%, transparent) 0%, transparent 60%),
+                  var(--liquid-reflections-multi),
+                  var(--liquid-highlight-ambient),
+                  var(--liquid-glass-bg-elevated)
+                `
+              : `
+                  radial-gradient(ellipse at 50% 100%, color-mix(in srgb, ${stepColor} 12%, transparent) 0%, transparent 60%),
+                  var(--liquid-reflections-multi),
+                  var(--liquid-highlight-ambient),
+                  var(--liquid-glass-bg-base)
+                `,
+            backdropFilter: 'blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate))',
+            WebkitBackdropFilter: 'blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate))',
+            border: isFocused || currentInputMode !== 'text'
+              ? `1.5px solid color-mix(in srgb, ${stepColor} 40%, transparent)`
+              : '1.5px solid rgba(255, 255, 255, 0.15)',
+            boxShadow: isFocused || currentInputMode !== 'text'
+              ? `
+                  0 4px 24px rgba(0, 0, 0, 0.25),
+                  0 0 32px color-mix(in srgb, ${stepColor} 20%, transparent),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.15)
+                `
+              : `
+                  0 4px 20px rgba(0, 0, 0, 0.2),
+                  0 0 24px rgba(255, 255, 255, 0.05),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                `,
+            borderRadius: '18px',
+            padding: currentInputMode === 'text' ? '6px 8px' : '0',
+            minHeight: currentInputMode === 'text' ? 'auto' : '240px',
+            transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
+            overflow: 'hidden',
+            willChange: 'transform, opacity'
+          }}
+        >
         {/* Mode TEXT: afficher les contrôles classiques */}
         {currentInputMode === 'text' && (
           <div className="flex items-center gap-2">
@@ -484,6 +537,7 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
             isRecording={false}
             isTranscribing={false}
             onStopRecording={() => {}}
+            transcribedText=""
             voiceState="idle"
             onStopRealtime={() => {}}
             stepColor={stepColor}
@@ -677,12 +731,14 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
             isRecording={isRecording}
             isTranscribing={isTranscribing}
             onStopRecording={handleVoiceToggle}
+            transcribedText={transcribedText}
             voiceState={realtimeState}
             onStopRealtime={handleRealtimeToggle}
             stepColor={stepColor}
           />
         )}
-      </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
