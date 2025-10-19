@@ -123,16 +123,7 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
           : '1.5px solid rgba(255,255,255,0.22)',
         backdropFilter: 'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
         WebkitBackdropFilter: 'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
-        boxShadow: hasUnreadMessages
-          ? `
-              var(--liquid-pill-shadow),
-              0 0 40px color-mix(in srgb, ${modeColor} 30%, transparent),
-              0 0 60px color-mix(in srgb, ${modeColor} 15%, transparent)
-            `
-          : `
-              var(--liquid-pill-shadow),
-              0 0 32px color-mix(in srgb, ${modeColor} 15%, transparent)
-            `,
+        boxShadow: 'none',
         cursor: 'pointer',
         transition: 'right 400ms cubic-bezier(0.25, 0.1, 0.25, 1), transform var(--liquid-transition-medium), background var(--liquid-transition-fast), box-shadow var(--liquid-transition-fast), border-color var(--liquid-transition-fast)',
         willChange: 'right, transform, filter',
@@ -141,11 +132,7 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
       initial={false}
       whileHover={{
         scale: 1.08,
-        boxShadow: `
-          var(--liquid-pill-shadow),
-          0 0 48px color-mix(in srgb, ${modeColor} 25%, transparent),
-          0 4px 20px rgba(0, 0, 0, 0.3)
-        `,
+        boxShadow: 'none',
         transition: {
           duration: 0.25,
           ease: [0.16, 1, 0.3, 1]
@@ -189,9 +176,7 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
           size={isDesktop ? 28 : 24}
           style={{
             color: modeColor,
-            filter: isStep2Active
-              ? `drop-shadow(0 0 16px rgba(59, 130, 246, 0.8))`
-              : `drop-shadow(0 0 14px color-mix(in srgb, ${modeColor} 60%, transparent))`
+            filter: 'none'
           }}
         />
       </motion.div>
@@ -222,10 +207,7 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
               fontSize: '11px',
               fontWeight: 'bold',
               color: 'white',
-              boxShadow: `
-                0 0 16px color-mix(in srgb, ${modeColor} 60%, transparent),
-                0 2px 8px rgba(0, 0, 0, 0.4)
-              `
+              boxShadow: 'none'
             }}
           >
             {unreadCount > 9 ? '9+' : unreadCount}

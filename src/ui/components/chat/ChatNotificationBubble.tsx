@@ -190,7 +190,7 @@ const ChatNotificationBubble: React.FC<ChatNotificationBubbleProps> = ({ buttonR
                 size={isDesktop ? 16 : 18}
                 style={{
                   color: '#18E3FF',
-                  filter: 'drop-shadow(0 0 8px rgba(24, 227, 255, 0.4))'
+                  filter: 'none'
                 }}
               />
             </div>
