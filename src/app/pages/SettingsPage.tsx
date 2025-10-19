@@ -7,6 +7,8 @@ import UnderConstructionCard from '../components/UnderConstructionCard';
 import ConnectedDevicesTab from './Settings/ConnectedDevicesTab';
 import GeneralSettingsTab from './Settings/GeneralSettingsTab';
 import PreferencesSettingsTab from './Settings/PreferencesSettingsTab';
+import { NotificationsSettingsTab } from './Settings/NotificationsSettingsTab';
+import { PrivacySettingsTab } from './Settings/PrivacySettingsTab';
 import { PLACEHOLDER_PAGES_CONFIG } from '../../config/placeholderPagesConfig';
 
 /**
@@ -55,6 +57,10 @@ const SettingsPage: React.FC = () => {
               <GeneralSettingsTab />
             ) : tab.value === 'preferences' ? (
               <PreferencesSettingsTab />
+            ) : tab.value === 'notifications' ? (
+              <NotificationsSettingsTab />
+            ) : tab.value === 'confidentialite' ? (
+              <PrivacySettingsTab />
             ) : (
               <GlassCard className="p-6">
                 <UnderConstructionCard
