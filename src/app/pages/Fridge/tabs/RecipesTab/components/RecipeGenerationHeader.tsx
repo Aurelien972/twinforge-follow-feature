@@ -165,7 +165,7 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
           style={hasValidInventory && !isGenerating ? (isPerformanceMode ? {
             background: 'linear-gradient(145deg, color-mix(in srgb, #10B981 80%, #1e293b), color-mix(in srgb, #22C55E 70%, #0f172a))',
             border: '2px solid color-mix(in srgb, #10B981 60%, transparent)',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
+            boxShadow: '0 6px 24px rgba(16, 185, 129, 0.6), 0 4px 16px rgba(0, 0, 0, 0.5)',
             color: 'white'
           } : {
             background: `
@@ -176,8 +176,9 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
             `,
             border: '2px solid color-mix(in srgb, #10B981 60%, transparent)',
             boxShadow: `
-              0 8px 32px color-mix(in srgb, #10B981 40%, transparent),
-              0 0 40px color-mix(in srgb, #10B981 30%, transparent),
+              0 12px 40px rgba(16, 185, 129, 0.5),
+              0 8px 32px rgba(16, 185, 129, 0.4),
+              0 0 60px rgba(16, 185, 129, 0.3),
               inset 0 2px 0 rgba(255, 255, 255, 0.4),
               inset 0 -2px 0 rgba(0, 0, 0, 0.2)
             `,

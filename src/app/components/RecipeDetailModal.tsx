@@ -84,7 +84,7 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({ recipe, isOpen, o
                   <h3 className="text-lg font-semibold text-white mb-3">Ingrédients</h3>
                   <div className="space-y-2">
                     {recipe.ingredients.map((ingredient, index) => (
-                      <div key={index} className="flex items-start gap-2">
+                      <div key={`ingredient-${recipe.id}-${index}-${ingredient.name}`} className="flex items-start gap-2">
                         <span className="text-cyan-400 mt-1">•</span>
                         <span className="text-white/80">
                           {ingredient.quantity} {ingredient.unit && ingredient.unit} {ingredient.name}

@@ -146,8 +146,13 @@ const NewMobileBottomBar: React.FC = () => {
           left: '8px',
           right: '8px',
           zIndex: 9996,
-          background: isPerformanceMode ? 'rgb(11, 14, 23)' : undefined,
-          backdropFilter: isPerformanceMode ? 'none' : undefined,
+          background: isPerformanceMode
+            ? 'rgba(11, 14, 23, 0.95)'
+            : undefined,
+          backdropFilter: isPerformanceMode ? 'blur(10px)' : undefined,
+          WebkitBackdropFilter: isPerformanceMode ? 'blur(10px)' : undefined,
+          border: isPerformanceMode ? '1px solid rgba(255, 255, 255, 0.1)' : undefined,
+          borderRadius: '20px',
         }}
       >
         <div className="new-mobile-bottom-bar-container">
