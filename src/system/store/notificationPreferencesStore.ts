@@ -117,6 +117,7 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
           logger.error('NOTIFICATION_PREFS', 'Failed to load global settings from Supabase', {
             error,
           });
+          // Continue with local cache - don't throw
         } else if (data) {
           const settings: GlobalNotificationSettings = {
             push_notifications_enabled: data.push_notifications_enabled ?? true,
@@ -221,7 +222,9 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
 
       if (error) {
         logger.error('NOTIFICATION_PREFS', 'Failed to load category preferences', { error });
-        throw error;
+        // Continue with empty map - don't throw
+        set({ isLoading: false });
+        return;
       }
 
       const prefsMap = new Map<NotificationCategory, NotificationPreference>();
@@ -341,7 +344,9 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
 
       if (error) {
         logger.error('NOTIFICATION_PREFS', 'Failed to load push subscriptions', { error });
-        throw error;
+        // Continue with empty array - don't throw
+        set({ pushSubscriptions: [], activePushSubscription: null, isLoading: false });
+        return;
       }
 
       const subscriptions = (data || []) as PushSubscription[];

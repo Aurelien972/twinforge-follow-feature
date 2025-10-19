@@ -65,7 +65,11 @@ export const NotificationsSettingsTab: React.FC = () => {
   // Check push permission
   const checkPushPermission = async () => {
     try {
-      const permission = await webPushService.checkPushPermission();
+      if (!('Notification' in window)) {
+        setPushPermission('denied');
+        return;
+      }
+      const permission = Notification.permission;
       setPushPermission(permission);
     } catch (err) {
       console.error('Failed to check push permission:', err);

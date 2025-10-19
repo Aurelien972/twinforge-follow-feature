@@ -120,6 +120,7 @@ export const useDataPrivacyStore = create<DataPrivacyState>((set, get) => ({
           logger.error('DATA_PRIVACY', 'Failed to load privacy preferences from Supabase', {
             error,
           });
+          // Continue with local cache - don't throw
         } else if (data) {
           const preferences: PrivacyPreferences = {
             data_retention_preference: (data.data_retention_preference as DataRetentionPreference) ?? 'standard',
@@ -208,7 +209,9 @@ export const useDataPrivacyStore = create<DataPrivacyState>((set, get) => ({
 
       if (error) {
         logger.error('DATA_PRIVACY', 'Failed to load export requests', { error });
-        throw error;
+        // Continue with empty array - don't throw
+        set({ recentExportRequests: [], isLoading: false });
+        return;
       }
 
       set({
@@ -313,7 +316,9 @@ export const useDataPrivacyStore = create<DataPrivacyState>((set, get) => ({
 
       if (error) {
         logger.error('DATA_PRIVACY', 'Failed to load deletion request', { error });
-        throw error;
+        // Continue with null - don't throw
+        set({ activeDeletionRequest: null, isLoading: false });
+        return;
       }
 
       set({
