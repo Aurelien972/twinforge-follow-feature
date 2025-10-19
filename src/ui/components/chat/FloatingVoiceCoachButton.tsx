@@ -2,6 +2,14 @@
  * Floating Voice Coach Button
  * Bouton flottant refondé pour l'interaction vocale avec le coach
  * Remplace le bouton chat classique avec indicateurs visuels d'état vocal
+ *
+ * @deprecated Ce composant est obsolète. Utilisez UnifiedFloatingButton à la place.
+ * @see UnifiedFloatingButton
+ *
+ * Migration:
+ * - Remplacer FloatingVoiceCoachButton par UnifiedFloatingButton
+ * - Utiliser useUnifiedCoachStore au lieu de useVoiceCoachStore
+ * - Voir docs/technical/UNIFIED_CHAT_SYSTEM.md pour plus d'informations
  */
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -24,6 +32,15 @@ interface FloatingVoiceCoachButtonProps {
 
 const FloatingVoiceCoachButton = React.forwardRef<HTMLButtonElement, FloatingVoiceCoachButtonProps>(
   ({ className = '' }, ref) => {
+    // DEPRECATED WARNING
+    useEffect(() => {
+      console.warn(
+        '⚠️ DEPRECATED: FloatingVoiceCoachButton is deprecated and will be removed in a future version.\n' +
+        '→ Use UnifiedFloatingButton instead.\n' +
+        '→ See docs/technical/UNIFIED_CHAT_SYSTEM.md for migration guide.'
+      );
+    }, []);
+
     const location = useLocation();
     const { click } = useFeedback();
     const [isDesktop, setIsDesktop] = useState(

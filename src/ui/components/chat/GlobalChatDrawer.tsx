@@ -1,6 +1,14 @@
 /**
  * Global Chat Drawer
  * Drawer de chat contextuel qui slide depuis la droite de l'écran
+ *
+ * @deprecated Ce composant est obsolète. Utilisez UnifiedCoachDrawer à la place.
+ * @see UnifiedCoachDrawer
+ *
+ * Migration:
+ * - Remplacer GlobalChatDrawer par UnifiedCoachDrawer
+ * - Utiliser useUnifiedCoachStore au lieu de useGlobalChatStore
+ * - Voir docs/technical/UNIFIED_CHAT_SYSTEM.md pour plus d'informations
  */
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
@@ -23,6 +31,15 @@ interface GlobalChatDrawerProps {
 }
 
 const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) => {
+  // DEPRECATED WARNING
+  useEffect(() => {
+    console.warn(
+      '⚠️ DEPRECATED: GlobalChatDrawer is deprecated and will be removed in a future version.\n' +
+      '→ Use UnifiedCoachDrawer instead.\n' +
+      '→ See docs/technical/UNIFIED_CHAT_SYSTEM.md for migration guide.'
+    );
+  }, []);
+
   const location = useLocation();
   const navigate = useNavigate();
   const {

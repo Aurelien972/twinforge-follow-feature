@@ -2,6 +2,14 @@
  * Voice Coach Panel V2
  * Interface vocale/textuelle intelligente avec détection d'environnement
  * Utilise le bon service selon le mode (vocal ou texte)
+ *
+ * @deprecated Ce composant est obsolète. Utilisez UnifiedCoachDrawer à la place.
+ * @see UnifiedCoachDrawer
+ *
+ * Migration:
+ * - Remplacer VoiceCoachPanel par UnifiedCoachDrawer
+ * - Utiliser useUnifiedCoachStore au lieu de useVoiceCoachStore
+ * - Voir docs/technical/UNIFIED_CHAT_SYSTEM.md pour plus d'informations
  */
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -23,6 +31,15 @@ import logger from '../../../lib/utils/logger';
 import '../../../styles/components/voice-coach-panel.css';
 
 const VoiceCoachPanel: React.FC = () => {
+  // DEPRECATED WARNING
+  useEffect(() => {
+    console.warn(
+      '⚠️ DEPRECATED: VoiceCoachPanel is deprecated and will be removed in a future version.\n' +
+      '→ Use UnifiedCoachDrawer instead.\n' +
+      '→ See docs/technical/UNIFIED_CHAT_SYSTEM.md for migration guide.'
+    );
+  }, []);
+
   const { navClose } = useFeedback();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isTextProcessing, setIsTextProcessing] = useState(false);

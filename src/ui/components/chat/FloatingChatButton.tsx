@@ -1,6 +1,14 @@
 /**
  * Floating Chat Button
  * Bouton flottant pour ouvrir/fermer le chat global depuis le côté droit de l'écran
+ *
+ * @deprecated Ce composant est obsolète. Utilisez UnifiedFloatingButton à la place.
+ * @see UnifiedFloatingButton
+ *
+ * Migration:
+ * - Remplacer FloatingChatButton par UnifiedFloatingButton
+ * - Utiliser useUnifiedCoachStore au lieu de useGlobalChatStore
+ * - Voir docs/technical/UNIFIED_CHAT_SYSTEM.md pour plus d'informations
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -24,6 +32,15 @@ interface FloatingChatButtonProps {
 }
 
 const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButtonProps>(({ className = '' }, ref) => {
+  // DEPRECATED WARNING
+  useEffect(() => {
+    console.warn(
+      '⚠️ DEPRECATED: FloatingChatButton is deprecated and will be removed in a future version.\n' +
+      '→ Use UnifiedFloatingButton instead.\n' +
+      '→ See docs/technical/UNIFIED_CHAT_SYSTEM.md for migration guide.'
+    );
+  }, []);
+
   const location = useLocation();
   const { isOpen, toggle, currentMode, modeConfigs, hasUnreadMessages, unreadCount, isInStep2 } = useGlobalChatStore();
   const { click } = useFeedback();
