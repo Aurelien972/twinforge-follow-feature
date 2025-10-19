@@ -9,6 +9,7 @@ import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
+import { openaiWhisperService } from '../../../system/services/openaiWhisperService';
 
 interface ChatInputBarProps {
   onSendMessage: (message: string) => void;
@@ -45,6 +46,8 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
 }) => {
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [transcriptionError, setTranscriptionError] = useState<string | undefined>(undefined);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { click } = useFeedback();
 
@@ -74,14 +77,44 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
     }
   };
 
-  const handleVoiceToggle = () => {
-    if (isRecording) {
-      onStopVoiceRecording();
-    } else {
-      onStartVoiceRecording();
-    }
+  const handleVoiceToggle = async () => {
     click();
     Haptics.press();
+
+    if (isRecording) {
+      // Arrêter l'enregistrement et transcrire
+      try {
+        setTranscriptionError(undefined);
+        const audioBlob = await openaiWhisperService.stopRecording();
+
+        setIsTranscribing(true);
+        const transcribedText = await openaiWhisperService.transcribe(audioBlob);
+        setIsTranscribing(false);
+
+        // Envoyer automatiquement le message transcrit
+        if (transcribedText.text.trim()) {
+          onSendMessage(transcribedText.text.trim());
+          Haptics.impact();
+        }
+      } catch (error) {
+        setIsTranscribing(false);
+        const errorMessage = error instanceof Error ? error.message : 'Erreur de transcription';
+        setTranscriptionError(errorMessage);
+        console.error('Transcription error:', error);
+      }
+      onStopVoiceRecording();
+    } else {
+      // Démarrer l'enregistrement
+      try {
+        setTranscriptionError(undefined);
+        await openaiWhisperService.startRecording();
+        onStartVoiceRecording();
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Erreur microphone';
+        setTranscriptionError(errorMessage);
+        console.error('Recording error:', error);
+      }
+    }
   };
 
   const handleRealtimeToggle = async () => {
@@ -110,7 +143,7 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
         padding: '0'
       }}
     >
-      {/* Error Banner */}
+      {/* Error Banners */}
       <AnimatePresence>
         {realtimeError && (
           <motion.div
@@ -134,6 +167,32 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
               <SpatialIcon Icon={ICONS.AlertTriangle} size={14} style={{ color: '#EF4444' }} />
               <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.9)' }}>
                 {realtimeError}
+              </span>
+            </div>
+          </motion.div>
+        )}
+        {transcriptionError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            style={{
+              padding: '8px 16px',
+              marginBottom: '8px',
+              borderRadius: '12px',
+              background: 'linear-gradient(180deg, rgba(220, 38, 38, 0.2) 0%, rgba(153, 27, 27, 0.15) 100%)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '8px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <SpatialIcon Icon={ICONS.AlertTriangle} size={14} style={{ color: '#EF4444' }} />
+              <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.9)' }}>
+                {transcriptionError}
               </span>
             </div>
           </motion.div>
@@ -178,7 +237,7 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Processing Status Bar - En haut avec marge réduite */}
+      {/* Processing Status Bars */}
       <AnimatePresence>
         {isProcessing && (
           <motion.div
@@ -216,6 +275,45 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
             />
             <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>
               Traitement en cours...
+            </span>
+          </motion.div>
+        )}
+        {isTranscribing && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            style={{
+              padding: '6px 16px',
+              marginBottom: '8px',
+              borderRadius: '12px',
+              background: `
+                linear-gradient(180deg,
+                  rgba(11, 14, 23, 0.8) 0%,
+                  rgba(11, 14, 23, 0.6) 100%
+                )
+              `,
+              backdropFilter: 'blur(16px)',
+              border: `1px solid color-mix(in srgb, ${stepColor} 20%, transparent)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              style={{
+                width: '12px',
+                height: '12px',
+                border: `2px solid ${stepColor}`,
+                borderTopColor: 'transparent',
+                borderRadius: '50%'
+              }}
+            />
+            <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>
+              Transcription en cours...
             </span>
           </motion.div>
         )}
@@ -358,8 +456,8 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
               onKeyDown={handleKeyDown}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder={isRecording ? 'Enregistrement en cours...' : placeholder}
-              disabled={disabled || isRecording}
+              placeholder={isRecording ? 'Enregistrement en cours...' : isTranscribing ? 'Transcription...' : placeholder}
+              disabled={disabled || isRecording || isTranscribing}
               rows={1}
               className="chat-textarea w-full resize-none bg-transparent border-none outline-none text-white placeholder-white/40 text-sm leading-relaxed py-1.5 px-1.5"
               style={{
@@ -409,29 +507,19 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
               whileTap={{ scale: 0.92 }}
               disabled={disabled}
             >
-              {/* RED DOT inside the RED CIRCLE - Recording Indicator */}
-              <AnimatePresence>
-                {(realtimeState === 'listening' || realtimeState === 'speaking') && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    style={{
-                      position: 'absolute',
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      background: 'radial-gradient(circle at 30% 30%, #FF6B6B 0%, #DC2626 100%)',
-                      boxShadow: `
-                        0 0 12px rgba(239, 68, 68, 0.8),
-                        0 0 20px rgba(239, 68, 68, 0.6),
-                        inset 0 1px 2px rgba(255, 255, 255, 0.5)
-                      `,
-                      zIndex: 2
-                    }}
-                  />
-                )}
-              </AnimatePresence>
+              {/* Waves Icon inside the RED CIRCLE - Realtime Indicator */}
+              <SpatialIcon
+                Icon={ICONS.Waves}
+                size={18}
+                style={{
+                  color: isRealtimeActive ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.85)',
+                  filter: isRealtimeActive
+                    ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.6))'
+                    : 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.4))',
+                  zIndex: 2,
+                  position: 'relative'
+                }}
+              />
 
               {/* Pulsating glow effect */}
               {isRealtimeActive && (

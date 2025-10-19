@@ -148,6 +148,8 @@ export const ICONS = {
   Ban: L.Ban,
   Droplets: L.Droplets,
   Waves: L.Waves,
+  Radio: L.Radio,
+  PhoneCall: L.PhoneCall,
   Apple: L.Apple,
   Milk: L.Milk,
   Grid3X3: L.Grid3X3,

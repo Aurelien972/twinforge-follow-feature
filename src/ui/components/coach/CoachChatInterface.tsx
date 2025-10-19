@@ -60,13 +60,13 @@ const CoachChatInterface: React.FC<CoachChatInterfaceProps> = ({
   const voiceSettings = { enabled: true };
 
   const handleStartRecording = () => {
-    logger.info('COACH_CHAT_INTERFACE', 'Start voice-to-text recording');
-    // TODO: Implémenter voice-to-text classique
+    logger.info('COACH_CHAT_INTERFACE', 'Voice-to-text recording started via ChatInputBar');
+    // Handled by ChatInputBar with openaiWhisperService
   };
 
   const handleStopRecording = () => {
-    logger.info('COACH_CHAT_INTERFACE', 'Stop voice-to-text recording');
-    // TODO: Implémenter arrêt voice-to-text classique
+    logger.info('COACH_CHAT_INTERFACE', 'Voice-to-text recording stopped via ChatInputBar');
+    // Handled by ChatInputBar with openaiWhisperService
   };
 
   /**

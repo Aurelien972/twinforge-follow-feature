@@ -598,14 +598,40 @@ html.performance-mode .header-liquid-glass::after {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   animation: none !important;
+
+  /* Remove all colored glows and cyan shadows */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+.performance-mode .floating-chat-button:hover,
+.performance-mode .floating-voice-coach-button:hover,
+.performance-mode .unified-floating-button:hover {
+  /* Simple black shadow on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
 .performance-mode .floating-chat-button::before,
 .performance-mode .floating-chat-button::after,
 .performance-mode .floating-voice-coach-button::before,
 .performance-mode .floating-voice-coach-button::after {
+  /* Disable all decorative pseudo-elements */
+  display: none !important;
   animation: none !important;
-  opacity: 0.5 !important;
+  opacity: 0 !important;
+}
+
+/* Remove cyan/turquoise colored shadows specifically */
+.performance-mode .floating-chat-button[style*="box-shadow"],
+.performance-mode .floating-voice-coach-button[style*="box-shadow"],
+.performance-mode .unified-floating-button[style*="box-shadow"] {
+  /* Override inline styles with simple black shadow */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Remove pulsating glow effects */
+.performance-mode .floating-chat-button > div[style*="filter"],
+.performance-mode .floating-chat-button > div[style*="blur"] {
+  display: none !important;
 }
 
 /* =========================================
