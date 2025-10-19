@@ -10,6 +10,8 @@ import type {
   GlobalNotificationSettings,
   NotificationHistoryEntry,
   NotificationStats,
+} from '../../domain/notifications';
+import {
   DEFAULT_GLOBAL_SETTINGS,
   DEFAULT_CATEGORY_PREFERENCE,
 } from '../../domain/notifications';

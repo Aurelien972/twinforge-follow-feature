@@ -13,8 +13,8 @@ import type {
   AccountDeletionCancellation,
   ConsentUpdate,
   DataRetentionPreference,
-  DEFAULT_PRIVACY_PREFERENCES,
 } from '../../domain/privacy';
+import { DEFAULT_PRIVACY_PREFERENCES } from '../../domain/privacy';
 
 interface DataPrivacyState {
   // Privacy preferences
