@@ -11,7 +11,6 @@ Documentation complète des onglets de la page Avatar, qui constituent l'interfa
 - [Vue d'Ensemble](#vue-densemble)
 - [Onglet Scan CTA](#onglet-scan-cta)
 - [Onglet Avatar](#onglet-avatar)
-- [Onglet Projection](#onglet-projection)
 - [Onglet Insights](#onglet-insights)
 - [Onglet History](#onglet-history)
 - [Onglet Face](#onglet-face)
@@ -24,14 +23,14 @@ Documentation complète des onglets de la page Avatar, qui constituent l'interfa
 
 ### Architecture de la Page Avatar
 
-La page Avatar (`src/app/pages/Avatar/AvatarPage.tsx`) est organisée en 6 onglets principaux qui offrent une expérience utilisateur complète pour la visualisation, l'analyse et le suivi de l'évolution morphologique.
+La page Avatar (`src/app/pages/Avatar/AvatarPage.tsx`) est organisée en 5 onglets principaux qui offrent une expérience utilisateur complète pour la visualisation, l'analyse et le suivi de l'évolution morphologique.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         AVATAR PAGE                              │
 │                                                                  │
 │  ┌──────────────────────────────────────────────────────────┐  │
-│  │  [Scan CTA] [Avatar] [Projection] [Insights] [History] [Face] │  │
+│  │  [Scan CTA] [Avatar] [Insights] [History] [Face]           │  │
 │  └──────────────────────────────────────────────────────────┘  │
 │                                                                  │
 │  ┌──────────────────────────────────────────────────────────┐  │
@@ -148,12 +147,6 @@ const benefits = [
     title: 'Insights AI Personnalisés',
     description: 'Recommandations adaptées à vos objectifs',
     available: true
-  },
-  {
-    icon: 'target',
-    title: 'Projections Objectifs',
-    description: 'Visualisez votre avatar futur',
-    available: hasActiveGoals
   }
 ];
 ```
@@ -384,202 +377,6 @@ interface QuickInsights {
   <QuickInsightsCard insights={insights} />
 </AvatarReadyState>
 ```
-
----
-
-## 🎯 Onglet Projection
-
-**Fichier:** `src/app/pages/Avatar/tabs/ProjectionTab.tsx`
-**Objectif:** Visualiser des projections d'évolution corporelle basées sur objectifs
-
-### Fonctionnalités
-
-#### 1. Moteur de Projection
-
-**Algorithme:** `morphologicalProjectionEngine.ts`
-
-```typescript
-interface ProjectionRequest {
-  currentMorphology: {
-    morph3d: Record<string, number>;
-    limb_masses: Record<string, number>;
-    measurements: MorphologicalMeasurements;
-  };
-  targetGoal: {
-    type: 'fat_loss' | 'muscle_gain' | 'recomposition' | 'maintenance';
-    target_weight_kg?: number;
-    target_body_fat_perc?: number;
-    timeline_weeks: number;
-  };
-  userProfile: {
-    current_weight_kg: number;
-    height_cm: number;
-    age: number;
-    sex: 'male' | 'female';
-    activity_level: string;
-  };
-}
-
-interface ProjectionResult {
-  projected_morphology: {
-    morph3d: Record<string, number>;
-    limb_masses: Record<string, number>;
-    measurements: MorphologicalMeasurements;
-  };
-  timeline: Array<{
-    week: number;
-    weight_kg: number;
-    body_fat_perc: number;
-    morphology_snapshot: Record<string, number>;
-  }>;
-  feasibility: {
-    score: number;  // 0-100
-    warnings: string[];
-    recommendations: string[];
-  };
-  visualization: {
-    avatarDelta: Record<string, number>;
-    animationKeyframes: Array<{
-      timestamp: number;
-      morphology: Record<string, number>;
-    }>;
-  };
-}
-```
-
-#### 2. Panneau de Configuration
-
-Interface de définition des objectifs:
-
-```tsx
-<ProjectionConfigPanel>
-  <GoalTypeSelector
-    options={[
-      { value: 'fat_loss', label: 'Perte de Graisse', icon: 'flame' },
-      { value: 'muscle_gain', label: 'Gain Musculaire', icon: 'dumbbell' },
-      { value: 'recomposition', label: 'Recomposition', icon: 'balance' },
-      { value: 'maintenance', label: 'Maintien', icon: 'heart' }
-    ]}
-    selected={goalType}
-    onChange={setGoalType}
-  />
-
-  <TargetInputs
-    goalType={goalType}
-    currentWeight={currentWeight}
-    currentBodyFat={currentBodyFat}
-    onTargetChange={handleTargetChange}
-  />
-
-  <TimelineSlider
-    min={4}
-    max={52}
-    value={timelineWeeks}
-    onChange={setTimelineWeeks}
-    label="Durée objectif (semaines)"
-  />
-
-  <GenerateButton
-    onClick={generateProjection}
-    disabled={!isValid}
-    loading={isGenerating}
-  />
-</ProjectionConfigPanel>
-```
-
-#### 3. Visualisation Comparative
-
-Affichage côte-à-côte de l'avatar actuel et projeté:
-
-```tsx
-<ComparisonView>
-  <div className="comparison-container">
-    <div className="current-avatar">
-      <h3>Morphologie Actuelle</h3>
-      <Avatar3DViewer data={currentAvatar} />
-      <MeasurementsSummary data={currentMeasurements} />
-    </div>
-
-    <div className="projection-arrow">
-      <AnimatedArrow />
-      <TimelineBadge weeks={timelineWeeks} />
-    </div>
-
-    <div className="projected-avatar">
-      <h3>Projection {timelineWeeks} Semaines</h3>
-      <Avatar3DViewer data={projectedAvatar} />
-      <MeasurementsSummary data={projectedMeasurements} />
-      <DeltaIndicators deltas={calculatedDeltas} />
-    </div>
-  </div>
-</ComparisonView>
-```
-
-#### 4. Timeline d'Évolution
-
-Graphique interactif montrant progression prévue:
-
-```tsx
-<EvolutionTimeline
-  data={projectionResult.timeline}
-  metrics={['weight_kg', 'body_fat_perc', 'muscle_mass_kg']}
-  onWeekSelect={(week) => {
-    // Affiche snapshot morphologie à cette semaine
-    showMorphologySnapshot(week);
-  }}
-/>
-```
-
-#### 5. Analyse de Faisabilité
-
-Évaluation réalisme de l'objectif:
-
-```typescript
-interface FeasibilityAnalysis {
-  overallScore: number;  // 0-100
-  factors: Array<{
-    name: string;
-    score: number;
-    impact: 'positive' | 'negative' | 'neutral';
-    description: string;
-  }>;
-  warnings: Array<{
-    severity: 'high' | 'medium' | 'low';
-    message: string;
-    recommendation: string;
-  }>;
-  adjustedGoal?: {
-    reason: string;
-    suggested_timeline_weeks: number;
-    suggested_target_weight_kg: number;
-  };
-}
-```
-
-### Optimisations Performance
-
-**Cache Projections:**
-```typescript
-// Clé cache basée sur paramètres projection
-const projectionCacheKey = computeProjectionHash({
-  current_morph3d: currentAvatar.morph3d,
-  goal_type: goalType,
-  target_weight_kg: targetWeight,
-  timeline_weeks: timelineWeeks
-});
-
-// Cache React Query 7 jours
-const { data: projection } = useQuery({
-  queryKey: ['projection', projectionCacheKey],
-  queryFn: () => generateProjection(config),
-  staleTime: 7 * 24 * 60 * 60 * 1000  // 7 jours
-});
-```
-
-**Optimisation 3D:**
-- Réutilisation scène Three.js entre avatars
-- Transition morphologique animée (tweening)
-- Préchargement assets projection pendant config
 
 ---
 
@@ -1300,7 +1097,6 @@ function navigateToTab(tab: string) {
 const tabs = [
   { id: 'scan-cta', label: 'Scan', icon: 'camera' },
   { id: 'avatar', label: 'Avatar', icon: 'user', requiresScan: true },
-  { id: 'projection', label: 'Projection', icon: 'chart-line', requiresScan: true },
   { id: 'insights', label: 'Insights', icon: 'sparkles', requiresScan: true },
   { id: 'history', label: 'Historique', icon: 'clock', requiresScan: true },
   { id: 'face', label: 'Visage', icon: 'face-smile' }

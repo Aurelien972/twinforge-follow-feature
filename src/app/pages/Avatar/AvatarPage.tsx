@@ -8,11 +8,10 @@ import PageHeader from '../../../ui/page/PageHeader';
 import AvatarTab from './tabs/AvatarTab';
 import InsightsTab from './tabs/InsightsTab';
 import HistoryTab from './tabs/HistoryTab';
-import ProjectionTab from './tabs/ProjectionTab';
 import ScanCTA from './tabs/ScanCTA';
 import logger from '../../../lib/utils/logger';
 
-type TabKey = 'scanCta' | 'avatar' | 'projection' | 'insights' | 'history';
+type TabKey = 'scanCta' | 'avatar' | 'insights' | 'history';
 
 /**
  * Récupère le contenu dynamique de l'en-tête en fonction de l'onglet actif.
@@ -35,14 +34,6 @@ function getTabHeaderContent(activeTab: TabKey) {
         subtitle: 'Visualisez et ajustez votre reflet numérique personnalisé',
         circuit: 'avatar' as const,
         color: '#06B6D4',
-      };
-    case 'projection':
-      return {
-        icon: 'TrendingUp' as const,
-        title: 'Projection Corporelle',
-        subtitle: 'Visualisez votre évolution future selon vos habitudes de vie',
-        circuit: 'avatar' as const,
-        color: '#10B981',
       };
     case 'insights':
       return {
@@ -84,7 +75,7 @@ const AvatarPage: React.FC = () => {
 
   const activeTab = React.useMemo<TabKey>(() => {
     const hash = location.hash.replace('#', '');
-    return (['scanCta', 'avatar', 'projection', 'insights', 'history'] as TabKey[]).includes(hash as TabKey)
+    return (['scanCta', 'avatar', 'insights', 'history'] as TabKey[]).includes(hash as TabKey)
       ? (hash as TabKey)
       : 'scanCta';
   }, [location.hash]);
@@ -137,10 +128,6 @@ const AvatarPage: React.FC = () => {
             <span className="tab-text">Avatar</span>
           </Tabs.Trigger>
 
-          <Tabs.Trigger value="projection" icon="TrendingUp" aria-controls="panel-projection">
-            <span className="tab-text">Projection</span>
-          </Tabs.Trigger>
-
           <Tabs.Trigger value="insights" icon="Zap" aria-controls="panel-insights">
             <span className="tab-text">Insights</span>
           </Tabs.Trigger>
@@ -156,10 +143,6 @@ const AvatarPage: React.FC = () => {
 
         <Tabs.Panel id="panel-avatar" value="avatar">
           <AvatarTab />
-        </Tabs.Panel>
-
-        <Tabs.Panel id="panel-projection" value="projection">
-          <ProjectionTab />
         </Tabs.Panel>
 
         <Tabs.Panel id="panel-insights" value="insights">

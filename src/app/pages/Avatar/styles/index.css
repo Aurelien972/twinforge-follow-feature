@@ -35,9 +35,6 @@
 /* Insights Tab - AI-powered analysis display */
 @import './insightsTab.css';
 
-/* Projection Tab - Visualisation de projection morphologique */
-@import './projectionTab.css';
-
 /* =========================================
    AVATAR-SPECIFIC ENHANCEMENTS
    Extensions spécifiques aux onglets Avatar
@@ -76,10 +73,6 @@
   /* Face Scan Primary - Amber/Gold */
   --color-face-scan-primary: #F59E0B;
   --color-face-scan-accent: #FBBF24;
-
-  /* Projection Primary - Cyan */
-  --color-projection-primary: #06B6D4;
-  --color-projection-accent: #22D3EE;
 }
 
 /* =========================================
