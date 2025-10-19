@@ -46,6 +46,11 @@ class OpenAIRealtimeService {
   private localStream: MediaStream | null = null;
   private audioPlaybackStarted = false;
   private audioAutoplayBlocked = false;
+  private sessionConfigured = false;
+  private sessionConfiguredResolve: (() => void) | null = null;
+  private audioInputActive = false;
+  private healthCheckInterval: number | null = null;
+  private lastSpeechDetectedAt: number | null = null;
 
   /**
    * Initialiser la connexion WebRTC à l'API Realtime via l'interface unifiée
@@ -265,6 +270,13 @@ class OpenAIRealtimeService {
       logger.info('REALTIME_WEBRTC', '✅✅✅ SUCCESSFULLY CONNECTED TO REALTIME API VIA WEBRTC ✅✅✅');
       logger.info('REALTIME_WEBRTC', '✅ Data channel is ready for sending messages');
 
+      // Vérifier que l'entrée audio fonctionne correctement
+      logger.info('REALTIME_WEBRTC', '🔍 Verifying audio input configuration...');
+      this.verifyAudioInput();
+
+      // Démarrer le monitoring périodique de la santé de la connexion
+      this.startHealthCheck();
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
@@ -475,7 +487,10 @@ class OpenAIRealtimeService {
           'response.audio_transcript.delta',
           'response.audio_transcript.done',
           'response.done',
-          'error'
+          'error',
+          'input_audio_buffer.speech_started',
+          'input_audio_buffer.speech_stopped',
+          'conversation.item.created'
         ];
 
         if (importantTypes.includes(message.type)) {
@@ -483,6 +498,20 @@ class OpenAIRealtimeService {
             type: message.type,
             hasContent: !!message.delta || !!message.transcript
           });
+        }
+
+        // Traiter la confirmation de configuration de session
+        if (message.type === 'session.updated' && this.sessionConfiguredResolve) {
+          logger.info('REALTIME_WEBRTC', '✅ Session configuration confirmed by server');
+          this.sessionConfigured = true;
+          this.sessionConfiguredResolve();
+          this.sessionConfiguredResolve = null;
+        }
+
+        // Tracker la détection de parole pour monitoring
+        if (message.type === 'input_audio_buffer.speech_started') {
+          this.lastSpeechDetectedAt = Date.now();
+          logger.info('REALTIME_WEBRTC', '🎤 Speech detection active - VAD working correctly');
         }
 
         // Dispatcher aux handlers
@@ -594,10 +623,111 @@ class OpenAIRealtimeService {
 
     this.audioPlaybackStarted = false;
     this.audioAutoplayBlocked = false;
+    this.sessionConfigured = false;
+    this.sessionConfiguredResolve = null;
+    this.audioInputActive = false;
+    this.lastSpeechDetectedAt = null;
+
+    // Arrêter le health check
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = null;
+    }
 
     this.isConnected = false;
 
     logger.info('REALTIME_WEBRTC', 'Cleanup complete');
+  }
+
+  /**
+   * Démarrer le monitoring de santé de la connexion
+   */
+  private startHealthCheck(): void {
+    // Vérifier l'état toutes les 30 secondes
+    this.healthCheckInterval = window.setInterval(() => {
+      const diagnostics = this.getConnectionDiagnostics();
+
+      logger.debug('REALTIME_WEBRTC_HEALTH', '💓 Health check', {
+        ...diagnostics,
+        timeSinceLastSpeech: this.lastSpeechDetectedAt
+          ? Date.now() - this.lastSpeechDetectedAt
+          : null
+      });
+
+      // Alerter si des problèmes sont détectés
+      if (diagnostics.isConnected && !diagnostics.audioInputActive) {
+        logger.warn('REALTIME_WEBRTC_HEALTH', '⚠️ Audio input not active despite connection');
+      }
+
+      if (diagnostics.isConnected && diagnostics.dataChannelState !== 'open') {
+        logger.error('REALTIME_WEBRTC_HEALTH', '❌ Data channel not open - messages cannot be sent');
+      }
+    }, 30000); // Toutes les 30 secondes
+  }
+
+  /**
+   * Vérifier et logger l'état de l'entrée audio
+   */
+  private verifyAudioInput(): void {
+    if (!this.localStream) {
+      logger.warn('REALTIME_WEBRTC_INPUT', '⚠️ No local audio stream');
+      return;
+    }
+
+    const audioTracks = this.localStream.getAudioTracks();
+
+    if (audioTracks.length === 0) {
+      logger.error('REALTIME_WEBRTC_INPUT', '❌ No audio tracks in local stream');
+      return;
+    }
+
+    audioTracks.forEach((track, index) => {
+      logger.info('REALTIME_WEBRTC_INPUT', `🎤 Audio track ${index} status:`, {
+        label: track.label,
+        kind: track.kind,
+        enabled: track.enabled,
+        muted: track.muted,
+        readyState: track.readyState,
+        settings: track.getSettings()
+      });
+
+      // Vérifier si le track est actif
+      if (track.readyState === 'live' && track.enabled && !track.muted) {
+        this.audioInputActive = true;
+        logger.info('REALTIME_WEBRTC_INPUT', '✅ Audio input is active and ready');
+      } else {
+        logger.warn('REALTIME_WEBRTC_INPUT', '⚠️ Audio input may not be working correctly', {
+          readyState: track.readyState,
+          enabled: track.enabled,
+          muted: track.muted
+        });
+      }
+    });
+  }
+
+  /**
+   * Obtenir les diagnostics complets de l'état de connexion
+   */
+  getConnectionDiagnostics(): {
+    isConnected: boolean;
+    sessionConfigured: boolean;
+    audioInputActive: boolean;
+    peerConnectionState: string;
+    iceConnectionState: string;
+    dataChannelState: string;
+    localStreamActive: boolean;
+    audioTracksCount: number;
+  } {
+    return {
+      isConnected: this.isConnected,
+      sessionConfigured: this.sessionConfigured,
+      audioInputActive: this.audioInputActive,
+      peerConnectionState: this.peerConnection?.connectionState || 'none',
+      iceConnectionState: this.peerConnection?.iceConnectionState || 'none',
+      dataChannelState: this.dataChannel?.readyState || 'none',
+      localStreamActive: this.localStream?.active || false,
+      audioTracksCount: this.localStream?.getAudioTracks().length || 0
+    };
   }
 
   /**
@@ -638,7 +768,11 @@ class OpenAIRealtimeService {
    * - La transcription automatique de l'audio
    * - Les réponses automatiques du coach
    */
-  configureSession(systemPrompt: string, mode: ChatMode): void {
+  async configureSession(systemPrompt: string, mode: ChatMode): Promise<void> {
+    if (this.sessionConfigured) {
+      logger.warn('REALTIME_WEBRTC', '⚠️ Session already configured, skipping');
+      return;
+    }
     logger.info('REALTIME_WEBRTC', '⚙️ Configuring session with turn detection and transcription', {
       mode,
       promptLength: systemPrompt.length
@@ -674,7 +808,8 @@ class OpenAIRealtimeService {
           type: 'server_vad',
           threshold: 0.5,          // Sensibilité de détection (0.0 à 1.0)
           prefix_padding_ms: 300,  // Garder 300ms avant la parole détectée
-          silence_duration_ms: 500 // Attendre 500ms de silence avant de considérer la fin
+          silence_duration_ms: 700, // Attendre 700ms de silence avant de considérer la fin (augmenté pour pauses naturelles)
+          create_response: true    // Créer automatiquement une réponse quand l'utilisateur arrête de parler
         },
 
         // Configuration du modèle
@@ -684,6 +819,20 @@ class OpenAIRealtimeService {
     });
 
     logger.info('REALTIME_WEBRTC', '✅ Session configuration sent - VAD and transcription enabled');
+
+    // Attendre la confirmation de configuration avant de continuer
+    return new Promise<void>((resolve) => {
+      this.sessionConfiguredResolve = resolve;
+      // Timeout de sécurité si aucune confirmation
+      setTimeout(() => {
+        if (!this.sessionConfigured && this.sessionConfiguredResolve) {
+          logger.warn('REALTIME_WEBRTC', '⚠️ Session configuration confirmation timeout, continuing anyway');
+          this.sessionConfigured = true;
+          this.sessionConfiguredResolve = null;
+          resolve();
+        }
+      }, 3000);
+    });
   }
 
   /**

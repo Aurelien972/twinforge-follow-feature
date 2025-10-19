@@ -116,8 +116,16 @@ class VoiceCoachOrchestrator {
       // CRITIQUE: Configurer la session pour activer la détection vocale et les réponses
       // Le data channel est maintenant garanti d'être ouvert, donc cette configuration sera envoyée avec succès
       logger.info('VOICE_ORCHESTRATOR', '⚙️ Configuring session with VAD and transcription');
-      openaiRealtimeService.configureSession(modeConfig.systemPrompt, mode as any);
-      logger.info('VOICE_ORCHESTRATOR', '✅ Session configuration sent successfully');
+      await openaiRealtimeService.configureSession(modeConfig.systemPrompt, mode as any);
+      logger.info('VOICE_ORCHESTRATOR', '✅ Session configuration confirmed by server');
+
+      // Logger les diagnostics de connexion
+      const connectionDiagnostics = openaiRealtimeService.getConnectionDiagnostics();
+      logger.info('VOICE_ORCHESTRATOR', '🔍 Connection diagnostics after configuration:', connectionDiagnostics);
+
+      if (!connectionDiagnostics.audioInputActive) {
+        logger.warn('VOICE_ORCHESTRATOR', '⚠️ Audio input may not be active - user speech detection might not work');
+      }
 
       // Démarrer une conversation dans le store
       logger.info('VOICE_ORCHESTRATOR', '💬 Starting conversation in store');
@@ -235,6 +243,19 @@ class VoiceCoachOrchestrator {
     });
 
     switch (message.type) {
+      // Détection du début de parole de l'utilisateur
+      case 'input_audio_buffer.speech_started':
+        logger.info('VOICE_ORCHESTRATOR', '🎤 User started speaking - VAD detected speech');
+        store.setVoiceState('processing');
+        store.setProcessing(true);
+        break;
+
+      // Détection de la fin de parole de l'utilisateur
+      case 'input_audio_buffer.speech_stopped':
+        logger.info('VOICE_ORCHESTRATOR', '🔇 User stopped speaking - VAD detected silence');
+        // L'état sera mis à jour quand la transcription arrive
+        break;
+
       // Transcription de l'utilisateur en cours (delta)
       case 'conversation.item.input_audio_transcription.delta':
         if (message.delta) {
@@ -258,6 +279,15 @@ class VoiceCoachOrchestrator {
           // Réinitialiser la transcription courante
           store.setCurrentTranscription('');
         }
+        break;
+
+      // Item de conversation créé (pour tracker les messages)
+      case 'conversation.item.created':
+        logger.info('VOICE_ORCHESTRATOR', '📋 Conversation item created', {
+          itemId: message.item?.id,
+          itemType: message.item?.type,
+          itemRole: message.item?.role
+        });
         break;
 
       // Début de réponse du coach (audio)
