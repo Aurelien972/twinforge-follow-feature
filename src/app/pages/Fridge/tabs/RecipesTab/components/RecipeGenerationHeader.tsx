@@ -164,8 +164,8 @@ const RecipeGenerationHeader: React.FC<RecipeGenerationHeaderProps> = ({
           className={`btn-glass btn-glass--primary w-full px-8 py-4 text-lg font-bold transition-all duration-200 flex items-center justify-center gap-2 ${!hasValidInventory || isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={hasValidInventory && !isGenerating ? (isPerformanceMode ? {
             background: 'linear-gradient(145deg, color-mix(in srgb, #10B981 80%, #1e293b), color-mix(in srgb, #22C55E 70%, #0f172a))',
-            border: '2px solid color-mix(in srgb, #10B981 60%, transparent)',
-            boxShadow: '0 6px 24px rgba(16, 185, 129, 0.6), 0 4px 16px rgba(0, 0, 0, 0.5)',
+            border: '2.5px solid color-mix(in srgb, #10B981 60%, transparent)',
+            boxShadow: '0 8px 32px rgba(16, 185, 129, 0.8), 0 4px 20px rgba(16, 185, 129, 0.6), 0 0 50px rgba(16, 185, 129, 0.4)',
             color: 'white'
           } : {
             background: `

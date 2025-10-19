@@ -36,25 +36,18 @@ const AVAILABLE_VOICES: Array<{
     sampleText: 'Bonjour, je suis Shimmer. Je suis là pour t\'encourager à chaque étape de ton parcours.'
   },
   {
-    id: 'fable',
-    name: 'Fable',
-    description: 'Voix masculine posée',
-    personality: 'Calme et rassurante',
-    sampleText: 'Bonjour, je suis Fable. Prenons le temps ensemble de progresser à ton rythme.'
+    id: 'cedar',
+    name: 'Cedar',
+    description: 'Voix naturelle et conversationnelle (Nouveau)',
+    personality: 'Authentique et accessible',
+    sampleText: 'Salut, je suis Cedar. Ensemble, on va atteindre tes objectifs de façon naturelle et efficace.'
   },
   {
-    id: 'onyx',
-    name: 'Onyx',
-    description: 'Voix masculine profonde',
-    personality: 'Autoritaire et confiante',
-    sampleText: 'Je suis Onyx. Concentre-toi sur tes objectifs et dépasse tes limites.'
-  },
-  {
-    id: 'nova',
-    name: 'Nova',
-    description: 'Voix féminine énergique',
-    personality: 'Dynamique et inspirante',
-    sampleText: 'Coucou, c\'est Nova ! Tu es prêt à briller aujourd\'hui ? On fonce ensemble !'
+    id: 'marin',
+    name: 'Marin',
+    description: 'Voix professionnelle et claire (Nouveau)',
+    personality: 'Précise et structurée',
+    sampleText: 'Bonjour, je suis Marin. Je te guide avec clarté et professionnalisme dans ton parcours fitness.'
   }
 ];
 

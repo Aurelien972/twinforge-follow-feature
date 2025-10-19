@@ -8,6 +8,20 @@
   animation: step2-pulse 2s ease-in-out infinite;
 }
 
+/* Disable animations in high-performance mode */
+.mode-high-performance .floating-chat-button--step2 {
+  animation: none !important;
+}
+
+.mode-high-performance .floating-chat-button--step2::before {
+  display: none !important;
+}
+
+.mode-high-performance .floating-chat-button--step2 .button-icon {
+  animation: none !important;
+  filter: none !important;
+}
+
 @keyframes step2-pulse {
   0%, 100% {
     transform: scale(1);
@@ -84,6 +98,12 @@
     0 0 20px rgba(239, 68, 68, 0.3);
   z-index: 100;
   pointer-events: none;
+}
+
+/* Simplify notification in high-performance mode */
+.mode-high-performance .floating-chat-button--step2-notification {
+  animation: none !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.6) !important;
 }
 
 @keyframes notification-bounce {

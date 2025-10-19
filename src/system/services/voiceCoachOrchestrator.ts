@@ -105,7 +105,7 @@ class VoiceCoachOrchestrator {
 
       // La configuration est passée directement lors de la connexion (instructions)
       await openaiRealtimeService.connect({
-        model: 'gpt-4o-realtime-preview-2024-12-17', // Updated to latest production model
+        model: 'gpt-realtime-mini', // Updated to cost-efficient realtime model
         voice: 'alloy',
         temperature: 0.8,
         maxTokens: 4096,

@@ -42,9 +42,9 @@ const corsHeaders = {
 
 const OPENAI_REALTIME_API = 'https://api.openai.com/v1/realtime';
 
-// Updated model - using latest stable production model
-const DEFAULT_MODEL = 'gpt-4o-realtime-preview-2024-12-17';
-const FALLBACK_MODEL = 'gpt-4o-mini-realtime-preview-2024-12-17';
+// Updated model - using cost-efficient gpt-realtime-mini
+const DEFAULT_MODEL = 'gpt-realtime-mini';
+const FALLBACK_MODEL = 'gpt-realtime-mini-2025-10-06';
 
 // Structured logging helper with enhanced context
 function log(level: 'info' | 'warn' | 'error', message: string, data?: any) {

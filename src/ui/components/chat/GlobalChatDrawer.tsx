@@ -344,13 +344,15 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
               width: `min(${drawerWidth}px, calc(100vw - 16px))`,
               zIndex: Z_INDEX.CHAT_DRAWER,
               borderRadius: '20px',
-              background: `
-                var(--liquid-reflections-multi),
-                var(--liquid-highlight-ambient),
-                var(--liquid-glass-bg-elevated)
-              `,
-              backdropFilter: 'blur(var(--liquid-panel-blur)) saturate(var(--liquid-panel-saturate))',
-              WebkitBackdropFilter: 'blur(var(--liquid-panel-blur)) saturate(var(--liquid-panel-saturate))',
+              background: mode === 'high-performance'
+                ? 'rgba(11, 14, 23, 0.95)'
+                : `
+                    var(--liquid-reflections-multi),
+                    var(--liquid-highlight-ambient),
+                    var(--liquid-glass-bg-elevated)
+                  `,
+              backdropFilter: mode === 'high-performance' ? 'none' : 'blur(var(--liquid-panel-blur)) saturate(var(--liquid-panel-saturate))',
+              WebkitBackdropFilter: mode === 'high-performance' ? 'none' : 'blur(var(--liquid-panel-blur)) saturate(var(--liquid-panel-saturate))',
               boxShadow: 'var(--liquid-panel-shadow)',
               display: 'flex',
               flexDirection: 'column',
@@ -360,42 +362,46 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
               willChange: 'transform, filter'
             }}
           >
-            {/* Multi-color gradient border */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: '-2px',
-                borderRadius: 'inherit',
-                padding: '2px',
-                background: 'var(--liquid-border-gradient-tricolor)',
-                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                WebkitMaskComposite: 'xor',
-                maskComposite: 'exclude',
-                pointerEvents: 'none',
-                opacity: 1,
-                zIndex: 1,
-                animation: 'borderPulse 4s ease-in-out infinite'
-              }}
-            />
+            {/* Multi-color gradient border - Disabled in high-performance */}
+            {mode !== 'high-performance' && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: '-2px',
+                  borderRadius: 'inherit',
+                  padding: '2px',
+                  background: 'var(--liquid-border-gradient-tricolor)',
+                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
+                  pointerEvents: 'none',
+                  opacity: 1,
+                  zIndex: 1,
+                  animation: 'borderPulse 4s ease-in-out infinite'
+                }}
+              />
+            )}
 
-            {/* Ambient glow layer */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: '-8px',
-                borderRadius: 'calc(20px + 4px)',
-                background: `radial-gradient(
-                  ellipse at 80% 50%,
-                  color-mix(in srgb, ${modeColor} 15%, transparent) 0%,
-                  rgba(61, 19, 179, 0.1) 40%,
-                  transparent 70%
-                )`,
-                opacity: 0.8,
-                zIndex: -1,
-                pointerEvents: 'none',
-                animation: 'glowPulse 3s ease-in-out infinite alternate'
-              }}
-            />
+            {/* Ambient glow layer - Disabled in high-performance */}
+            {mode !== 'high-performance' && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: '-8px',
+                  borderRadius: 'calc(20px + 4px)',
+                  background: `radial-gradient(
+                    ellipse at 80% 50%,
+                    color-mix(in srgb, ${modeColor} 15%, transparent) 0%,
+                    rgba(61, 19, 179, 0.1) 40%,
+                    transparent 70%
+                  )`,
+                  opacity: 0.8,
+                  zIndex: -1,
+                  pointerEvents: 'none',
+                  animation: 'glowPulse 3s ease-in-out infinite alternate'
+                }}
+              />
+            )}
             {/* Header */}
             <div
               className="drawer-header"
@@ -485,6 +491,39 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
                     </motion.button>
                   )}
                 </AnimatePresence>
+
+                {/* Minimize Button - Continue in background */}
+                {voiceState === 'listening' || voiceState === 'speaking' && (
+                  <motion.button
+                    className="minimize-button"
+                    onClick={() => {
+                      logger.info('GLOBAL_CHAT_DRAWER', 'Minimizing chat with active voice session');
+                      navClose();
+                      Haptics.tap();
+                      handleClose();
+                    }}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      background: 'rgba(239, 68, 68, 0.2)',
+                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer'
+                    }}
+                    whileHover={{ scale: 1.05, background: 'rgba(239, 68, 68, 0.3)' }}
+                    whileTap={{ scale: 0.95 }}
+                    title="Continuer en arrière-plan"
+                  >
+                    <SpatialIcon
+                      Icon={ICONS.Minimize2}
+                      size={16}
+                      className="text-red-400"
+                    />
+                  </motion.button>
+                )}
 
                 {/* Close Button */}
                 <motion.button

@@ -12,6 +12,7 @@ import { ICONS } from '../../icons/registry';
 import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
 import { Z_INDEX } from '../../../system/store/overlayStore';
 import { useFeedback } from '../../../hooks/useFeedback';
+import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 import { Haptics } from '../../../utils/haptics';
 import ContextualTooltip from '../ContextualTooltip';
 import ChatNotificationBubble from './ChatNotificationBubble';
@@ -35,13 +36,17 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
     modeConfigs,
     hasUnreadMessages,
     unreadCount,
-    isInStep2
+    isInStep2,
+    voiceState
   } = useUnifiedCoachStore();
 
   const { click } = useFeedback();
+  const { mode: performanceMode } = usePerformanceMode();
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1025 : false);
   const internalButtonRef = useRef<HTMLButtonElement>(null);
   const buttonRef = (ref as React.RefObject<HTMLButtonElement>) || internalButtonRef;
+
+  const isHighPerformance = performanceMode === 'high-performance';
 
   const isStep2Active = isInStep2 || location.pathname.includes('/pipeline/step-2');
 
@@ -76,6 +81,7 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
 
   const modeConfig = modeConfigs[currentMode];
   const modeColor = modeConfig.color;
+  const isVoiceActive = voiceState === 'listening' || voiceState === 'speaking';
 
   const handleClick = () => {
     click();
@@ -112,31 +118,39 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
         isolation: 'isolate',
         width: isDesktop ? '60px' : '56px',
         height: isDesktop ? '60px' : '56px',
-        background: hasUnreadMessages
-          ? `
-              radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 30%, transparent) 0%, transparent 50%),
-              radial-gradient(circle at 70% 70%, rgba(255,255,255,0.25) 0%, transparent 60%),
-              var(--liquid-pill-bg)
-            `
-          : `
-              radial-gradient(circle at 30% 30%, rgba(255,255,255,0.20) 0%, transparent 50%),
-              var(--liquid-pill-bg)
-            `,
+        background: isHighPerformance
+          ? (isVoiceActive && !isOpen
+              ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.4))'
+              : (hasUnreadMessages
+                  ? `linear-gradient(135deg, color-mix(in srgb, ${modeColor} 15%, rgba(11, 14, 23, 0.95)), rgba(11, 14, 23, 0.95))`
+                  : 'rgba(11, 14, 23, 0.95)'))
+          : (hasUnreadMessages
+              ? `
+                  radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 30%, transparent) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 70%, rgba(255,255,255,0.25) 0%, transparent 60%),
+                  var(--liquid-pill-bg)
+                `
+              : `
+                  radial-gradient(circle at 30% 30%, rgba(255,255,255,0.20) 0%, transparent 50%),
+                  var(--liquid-pill-bg)
+                `),
         border: hasUnreadMessages
           ? `1.5px solid color-mix(in srgb, ${modeColor} 40%, transparent)`
           : '1.5px solid rgba(255,255,255,0.22)',
         backdropFilter: 'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
         WebkitBackdropFilter: 'blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate))',
-        boxShadow: hasUnreadMessages
-          ? `
-              var(--liquid-pill-shadow),
-              0 0 40px color-mix(in srgb, ${modeColor} 30%, transparent),
-              0 0 60px color-mix(in srgb, ${modeColor} 15%, transparent)
-            `
-          : `
-              var(--liquid-pill-shadow),
-              0 0 32px color-mix(in srgb, ${modeColor} 15%, transparent)
-            `,
+        boxShadow: isHighPerformance
+          ? '0 2px 8px rgba(0, 0, 0, 0.3)'
+          : (hasUnreadMessages
+              ? `
+                  var(--liquid-pill-shadow),
+                  0 0 40px color-mix(in srgb, ${modeColor} 30%, transparent),
+                  0 0 60px color-mix(in srgb, ${modeColor} 15%, transparent)
+                `
+              : `
+                  var(--liquid-pill-shadow),
+                  0 0 32px color-mix(in srgb, ${modeColor} 15%, transparent)
+                `),
         cursor: 'pointer',
         transition: 'right 400ms cubic-bezier(0.25, 0.1, 0.25, 1), transform var(--liquid-transition-medium), background var(--liquid-transition-fast), box-shadow var(--liquid-transition-fast), border-color var(--liquid-transition-fast)',
         willChange: 'right, transform, filter',
@@ -162,22 +176,24 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
       aria-label={isOpen ? 'Fermer le chat' : 'Ouvrir le chat'}
       aria-expanded={isOpen}
     >
-      {/* Corner highlight effect matching bottom bar pills */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '2px',
-          left: '2px',
-          right: '50%',
-          bottom: '50%',
-          borderRadius: 'inherit',
-          background: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 60%)',
-          opacity: 0.6,
-          pointerEvents: 'none'
-        }}
-      />
+      {/* Corner highlight effect matching bottom bar pills - Disabled in high-performance */}
+      {!isHighPerformance && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '2px',
+            left: '2px',
+            right: '50%',
+            bottom: '50%',
+            borderRadius: 'inherit',
+            background: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 60%)',
+            opacity: 0.6,
+            pointerEvents: 'none'
+          }}
+        />
+      )}
 
-      {/* Icon with mode color */}
+      {/* Icon - Dynamic based on voice state */}
       <motion.div
         animate={{ rotate: isOpen ? 180 : 0 }}
         transition={{ duration: 0.3 }}
@@ -188,16 +204,45 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
           justifyContent: 'center'
         }}
       >
-        <SpatialIcon
-          Icon={ICONS.MessageSquare}
-          size={isDesktop ? 28 : 24}
-          style={{
-            color: modeColor,
-            filter: isStep2Active
-              ? `drop-shadow(0 0 16px rgba(59, 130, 246, 0.8))`
-              : `drop-shadow(0 0 14px color-mix(in srgb, ${modeColor} 60%, transparent))`
-          }}
-        />
+        <AnimatePresence mode="wait">
+          {isVoiceActive && !isOpen ? (
+            <motion.div
+              key="voice-active-icon"
+              initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              exit={{ scale: 0.8, opacity: 0, rotate: 10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <SpatialIcon
+                Icon={ICONS.Radio}
+                size={isDesktop ? 28 : 24}
+                style={{
+                  color: 'rgba(239, 68, 68, 0.95)',
+                  filter: 'drop-shadow(0 0 16px rgba(239, 68, 68, 0.8))'
+                }}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="default-icon"
+              initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              exit={{ scale: 0.8, opacity: 0, rotate: 10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <SpatialIcon
+                Icon={ICONS.MessageSquare}
+                size={isDesktop ? 28 : 24}
+                style={{
+                  color: modeColor,
+                  filter: isStep2Active
+                    ? `drop-shadow(0 0 16px rgba(59, 130, 246, 0.8))`
+                    : `drop-shadow(0 0 14px color-mix(in srgb, ${modeColor} 60%, transparent))`
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       {/* Badge for unread messages - Only shown when NO contextual notification is active */}

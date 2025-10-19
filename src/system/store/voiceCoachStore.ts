@@ -10,7 +10,7 @@ import type { ChatMode } from './globalChatStore';
 
 export type VoiceState = 'idle' | 'ready' | 'connecting' | 'listening' | 'processing' | 'speaking' | 'error';
 export type VoiceMode = 'auto' | 'push-to-talk' | 'continuous';
-export type VoiceType = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+export type VoiceType = 'alloy' | 'echo' | 'shimmer' | 'cedar' | 'marin';
 export type CommunicationMode = 'voice' | 'text';
 
 export interface VoiceMessage {
