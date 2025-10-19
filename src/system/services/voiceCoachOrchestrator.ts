@@ -1,22 +1,17 @@
 /**
- * Voice Coach Orchestrator
- * Service central qui coordonne tous les composants du système vocal
- * Gère la connexion, l'audio, les transcriptions et les réponses
+ * Voice Coach Orchestrator - WebRTC Edition
+ * Service central qui coordonne le système vocal WebRTC
+ * Architecture simplifiée : audio géré automatiquement par WebRTC
+ * Se concentre sur la gestion des événements et des transcriptions
  */
 
 import logger from '../../lib/utils/logger';
 import { useUnifiedCoachStore } from '../store/unifiedCoachStore';
 import type { VoiceState } from '../store/unifiedCoachStore';
 import { openaiRealtimeService } from './openaiRealtimeService';
-import { audioInputService } from './audioInputService';
-import { audioOutputService } from './audioOutputService';
 
 class VoiceCoachOrchestrator {
   private isInitialized = false;
-  private audioBuffer: Float32Array[] = [];
-  private isProcessingAudio = false;
-  private silenceTimer: NodeJS.Timeout | null = null;
-  private silenceDuration = 1500; // ms de silence avant d'envoyer
   private currentCoachMessage = ''; // Accumulation de la transcription du coach
 
   /**
@@ -29,9 +24,9 @@ class VoiceCoachOrchestrator {
     }
 
     try {
-      logger.info('VOICE_ORCHESTRATOR', 'Initializing voice coach orchestrator');
+      logger.info('VOICE_ORCHESTRATOR', 'Initializing voice coach orchestrator (WebRTC mode)');
 
-      // Vérifier la configuration Supabase (nécessaire pour l'edge function)
+      // Vérifier la configuration Supabase
       logger.debug('VOICE_ORCHESTRATOR', 'Checking Supabase configuration');
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -43,21 +38,13 @@ class VoiceCoachOrchestrator {
 
       logger.debug('VOICE_ORCHESTRATOR', 'Supabase configuration OK, setting up handlers');
 
-      // Setup event handlers pour l'API Realtime
+      // Setup event handlers pour l'API Realtime WebRTC
       logger.debug('VOICE_ORCHESTRATOR', 'Setting up Realtime handlers');
       this.setupRealtimeHandlers();
 
-      // Setup event handlers pour l'audio input
-      logger.debug('VOICE_ORCHESTRATOR', 'Setting up audio input handlers');
-      this.setupAudioHandlers();
-
-      // Initialiser le service de sortie audio
-      logger.debug('VOICE_ORCHESTRATOR', 'Initializing audio output service');
-      await audioOutputService.initialize(24000);
-
       this.isInitialized = true;
 
-      logger.info('VOICE_ORCHESTRATOR', 'Voice coach orchestrator initialized successfully');
+      logger.info('VOICE_ORCHESTRATOR', 'Voice coach orchestrator initialized successfully (WebRTC mode)');
     } catch (error) {
       logger.error('VOICE_ORCHESTRATOR', 'Initialization failed', {
         error: error instanceof Error ? error.message : String(error),
@@ -74,7 +61,7 @@ class VoiceCoachOrchestrator {
     const store = useUnifiedCoachStore.getState();
 
     try {
-      logger.info('VOICE_ORCHESTRATOR', '🚀 Starting voice session', { mode });
+      logger.info('VOICE_ORCHESTRATOR', '🚀 Starting voice session (WebRTC)', { mode });
 
       // Vérifier l'état actuel
       if (store.voiceState === 'listening' || store.voiceState === 'speaking') {
@@ -112,54 +99,26 @@ class VoiceCoachOrchestrator {
         throw new Error(`Invalid mode: ${mode}`);
       }
 
-      // Vérifier les permissions micro
-      logger.info('VOICE_ORCHESTRATOR', '🎤 Checking microphone permissions');
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop());
-        logger.info('VOICE_ORCHESTRATOR', '✅ Microphone permission granted');
-      } catch (permError) {
-        logger.error('VOICE_ORCHESTRATOR', '❌ Microphone permission denied', { error: permError });
-        throw new Error('Microphone access required for voice sessions');
-      }
+      // Connexion à l'API Realtime WebRTC via l'interface unifiée
+      // Note: La demande de permissions micro est faite automatiquement par openaiRealtimeService
+      logger.info('VOICE_ORCHESTRATOR', '🌐 Connecting to Realtime API via WebRTC');
 
-      // Initialiser l'audio input si pas déjà fait
-      if (!audioInputService.initialized) {
-        logger.info('VOICE_ORCHESTRATOR', '🔊 Initializing audio input service');
-        await audioInputService.initialize({
-          sampleRate: 24000,
-          channelCount: 1,
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        });
-        logger.info('VOICE_ORCHESTRATOR', '✅ Audio input service initialized');
-      }
-
-      // Connexion à l'API Realtime via notre edge function
-      logger.info('VOICE_ORCHESTRATOR', '🌐 Connecting to Realtime API via edge function');
-
+      // La configuration est passée directement lors de la connexion (instructions)
       await openaiRealtimeService.connect({
         model: 'gpt-4o-realtime-preview-2024-10-01',
         voice: 'alloy',
         temperature: 0.8,
-        maxTokens: 4096
+        maxTokens: 4096,
+        instructions: modeConfig.systemPrompt // Directement dans la config WebRTC
       });
-      logger.info('VOICE_ORCHESTRATOR', '✅ Connected to Realtime API');
-
-      // Configurer la session avec le system prompt
-      logger.info('VOICE_ORCHESTRATOR', '⚙️ Configuring session with system prompt');
-      openaiRealtimeService.configureSession(modeConfig.systemPrompt, mode as any);
-      logger.info('VOICE_ORCHESTRATOR', '✅ Session configured');
+      logger.info('VOICE_ORCHESTRATOR', '✅ Connected to Realtime API via WebRTC');
 
       // Démarrer une conversation dans le store
       logger.info('VOICE_ORCHESTRATOR', '💬 Starting conversation in store');
       store.startConversation(mode as any);
 
-      // Démarrer l'enregistrement audio
-      logger.info('VOICE_ORCHESTRATOR', '🎙️ Starting audio recording');
-      audioInputService.startRecording();
-      logger.info('VOICE_ORCHESTRATOR', '✅ Audio recording started');
+      // Note: Avec WebRTC, l'audio est géré automatiquement via les tracks
+      // Pas besoin de démarrer manuellement l'enregistrement
 
       // Passer en état listening
       logger.info('VOICE_ORCHESTRATOR', '👂 Setting voice state to listening');
@@ -180,7 +139,7 @@ class VoiceCoachOrchestrator {
       if (error instanceof Error) {
         if (error.message.includes('permission')) {
           errorMessage = 'Microphone permission required';
-        } else if (error.message.includes('connect') || error.message.includes('WebSocket')) {
+        } else if (error.message.includes('connect') || error.message.includes('WebRTC')) {
           errorMessage = 'Unable to connect to voice service';
         } else {
           errorMessage = error.message;
@@ -201,24 +160,8 @@ class VoiceCoachOrchestrator {
     try {
       logger.info('VOICE_ORCHESTRATOR', 'Stopping voice session');
 
-      // Arrêter l'enregistrement audio
-      if (audioInputService.recording) {
-        audioInputService.stopRecording();
-      }
-
-      // Envoyer le buffer audio final si nécessaire
-      if (this.audioBuffer.length > 0) {
-        await this.flushAudioBuffer();
-      }
-
-      // Déconnecter de l'API
+      // Déconnecter de l'API (qui nettoiera automatiquement l'audio WebRTC)
       openaiRealtimeService.disconnect();
-
-      // Arrêter la lecture audio
-      audioOutputService.stop();
-
-      // Nettoyer l'audio input
-      audioInputService.cleanup();
 
       // Terminer la conversation
       const store = useUnifiedCoachStore.getState();
@@ -253,7 +196,7 @@ class VoiceCoachOrchestrator {
 
     // Handler pour la connexion
     openaiRealtimeService.onConnect(() => {
-      logger.info('VOICE_ORCHESTRATOR', '✅ Realtime API WebSocket connected successfully');
+      logger.info('VOICE_ORCHESTRATOR', '✅ Realtime API WebRTC connected successfully');
     });
 
     // Handler pour la déconnexion
@@ -262,115 +205,8 @@ class VoiceCoachOrchestrator {
     });
   }
 
-  /**
-   * Setup des handlers pour l'audio input
-   */
-  private setupAudioHandlers(): void {
-    // Handler pour les données audio
-    audioInputService.onAudioData((audioData) => {
-      if (!this.isProcessingAudio) {
-        this.handleAudioData(audioData);
-      }
-    });
-
-    // Handler pour le niveau audio (pour visualisation)
-    audioInputService.onAudioLevel((level) => {
-      const store = useUnifiedCoachStore.getState();
-
-      // Mettre à jour la visualisation
-      store.updateVisualization({
-        volume: level.volume,
-        isSpeaking: level.isSpeaking
-      });
-
-      // Gérer la détection automatique de silence (mode auto)
-      if (level.isSpeaking) {
-          // Réinitialiser le timer de silence
-          if (this.silenceTimer) {
-            clearTimeout(this.silenceTimer);
-            this.silenceTimer = null;
-          }
-      } else if (store.voiceState === 'listening' && this.audioBuffer.length > 0) {
-        // Démarrer le timer de silence si pas déjà actif
-        if (!this.silenceTimer) {
-          this.silenceTimer = setTimeout(() => {
-            this.handleSilenceDetected();
-          }, this.silenceDuration);
-        }
-      }
-    });
-  }
-
-  /**
-   * Traiter les données audio capturées
-   */
-  private handleAudioData(audioData: Float32Array): void {
-    // Ajouter au buffer
-    this.audioBuffer.push(new Float32Array(audioData));
-
-    // Mettre à jour les fréquences pour visualisation
-    const frequencies = audioInputService.getFrequencyData();
-    if (frequencies) {
-      const store = useUnifiedCoachStore.getState();
-      store.updateVisualization({
-        frequencies: Array.from(frequencies.slice(0, 32))
-      });
-    }
-  }
-
-  /**
-   * Silence détecté - envoyer l'audio
-   */
-  private async handleSilenceDetected(): Promise<void> {
-    logger.debug('VOICE_ORCHESTRATOR', 'Silence detected, sending audio');
-
-    this.silenceTimer = null;
-
-    if (this.audioBuffer.length > 0) {
-      await this.flushAudioBuffer();
-    }
-  }
-
-  /**
-   * Envoyer le buffer audio accumulé
-   */
-  private async flushAudioBuffer(): Promise<void> {
-    if (this.audioBuffer.length === 0) return;
-
-    try {
-      this.isProcessingAudio = true;
-
-      // Concaténer tous les chunks
-      const totalLength = this.audioBuffer.reduce((sum, chunk) => sum + chunk.length, 0);
-      const concatenated = new Float32Array(totalLength);
-
-      let offset = 0;
-      for (const chunk of this.audioBuffer) {
-        concatenated.set(chunk, offset);
-        offset += chunk.length;
-      }
-
-      // Convertir en PCM16
-      const pcm16 = this.float32ToPCM16(concatenated);
-
-      // Envoyer à l'API
-      openaiRealtimeService.sendAudio(pcm16.buffer);
-      openaiRealtimeService.commitAudioBuffer();
-
-      // Vider le buffer
-      this.audioBuffer = [];
-
-      // Mettre à jour l'état
-      const store = useUnifiedCoachStore.getState();
-      logger.info('VOICE_ORCHESTRATOR', '🔄 Audio buffer flushed, setting state to processing');
-      store.setVoiceState('processing');
-
-      this.isProcessingAudio = false;
-    } catch (error) {
-      logger.error('VOICE_ORCHESTRATOR', 'Error flushing audio buffer', { error });
-      this.isProcessingAudio = false;
-    }
-  }
+  // Avec WebRTC, plus besoin de gérer manuellement l'audio
+  // Tout est automatique via les tracks WebRTC
 
   /**
    * Traiter les messages de l'API Realtime
@@ -409,18 +245,14 @@ class VoiceCoachOrchestrator {
         }
         break;
 
-      // Début de réponse du coach
+      // Début de réponse du coach (audio)
       case 'response.audio.delta':
-        // Changer l'état en speaking dès le premier chunk audio
+        // Avec WebRTC, l'audio est joué automatiquement
+        // On se contente de mettre à jour l'état
         if (store.voiceState !== 'speaking') {
-          logger.info('VOICE_ORCHESTRATOR', '🔊 Coach audio started, setting state to speaking');
+          logger.info('VOICE_ORCHESTRATOR', '🔊 Coach speaking via WebRTC, setting state to speaking');
           store.setVoiceState('speaking');
           store.setSpeaking(true);
-        }
-
-        // Jouer l'audio reçu
-        if (message.delta) {
-          audioOutputService.addAudioChunk(message.delta);
         }
         break;
 
@@ -491,7 +323,6 @@ class VoiceCoachOrchestrator {
         });
         store.setVoiceState('error');
         store.setError(message.error?.message || 'Unknown error');
-        audioOutputService.stop();
         break;
 
       // Session mise à jour
@@ -512,33 +343,9 @@ class VoiceCoachOrchestrator {
   }
 
   /**
-   * Convertir Float32 en PCM16
-   */
-  private float32ToPCM16(float32Array: Float32Array): Int16Array {
-    const pcm16 = new Int16Array(float32Array.length);
-
-    for (let i = 0; i < float32Array.length; i++) {
-      // Clamper entre -1 et 1
-      const clamped = Math.max(-1, Math.min(1, float32Array[i]));
-      // Convertir en Int16
-      pcm16[i] = clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff;
-    }
-
-    return pcm16;
-  }
-
-  /**
    * Nettoyer l'orchestrateur
    */
   cleanup(): void {
-    if (this.silenceTimer) {
-      clearTimeout(this.silenceTimer);
-      this.silenceTimer = null;
-    }
-
-    audioOutputService.cleanup();
-    this.audioBuffer = [];
-    this.isProcessingAudio = false;
     this.currentCoachMessage = '';
     this.isInitialized = false;
   }

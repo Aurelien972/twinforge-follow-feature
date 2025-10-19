@@ -1,7 +1,15 @@
 /**
- * OpenAI Realtime API Service
- * Service pour gérer la connexion WebSocket avec l'API Realtime d'OpenAI
- * Gère l'audio bidirectionnel, les transcriptions et les réponses vocales
+ * OpenAI Realtime API Service - WebRTC Edition
+ * Service pour gérer la connexion WebRTC avec l'API Realtime d'OpenAI
+ * Utilise l'interface unifiée recommandée par OpenAI pour les navigateurs
+ *
+ * Architecture:
+ * - Le client crée un RTCPeerConnection
+ * - Envoie le SDP offer au backend (/session)
+ * - Le backend retourne le SDP answer d'OpenAI
+ * - Connexion WebRTC peer-to-peer automatique
+ * - Audio géré automatiquement par WebRTC
+ * - Événements via RTCDataChannel
  */
 
 import logger from '../../lib/utils/logger';
@@ -13,6 +21,7 @@ interface RealtimeConfig {
   voice: VoiceType;
   temperature?: number;
   maxTokens?: number;
+  instructions?: string;
 }
 
 interface RealtimeMessage {
@@ -25,32 +34,30 @@ type ErrorHandler = (error: Error) => void;
 type ConnectionHandler = () => void;
 
 class OpenAIRealtimeService {
-  private ws: WebSocket | null = null;
+  private peerConnection: RTCPeerConnection | null = null;
+  private dataChannel: RTCDataChannel | null = null;
   private config: RealtimeConfig | null = null;
   private isConnected = false;
-  private reconnectAttempts = 0;
-  private maxReconnectAttempts = 3;
-  private reconnectDelay = 1000;
   private messageHandlers: Set<MessageHandler> = new Set();
   private errorHandlers: Set<ErrorHandler> = new Set();
   private connectHandlers: Set<ConnectionHandler> = new Set();
   private disconnectHandlers: Set<ConnectionHandler> = new Set();
-  private audioQueue: ArrayBuffer[] = [];
-  private isProcessingQueue = false;
+  private audioElement: HTMLAudioElement | null = null;
+  private localStream: MediaStream | null = null;
 
   /**
-   * Initialiser la connexion à l'API Realtime via notre edge function
+   * Initialiser la connexion WebRTC à l'API Realtime via l'interface unifiée
    */
   async connect(config: RealtimeConfig): Promise<void> {
-    if (this.isConnected && this.ws) {
-      logger.info('REALTIME_API', '✅ Already connected, skipping');
+    if (this.isConnected && this.peerConnection) {
+      logger.info('REALTIME_WEBRTC', '✅ Already connected, skipping');
       return;
     }
 
     this.config = config;
 
     try {
-      logger.info('REALTIME_API', '🚀 STARTING CONNECTION TO REALTIME API via edge function', {
+      logger.info('REALTIME_WEBRTC', '🚀 STARTING WEBRTC CONNECTION TO REALTIME API', {
         model: config.model,
         voice: config.voice,
         temperature: config.temperature,
@@ -58,16 +65,15 @@ class OpenAIRealtimeService {
         timestamp: new Date().toISOString()
       });
 
-      // Récupérer le token Supabase pour l'authentification
+      // Vérifier la configuration Supabase
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-      logger.info('REALTIME_API', '🔍 Environment variables check', {
+      logger.info('REALTIME_WEBRTC', '🔍 Environment variables check', {
         hasSupabaseUrl: !!supabaseUrl,
         supabaseUrlLength: supabaseUrl?.length || 0,
         hasSupabaseAnonKey: !!supabaseAnonKey,
-        supabaseAnonKeyLength: supabaseAnonKey?.length || 0,
-        supabaseUrlPreview: supabaseUrl ? `${supabaseUrl.substring(0, 30)}...` : 'undefined'
+        supabaseAnonKeyLength: supabaseAnonKey?.length || 0
       });
 
       if (!supabaseUrl || !supabaseAnonKey) {
@@ -75,230 +81,410 @@ class OpenAIRealtimeService {
         if (!supabaseUrl) missingVars.push('VITE_SUPABASE_URL');
         if (!supabaseAnonKey) missingVars.push('VITE_SUPABASE_ANON_KEY');
 
-        logger.error('REALTIME_API', '❌ Missing Supabase configuration', {
-          missingVariables: missingVars,
-          allEnvVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_'))
+        logger.error('REALTIME_WEBRTC', '❌ Missing Supabase configuration', {
+          missingVariables: missingVars
         });
         throw new Error(`Supabase configuration missing: ${missingVars.join(', ')}`);
       }
 
-      // URL de notre edge function proxy
-      // Pour les WebSockets, on doit construire l'URL correctement
-      // Format: wss://[project-ref].supabase.co/functions/v1/[function-name]
-      // Important: Supabase nécessite l'apikey dans l'URL pour les WebSockets
-      const wsUrl = supabaseUrl
-        .replace('https://', 'wss://')
-        .replace('/rest/v1', '') // Retirer le path REST si présent
-        + `/functions/v1/voice-coach-realtime?model=${encodeURIComponent(config.model)}&apikey=${supabaseAnonKey}`;
-
-      logger.info('REALTIME_API', '🌐 WebSocket URL constructed', {
-        originalUrl: supabaseUrl,
-        wsUrl: wsUrl.replace(supabaseAnonKey, '[REDACTED]'),
-        model: config.model,
-        wsUrlStructure: {
-          protocol: wsUrl.split('://')[0],
-          host: wsUrl.split('://')[1]?.split('/')[0],
-          path: wsUrl.split('://')[1]?.split('?')[0].substring(wsUrl.split('://')[1]?.split('/')[0].length || 0),
-          hasApikey: wsUrl.includes('apikey='),
-          hasModel: wsUrl.includes('model=')
-        }
-      });
-
-      // Test WebSocket availability
-      if (typeof WebSocket === 'undefined') {
-        logger.error('REALTIME_API', '❌ WebSocket not available in this environment');
-        throw new Error('WebSocket API is not available in this browser/environment');
+      // Vérifier le support WebRTC
+      if (typeof RTCPeerConnection === 'undefined') {
+        logger.error('REALTIME_WEBRTC', '❌ WebRTC not available in this environment');
+        throw new Error('WebRTC API is not available in this browser/environment');
       }
 
-      logger.info('REALTIME_API', '✅ WebSocket API is available');
+      logger.info('REALTIME_WEBRTC', '✅ WebRTC API is available');
 
-      // Créer la connexion WebSocket via notre edge function
-      logger.info('REALTIME_API', '🔌 Creating WebSocket connection to edge function...');
-      this.ws = new WebSocket(wsUrl);
-      logger.info('REALTIME_API', '✅ WebSocket object created', {
-        readyState: this.ws.readyState,
-        readyStateName: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][this.ws.readyState]
+      // Créer le RTCPeerConnection
+      logger.info('REALTIME_WEBRTC', '🔌 Creating RTCPeerConnection...');
+      this.peerConnection = new RTCPeerConnection();
+
+      logger.info('REALTIME_WEBRTC', '✅ RTCPeerConnection created', {
+        connectionState: this.peerConnection.connectionState,
+        iceConnectionState: this.peerConnection.iceConnectionState
       });
 
-      // Note: WebSocket ne supporte pas les headers custom dans le constructeur
-      // L'authentification Supabase se fait via le paramètre apikey dans l'URL
+      // Configurer l'élément audio pour la lecture
+      this.audioElement = document.createElement('audio');
+      this.audioElement.autoplay = true;
+      logger.info('REALTIME_WEBRTC', '🔊 Audio element created and configured');
 
-      this.ws.binaryType = 'arraybuffer';
-      logger.info('REALTIME_API', '⏳ WebSocket instance created, setting up event handlers...');
-
-      this.ws.onopen = () => {
-        logger.info('REALTIME_API', '📡 WebSocket.onopen triggered');
-        this.handleOpen();
-      };
-      this.ws.onmessage = (event) => {
-        logger.debug('REALTIME_API', '📨 WebSocket.onmessage triggered');
-        this.handleMessage(event);
-      };
-      this.ws.onerror = (event) => {
-        logger.error('REALTIME_API', '❌ WebSocket.onerror triggered', { event });
-        this.handleError(event);
-      };
-      this.ws.onclose = (event) => {
-        logger.info('REALTIME_API', '🔌 WebSocket.onclose triggered', {
-          code: event.code,
-          reason: event.reason,
-          wasClean: event.wasClean
+      // Gérer les tracks audio entrants (de l'API OpenAI)
+      this.peerConnection.ontrack = (event) => {
+        logger.info('REALTIME_WEBRTC', '📥 Received remote audio track', {
+          streamId: event.streams[0]?.id,
+          trackKind: event.track.kind,
+          trackId: event.track.id
         });
-        this.handleClose(event);
+
+        if (this.audioElement && event.streams[0]) {
+          this.audioElement.srcObject = event.streams[0];
+          logger.info('REALTIME_WEBRTC', '✅ Audio stream connected to audio element');
+        }
       };
 
-      logger.info('REALTIME_API', '✅ Event handlers attached, waiting for connection...');
-
-      // Attendre la connexion
-      logger.info('REALTIME_API', '⏳ Waiting for WebSocket connection (timeout: 15s)...');
-      await new Promise<void>((resolve, reject) => {
-        const startTime = Date.now();
-        let timeoutHandle: NodeJS.Timeout | null = null;
-        let errorOccurred = false;
-
-        const cleanup = () => {
-          if (timeoutHandle) {
-            clearTimeout(timeoutHandle);
-            timeoutHandle = null;
-          }
-        };
-
-        const onConnect = () => {
-          if (errorOccurred) return;
-
-          const duration = Date.now() - startTime;
-          logger.info('REALTIME_API', '✅ Connection promise resolved', {
-            durationMs: duration,
-            timestamp: new Date().toISOString()
-          });
-          cleanup();
-          this.connectHandlers.delete(onConnect);
-          this.errorHandlers.delete(onError);
-          resolve();
-        };
-
-        const onError = (error: Error) => {
-          if (errorOccurred) return;
-          errorOccurred = true;
-
-          const duration = Date.now() - startTime;
-          logger.error('REALTIME_API', '❌ Connection error during wait', {
-            error: error.message,
-            durationMs: duration,
-            wsState: this.ws?.readyState
-          });
-          cleanup();
-          this.connectHandlers.delete(onConnect);
-          this.errorHandlers.delete(onError);
-          reject(error);
-        };
-
-        timeoutHandle = setTimeout(() => {
-          if (errorOccurred) return;
-          errorOccurred = true;
-
-          const duration = Date.now() - startTime;
-          logger.error('REALTIME_API', '❌ CONNECTION TIMEOUT after 15 seconds', {
-            durationMs: duration,
-            wsState: this.ws?.readyState,
-            wsStateName: this.ws?.readyState !== undefined
-              ? ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][this.ws.readyState]
-              : 'NO_WS',
-            timestamp: new Date().toISOString()
-          });
-
-          this.connectHandlers.delete(onConnect);
-          this.errorHandlers.delete(onError);
-
-          // Close the WebSocket if it's still trying to connect
-          if (this.ws && this.ws.readyState === WebSocket.CONNECTING) {
-            logger.warn('REALTIME_API', 'Closing stuck WebSocket connection');
-            this.ws.close();
-          }
-
-          reject(new Error('Connection timeout - WebSocket did not open within 15 seconds. Please check your network connection and try again.'));
-        }, 15000);
-
-        this.connectHandlers.add(onConnect);
-        this.errorHandlers.add(onError);
-        logger.info('REALTIME_API', '👂 Listening for connection and error events...', {
-          handlerCounts: {
-            connect: this.connectHandlers.size,
-            error: this.errorHandlers.size
+      // Obtenir le flux audio local (microphone)
+      logger.info('REALTIME_WEBRTC', '🎤 Requesting microphone access...');
+      try {
+        this.localStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            sampleRate: 24000,
+            channelCount: 1
           }
         });
+
+        logger.info('REALTIME_WEBRTC', '✅ Microphone access granted', {
+          trackCount: this.localStream.getTracks().length,
+          tracks: this.localStream.getTracks().map(t => ({
+            kind: t.kind,
+            label: t.label,
+            enabled: t.enabled
+          }))
+        });
+
+        // Ajouter le track audio local au peer connection
+        this.localStream.getTracks().forEach(track => {
+          if (this.peerConnection && this.localStream) {
+            this.peerConnection.addTrack(track, this.localStream);
+            logger.info('REALTIME_WEBRTC', '✅ Local audio track added to peer connection', {
+              trackKind: track.kind,
+              trackId: track.id
+            });
+          }
+        });
+      } catch (micError) {
+        logger.error('REALTIME_WEBRTC', '❌ Failed to get microphone access', {
+          error: micError instanceof Error ? micError.message : String(micError)
+        });
+        throw new Error('Microphone access required for voice sessions');
+      }
+
+      // Créer le data channel pour les événements
+      logger.info('REALTIME_WEBRTC', '📡 Creating data channel for events...');
+      this.dataChannel = this.peerConnection.createDataChannel('oai-events');
+
+      this.setupDataChannelHandlers();
+
+      // Gérer les événements de connexion
+      this.setupConnectionHandlers();
+
+      // Créer l'offer SDP
+      logger.info('REALTIME_WEBRTC', '📝 Creating SDP offer...');
+      const offer = await this.peerConnection.createOffer();
+      await this.peerConnection.setLocalDescription(offer);
+
+      logger.info('REALTIME_WEBRTC', '✅ SDP offer created and set as local description', {
+        sdpType: offer.type,
+        sdpLength: offer.sdp?.length || 0
       });
 
-      logger.info('REALTIME_API', '✅✅✅ SUCCESSFULLY CONNECTED TO REALTIME API ✅✅✅');
+      // Envoyer le SDP offer au backend pour obtenir le SDP answer d'OpenAI
+      const sessionUrl = `${supabaseUrl}/functions/v1/voice-coach-realtime/session`;
+
+      logger.info('REALTIME_WEBRTC', '🌐 Sending SDP offer to backend', {
+        url: sessionUrl
+      });
+
+      const response = await fetch(sessionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'apikey': supabaseAnonKey
+        },
+        body: JSON.stringify({
+          sdp: offer.sdp,
+          model: config.model,
+          voice: config.voice,
+          instructions: config.instructions
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        logger.error('REALTIME_WEBRTC', '❌ Backend returned error', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText
+        });
+        throw new Error(`Failed to create session: ${response.status} - ${errorText}`);
+      }
+
+      // Récupérer le SDP answer
+      const sdpAnswer = await response.text();
+      logger.info('REALTIME_WEBRTC', '✅ Received SDP answer from backend', {
+        sdpAnswerLength: sdpAnswer.length
+      });
+
+      // Définir le SDP answer comme remote description
+      const answer: RTCSessionDescriptionInit = {
+        type: 'answer',
+        sdp: sdpAnswer
+      };
+
+      await this.peerConnection.setRemoteDescription(answer);
+      logger.info('REALTIME_WEBRTC', '✅ SDP answer set as remote description');
+
+      // Attendre que la connexion soit établie
+      logger.info('REALTIME_WEBRTC', '⏳ Waiting for connection to establish...');
+      await this.waitForConnection();
+
+      logger.info('REALTIME_WEBRTC', '✅✅✅ SUCCESSFULLY CONNECTED TO REALTIME API VIA WEBRTC ✅✅✅');
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      logger.error('REALTIME_API', '❌❌❌ CONNECTION FAILED ❌❌❌', {
+      logger.error('REALTIME_WEBRTC', '❌❌❌ CONNECTION FAILED ❌❌❌', {
         errorMessage,
         errorStack,
-        wsState: this.ws?.readyState,
-        isConnected: this.isConnected
+        connectionState: this.peerConnection?.connectionState,
+        iceConnectionState: this.peerConnection?.iceConnectionState
       });
 
-      // Détecter si on est dans StackBlitz (WebContainer)
-      const isStackBlitz = window.location.hostname.includes('stackblitz') ||
-                          window.location.hostname.includes('webcontainer');
+      // Nettoyer en cas d'erreur
+      this.cleanup();
 
-      if (isStackBlitz) {
-        const stackBlitzError = new Error(
-          '🚫 La fonctionnalité vocale n\'est pas disponible dans l\'environnement de développement StackBlitz.\n\n' +
-          'Raison : Les WebSockets externes ne sont pas supportés dans WebContainer.\n\n' +
-          '💡 Solutions :\n' +
-          '• Utilisez le chat texte à la place\n' +
-          '• Déployez l\'application en production pour accéder au chat vocal'
-        );
-        logger.error('REALTIME_API', 'StackBlitz WebSocket limitation', {
-          message: 'WebSockets are not supported in StackBlitz WebContainer environment',
-          suggestion: 'Use text chat or deploy to production'
-        });
-        throw stackBlitzError;
-      }
-
-      logger.error('REALTIME_API', 'Connection failed', { error: errorMessage });
       throw error;
     }
+  }
+
+  /**
+   * Attendre que la connexion WebRTC soit établie
+   */
+  private async waitForConnection(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const startTime = Date.now();
+      const timeout = 15000; // 15 secondes
+
+      const checkConnection = () => {
+        if (!this.peerConnection) {
+          reject(new Error('Peer connection lost'));
+          return;
+        }
+
+        const state = this.peerConnection.connectionState;
+        const iceState = this.peerConnection.iceConnectionState;
+
+        logger.debug('REALTIME_WEBRTC', 'Checking connection state', {
+          connectionState: state,
+          iceConnectionState: iceState,
+          elapsed: Date.now() - startTime
+        });
+
+        if (state === 'connected' || iceState === 'connected' || iceState === 'completed') {
+          logger.info('REALTIME_WEBRTC', '✅ Connection established', {
+            connectionState: state,
+            iceConnectionState: iceState,
+            duration: Date.now() - startTime
+          });
+          this.isConnected = true;
+          this.connectHandlers.forEach(handler => {
+            try {
+              handler();
+            } catch (error) {
+              logger.error('REALTIME_WEBRTC', 'Error in connection handler', { error });
+            }
+          });
+          resolve();
+          return;
+        }
+
+        if (state === 'failed' || iceState === 'failed') {
+          logger.error('REALTIME_WEBRTC', '❌ Connection failed', {
+            connectionState: state,
+            iceConnectionState: iceState
+          });
+          reject(new Error('WebRTC connection failed'));
+          return;
+        }
+
+        if (Date.now() - startTime > timeout) {
+          logger.error('REALTIME_WEBRTC', '❌ Connection timeout', {
+            connectionState: state,
+            iceConnectionState: iceState,
+            duration: Date.now() - startTime
+          });
+          reject(new Error('Connection timeout'));
+          return;
+        }
+
+        // Réessayer après un court délai
+        setTimeout(checkConnection, 100);
+      };
+
+      checkConnection();
+    });
+  }
+
+  /**
+   * Configurer les handlers du data channel
+   */
+  private setupDataChannelHandlers(): void {
+    if (!this.dataChannel) return;
+
+    this.dataChannel.onopen = () => {
+      logger.info('REALTIME_WEBRTC', '✅ Data channel opened');
+    };
+
+    this.dataChannel.onclose = () => {
+      logger.info('REALTIME_WEBRTC', '🔌 Data channel closed');
+    };
+
+    this.dataChannel.onerror = (error) => {
+      logger.error('REALTIME_WEBRTC', '❌ Data channel error', { error });
+    };
+
+    this.dataChannel.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data) as RealtimeMessage;
+
+        // Log des types de messages importants
+        const importantTypes = [
+          'session.updated',
+          'conversation.item.input_audio_transcription.delta',
+          'conversation.item.input_audio_transcription.completed',
+          'response.audio_transcript.delta',
+          'response.audio_transcript.done',
+          'response.done',
+          'error'
+        ];
+
+        if (importantTypes.includes(message.type)) {
+          logger.info('REALTIME_WEBRTC', `📨 Important message: ${message.type}`, {
+            type: message.type,
+            hasContent: !!message.delta || !!message.transcript
+          });
+        }
+
+        // Dispatcher aux handlers
+        this.messageHandlers.forEach(handler => {
+          try {
+            handler(message);
+          } catch (error) {
+            logger.error('REALTIME_WEBRTC', 'Error in message handler', {
+              error: error instanceof Error ? error.message : String(error),
+              messageType: message.type
+            });
+          }
+        });
+      } catch (error) {
+        logger.error('REALTIME_WEBRTC', 'Error parsing data channel message', {
+          error: error instanceof Error ? error.message : String(error),
+          data: event.data
+        });
+      }
+    };
+  }
+
+  /**
+   * Configurer les handlers de connexion
+   */
+  private setupConnectionHandlers(): void {
+    if (!this.peerConnection) return;
+
+    this.peerConnection.onconnectionstatechange = () => {
+      const state = this.peerConnection?.connectionState;
+      logger.info('REALTIME_WEBRTC', `Connection state changed: ${state}`);
+
+      if (state === 'failed' || state === 'closed' || state === 'disconnected') {
+        this.isConnected = false;
+        this.disconnectHandlers.forEach(handler => {
+          try {
+            handler();
+          } catch (error) {
+            logger.error('REALTIME_WEBRTC', 'Error in disconnect handler', { error });
+          }
+        });
+
+        if (state === 'failed') {
+          const error = new Error('WebRTC connection failed');
+          this.errorHandlers.forEach(handler => {
+            try {
+              handler(error);
+            } catch (handlerError) {
+              logger.error('REALTIME_WEBRTC', 'Error in error handler', { handlerError });
+            }
+          });
+        }
+      }
+    };
+
+    this.peerConnection.oniceconnectionstatechange = () => {
+      const state = this.peerConnection?.iceConnectionState;
+      logger.info('REALTIME_WEBRTC', `ICE connection state changed: ${state}`);
+    };
+
+    this.peerConnection.onicegatheringstatechange = () => {
+      const state = this.peerConnection?.iceGatheringState;
+      logger.debug('REALTIME_WEBRTC', `ICE gathering state changed: ${state}`);
+    };
   }
 
   /**
    * Déconnecter de l'API
    */
   disconnect(): void {
-    if (this.ws) {
-      logger.info('REALTIME_API', 'Disconnecting');
-      this.ws.close(1000, 'Client disconnect');
-      this.ws = null;
-      this.isConnected = false;
-    }
+    logger.info('REALTIME_WEBRTC', 'Disconnecting...');
+    this.cleanup();
   }
 
   /**
-   * Envoyer un message à l'API
+   * Nettoyer toutes les ressources
+   */
+  private cleanup(): void {
+    // Fermer le data channel
+    if (this.dataChannel) {
+      this.dataChannel.close();
+      this.dataChannel = null;
+    }
+
+    // Fermer la peer connection
+    if (this.peerConnection) {
+      this.peerConnection.close();
+      this.peerConnection = null;
+    }
+
+    // Arrêter les tracks du stream local
+    if (this.localStream) {
+      this.localStream.getTracks().forEach(track => track.stop());
+      this.localStream = null;
+    }
+
+    // Nettoyer l'élément audio
+    if (this.audioElement) {
+      this.audioElement.srcObject = null;
+      this.audioElement = null;
+    }
+
+    this.isConnected = false;
+
+    logger.info('REALTIME_WEBRTC', 'Cleanup complete');
+  }
+
+  /**
+   * Envoyer un message via le data channel
    */
   private sendMessage(message: RealtimeMessage): void {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      logger.error('REALTIME_API', '❌ Cannot send message: not connected', {
-        hasWs: !!this.ws,
-        readyState: this.ws?.readyState,
+    if (!this.dataChannel || this.dataChannel.readyState !== 'open') {
+      logger.error('REALTIME_WEBRTC', '❌ Cannot send message: data channel not open', {
+        hasDataChannel: !!this.dataChannel,
+        readyState: this.dataChannel?.readyState,
         messageType: message.type
       });
       return;
     }
 
     try {
-      this.ws.send(JSON.stringify(message));
-      logger.info('REALTIME_API', '📤 Message sent to server', {
-        type: message.type,
-        keys: Object.keys(message)
+      this.dataChannel.send(JSON.stringify(message));
+      logger.debug('REALTIME_WEBRTC', '📤 Message sent', {
+        type: message.type
       });
     } catch (error) {
-      logger.error('REALTIME_API', '❌ Error sending message', {
+      logger.error('REALTIME_WEBRTC', '❌ Error sending message', {
         error: error instanceof Error ? error.message : String(error),
         messageType: message.type
       });
@@ -306,100 +492,34 @@ class OpenAIRealtimeService {
   }
 
   /**
-   * Configurer la session avec le système prompt
+   * Configurer la session (pas nécessaire avec WebRTC, tout est dans le SDP)
+   * Gardé pour compatibilité mais ne fait rien
    */
   configureSession(systemPrompt: string, mode: ChatMode): void {
-    logger.info('REALTIME_API', '⚙️ Configuring session...', {
+    logger.info('REALTIME_WEBRTC', '⚙️ Session configuration handled by backend during connection', {
       mode,
-      voice: this.config?.voice || 'alloy',
-      systemPromptLength: systemPrompt.length
+      promptLength: systemPrompt.length
     });
-
-    this.sendMessage({
-      type: 'session.update',
-      session: {
-        modalities: ['text', 'audio'],
-        instructions: systemPrompt,
-        voice: this.config?.voice || 'alloy',
-        input_audio_format: 'pcm16',
-        output_audio_format: 'pcm16',
-        input_audio_transcription: {
-          model: 'whisper-1'
-        },
-        turn_detection: {
-          type: 'server_vad',
-          threshold: 0.5,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 500
-        },
-        temperature: this.config?.temperature || 0.8,
-        max_response_output_tokens: this.config?.maxTokens || 4096
-      }
-    });
-
-    logger.info('REALTIME_API', '✅ Session configuration sent to server', { mode });
+    // Avec WebRTC + interface unifiée, la config est faite lors du POST /session
+    // Pas besoin d'envoyer session.update
   }
 
   /**
-   * Envoyer de l'audio à l'API pour transcription et traitement
+   * Envoyer de l'audio (pas nécessaire avec WebRTC, géré automatiquement)
+   * Gardé pour compatibilité mais ne fait rien
    */
   sendAudio(audioData: ArrayBuffer): void {
-    if (!this.isConnected) {
-      logger.warn('REALTIME_API', '⚠️ Cannot send audio: not connected');
-      return;
-    }
-
-    logger.debug('REALTIME_API', '🎙️ Audio data added to queue', {
-      bytesLength: audioData.byteLength,
-      queueLength: this.audioQueue.length + 1
-    });
-
-    this.audioQueue.push(audioData);
-    this.processAudioQueue();
+    logger.debug('REALTIME_WEBRTC', 'Audio is handled automatically by WebRTC, ignoring manual send');
+    // WebRTC gère l'audio automatiquement via les tracks
   }
 
   /**
-   * Traiter la file d'attente audio
-   */
-  private async processAudioQueue(): Promise<void> {
-    if (this.isProcessingQueue || this.audioQueue.length === 0) {
-      return;
-    }
-
-    this.isProcessingQueue = true;
-
-    while (this.audioQueue.length > 0) {
-      const audioData = this.audioQueue.shift();
-      if (audioData) {
-        await this.sendAudioChunk(audioData);
-      }
-    }
-
-    this.isProcessingQueue = false;
-  }
-
-  /**
-   * Envoyer un chunk audio
-   */
-  private async sendAudioChunk(audioData: ArrayBuffer): Promise<void> {
-    // Convertir en base64
-    const base64Audio = this.arrayBufferToBase64(audioData);
-
-    this.sendMessage({
-      type: 'input_audio_buffer.append',
-      audio: base64Audio
-    });
-  }
-
-  /**
-   * Valider l'input audio buffer pour traitement
+   * Valider l'audio buffer (pas nécessaire avec WebRTC)
+   * Gardé pour compatibilité mais ne fait rien
    */
   commitAudioBuffer(): void {
-    logger.info('REALTIME_API', '✅ Committing audio buffer for processing');
-    this.sendMessage({
-      type: 'input_audio_buffer.commit'
-    });
-    logger.info('REALTIME_API', '🚀 Audio buffer commit sent to server');
+    logger.debug('REALTIME_WEBRTC', 'Audio buffer commit not needed with WebRTC');
+    // WebRTC gère tout automatiquement
   }
 
   /**
@@ -409,8 +529,7 @@ class OpenAIRealtimeService {
     this.sendMessage({
       type: 'response.cancel'
     });
-
-    logger.debug('REALTIME_API', 'Response cancelled');
+    logger.debug('REALTIME_WEBRTC', 'Response cancellation requested');
   }
 
   /**
@@ -436,205 +555,7 @@ class OpenAIRealtimeService {
       type: 'response.create'
     });
 
-    logger.debug('REALTIME_API', 'Text message sent', { text });
-  }
-
-  /**
-   * Handlers d'événements
-   */
-  private handleOpen(): void {
-    logger.info('REALTIME_API', '✅✅✅ WebSocket OPEN event - Connection established ✅✅✅');
-    this.isConnected = true;
-    this.reconnectAttempts = 0;
-
-    logger.info('REALTIME_API', '📢 Notifying connection handlers', {
-      handlerCount: this.connectHandlers.size
-    });
-    this.connectHandlers.forEach(handler => {
-      try {
-        handler();
-        logger.debug('REALTIME_API', '✅ Connection handler executed');
-      } catch (error) {
-        logger.error('REALTIME_API', '❌ Error in connection handler', { error });
-      }
-    });
-  }
-
-  private handleMessage(event: MessageEvent): void {
-    try {
-      const message = JSON.parse(event.data) as RealtimeMessage;
-
-      // Log détaillé pour les types importants
-      const importantTypes = [
-        'session.updated',
-        'conversation.item.input_audio_transcription.delta',
-        'conversation.item.input_audio_transcription.completed',
-        'response.audio.delta',
-        'response.audio_transcript.delta',
-        'response.done',
-        'error'
-      ];
-
-      if (importantTypes.includes(message.type)) {
-        logger.info('REALTIME_API', `📨 Important message received: ${message.type}`, {
-          type: message.type,
-          hasContent: !!message.delta || !!message.transcript || !!message.audio
-        });
-      } else {
-        logger.debug('REALTIME_API', '📨 Message received', { type: message.type });
-      }
-
-      // Dispatcher le message à tous les handlers
-      logger.debug('REALTIME_API', '📢 Dispatching to handlers', {
-        handlerCount: this.messageHandlers.size,
-        messageType: message.type
-      });
-      this.messageHandlers.forEach(handler => {
-        try {
-          handler(message);
-        } catch (error) {
-          logger.error('REALTIME_API', '❌ Error in message handler', {
-            error: error instanceof Error ? error.message : String(error),
-            messageType: message.type
-          });
-        }
-      });
-
-    } catch (error) {
-      logger.error('REALTIME_API', '❌ Error parsing message', {
-        error: error instanceof Error ? error.message : String(error),
-        data: typeof event.data === 'string' ? event.data.substring(0, 200) : 'binary data'
-      });
-    }
-  }
-
-  private handleError(event: Event): void {
-    // Essayer d'extraire plus d'informations sur l'erreur
-    const ws = event.target as WebSocket;
-    const errorDetails: any = {
-      type: event.type,
-      timestamp: new Date().toISOString(),
-      target: ws ? {
-        readyState: ws.readyState,
-        readyStateName: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][ws.readyState],
-        url: ws.url?.replace(this.config?.voice || '', '[REDACTED]'),
-        protocol: ws.protocol,
-        extensions: ws.extensions
-      } : null,
-      // Additional diagnostic info
-      browser: navigator.userAgent,
-      online: navigator.onLine,
-      config: this.config ? {
-        model: this.config.model,
-        voice: this.config.voice
-      } : null
-    };
-
-    // Enhanced error message with troubleshooting hints
-    let errorMessage = 'WebSocket connection failed. ';
-
-    if (!navigator.onLine) {
-      errorMessage += 'No internet connection detected.';
-    } else if (ws?.url?.includes('supabase.co')) {
-      errorMessage += 'Unable to connect to Supabase Edge Function. Please verify:\n' +
-                     '1. The edge function is deployed\n' +
-                     '2. OPENAI_API_KEY is configured in Supabase secrets\n' +
-                     '3. Your network allows WebSocket connections';
-    } else {
-      errorMessage += 'Please check your network connection and try again.';
-    }
-
-    const error = new Error(errorMessage);
-    logger.error('REALTIME_API', '❌❌❌ WebSocket ERROR event ❌❌❌', errorDetails);
-
-    logger.info('REALTIME_API', '📢 Notifying error handlers', {
-      handlerCount: this.errorHandlers.size
-    });
-    this.errorHandlers.forEach(handler => {
-      try {
-        handler(error);
-      } catch (handlerError) {
-        logger.error('REALTIME_API', '❌ Error in error handler', { handlerError });
-      }
-    });
-  }
-
-  private handleClose(event: CloseEvent): void {
-    logger.info('REALTIME_API', '🔌🔌🔌 WebSocket CLOSED 🔌🔌🔌', {
-      code: event.code,
-      reason: event.reason || 'No reason provided',
-      wasClean: event.wasClean,
-      closeCodeMeaning: this.getCloseCodeMeaning(event.code)
-    });
-
-    this.isConnected = false;
-    this.ws = null;
-
-    logger.info('REALTIME_API', '📢 Notifying disconnect handlers', {
-      handlerCount: this.disconnectHandlers.size
-    });
-    this.disconnectHandlers.forEach(handler => {
-      try {
-        handler();
-      } catch (error) {
-        logger.error('REALTIME_API', '❌ Error in disconnect handler', { error });
-      }
-    });
-
-    // Tentative de reconnexion si ce n'était pas une fermeture propre
-    if (!event.wasClean && this.reconnectAttempts < this.maxReconnectAttempts) {
-      logger.info('REALTIME_API', '🔄 Will attempt reconnection (unclean close)');
-      this.attemptReconnect();
-    } else if (event.wasClean) {
-      logger.info('REALTIME_API', '✅ Clean close, no reconnection needed');
-    } else {
-      logger.warn('REALTIME_API', '⚠️ Max reconnection attempts reached, giving up');
-    }
-  }
-
-  /**
-   * Obtenir la signification d'un code de fermeture WebSocket
-   */
-  private getCloseCodeMeaning(code: number): string {
-    const meanings: Record<number, string> = {
-      1000: 'Normal Closure',
-      1001: 'Going Away',
-      1002: 'Protocol Error',
-      1003: 'Unsupported Data',
-      1005: 'No Status Received',
-      1006: 'Abnormal Closure',
-      1007: 'Invalid Frame Payload Data',
-      1008: 'Policy Violation',
-      1009: 'Message Too Big',
-      1010: 'Mandatory Extension',
-      1011: 'Internal Server Error',
-      1015: 'TLS Handshake'
-    };
-    return meanings[code] || `Unknown (${code})`;
-  }
-
-  /**
-   * Tentative de reconnexion
-   */
-  private async attemptReconnect(): Promise<void> {
-    this.reconnectAttempts++;
-
-    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-
-    logger.info('REALTIME_API', 'Attempting reconnection', {
-      attempt: this.reconnectAttempts,
-      delay
-    });
-
-    await new Promise(resolve => setTimeout(resolve, delay));
-
-    if (this.config) {
-      try {
-        await this.connect(this.config);
-      } catch (error) {
-        logger.error('REALTIME_API', 'Reconnection failed', { error });
-      }
-    }
+    logger.debug('REALTIME_WEBRTC', 'Text message sent', { text });
   }
 
   /**
@@ -661,18 +582,6 @@ class OpenAIRealtimeService {
   }
 
   /**
-   * Utilitaires
-   */
-  private arrayBufferToBase64(buffer: ArrayBuffer): string {
-    const bytes = new Uint8Array(buffer);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-  }
-
-  /**
    * Getters
    */
   get connected(): boolean {
@@ -680,7 +589,23 @@ class OpenAIRealtimeService {
   }
 
   get readyState(): number {
-    return this.ws?.readyState ?? WebSocket.CLOSED;
+    if (!this.peerConnection) return 3; // CLOSED
+
+    // Mapper les états WebRTC aux états WebSocket pour compatibilité
+    const state = this.peerConnection.connectionState;
+    switch (state) {
+      case 'new':
+      case 'connecting':
+        return 0; // CONNECTING
+      case 'connected':
+        return 1; // OPEN
+      case 'disconnected':
+      case 'failed':
+      case 'closed':
+        return 3; // CLOSED
+      default:
+        return 3;
+    }
   }
 }
 

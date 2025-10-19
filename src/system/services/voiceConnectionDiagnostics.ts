@@ -132,21 +132,24 @@ export class VoiceConnectionDiagnostics {
   }
 
   /**
-   * Test 2: WebSocket API availability
+   * Test 2: WebRTC API availability
    */
   private async testWebSocketAPI(): Promise<DiagnosticResult> {
-    logger.info('VOICE_DIAGNOSTICS', 'Test 2: Checking WebSocket API availability');
+    logger.info('VOICE_DIAGNOSTICS', 'Test 2: Checking WebRTC API availability');
 
-    const passed = typeof WebSocket !== 'undefined';
+    const hasRTCPeerConnection = typeof RTCPeerConnection !== 'undefined';
+    const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    const passed = hasRTCPeerConnection && hasGetUserMedia;
 
     return {
       passed,
-      test: 'WebSocket API',
+      test: 'WebRTC API',
       message: passed
-        ? 'WebSocket API is available'
-        : 'WebSocket API is not available in this browser/environment',
+        ? 'WebRTC API is available'
+        : `WebRTC requirements missing: ${!hasRTCPeerConnection ? 'RTCPeerConnection ' : ''}${!hasGetUserMedia ? 'getUserMedia' : ''}`,
       details: {
-        hasWebSocket: passed,
+        hasRTCPeerConnection,
+        hasGetUserMedia,
         userAgent: navigator.userAgent
       }
     };
@@ -329,10 +332,10 @@ export class VoiceConnectionDiagnostics {
   }
 
   /**
-   * Test 6: WebSocket connection
+   * Test 6: WebRTC session creation
    */
   private async testWebSocketConnection(): Promise<DiagnosticResult> {
-    logger.info('VOICE_DIAGNOSTICS', 'Test 6: Testing WebSocket connection');
+    logger.info('VOICE_DIAGNOSTICS', 'Test 6: Testing WebRTC session creation');
 
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -340,109 +343,126 @@ export class VoiceConnectionDiagnostics {
     if (!supabaseUrl || !supabaseAnonKey) {
       return {
         passed: false,
-        test: 'WebSocket Connection',
+        test: 'WebRTC Session Creation',
         message: 'Cannot test - missing configuration',
         details: { reason: 'Environment variables not set' }
       };
     }
 
-    return new Promise((resolve) => {
-      const wsUrl = supabaseUrl
-        .replace('https://', 'wss://')
-        .replace('/rest/v1', '')
-        + `/functions/v1/voice-coach-realtime?model=gpt-4o-realtime-preview-2024-10-01&apikey=${supabaseAnonKey}`;
-
-      logger.info('VOICE_DIAGNOSTICS', 'Creating WebSocket connection', {
-        url: wsUrl.replace(supabaseAnonKey, '[REDACTED]')
-      });
-
-      const ws = new WebSocket(wsUrl);
+    return new Promise(async (resolve) => {
       const startTime = Date.now();
-      let resolved = false;
+      let peerConnection: RTCPeerConnection | null = null;
 
-      const cleanup = () => {
-        if (!resolved) {
-          resolved = true;
-          ws.close();
-        }
-      };
+      try {
+        logger.info('VOICE_DIAGNOSTICS', 'Creating RTCPeerConnection for test');
 
-      const timeout = setTimeout(() => {
-        const duration = Date.now() - startTime;
-        cleanup();
+        // Créer une peer connection de test
+        peerConnection = new RTCPeerConnection();
 
-        resolve({
-          passed: false,
-          test: 'WebSocket Connection',
-          message: 'WebSocket connection timeout (10s)',
-          details: {
-            duration,
-            finalState: ws.readyState,
-            finalStateName: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][ws.readyState]
+        // Ajouter un track audio simulé (silence)
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => {
+          if (peerConnection) {
+            peerConnection.addTrack(track, stream);
           }
         });
-      }, 10000);
 
-      ws.onopen = () => {
-        const duration = Date.now() - startTime;
-        clearTimeout(timeout);
-        cleanup();
+        // Créer le data channel
+        const dataChannel = peerConnection.createDataChannel('test-channel');
 
-        resolve({
-          passed: true,
-          test: 'WebSocket Connection',
-          message: `WebSocket connected successfully (${duration}ms)`,
-          details: {
-            duration,
-            state: 'OPEN'
-          }
+        // Créer l'offer
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        logger.info('VOICE_DIAGNOSTICS', 'Sending SDP offer to backend');
+
+        // Tester l'endpoint /session
+        const sessionUrl = `${supabaseUrl}/functions/v1/voice-coach-realtime/session`;
+        const response = await fetch(sessionUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseAnonKey}`,
+            'apikey': supabaseAnonKey
+          },
+          body: JSON.stringify({
+            sdp: offer.sdp,
+            model: 'gpt-4o-realtime-preview-2024-10-01',
+            voice: 'alloy'
+          })
         });
-      };
 
-      ws.onerror = (event) => {
+        // Nettoyer
+        stream.getTracks().forEach(track => track.stop());
+        dataChannel.close();
+        peerConnection.close();
+
         const duration = Date.now() - startTime;
-        clearTimeout(timeout);
-        cleanup();
 
-        resolve({
-          passed: false,
-          test: 'WebSocket Connection',
-          message: 'WebSocket connection error - likely OPENAI_API_KEY not configured',
-          details: {
-            duration,
-            error: 'WebSocket error event fired',
-            state: ws.readyState,
-            stateName: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][ws.readyState],
-            possibleCauses: [
-              'OPENAI_API_KEY not set in Supabase Edge Function secrets',
-              'OpenAI API key is invalid or expired',
-              'Network firewall blocking WebSocket connections',
-              'Supabase edge function internal error'
-            ],
-            solution: 'Go to Supabase Dashboard > Edge Functions > Secrets and add OPENAI_API_KEY'
-          }
-        });
-      };
+        if (response.ok) {
+          const sdpAnswer = await response.text();
 
-      ws.onclose = (event) => {
-        if (!resolved) {
-          const duration = Date.now() - startTime;
-          clearTimeout(timeout);
-          cleanup();
+          resolve({
+            passed: true,
+            test: 'WebRTC Session Creation',
+            message: `WebRTC session created successfully (${duration}ms)`,
+            details: {
+              duration,
+              sdpOfferLength: offer.sdp?.length || 0,
+              sdpAnswerLength: sdpAnswer.length,
+              status: response.status
+            }
+          });
+        } else {
+          const errorText = await response.text();
 
           resolve({
             passed: false,
-            test: 'WebSocket Connection',
-            message: `WebSocket closed unexpectedly: ${event.reason || 'No reason'}`,
+            test: 'WebRTC Session Creation',
+            message: `Session creation failed: HTTP ${response.status}`,
             details: {
               duration,
-              code: event.code,
-              reason: event.reason,
-              wasClean: event.wasClean
+              status: response.status,
+              statusText: response.statusText,
+              error: errorText,
+              possibleCauses: [
+                response.status === 500 ? 'OPENAI_API_KEY not configured in Edge Function' : '',
+                response.status === 401 ? 'Supabase authentication failed' : '',
+                response.status === 400 ? 'Invalid SDP format' : '',
+                'Network or CORS issue'
+              ].filter(Boolean),
+              solution: response.status === 500
+                ? 'Go to Supabase Dashboard > Edge Functions > Secrets and add OPENAI_API_KEY'
+                : 'Check backend logs for details'
             }
           });
         }
-      };
+      } catch (error) {
+        const duration = Date.now() - startTime;
+
+        // Nettoyer en cas d'erreur
+        if (peerConnection) {
+          peerConnection.close();
+        }
+
+        resolve({
+          passed: false,
+          test: 'WebRTC Session Creation',
+          message: `WebRTC test failed: ${error instanceof Error ? error.message : String(error)}`,
+          details: {
+            duration,
+            error: error instanceof Error ? error.message : String(error),
+            errorName: error instanceof Error ? error.name : 'Unknown',
+            stack: error instanceof Error ? error.stack : undefined,
+            possibleCauses: [
+              'Microphone access denied',
+              'RTCPeerConnection not supported',
+              'Network connectivity issue',
+              'CORS or firewall blocking'
+            ]
+          }
+        });
+      }
     });
   }
 

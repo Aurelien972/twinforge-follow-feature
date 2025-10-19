@@ -1,18 +1,33 @@
 /**
- * Voice Coach Realtime Proxy
- * Proxifie les connexions WebSocket vers l'API Realtime d'OpenAI
- * Garde la clé API côté serveur pour plus de sécurité
+ * Voice Coach Realtime API - WebRTC Interface Unifiée
+ *
+ * Endpoints:
+ * - POST /session : Crée une session WebRTC (interface unifiée OpenAI)
+ * - GET /health : Health check et diagnostics
+ *
+ * Architecture:
+ * - Le client envoie son SDP offer via POST /session
+ * - Le serveur fait un POST vers OpenAI /v1/realtime/calls avec le SDP + config
+ * - OpenAI retourne un SDP answer
+ * - Le serveur retourne ce SDP au client
+ * - WebRTC peer-to-peer connection automatique entre client et OpenAI
+ *
+ * Avantages:
+ * - Pas de proxy, connexion directe client <-> OpenAI
+ * - Audio géré automatiquement par WebRTC
+ * - Meilleure latence
+ * - Plus simple à maintenir
+ * - Recommandé par OpenAI pour les navigateurs web
  *
  * IMPORTANT:
  * - Cette fonction nécessite OPENAI_API_KEY dans les secrets Supabase
- * - Les WebSockets ne fonctionnent PAS dans StackBlitz/WebContainer
- * - En production uniquement
+ * - WebRTC ne fonctionne PAS dans StackBlitz/WebContainer (production uniquement)
  */
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { corsHeaders } from '../_shared/cors.ts';
 
-const OPENAI_REALTIME_URL = 'wss://api.openai.com/v1/realtime';
+const OPENAI_REALTIME_API = 'https://api.openai.com/v1/realtime';
 
 // Structured logging helper
 function log(level: 'info' | 'warn' | 'error', message: string, data?: any) {
@@ -34,159 +49,102 @@ function log(level: 'info' | 'warn' | 'error', message: string, data?: any) {
   }
 }
 
-function setupOpenAIHandlers(openaiSocket: WebSocket, clientSocket: WebSocket) {
-  let openaiConnected = false;
+/**
+ * Crée une session Realtime via l'interface unifiée d'OpenAI
+ * Le client envoie son SDP offer, on retourne le SDP answer d'OpenAI
+ */
+async function createRealtimeSession(
+  sdpOffer: string,
+  openaiApiKey: string,
+  model: string = 'gpt-4o-realtime-preview-2024-10-01',
+  voice: string = 'alloy',
+  instructions?: string
+): Promise<string> {
+  log('info', 'Creating Realtime session via unified interface', {
+    model,
+    voice,
+    hasInstructions: !!instructions,
+    sdpLength: sdpOffer.length
+  });
 
-  openaiSocket.onopen = () => {
-    log('info', 'OpenAI connection established');
-    openaiConnected = true;
-
-    if (clientSocket.readyState === WebSocket.OPEN) {
-      clientSocket.send(JSON.stringify({
-        type: 'proxy.connected',
-        timestamp: new Date().toISOString()
-      }));
-    }
+  // Configuration de la session
+  const sessionConfig = {
+    type: 'realtime',
+    model,
+    voice,
+    modalities: ['text', 'audio'],
+    instructions: instructions || 'You are a helpful fitness coach assistant.',
+    input_audio_format: 'pcm16',
+    output_audio_format: 'pcm16',
+    input_audio_transcription: {
+      model: 'whisper-1'
+    },
+    turn_detection: {
+      type: 'server_vad',
+      threshold: 0.5,
+      prefix_padding_ms: 300,
+      silence_duration_ms: 500
+    },
+    temperature: 0.8,
+    max_response_output_tokens: 4096
   };
 
-  openaiSocket.onerror = (error) => {
-    log('error', 'OpenAI WebSocket error', { error: String(error) });
+  // Créer le FormData avec SDP + session config
+  const formData = new FormData();
+  formData.append('sdp', sdpOffer);
+  formData.append('session', JSON.stringify(sessionConfig));
 
-    if (clientSocket.readyState === WebSocket.OPEN) {
-      clientSocket.send(JSON.stringify({
-        type: 'error',
-        error: {
-          message: 'Failed to connect to OpenAI Realtime API',
-          details: 'Check server logs for more information'
-        },
-      }));
-      clientSocket.close(1011, 'OpenAI connection failed');
+  log('info', 'Sending request to OpenAI', {
+    url: `${OPENAI_REALTIME_API}/calls`,
+    sessionConfig: {
+      model,
+      voice,
+      modalities: sessionConfig.modalities
     }
-  };
+  });
 
-  openaiSocket.onclose = (event) => {
-    log('info', 'OpenAI connection closed', {
-      code: event.code,
-      reason: event.reason,
-      wasClean: event.wasClean
-    });
-    openaiConnected = false;
-
-    if (clientSocket.readyState === WebSocket.OPEN) {
-      clientSocket.close(event.code, event.reason || 'OpenAI disconnected');
-    }
-  };
-
-  let messageToClientCount = 0;
-  let messageToOpenAICount = 0;
-
-  openaiSocket.onmessage = (event) => {
-    try {
-      messageToClientCount++;
-
-      if (messageToClientCount <= 5) {
-        try {
-          const parsed = JSON.parse(event.data);
-          log('info', 'OpenAI message received', {
-            messageNumber: messageToClientCount,
-            messageType: parsed.type,
-            hasContent: !!parsed.delta?.audio || !!parsed.delta?.transcript,
-            dataPreview: event.data.substring(0, 200)
-          });
-        } catch {
-          log('info', 'OpenAI message received (non-JSON)', {
-            messageNumber: messageToClientCount,
-            dataLength: event.data.length,
-            dataPreview: event.data.substring(0, 100)
-          });
-        }
-      }
-
-      if (clientSocket.readyState === WebSocket.OPEN) {
-        clientSocket.send(event.data);
-      } else {
-        log('warn', 'Client socket not ready, dropping message', {
-          messageNumber: messageToClientCount,
-          clientState: clientSocket.readyState
-        });
-      }
-    } catch (error) {
-      log('error', 'Error forwarding to client', {
-        error: String(error),
-        messageNumber: messageToClientCount
-      });
-    }
-  };
-
-  clientSocket.onmessage = (event) => {
-    try {
-      messageToOpenAICount++;
-
-      if (messageToOpenAICount <= 5) {
-        try {
-          const parsed = JSON.parse(event.data);
-          log('info', 'Client message received', {
-            messageNumber: messageToOpenAICount,
-            messageType: parsed.type,
-            hasAudio: !!parsed.audio,
-            dataPreview: event.data.substring(0, 200)
-          });
-        } catch {
-          log('info', 'Client message received (non-JSON)', {
-            messageNumber: messageToOpenAICount,
-            dataLength: event.data.length
-          });
-        }
-      }
-
-      if (openaiSocket.readyState === WebSocket.OPEN) {
-        openaiSocket.send(event.data);
-      } else {
-        log('warn', 'OpenAI socket not ready', {
-          state: openaiSocket.readyState,
-          connected: openaiConnected,
-          messageNumber: messageToOpenAICount
-        });
-
-        if (clientSocket.readyState === WebSocket.OPEN) {
-          clientSocket.send(JSON.stringify({
-            type: 'error',
-            error: { message: 'OpenAI connection not ready' }
-          }));
-        }
-      }
-    } catch (error) {
-      log('error', 'Error forwarding to OpenAI', {
-        error: String(error),
-        messageNumber: messageToOpenAICount
-      });
-    }
-  };
-
-  clientSocket.onclose = (event) => {
-    log('info', 'Client connection closed', {
-      code: event.code,
-      reason: event.reason
+  try {
+    const response = await fetch(`${OPENAI_REALTIME_API}/calls`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiApiKey}`,
+      },
+      body: formData,
     });
 
-    if (openaiSocket.readyState === WebSocket.OPEN) {
-      openaiSocket.close(1000, 'Client disconnected');
+    if (!response.ok) {
+      const errorText = await response.text();
+      log('error', 'OpenAI API error', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
     }
-  };
 
-  clientSocket.onerror = (error) => {
-    log('error', 'Client WebSocket error', { error: String(error) });
+    // La réponse est le SDP answer en text/plain
+    const sdpAnswer = await response.text();
 
-    if (openaiSocket.readyState === WebSocket.OPEN) {
-      openaiSocket.close(1011, 'Client error');
-    }
-  };
+    log('info', 'Received SDP answer from OpenAI', {
+      sdpAnswerLength: sdpAnswer.length,
+      sdpPreview: sdpAnswer.substring(0, 100)
+    });
+
+    return sdpAnswer;
+  } catch (error) {
+    log('error', 'Failed to create Realtime session', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    throw error;
+  }
 }
 
 Deno.serve(async (req: Request) => {
-  // Generate request ID for tracing
   const requestId = crypto.randomUUID();
+  const url = new URL(req.url);
 
+  // CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 200,
@@ -194,23 +152,25 @@ Deno.serve(async (req: Request) => {
     });
   }
 
-  // Add a simple HTTP GET endpoint for health check and diagnostics
-  if (req.method === 'GET') {
-    const url = new URL(req.url);
-
-    // Health check endpoint
-    if (url.pathname.includes('/health')) {
+  try {
+    // ==========================================
+    // GET /health - Health check endpoint
+    // ==========================================
+    if (req.method === 'GET' && url.pathname.includes('/health')) {
       const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+
+      log('info', 'Health check requested', { requestId });
 
       return new Response(
         JSON.stringify({
           status: 'ok',
+          mode: 'webrtc-unified',
           timestamp: new Date().toISOString(),
           hasOpenAIKey: !!openaiApiKey,
           openaiKeyLength: openaiApiKey?.length || 0,
           openaiKeyPrefix: openaiApiKey ? `${openaiApiKey.substring(0, 7)}...` : 'NOT_SET',
           message: openaiApiKey
-            ? 'Edge function is configured and ready'
+            ? 'Edge function is configured and ready for WebRTC'
             : 'OPENAI_API_KEY is not configured'
         }),
         {
@@ -219,142 +179,179 @@ Deno.serve(async (req: Request) => {
         }
       );
     }
-  }
 
-  try {
-    const url = new URL(req.url);
+    // ==========================================
+    // POST /session - Create WebRTC session
+    // ==========================================
+    if (req.method === 'POST' && url.pathname.includes('/session')) {
+      log('info', 'WebRTC session creation requested', { requestId });
 
-    log('info', 'Incoming WebSocket request', {
-      requestId,
-      method: req.method,
-      url: url.pathname,
-      headers: {
-        upgrade: req.headers.get('upgrade'),
-        connection: req.headers.get('connection'),
-        secWebSocketKey: req.headers.get('sec-websocket-key') ? 'present' : 'missing'
+      // Vérifier l'authentification Supabase
+      const authHeader = req.headers.get('Authorization');
+      const apikeyHeader = req.headers.get('apikey');
+
+      if (!authHeader && !apikeyHeader) {
+        log('error', 'Missing authentication', { requestId });
+        return new Response(
+          JSON.stringify({
+            error: 'Missing authentication',
+            details: 'Authorization header or apikey required'
+          }),
+          {
+            status: 401,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
       }
-    });
 
-    // Vérifier l'authentification
-    // Pour les WebSockets, le token peut être dans l'URL (apikey query param)
-    const apikeyFromUrl = url.searchParams.get('apikey');
-    const authHeader = req.headers.get('Authorization') ||
-                       req.headers.get('authorization');
+      // Vérifier la clé OpenAI
+      const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+      if (!openaiApiKey) {
+        log('error', 'OPENAI_API_KEY not configured', { requestId });
+        return new Response(
+          JSON.stringify({
+            error: 'OpenAI API key not configured',
+            details: 'Please configure OPENAI_API_KEY in Supabase Edge Function secrets'
+          }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
 
-    log('info', 'Request authentication check', {
-      requestId,
-      hasApikeyInUrl: !!apikeyFromUrl,
-      hasAuthHeader: !!authHeader,
-      upgrade: req.headers.get('upgrade'),
-      connection: req.headers.get('connection')
-    });
+      // Récupérer le SDP offer du client
+      const contentType = req.headers.get('content-type') || '';
+      let sdpOffer: string;
 
-    // Vérifier qu'on a au moins un moyen d'authentification
-    if (!apikeyFromUrl && !authHeader) {
-      log('error', 'Missing authentication', { requestId });
-      return new Response(
-        JSON.stringify({ error: 'Missing authentication (apikey or Authorization header)' }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      if (contentType.includes('application/json')) {
+        const body = await req.json();
+        sdpOffer = body.sdp;
+
+        if (!sdpOffer) {
+          log('error', 'Missing SDP in JSON body', { requestId });
+          return new Response(
+            JSON.stringify({
+              error: 'Missing SDP',
+              details: 'Expected { "sdp": "...", ... } in request body'
+            }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
         }
-      );
-    }
 
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openaiApiKey) {
-      log('error', 'OPENAI_API_KEY not configured', {
-        requestId,
-        message: 'Please configure OPENAI_API_KEY in Supabase Edge Function secrets'
-      });
-      return new Response(
-        JSON.stringify({
-          error: 'OpenAI API key not configured on server',
-          details: 'Please configure OPENAI_API_KEY in Supabase Edge Function secrets'
-        }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
+        log('info', 'Received SDP offer (JSON)', {
+          requestId,
+          sdpLength: sdpOffer.length,
+          model: body.model,
+          voice: body.voice
+        });
 
-    // Vérifier que la requête est bien un upgrade WebSocket
-    const upgradeHeader = req.headers.get('upgrade');
-    if (!upgradeHeader || upgradeHeader.toLowerCase() !== 'websocket') {
-      log('error', 'Not a WebSocket upgrade request', {
-        requestId,
-        upgrade: upgradeHeader,
-        method: req.method
-      });
-      return new Response(
-        JSON.stringify({
-          error: 'Expected WebSocket upgrade request',
-          details: 'This endpoint only accepts WebSocket connections'
-        }),
-        {
-          status: 426,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
+        // Créer la session avec les paramètres optionnels
+        const sdpAnswer = await createRealtimeSession(
+          sdpOffer,
+          openaiApiKey,
+          body.model,
+          body.voice,
+          body.instructions
+        );
 
-    const model = url.searchParams.get('model') || 'gpt-4o-realtime-preview-2024-10-01';
+        log('info', 'Returning SDP answer to client', {
+          requestId,
+          sdpAnswerLength: sdpAnswer.length
+        });
 
-    log('info', 'Initiating WebSocket connection', {
-      requestId,
-      model,
-      timestamp: new Date().toISOString()
-    });
-
-    const openaiWsUrl = `${OPENAI_REALTIME_URL}?model=${encodeURIComponent(model)}`;
-
-    log('info', 'Connecting to OpenAI', {
-      requestId,
-      url: openaiWsUrl.replace(model, '[MODEL]')
-    });
-
-    // Upgrade the request to WebSocket
-    const { socket: clientSocket, response } = Deno.upgradeWebSocket(req);
-
-    log('info', 'WebSocket upgrade successful', { requestId });
-
-    // Attendre que le client soit connecté avant de créer la connexion OpenAI
-    clientSocket.onopen = () => {
-      log('info', 'Client connection established', { requestId });
-
-      // Maintenant créer la connexion OpenAI
-      try {
-        log('info', 'Creating OpenAI WebSocket connection', { requestId });
-
-        const openaiSocket = new WebSocket(openaiWsUrl, {
+        // Retourner le SDP answer
+        return new Response(sdpAnswer, {
+          status: 200,
           headers: {
-            'Authorization': `Bearer ${openaiApiKey}`,
-            'OpenAI-Beta': 'realtime=v1',
+            ...corsHeaders,
+            'Content-Type': 'application/sdp',
           },
         });
+      } else if (contentType.includes('application/sdp') || contentType.includes('text/plain')) {
+        // Format simple: juste le SDP en text/plain
+        sdpOffer = await req.text();
 
-        log('info', 'OpenAI WebSocket instance created', { requestId });
-        setupOpenAIHandlers(openaiSocket, clientSocket);
-      } catch (error) {
-        log('error', 'Failed to create OpenAI WebSocket', {
-          requestId,
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined
-        });
-        if (clientSocket.readyState === WebSocket.OPEN) {
-          clientSocket.send(JSON.stringify({
-            type: 'error',
-            error: { message: 'Failed to connect to OpenAI' }
-          }));
-          clientSocket.close(1011, 'OpenAI connection failed');
+        if (!sdpOffer || sdpOffer.trim().length === 0) {
+          log('error', 'Empty SDP offer', { requestId });
+          return new Response(
+            JSON.stringify({ error: 'Empty SDP offer' }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
         }
-      }
-    };
 
-    return response;
+        log('info', 'Received SDP offer (plain text)', {
+          requestId,
+          sdpLength: sdpOffer.length
+        });
+
+        // Utiliser les valeurs par défaut
+        const model = url.searchParams.get('model') || 'gpt-4o-realtime-preview-2024-10-01';
+        const voice = url.searchParams.get('voice') || 'alloy';
+
+        const sdpAnswer = await createRealtimeSession(
+          sdpOffer,
+          openaiApiKey,
+          model,
+          voice
+        );
+
+        log('info', 'Returning SDP answer to client', {
+          requestId,
+          sdpAnswerLength: sdpAnswer.length
+        });
+
+        return new Response(sdpAnswer, {
+          status: 200,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/sdp',
+          },
+        });
+      } else {
+        log('error', 'Unsupported content type', { requestId, contentType });
+        return new Response(
+          JSON.stringify({
+            error: 'Unsupported content type',
+            details: 'Expected application/json, application/sdp, or text/plain'
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+    }
+
+    // ==========================================
+    // Route non reconnue
+    // ==========================================
+    log('warn', 'Unknown endpoint', {
+      requestId,
+      method: req.method,
+      path: url.pathname
+    });
+
+    return new Response(
+      JSON.stringify({
+        error: 'Not Found',
+        details: 'Available endpoints: GET /health, POST /session',
+        mode: 'webrtc-unified'
+      }),
+      {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
+
   } catch (error) {
-    log('error', 'Fatal error in proxy', {
+    log('error', 'Fatal error', {
       requestId,
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined
@@ -363,7 +360,7 @@ Deno.serve(async (req: Request) => {
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
+        details: error instanceof Error ? error.stack : undefined
       }),
       {
         status: 500,
