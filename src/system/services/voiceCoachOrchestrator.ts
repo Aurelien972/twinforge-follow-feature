@@ -111,15 +111,13 @@ class VoiceCoachOrchestrator {
         maxTokens: 4096,
         instructions: modeConfig.systemPrompt // Directement dans la config WebRTC
       });
-      logger.info('VOICE_ORCHESTRATOR', '✅ Connected to Realtime API via WebRTC');
+      logger.info('VOICE_ORCHESTRATOR', '✅ Realtime API WebRTC connected successfully');
 
       // CRITIQUE: Configurer la session pour activer la détection vocale et les réponses
+      // Le data channel est maintenant garanti d'être ouvert, donc cette configuration sera envoyée avec succès
       logger.info('VOICE_ORCHESTRATOR', '⚙️ Configuring session with VAD and transcription');
       openaiRealtimeService.configureSession(modeConfig.systemPrompt, mode as any);
-
-      // Attendre un court instant pour que la configuration soit prise en compte
-      await new Promise(resolve => setTimeout(resolve, 500));
-      logger.info('VOICE_ORCHESTRATOR', '✅ Session configuration applied');
+      logger.info('VOICE_ORCHESTRATOR', '✅ Session configuration sent successfully');
 
       // Démarrer une conversation dans le store
       logger.info('VOICE_ORCHESTRATOR', '💬 Starting conversation in store');

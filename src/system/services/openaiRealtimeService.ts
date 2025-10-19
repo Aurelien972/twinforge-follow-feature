@@ -257,7 +257,13 @@ class OpenAIRealtimeService {
       logger.info('REALTIME_WEBRTC', '⏳ Waiting for connection to establish...');
       await this.waitForConnection();
 
+      // CRITIQUE: Attendre que le data channel soit ouvert avant de résoudre
+      // Cela garantit qu'on peut envoyer des messages immédiatement après connect()
+      logger.info('REALTIME_WEBRTC', '⏳ Waiting for data channel to be ready...');
+      await this.waitForDataChannel();
+
       logger.info('REALTIME_WEBRTC', '✅✅✅ SUCCESSFULLY CONNECTED TO REALTIME API VIA WEBRTC ✅✅✅');
+      logger.info('REALTIME_WEBRTC', '✅ Data channel is ready for sending messages');
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -346,21 +352,115 @@ class OpenAIRealtimeService {
   }
 
   /**
+   * Attendre que le data channel soit ouvert et prêt à envoyer des messages
+   * CRITIQUE: Cette méthode garantit qu'on ne tentera pas d'envoyer des messages
+   * avant que le canal soit complètement ouvert
+   */
+  private async waitForDataChannel(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const startTime = Date.now();
+      const timeout = 10000; // 10 secondes
+
+      if (!this.dataChannel) {
+        logger.error('REALTIME_WEBRTC_DC', '❌ No data channel to wait for');
+        reject(new Error('Data channel not created'));
+        return;
+      }
+
+      // Si déjà ouvert, résoudre immédiatement
+      if (this.dataChannel.readyState === 'open') {
+        logger.info('REALTIME_WEBRTC_DC', '✅ Data channel already open');
+        resolve();
+        return;
+      }
+
+      logger.info('REALTIME_WEBRTC_DC', '⏳ Waiting for data channel to open...', {
+        currentState: this.dataChannel.readyState
+      });
+
+      // Listener pour l'ouverture
+      const onOpen = () => {
+        const duration = Date.now() - startTime;
+        logger.info('REALTIME_WEBRTC_DC', '✅ Data channel opened', {
+          duration,
+          readyState: this.dataChannel?.readyState
+        });
+        cleanup();
+        resolve();
+      };
+
+      // Listener pour les erreurs
+      const onError = (error: Event) => {
+        logger.error('REALTIME_WEBRTC_DC', '❌ Data channel error while waiting', { error });
+        cleanup();
+        reject(new Error('Data channel error'));
+      };
+
+      // Listener pour la fermeture prématurée
+      const onClose = () => {
+        logger.error('REALTIME_WEBRTC_DC', '❌ Data channel closed while waiting');
+        cleanup();
+        reject(new Error('Data channel closed before opening'));
+      };
+
+      // Timeout
+      const timeoutId = setTimeout(() => {
+        const duration = Date.now() - startTime;
+        logger.error('REALTIME_WEBRTC_DC', '❌ Data channel open timeout', {
+          duration,
+          currentState: this.dataChannel?.readyState
+        });
+        cleanup();
+        reject(new Error('Data channel open timeout'));
+      }, timeout);
+
+      // Fonction de nettoyage
+      const cleanup = () => {
+        clearTimeout(timeoutId);
+        if (this.dataChannel) {
+          this.dataChannel.removeEventListener('open', onOpen);
+          this.dataChannel.removeEventListener('error', onError);
+          this.dataChannel.removeEventListener('close', onClose);
+        }
+      };
+
+      // Attacher les listeners
+      this.dataChannel.addEventListener('open', onOpen);
+      this.dataChannel.addEventListener('error', onError);
+      this.dataChannel.addEventListener('close', onClose);
+    });
+  }
+
+  /**
    * Configurer les handlers du data channel
    */
   private setupDataChannelHandlers(): void {
     if (!this.dataChannel) return;
 
+    // Log des changements d'état pour le debugging
+    logger.info('REALTIME_WEBRTC_DC', '📡 Data channel created', {
+      readyState: this.dataChannel.readyState,
+      label: this.dataChannel.label
+    });
+
     this.dataChannel.onopen = () => {
-      logger.info('REALTIME_WEBRTC', '✅ Data channel opened');
+      logger.info('REALTIME_WEBRTC_DC', '✅ Data channel opened', {
+        readyState: this.dataChannel?.readyState,
+        label: this.dataChannel?.label
+      });
     };
 
     this.dataChannel.onclose = () => {
-      logger.info('REALTIME_WEBRTC', '🔌 Data channel closed');
+      logger.info('REALTIME_WEBRTC_DC', '🔌 Data channel closed', {
+        readyState: this.dataChannel?.readyState
+      });
     };
 
     this.dataChannel.onerror = (error) => {
-      logger.error('REALTIME_WEBRTC', '❌ Data channel error', { error });
+      logger.error('REALTIME_WEBRTC_DC', '❌ Data channel error', {
+        error,
+        readyState: this.dataChannel?.readyState
+      });
     };
 
     this.dataChannel.onmessage = (event) => {
@@ -505,23 +605,28 @@ class OpenAIRealtimeService {
    */
   private sendMessage(message: RealtimeMessage): void {
     if (!this.dataChannel || this.dataChannel.readyState !== 'open') {
-      logger.error('REALTIME_WEBRTC', '❌ Cannot send message: data channel not open', {
+      logger.error('REALTIME_WEBRTC_SEND', '❌ Cannot send message: data channel not open', {
         hasDataChannel: !!this.dataChannel,
         readyState: this.dataChannel?.readyState,
-        messageType: message.type
+        messageType: message.type,
+        timestamp: new Date().toISOString()
       });
       return;
     }
 
     try {
-      this.dataChannel.send(JSON.stringify(message));
-      logger.debug('REALTIME_WEBRTC', '📤 Message sent', {
-        type: message.type
+      const messageStr = JSON.stringify(message);
+      this.dataChannel.send(messageStr);
+      logger.info('REALTIME_WEBRTC_SEND', `✅ Message sent: ${message.type}`, {
+        type: message.type,
+        size: messageStr.length,
+        readyState: this.dataChannel.readyState
       });
     } catch (error) {
-      logger.error('REALTIME_WEBRTC', '❌ Error sending message', {
+      logger.error('REALTIME_WEBRTC_SEND', '❌ Error sending message', {
         error: error instanceof Error ? error.message : String(error),
-        messageType: message.type
+        messageType: message.type,
+        readyState: this.dataChannel?.readyState
       });
     }
   }
