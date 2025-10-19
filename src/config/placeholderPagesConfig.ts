@@ -11,6 +11,7 @@ export interface TabConfig {
   icon?: keyof typeof ICONS;
   description: string;
   features: string[];
+  color?: string;
 }
 
 export interface PageConfig {
@@ -205,6 +206,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         label: 'Forfaits',
         icon: 'CreditCard',
         description: 'Gérez votre abonnement et vos tokens pour les fonctionnalités IA',
+        color: '#10B981',
         features: [
           'Abonnements mensuels avec tokens inclus',
           'Achats ponctuels de tokens',
@@ -218,6 +220,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         label: 'Performance',
         icon: 'Zap',
         description: 'Optimisez les performances visuelles selon votre appareil',
+        color: '#F59E0B',
         features: [
           'Mode Ultra Performance pour iPhone 8-10',
           'Mode Équilibré pour iPhone 11-12',
@@ -231,6 +234,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         label: 'Préférences',
         icon: 'User',
         description: 'Personnalisez votre expérience utilisateur',
+        color: '#8B5CF6',
         features: [
           'Choix de la voix du coach vocal',
           'Préférences d\'interface',
@@ -244,6 +248,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         label: 'Notifications',
         icon: 'Bell',
         description: 'Alertes et rappels personnalisés',
+        color: '#EC4899',
         features: [
           'Notifications personnalisées',
           'Horaires de rappel',
@@ -256,6 +261,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         label: 'Confidentialité',
         icon: 'Shield',
         description: 'Données et confidentialité',
+        color: '#3B82F6',
         features: [
           'Synchronisation des données',
           'Paramètres de confidentialité',
@@ -268,6 +274,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         label: 'Appareils',
         icon: 'Watch',
         description: 'Synchronisez vos trackers fitness',
+        color: '#06B6D4',
         features: [
           'Strava, Garmin, Fitbit, Apple Health',
           'Polar, Wahoo, WHOOP, Oura',

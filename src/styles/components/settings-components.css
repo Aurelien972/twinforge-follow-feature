@@ -1,7 +1,22 @@
 /**
  * Settings Components Styles
  * Shared styles for settings UI components
+ * Dynamic color system per tab for visual hierarchy
  */
+
+/* =============================================
+   DYNAMIC COLOR SYSTEM
+   Colors propagated via --settings-active-color CSS variable
+   ============================================= */
+
+.settings-section-icon {
+  color: var(--settings-active-color, var(--accent)) !important;
+}
+
+.settings-section-icon svg {
+  color: var(--settings-active-color, var(--accent)) !important;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--settings-active-color, var(--accent)) 40%, transparent));
+}
 
 /* =============================================
    SETTINGS SECTION

@@ -28,13 +28,16 @@ const SettingsPage: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className="space-y-6"
+      style={{
+        '--settings-active-color': activeTabConfig.color || config.color
+      } as React.CSSProperties}
     >
       <PageHeader
         icon={activeTabConfig.icon || config.icon}
         title={activeTabConfig.label}
         subtitle={activeTabConfig.description}
         circuit={config.circuit as any}
-        iconColor={config.color}
+        iconColor={activeTabConfig.color || config.color}
       />
 
       <Tabs

@@ -961,10 +961,13 @@
 
 /* =========================================
    PERFORMANCE MODE - OPTIMIZATIONS SIDEBAR
-   Remove decorative inner circles and simplify effects
+   HIGH-PERFORMANCE MODE ONLY: Remove decorative inner circles and simplify effects
+   BALANCED MODE: Keep all premium glassmorphism effects like header
    ========================================= */
 
-/* Remove inner decorative radial gradients from icon containers in performance mode */
+/* IMPORTANT: These optimizations ONLY apply to high-performance mode, NOT balanced mode */
+
+/* Remove inner decorative radial gradients from icon containers ONLY in high-performance mode */
 .mode-high-performance .sidebar-item-icon-container {
   /* Simplify to solid colors - remove inner decorative circles */
   background: rgba(255, 255, 255, 0.12) !important;
