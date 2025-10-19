@@ -5,11 +5,12 @@
  */
 
 import React, { useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
 import CoachMessage from './CoachMessage';
 import CoachMessageRenderer from './CoachMessageRenderer';
 import TypingIndicator from './TypingIndicator';
+import AudioWaveform from './AudioWaveform';
 import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
 import type { ExtendedChatMessage } from '../../../domain/chatMessages';
@@ -71,6 +72,12 @@ const MessagesDisplay: React.FC<MessagesDisplayProps> = ({
 
   const messages = useUnifiedCoachStore(state => state.messages);
   const currentMode = useUnifiedCoachStore(state => state.currentMode);
+  const voiceState = useUnifiedCoachStore(state => state.voiceState);
+  const currentTranscription = useUnifiedCoachStore(state => state.currentTranscription);
+  const isSpeaking = useUnifiedCoachStore(state => state.isSpeaking);
+  const visualization = useUnifiedCoachStore(state => state.visualization);
+
+  const isRealtimeActive = voiceState === 'listening' || voiceState === 'speaking' || voiceState === 'processing';
 
   const scrollToBottom = (smooth = true) => {
     messagesEndRef.current?.scrollIntoView({
@@ -105,6 +112,89 @@ const MessagesDisplay: React.FC<MessagesDisplayProps> = ({
         minHeight: 0
       }}
     >
+      {/* Realtime Session Active Banner */}
+      <AnimatePresence>
+        {isRealtimeActive && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            style={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 10,
+              marginBottom: '12px',
+              padding: '12px 16px',
+              borderRadius: '16px',
+              background: `
+                linear-gradient(180deg,
+                  rgba(239, 68, 68, 0.25) 0%,
+                  rgba(220, 38, 38, 0.15) 100%
+                )
+              `,
+              backdropFilter: 'blur(20px)',
+              border: '1.5px solid rgba(239, 68, 68, 0.4)',
+              boxShadow: '0 4px 24px rgba(239, 68, 68, 0.2), 0 0 32px rgba(239, 68, 68, 0.15)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <motion.div
+                  animate={{
+                    scale: isSpeaking ? [1, 1.2, 1] : 1,
+                    opacity: isSpeaking ? [0.6, 1, 0.6] : 1
+                  }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  style={{
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    background: isSpeaking ? '#10B981' : '#EF4444',
+                    boxShadow: isSpeaking
+                      ? '0 0 12px rgba(16, 185, 129, 0.8)'
+                      : '0 0 12px rgba(239, 68, 68, 0.8)'
+                  }}
+                />
+                <span style={{ fontSize: '13px', fontWeight: 600, color: '#FFF' }}>
+                  {voiceState === 'listening' && 'En écoute...'}
+                  {voiceState === 'speaking' && 'Coach parle...'}
+                  {voiceState === 'processing' && 'Traitement...'}
+                </span>
+              </div>
+            </div>
+
+            {/* Waveform visualization */}
+            {visualization.frequencies && visualization.frequencies.length > 0 && (
+              <AudioWaveform
+                frequencies={visualization.frequencies}
+                color={isSpeaking ? '#10B981' : '#EF4444'}
+                height={40}
+              />
+            )}
+
+            {/* Current transcription preview */}
+            {currentTranscription && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                style={{
+                  fontSize: '12px',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  fontStyle: 'italic',
+                  paddingTop: '8px',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+                }}
+              >
+                Vous: {currentTranscription}...
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
       {messages.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-center py-4">
           <motion.div

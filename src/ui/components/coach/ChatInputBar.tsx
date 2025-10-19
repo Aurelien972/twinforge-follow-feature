@@ -14,9 +14,13 @@ interface ChatInputBarProps {
   onSendMessage: (message: string) => void;
   onStartVoiceRecording: () => void;
   onStopVoiceRecording: () => void;
+  onStartRealtimeSession: () => Promise<void>;
+  onStopRealtimeSession: () => void;
   isRecording: boolean;
   isProcessing: boolean;
   isSpeaking: boolean;
+  realtimeState: 'idle' | 'connecting' | 'listening' | 'speaking' | 'error';
+  realtimeError?: string;
   voiceEnabled: boolean;
   stepColor: string;
   placeholder?: string;
@@ -27,9 +31,13 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
   onSendMessage,
   onStartVoiceRecording,
   onStopVoiceRecording,
+  onStartRealtimeSession,
+  onStopRealtimeSession,
   isRecording,
   isProcessing,
   isSpeaking,
+  realtimeState,
+  realtimeError,
   voiceEnabled,
   stepColor,
   placeholder = 'Parle à ton coach...',
@@ -76,11 +84,18 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
     Haptics.press();
   };
 
-  const handleLiveVoice = () => {
-    console.log('Live voice communication');
+  const handleRealtimeToggle = async () => {
     click();
     Haptics.press();
+
+    if (realtimeState === 'idle' || realtimeState === 'error') {
+      await onStartRealtimeSession();
+    } else {
+      onStopRealtimeSession();
+    }
   };
+
+  const isRealtimeActive = realtimeState !== 'idle' && realtimeState !== 'error';
 
   return (
     <div
@@ -95,6 +110,74 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
         padding: '0'
       }}
     >
+      {/* Error Banner */}
+      <AnimatePresence>
+        {realtimeError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            style={{
+              padding: '8px 16px',
+              marginBottom: '8px',
+              borderRadius: '12px',
+              background: 'linear-gradient(180deg, rgba(220, 38, 38, 0.2) 0%, rgba(153, 27, 27, 0.15) 100%)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '8px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <SpatialIcon Icon={ICONS.AlertTriangle} size={14} style={{ color: '#EF4444' }} />
+              <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.9)' }}>
+                {realtimeError}
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Realtime Status Bar */}
+      <AnimatePresence>
+        {realtimeState === 'connecting' && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            style={{
+              padding: '6px 16px',
+              marginBottom: '8px',
+              borderRadius: '12px',
+              background: 'linear-gradient(180deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.1) 100%)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              style={{
+                width: '12px',
+                height: '12px',
+                border: '2px solid #EF4444',
+                borderTopColor: 'transparent',
+                borderRadius: '50%'
+              }}
+            />
+            <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.9)' }}>
+              Connexion au coach vocal...
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Processing Status Bar - En haut avec marge réduite */}
       <AnimatePresence>
         {isProcessing && (
@@ -266,33 +349,117 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
             </motion.button>
           )}
 
-          {/* Live Voice Button */}
+          {/* Realtime Voice Button - RED */}
           {voiceEnabled && (
             <motion.button
-              onClick={handleLiveVoice}
+              onClick={handleRealtimeToggle}
               className="chat-input-button flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
               style={{
-                background: `
-                  radial-gradient(circle at 30% 30%, color-mix(in srgb, ${stepColor} 30%, transparent) 0%, transparent 70%),
-                  rgba(255, 255, 255, 0.1)
-                `,
-                border: `2px solid color-mix(in srgb, ${stepColor} 40%, transparent)`,
-                boxShadow: `0 0 20px color-mix(in srgb, ${stepColor} 25%, transparent), var(--liquid-pill-shadow)`,
+                background: isRealtimeActive
+                  ? 'radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.5) 0%, rgba(220, 38, 38, 0.8) 100%)'
+                  : realtimeState === 'error'
+                  ? 'radial-gradient(circle at 30% 30%, rgba(153, 27, 27, 0.5) 0%, rgba(127, 29, 29, 0.8) 100%)'
+                  : 'radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.3) 0%, rgba(239, 68, 68, 0.15) 100%)',
+                border: '2px solid rgba(239, 68, 68, 0.6)',
+                boxShadow: isRealtimeActive
+                  ? '0 0 20px rgba(239, 68, 68, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3)'
+                  : '0 0 12px rgba(239, 68, 68, 0.4)',
                 position: 'relative',
                 overflow: 'visible'
               }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              disabled={disabled || isProcessing}
+              disabled={disabled || isProcessing || realtimeState === 'connecting'}
             >
-              <SpatialIcon
-                Icon={ICONS.Phone}
-                size={18}
-                style={{
-                  color: stepColor,
-                  filter: `drop-shadow(0 0 8px ${stepColor})`
-                }}
-              />
+              <AnimatePresence mode="wait">
+                {realtimeState === 'connecting' ? (
+                  <motion.div
+                    key="connecting"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  >
+                    <SpatialIcon
+                      Icon={ICONS.Loader}
+                      size={18}
+                      style={{ color: '#FFF' }}
+                    />
+                  </motion.div>
+                ) : realtimeState === 'speaking' ? (
+                  <motion.div
+                    key="speaking"
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: [0.8, 1.1, 0.8] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    <SpatialIcon
+                      Icon={ICONS.Volume2}
+                      size={18}
+                      style={{ color: '#10B981' }}
+                    />
+                  </motion.div>
+                ) : realtimeState === 'error' ? (
+                  <motion.div key="error">
+                    <SpatialIcon
+                      Icon={ICONS.X}
+                      size={18}
+                      style={{ color: '#DC2626' }}
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div key="mic">
+                    <SpatialIcon
+                      Icon={ICONS.Mic}
+                      size={18}
+                      style={{
+                        color: isRealtimeActive ? '#FFF' : '#EF4444',
+                        filter: isRealtimeActive ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))' : 'none'
+                      }}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {/* Pulsation pendant listening */}
+              {realtimeState === 'listening' && (
+                <>
+                  <motion.div
+                    style={{
+                      position: 'absolute',
+                      inset: -4,
+                      borderRadius: '50%',
+                      border: '2px solid rgba(239, 68, 68, 0.8)',
+                      pointerEvents: 'none'
+                    }}
+                    animate={{
+                      scale: [1, 1.4, 1],
+                      opacity: [0.8, 0, 0.8]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut'
+                    }}
+                  />
+                  <motion.div
+                    style={{
+                      position: 'absolute',
+                      inset: -8,
+                      borderRadius: '50%',
+                      border: '2px solid rgba(239, 68, 68, 0.6)',
+                      pointerEvents: 'none'
+                    }}
+                    animate={{
+                      scale: [1, 1.6, 1],
+                      opacity: [0.6, 0, 0.6]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: 0.4
+                    }}
+                  />
+                </>
+              )}
             </motion.button>
           )}
 

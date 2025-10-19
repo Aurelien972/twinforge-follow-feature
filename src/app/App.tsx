@@ -19,9 +19,6 @@ import Sidebar from './shell/Sidebar';
 import NewMobileBottomBar from './shell/NewMobileBottomBar';
 import GlobalExitModal from '../ui/components/GlobalExitModal';
 import CentralActionsMenu from './shell/CentralActionsMenu';
-import UnifiedFloatingButton from '../ui/components/chat/UnifiedFloatingButton';
-import UnifiedCoachDrawer from '../ui/components/chat/UnifiedCoachDrawer';
-import { ChatButtonProvider, useChatButtonRef } from '../system/context/ChatButtonContext';
 import { useVoiceCoachInitialization } from '../hooks/useVoiceCoachInitialization';
 
 function AppContent() {
@@ -31,8 +28,6 @@ function AppContent() {
   const location = useLocation();
   const { isAnyOpen, isOpen: checkIsOpen, close } = useOverlayStore();
   const isCentralMenuOpen = checkIsOpen('centralMenu');
-  const { chatButtonRef } = useChatButtonRef();
-
   // Initialiser le système Voice Coach
   useVoiceCoachInitialization();
 
@@ -262,17 +257,11 @@ function AppContent() {
         onClose={close}
       />
 
-      {/* Unified Coach System */}
-      <UnifiedFloatingButton ref={chatButtonRef} />
-      <UnifiedCoachDrawer chatButtonRef={chatButtonRef} />
+      {/* Coach system is now integrated directly in pages */}
     </div>
   );
 }
 
 export default function App() {
-  return (
-    <ChatButtonProvider>
-      <AppContent />
-    </ChatButtonProvider>
-  );
+  return <AppContent />;
 }

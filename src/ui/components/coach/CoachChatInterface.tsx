@@ -6,6 +6,8 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
+import { voiceCoachOrchestrator } from '../../../system/services/voiceCoachOrchestrator';
+import logger from '../../../lib/utils/logger';
 import MessagesDisplay from './MessagesDisplay';
 import ChatInputBar from './ChatInputBar';
 import type { ExerciseAdjustmentCategory } from '../../../config/exerciseAdjustmentConfig';
@@ -47,17 +49,80 @@ const CoachChatInterface: React.FC<CoachChatInterfaceProps> = ({
   const isRecording = useUnifiedCoachStore(state => state.isRecording);
   const isProcessing = useUnifiedCoachStore(state => state.isProcessing);
   const isSpeaking = useUnifiedCoachStore(state => state.isSpeaking);
+  const voiceState = useUnifiedCoachStore(state => state.voiceState);
+  const currentMode = useUnifiedCoachStore(state => state.currentMode);
+  const voiceError = useUnifiedCoachStore(state => state.error);
+
+  // Local state for realtime
+  const [realtimeError, setRealtimeError] = useState<string | undefined>(undefined);
 
   // Voice settings - default enabled for all modes
   const voiceSettings = { enabled: true };
 
   const handleStartRecording = () => {
-    console.log('Start voice recording');
+    logger.info('COACH_CHAT_INTERFACE', 'Start voice-to-text recording');
+    // TODO: Implémenter voice-to-text classique
   };
 
   const handleStopRecording = () => {
-    console.log('Stop voice recording');
+    logger.info('COACH_CHAT_INTERFACE', 'Stop voice-to-text recording');
+    // TODO: Implémenter arrêt voice-to-text classique
   };
+
+  /**
+   * Démarrer la session Realtime
+   */
+  const handleStartRealtimeSession = async () => {
+    try {
+      logger.info('COACH_CHAT_INTERFACE', 'Starting Realtime session');
+      setRealtimeError(undefined);
+
+      // Initialiser l'orchestrateur si nécessaire
+      if (!voiceCoachOrchestrator.initialized) {
+        logger.info('COACH_CHAT_INTERFACE', 'Initializing voice coach orchestrator');
+        await voiceCoachOrchestrator.initialize();
+      }
+
+      // Démarrer la session avec le mode actuel (ou par défaut 'force')
+      const mode = currentMode || 'force';
+      logger.info('COACH_CHAT_INTERFACE', `Starting voice session with mode: ${mode}`);
+      await voiceCoachOrchestrator.startVoiceSession(mode);
+
+      logger.info('COACH_CHAT_INTERFACE', 'Realtime session started successfully');
+    } catch (error) {
+      logger.error('COACH_CHAT_INTERFACE', 'Failed to start Realtime session', { error });
+
+      // Afficher l'erreur dans l'UI
+      const errorMessage = error instanceof Error ? error.message : 'Failed to start voice session';
+      setRealtimeError(errorMessage);
+
+      // Aussi l'afficher dans le store si disponible
+      if (voiceError) {
+        setRealtimeError(voiceError);
+      }
+    }
+  };
+
+  /**
+   * Arrêter la session Realtime
+   */
+  const handleStopRealtimeSession = () => {
+    try {
+      logger.info('COACH_CHAT_INTERFACE', 'Stopping Realtime session');
+      setRealtimeError(undefined);
+      voiceCoachOrchestrator.stopVoiceSession();
+      logger.info('COACH_CHAT_INTERFACE', 'Realtime session stopped');
+    } catch (error) {
+      logger.error('COACH_CHAT_INTERFACE', 'Error stopping Realtime session', { error });
+    }
+  };
+
+  // Nettoyer l'erreur quand l'état change
+  useEffect(() => {
+    if (voiceState === 'idle') {
+      setRealtimeError(undefined);
+    }
+  }, [voiceState]);
 
   return (
     <div className={`coach-chat-interface flex flex-col ${className}`} style={{ height: '100%', position: 'relative', minHeight: 0 }}>
@@ -87,9 +152,13 @@ const CoachChatInterface: React.FC<CoachChatInterfaceProps> = ({
           onSendMessage={onSendMessage}
           onStartVoiceRecording={handleStartRecording}
           onStopVoiceRecording={handleStopRecording}
+          onStartRealtimeSession={handleStartRealtimeSession}
+          onStopRealtimeSession={handleStopRealtimeSession}
           isRecording={isRecording}
           isProcessing={isProcessing}
           isSpeaking={isSpeaking}
+          realtimeState={voiceState}
+          realtimeError={realtimeError}
           voiceEnabled={voiceSettings.enabled}
           stepColor={stepColor}
         />
