@@ -187,13 +187,13 @@ CREATE TABLE IF NOT EXISTS user_subscriptions (
 
   -- Métadonnées
   created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now(),
-
-  -- Contrainte: un utilisateur = un abonnement actif max
-  CONSTRAINT unique_active_subscription_per_user
-    UNIQUE (user_id)
-    WHERE subscription_status IN ('active', 'trialing')
+  updated_at TIMESTAMPTZ DEFAULT now()
 );
+
+-- Index unique partiel: un utilisateur = un abonnement actif max
+CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_active_subscription_per_user
+  ON user_subscriptions(user_id)
+  WHERE subscription_status IN ('active', 'trialing');
 
 -- Index pour lookups fréquents
 CREATE INDEX IF NOT EXISTS idx_user_subscriptions_user_id ON user_subscriptions(user_id);

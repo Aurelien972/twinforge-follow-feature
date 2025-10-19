@@ -120,10 +120,17 @@ async function createStripeProducts() {
     .from('token_pricing_config')
     .select('id, subscription_plans')
     .eq('is_active', true)
-    .single();
+    .maybeSingle();
 
-  if (error || !pricingConfig) {
+  if (error) {
     console.error('❌ Erreur lors de la récupération de la configuration:', error);
+    process.exit(1);
+  }
+
+  if (!pricingConfig) {
+    console.error('❌ Aucune configuration de pricing active trouvée');
+    console.log('\n💡 Vérifiez que la migration du système de tokens a été appliquée:');
+    console.log('   supabase/migrations/20251020120000_create_token_system_complete.sql');
     process.exit(1);
   }
 
@@ -158,9 +165,9 @@ async function createStripeProducts() {
           plan_key: planKey,
           tokens_monthly: planData.tokens_monthly.toString(),
           environment: mode,
-          created_by: 'create-stripe-products-script'
-        },
-        features: planConfig.features.map(feature => ({ name: feature })),
+          created_by: 'create-stripe-products-script',
+          features: planConfig.features.join(', ')
+        }
       });
 
       console.log(`   ✅ Produit créé: ${product.id}`);
