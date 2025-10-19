@@ -369,6 +369,115 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
             />
           </div>
 
+          {/* Realtime Voice Button (RED with RED DOT) */}
+          {voiceEnabled && (
+            <motion.button
+              onClick={handleRealtimeToggle}
+              className="chat-input-button flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center relative"
+              style={{
+                background: isRealtimeActive
+                  ? `
+                      radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.4) 0%, transparent 70%),
+                      linear-gradient(135deg, rgba(239, 68, 68, 0.85), rgba(220, 38, 38, 0.95))
+                    `
+                  : `
+                      radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.3) 0%, transparent 70%),
+                      linear-gradient(135deg, rgba(239, 68, 68, 0.7), rgba(220, 38, 38, 0.8))
+                    `,
+                border: isRealtimeActive ? '2px solid rgba(239, 68, 68, 0.8)' : '2px solid rgba(239, 68, 68, 0.6)',
+                boxShadow: isRealtimeActive
+                  ? `
+                      0 0 30px rgba(239, 68, 68, 0.6),
+                      0 6px 16px rgba(0, 0, 0, 0.4),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.3)
+                    `
+                  : `
+                      0 0 20px rgba(239, 68, 68, 0.4),
+                      0 4px 12px rgba(0, 0, 0, 0.3),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                    `
+              }}
+              whileHover={{
+                scale: 1.08,
+                boxShadow: `
+                  0 0 35px rgba(239, 68, 68, 0.7),
+                  0 8px 20px rgba(0, 0, 0, 0.5),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.4)
+                `
+              }}
+              whileTap={{ scale: 0.92 }}
+              disabled={disabled}
+            >
+              {/* RED DOT inside the RED CIRCLE - Recording Indicator */}
+              <AnimatePresence>
+                {(realtimeState === 'listening' || realtimeState === 'speaking') && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    style={{
+                      position: 'absolute',
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      background: 'radial-gradient(circle at 30% 30%, #FF6B6B 0%, #DC2626 100%)',
+                      boxShadow: `
+                        0 0 12px rgba(239, 68, 68, 0.8),
+                        0 0 20px rgba(239, 68, 68, 0.6),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.5)
+                      `,
+                      zIndex: 2
+                    }}
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* Pulsating glow effect */}
+              {isRealtimeActive && (
+                <motion.div
+                  style={{
+                    position: 'absolute',
+                    inset: -2,
+                    borderRadius: '50%',
+                    background: 'rgba(239, 68, 68, 0.3)',
+                    filter: 'blur(8px)',
+                    zIndex: -1
+                  }}
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 0.8, 0.5]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
+                  }}
+                />
+              )}
+
+              {/* Connecting state - spinning border */}
+              {realtimeState === 'connecting' && (
+                <motion.div
+                  style={{
+                    position: 'absolute',
+                    inset: -3,
+                    borderRadius: '50%',
+                    border: '2px solid transparent',
+                    borderTopColor: '#EF4444',
+                    borderRightColor: '#EF4444',
+                    pointerEvents: 'none'
+                  }}
+                  animate={{ rotate: 360 }}
+                  transition={{
+                    duration: 1,
+                    repeat: Infinity,
+                    ease: 'linear'
+                  }}
+                />
+              )}
+            </motion.button>
+          )}
+
           {/* Send Button */}
           <motion.button
             onClick={handleSubmit}
