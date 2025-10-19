@@ -369,8 +369,9 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
             />
           </div>
 
-          {/* Realtime Voice Button (RED with RED DOT) */}
-          {voiceEnabled && (
+          {/* Dynamic Button: Realtime when empty, Send when typing */}
+          {voiceEnabled && !message.trim() ? (
+            // Bouton Realtime rouge quand aucun texte
             <motion.button
               onClick={handleRealtimeToggle}
               className="chat-input-button flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center relative"
@@ -476,41 +477,44 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
                 />
               )}
             </motion.button>
-          )}
-
-          {/* Send Button */}
-          <motion.button
-            onClick={handleSubmit}
-            disabled={!message.trim() || disabled || isProcessing}
-            className={`chat-input-button flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${message.trim() && !disabled ? 'chat-input-button--send-enabled' : ''}`}
-            style={{
-              background: message.trim()
-                ? `
-                    radial-gradient(circle at 30% 30%, color-mix(in srgb, ${stepColor} 35%, transparent) 0%, transparent 70%),
-                    linear-gradient(135deg, color-mix(in srgb, ${stepColor} 30%, transparent), color-mix(in srgb, ${stepColor} 18%, transparent))
-                  `
-                : 'rgba(255, 255, 255, 0.05)',
-              border: message.trim()
-                ? `1.5px solid color-mix(in srgb, ${stepColor} 50%, transparent)`
-                : '1px solid rgba(255, 255, 255, 0.1)',
-              boxShadow: message.trim()
-                ? `0 0 16px color-mix(in srgb, ${stepColor} 25%, transparent), 0 4px 12px rgba(0, 0, 0, 0.2)`
-                : 'none',
-              cursor: message.trim() && !disabled ? 'pointer' : 'not-allowed',
-              opacity: message.trim() && !disabled ? 1 : 0.5
-            }}
-            whileHover={message.trim() && !disabled ? { scale: 1.05 } : undefined}
-            whileTap={message.trim() && !disabled ? { scale: 0.95 } : undefined}
-          >
-            <SpatialIcon
-              Icon={ICONS.Send}
-              size={18}
+          ) : (
+            // Bouton Send quand l'utilisateur écrit
+            <motion.button
+              onClick={handleSubmit}
+              disabled={!message.trim() || disabled || isProcessing}
+              className={`chat-input-button flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${message.trim() && !disabled ? 'chat-input-button--send-enabled' : ''}`}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
               style={{
-                color: message.trim() ? stepColor : 'rgba(255, 255, 255, 0.4)',
-                filter: message.trim() ? `drop-shadow(0 0 8px color-mix(in srgb, ${stepColor} 40%, transparent))` : 'none'
+                background: message.trim()
+                  ? `
+                      radial-gradient(circle at 30% 30%, color-mix(in srgb, ${stepColor} 35%, transparent) 0%, transparent 70%),
+                      linear-gradient(135deg, color-mix(in srgb, ${stepColor} 30%, transparent), color-mix(in srgb, ${stepColor} 18%, transparent))
+                    `
+                  : 'rgba(255, 255, 255, 0.05)',
+                border: message.trim()
+                  ? `1.5px solid color-mix(in srgb, ${stepColor} 50%, transparent)`
+                  : '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: message.trim()
+                  ? `0 0 16px color-mix(in srgb, ${stepColor} 25%, transparent), 0 4px 12px rgba(0, 0, 0, 0.2)`
+                  : 'none',
+                cursor: message.trim() && !disabled ? 'pointer' : 'not-allowed',
+                opacity: message.trim() && !disabled ? 1 : 0.5
               }}
-            />
-          </motion.button>
+              whileHover={message.trim() && !disabled ? { scale: 1.05 } : undefined}
+              whileTap={message.trim() && !disabled ? { scale: 0.95 } : undefined}
+            >
+              <SpatialIcon
+                Icon={ICONS.Send}
+                size={18}
+                style={{
+                  color: message.trim() ? stepColor : 'rgba(255, 255, 255, 0.4)',
+                  filter: message.trim() ? `drop-shadow(0 0 8px color-mix(in srgb, ${stepColor} 40%, transparent))` : 'none'
+                }}
+              />
+            </motion.button>
+          )}
         </div>
 
         {/* Recording Indicator */}

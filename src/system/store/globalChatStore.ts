@@ -1,6 +1,9 @@
 /**
  * Global Chat Store
- * Zustand store for managing the global contextual chat system
+ * DEPRECATED: Use unifiedCoachStore instead
+ * This store is now a proxy/adapter to unifiedCoachStore for backward compatibility
+ *
+ * @deprecated Use useUnifiedCoachStore from './unifiedCoachStore' instead
  */
 
 import { create } from 'zustand';
@@ -12,6 +15,7 @@ import type { ChatState } from './chatStateMachine';
 import { initialChatState } from './chatStateMachine';
 import type { NotificationId } from '../services/unifiedNotificationService';
 import { useOverlayStore } from './overlayStore';
+import { useUnifiedCoachStore } from './unifiedCoachStore';
 
 export type ChatMode = 'training' | 'nutrition' | 'fasting' | 'general' | 'body-scan';
 

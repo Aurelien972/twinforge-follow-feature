@@ -1,14 +1,7 @@
 /**
- * Floating Chat Button
- * Bouton flottant pour ouvrir/fermer le chat global depuis le côté droit de l'écran
- *
- * @deprecated Ce composant est obsolète. Utilisez UnifiedFloatingButton à la place.
- * @see UnifiedFloatingButton
- *
- * Migration:
- * - Remplacer FloatingChatButton par UnifiedFloatingButton
- * - Utiliser useUnifiedCoachStore au lieu de useGlobalChatStore
- * - Voir docs/technical/UNIFIED_CHAT_SYSTEM.md pour plus d'informations
+ * Floating Chat Button - Unified Version
+ * Bouton flottant pour ouvrir/fermer le chat unifié (texte + Realtime)
+ * Utilise unifiedCoachStore pour gérer l'état du chat
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -16,8 +9,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
-import { useGlobalChatStore } from '../../../system/store/globalChatStore';
-import { Z_INDEX, useOverlayStore } from '../../../system/store/overlayStore';
+import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
+import { Z_INDEX } from '../../../system/store/overlayStore';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
 import ContextualTooltip from '../ContextualTooltip';
@@ -33,7 +26,18 @@ interface FloatingChatButtonProps {
 
 const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButtonProps>(({ className = '' }, ref) => {
   const location = useLocation();
-  const { isOpen, toggle, currentMode, modeConfigs, hasUnreadMessages, unreadCount, isInStep2 } = useGlobalChatStore();
+
+  // Utiliser unifiedCoachStore au lieu de globalChatStore
+  const {
+    isPanelOpen: isOpen,
+    togglePanel: toggle,
+    currentMode,
+    modeConfigs,
+    hasUnreadMessages,
+    unreadCount,
+    isInStep2
+  } = useUnifiedCoachStore();
+
   const { click } = useFeedback();
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1025 : false);
   const internalButtonRef = useRef<HTMLButtonElement>(null);

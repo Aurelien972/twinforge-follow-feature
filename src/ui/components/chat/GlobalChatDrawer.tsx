@@ -1,22 +1,15 @@
 /**
- * Global Chat Drawer
- * Drawer de chat contextuel qui slide depuis la droite de l'écran
- *
- * @deprecated Ce composant est obsolète. Utilisez UnifiedCoachDrawer à la place.
- * @see UnifiedCoachDrawer
- *
- * Migration:
- * - Remplacer GlobalChatDrawer par UnifiedCoachDrawer
- * - Utiliser useUnifiedCoachStore au lieu de useGlobalChatStore
- * - Voir docs/technical/UNIFIED_CHAT_SYSTEM.md pour plus d'informations
+ * Global Chat Drawer - Unified Version
+ * Drawer de chat unifié supportant texte et Realtime API
+ * Utilise unifiedCoachStore pour gérer tous les messages
  */
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
-import { useGlobalChatStore } from '../../../system/store/globalChatStore';
+import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
 import { Z_INDEX, useOverlayStore } from '../../../system/store/overlayStore';
 import CoachChatInterface from '../coach/CoachChatInterface';
 import { useFeedback } from '../../../hooks/useFeedback';
@@ -32,13 +25,13 @@ interface GlobalChatDrawerProps {
 
 const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) => {
   const location = useLocation();
-  const navigate = useNavigate();
+
+  // Utiliser unifiedCoachStore au lieu de globalChatStore
   const {
-    isOpen,
-    close,
+    isPanelOpen: isOpen,
+    closePanel: close,
     currentMode,
     modeConfigs,
-    position,
     setMode,
     closeOnNavigation,
     addMessage,
@@ -47,9 +40,8 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
     setTyping,
     conversationId,
     incrementUnread
-  } = useGlobalChatStore();
+  } = useUnifiedCoachStore();
 
-  const set = useGlobalChatStore.setState;
   const { navClose } = useFeedback();
   const previousPathRef = useRef(location.pathname);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -58,6 +50,9 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
 
   const modeConfig = modeConfigs[currentMode];
   const modeColor = modeConfig.color;
+
+  // Position du drawer (toujours à droite pour le moment)
+  const position = { side: 'right' as const, width: 420, isMinimized: false };
 
   // Performance-aware backdrop filters
   const overlayBackdrop = useMemo(() => {
@@ -171,7 +166,8 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
           const history = await chatConversationService.getConversationMessages(convId);
 
           if (history.length > 0) {
-            set({ conversationId: convId, messages: history });
+            // Utiliser le store unifié pour mettre à jour les messages
+            useUnifiedCoachStore.setState({ conversationId: convId, messages: history });
             logger.debug('GLOBAL_CHAT_DRAWER', 'Loaded conversation history', {
               conversationId: convId,
               messageCount: history.length,
@@ -232,7 +228,7 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
       logger.info('GLOBAL_CHAT_DRAWER', '✅ Conversation ID obtained', { convId });
 
       if (!conversationId) {
-        set({ conversationId: convId });
+        useUnifiedCoachStore.setState({ conversationId: convId });
       }
 
       await chatConversationService.saveMessage(convId, userMessage);
@@ -455,72 +451,6 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Voice Coach Button - Realtime API */}
-                <motion.button
-                  className="voice-coach-button"
-                  onClick={async () => {
-                    // TODO: Implement proper voice coach activation via unified coach store
-                    logger.info('GLOBAL_CHAT_DRAWER', 'Voice Coach button clicked - functionality to be implemented');
-                  }}
-                  style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '50%',
-                    background: `
-                      radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.4) 0%, transparent 70%),
-                      linear-gradient(135deg, rgba(239, 68, 68, 0.85), rgba(220, 38, 38, 0.95))
-                    `,
-                    border: '2px solid rgba(239, 68, 68, 0.6)',
-                    boxShadow: `
-                      0 0 20px rgba(239, 68, 68, 0.4),
-                      0 4px 12px rgba(0, 0, 0, 0.3),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    position: 'relative'
-                  }}
-                  whileHover={{
-                    scale: 1.08,
-                    boxShadow: `
-                      0 0 30px rgba(239, 68, 68, 0.6),
-                      0 6px 16px rgba(0, 0, 0, 0.4),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.3)
-                    `
-                  }}
-                  whileTap={{ scale: 0.92 }}
-                >
-                  <SpatialIcon
-                    Icon={ICONS.Mic}
-                    size={22}
-                    style={{
-                      color: 'white',
-                      filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.6))'
-                    }}
-                  />
-                  <motion.div
-                    style={{
-                      position: 'absolute',
-                      inset: -2,
-                      borderRadius: '50%',
-                      background: 'rgba(239, 68, 68, 0.3)',
-                      filter: 'blur(8px)',
-                      zIndex: -1
-                    }}
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      opacity: [0.5, 0.8, 0.5]
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeInOut'
-                    }}
-                  />
-                </motion.button>
-
                 {/* Scroll to Bottom Button */}
                 <AnimatePresence>
                   {showScrollButton && (
