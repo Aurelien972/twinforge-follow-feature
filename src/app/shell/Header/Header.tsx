@@ -41,11 +41,11 @@ export const Header = React.memo(() => {
           WebkitPerspective: '1000px',
           perspective: '1000px',
           background: isPerformanceMode
-            ? 'rgba(11, 14, 23, 0.95)'
+            ? 'rgba(11, 14, 23, 1.0)'
             : undefined,
-          backdropFilter: isPerformanceMode ? 'blur(10px)' : undefined,
-          WebkitBackdropFilter: isPerformanceMode ? 'blur(10px)' : undefined,
-          border: isPerformanceMode ? '1px solid rgba(255, 255, 255, 0.1)' : undefined,
+          backdropFilter: isPerformanceMode ? 'none' : undefined,
+          WebkitBackdropFilter: isPerformanceMode ? 'none' : undefined,
+          border: isPerformanceMode ? '1px solid rgba(255, 255, 255, 0.15)' : undefined,
         }}
         role="banner"
         aria-label="TwinForge Pont de Commandement"

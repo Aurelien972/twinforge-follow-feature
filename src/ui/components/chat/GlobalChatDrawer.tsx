@@ -31,15 +31,6 @@ interface GlobalChatDrawerProps {
 }
 
 const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) => {
-  // DEPRECATED WARNING
-  useEffect(() => {
-    console.warn(
-      '⚠️ DEPRECATED: GlobalChatDrawer is deprecated and will be removed in a future version.\n' +
-      '→ Use UnifiedCoachDrawer instead.\n' +
-      '→ See docs/technical/UNIFIED_CHAT_SYSTEM.md for migration guide.'
-    );
-  }, []);
-
   const location = useLocation();
   const navigate = useNavigate();
   const {
@@ -464,11 +455,12 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Voice Coach Button - Prominent */}
+                {/* Voice Coach Button - Realtime API */}
                 <motion.button
                   className="voice-coach-button"
-                  onClick={() => {
-                    console.log('Voice Coach activation');
+                  onClick={async () => {
+                    // TODO: Implement proper voice coach activation via unified coach store
+                    logger.info('GLOBAL_CHAT_DRAWER', 'Voice Coach button clicked - functionality to be implemented');
                   }}
                   style={{
                     width: '44px',
