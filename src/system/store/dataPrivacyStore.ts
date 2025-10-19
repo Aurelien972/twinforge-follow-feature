@@ -158,22 +158,22 @@ export const useDataPrivacyStore = create<DataPrivacyState>((set, get) => ({
 
       // If user is logged in, sync to Supabase
       if (userId) {
+        // Use update instead of upsert to avoid constraint issues with other fields
         const { error } = await supabase
           .from('user_preferences')
-          .upsert(
-            {
-              user_id: userId,
-              [key]: value,
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: 'user_id' }
-          );
+          .update({
+            [key]: value,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('user_id', userId);
 
         if (error) {
           logger.error('DATA_PRIVACY', 'Failed to update privacy preference in Supabase', {
             error,
           });
-          throw error;
+          // Don't throw - continue with local state
+          set({ isSaving: false, error: 'Erreur lors de la sauvegarde' });
+          return;
         }
 
         logger.info('DATA_PRIVACY', 'Updated privacy preference', { key, value });
