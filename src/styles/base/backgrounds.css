@@ -630,10 +630,10 @@ html.mode-high-performance .forge-particle,
    ========================================= */
 
 /* Spécificité maximale pour mode high-performance */
-html.mode-high-performance body .bg-twinforge-visionos,
-html.performance-mode body .bg-twinforge-visionos,
-body.mode-high-performance .bg-twinforge-visionos,
-body.performance-mode .bg-twinforge-visionos {
+html.mode-high-performance .bg-twinforge-visionos,
+html.performance-mode .bg-twinforge-visionos,
+.mode-high-performance .bg-twinforge-visionos,
+.performance-mode .bg-twinforge-visionos {
   background: var(--forge-deep) !important;
   background-image: none !important;
   background-color: var(--forge-deep) !important;
@@ -642,8 +642,8 @@ body.performance-mode .bg-twinforge-visionos {
 }
 
 /* Spécificité maximale pour mode balanced */
-html.mode-balanced body .bg-twinforge-visionos,
-body.mode-balanced .bg-twinforge-visionos {
+html.mode-balanced .bg-twinforge-visionos,
+.mode-balanced .bg-twinforge-visionos {
   /* Fond identique au mode quality MAIS sans animation */
   background:
     radial-gradient(ellipse 400% 300% at 20% 80%,
