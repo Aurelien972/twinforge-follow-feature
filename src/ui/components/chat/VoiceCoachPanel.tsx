@@ -82,16 +82,19 @@ const VoiceCoachPanel: React.FC = () => {
       logger.info('VOICE_COACH_PANEL', 'Environment detected', {
         environment: caps.environmentName,
         canUseVoice: caps.canUseVoiceMode,
-        isStackBlitz: caps.isStackBlitz
+        isStackBlitz: caps.isStackBlitz,
+        canUseWebSocket: caps.canUseWebSocket
       });
 
       // Log pour debugging
       environmentDetectionService.logEnvironmentInfo();
 
-      // Si on ne peut pas utiliser le mode vocal, forcer le mode texte
-      if (!caps.canUseVoiceMode && communicationMode === 'voice') {
-        logger.warn('VOICE_COACH_PANEL', 'Forcing text mode due to environment limitations');
+      // Only force text mode if WebSocket is truly not available
+      if (!caps.canUseWebSocket && communicationMode === 'voice') {
+        logger.warn('VOICE_COACH_PANEL', 'Forcing text mode - WebSocket not available in browser');
         setCommunicationMode('text');
+      } else if (caps.isStackBlitz && communicationMode === 'voice') {
+        logger.info('VOICE_COACH_PANEL', 'Voice mode requested in StackBlitz - will attempt connection');
       }
 
       setEnvironmentChecked(true);
@@ -187,13 +190,14 @@ const VoiceCoachPanel: React.FC = () => {
   };
 
   const handleStartVoiceSession = async () => {
-    // Vérifier si le mode vocal est disponible
+    // Vérifier si WebSocket est disponible dans le navigateur
     const caps = environmentDetectionService.getCapabilities();
 
-    if (!caps.canUseVoiceMode) {
-      logger.error('VOICE_COACH_PANEL', 'Voice mode not available in this environment');
+    // Only block if WebSocket is truly not available
+    if (!caps.canUseWebSocket) {
+      logger.error('VOICE_COACH_PANEL', 'WebSocket not available in browser');
 
-      const errorMessage = environmentDetectionService.getVoiceModeUnavailableMessage();
+      const errorMessage = 'Le mode vocal nécessite les WebSockets qui ne sont pas disponibles dans ce navigateur.';
       setError(errorMessage);
       setVoiceState('error');
 
@@ -205,6 +209,11 @@ const VoiceCoachPanel: React.FC = () => {
       }, 3000);
 
       return;
+    }
+
+    // Log warning if in StackBlitz but continue anyway
+    if (caps.isStackBlitz || caps.isWebContainer) {
+      logger.warn('VOICE_COACH_PANEL', '⚠️ Running in WebContainer environment - attempting connection');
     }
 
     try {
@@ -283,21 +292,14 @@ const VoiceCoachPanel: React.FC = () => {
   const handleToggleCommunicationMode = () => {
     const caps = environmentDetectionService.getCapabilities();
 
-    // Si on veut passer en mode vocal mais que ce n'est pas disponible
-    if (communicationMode === 'text' && !caps.canUseVoiceMode) {
-      logger.warn('VOICE_COACH_PANEL', 'Voice mode not available, staying in text mode');
+    // Log the toggle attempt
+    logger.info('VOICE_COACH_PANEL', '🎤 User toggling communication mode', {
+      from: communicationMode,
+      to: communicationMode === 'text' ? 'voice' : 'text',
+      canUseVoiceMode: caps.canUseVoiceMode
+    });
 
-      // Afficher un message d'information
-      setError(environmentDetectionService.getVoiceModeUnavailableMessage());
-
-      setTimeout(() => {
-        setError('');
-      }, 5000);
-
-      return;
-    }
-
-    // Sinon, basculer normalement
+    // Always allow the toggle - let the actual connection attempt determine if it works
     toggleCommunicationMode();
   };
 

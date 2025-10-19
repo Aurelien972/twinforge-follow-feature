@@ -51,11 +51,12 @@ class EnvironmentDetectionService {
     const isDevelopment = hostname.includes('localhost') ||
                           hostname === '127.0.0.1';
 
-    // Capacités WebSocket
-    const canUseWebSocket = !isWebContainer && typeof WebSocket !== 'undefined';
+    // Capacités WebSocket - vérifier uniquement si WebSocket existe dans le navigateur
+    const canUseWebSocket = typeof WebSocket !== 'undefined';
 
-    // Le mode vocal nécessite WebSocket
-    const canUseVoiceMode = canUseWebSocket && !isWebContainer;
+    // Le mode vocal nécessite WebSocket - ne pas bloquer basé sur l'environnement
+    // Laisser la tentative de connexion échouer naturellement si l'environnement ne supporte pas
+    const canUseVoiceMode = canUseWebSocket;
 
     // Le mode texte est toujours disponible
     const canUseTextMode = true;
@@ -73,9 +74,8 @@ class EnvironmentDetectionService {
     // Limitations
     const limitations: string[] = [];
     if (isWebContainer) {
-      limitations.push('Les WebSockets externes ne sont pas supportés dans WebContainer');
-      limitations.push('Le mode vocal n\'est pas disponible');
-      limitations.push('Seul le mode texte est fonctionnel');
+      limitations.push('WebContainer peut avoir des limitations avec les WebSockets externes');
+      limitations.push('Le mode vocal peut nécessiter des configurations supplémentaires');
     }
 
     if (!canUseWebSocket) {
@@ -85,9 +85,9 @@ class EnvironmentDetectionService {
     // Recommandations
     const recommendations: string[] = [];
     if (isStackBlitz) {
-      recommendations.push('Utilisez le mode texte pour tester les fonctionnalités de chat');
-      recommendations.push('Déployez en production pour accéder au mode vocal');
-      recommendations.push('Le mode texte fonctionne parfaitement dans cet environnement');
+      recommendations.push('Le mode vocal fonctionne via Supabase Edge Functions');
+      recommendations.push('Si vous rencontrez des problèmes, vérifiez la configuration de votre edge function');
+      recommendations.push('Le mode texte est toujours disponible comme alternative');
     }
 
     this.capabilities = {
@@ -141,20 +141,21 @@ class EnvironmentDetectionService {
   getVoiceModeUnavailableMessage(): string {
     const caps = this.getCapabilities();
 
-    if (caps.isStackBlitz || caps.isWebContainer) {
-      return `🚫 Le mode vocal n'est pas disponible dans ${caps.environmentName}.\n\n` +
-             `Raison : Les WebSockets externes ne sont pas supportés dans cet environnement.\n\n` +
-             `✅ Solutions :\n` +
-             `• Utilisez le mode texte (disponible maintenant)\n` +
-             `• Déployez l'application en production pour accéder au mode vocal\n\n` +
-             `💡 Le mode texte offre les mêmes fonctionnalités de chat intelligent !`;
-    }
-
     if (!caps.canUseWebSocket) {
       return `🚫 Le mode vocal nécessite la prise en charge des WebSockets.\n\n` +
              `Votre navigateur ou configuration réseau ne supporte pas cette fonctionnalité.\n\n` +
              `✅ Solution :\n` +
              `• Utilisez le mode texte (disponible maintenant)`;
+    }
+
+    if (caps.isStackBlitz || caps.isWebContainer) {
+      return `⚠️ Tentative de connexion en mode vocal...\n\n` +
+             `Note : Vous êtes dans ${caps.environmentName}. Si la connexion échoue :\n\n` +
+             `✅ Solutions :\n` +
+             `• Vérifiez que votre edge function Supabase est déployée\n` +
+             `• Vérifiez que OPENAI_API_KEY est configurée dans les secrets Supabase\n` +
+             `• Utilisez le mode texte comme alternative\n\n` +
+             `💡 La connexion peut prendre quelques secondes...`;
     }
 
     return 'Le mode vocal n\'est pas disponible actuellement. Utilisez le mode texte.';

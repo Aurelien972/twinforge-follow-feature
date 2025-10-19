@@ -93,13 +93,16 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
       logger.info('UNIFIED_COACH_DRAWER', 'Environment detected', {
         environment: caps.environmentName,
         canUseVoice: caps.canUseVoiceMode,
-        isStackBlitz: caps.isStackBlitz
+        isStackBlitz: caps.isStackBlitz,
+        canUseWebSocket: caps.canUseWebSocket
       });
 
-      // Si on ne peut pas utiliser le mode vocal, forcer le mode texte
-      if (!caps.canUseVoiceMode && communicationMode === 'voice') {
-        logger.warn('UNIFIED_COACH_DRAWER', 'Forcing text mode due to environment limitations');
+      // Only force text mode if WebSocket is truly not available
+      if (!caps.canUseWebSocket && communicationMode === 'voice') {
+        logger.warn('UNIFIED_COACH_DRAWER', 'Forcing text mode - WebSocket not available in browser');
         setCommunicationMode('text');
+      } else if (caps.isStackBlitz && communicationMode === 'voice') {
+        logger.info('UNIFIED_COACH_DRAWER', 'Voice mode requested in StackBlitz - will attempt connection');
       }
 
       setEnvironmentChecked(true);
@@ -487,7 +490,7 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
       timestamp: new Date().toISOString()
     });
 
-    // Detailed environment check logging
+    // Log environment info but don't block based on it
     const envCaps = environmentDetectionService.getCapabilities();
     logger.info('UNIFIED_COACH_DRAWER', '🔍 Environment capabilities check', {
       canUseVoiceMode: envCaps.canUseVoiceMode,
@@ -499,20 +502,14 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
       recommendations: envCaps.recommendations
     });
 
-    if (!envCaps.canUseVoiceMode) {
-      logger.error('UNIFIED_COACH_DRAWER', '❌ Voice mode not available in this environment', {
-        reason: 'Environment capabilities check failed',
-        environment: envCaps.environmentName,
-        limitations: envCaps.limitations
+    // Only block if WebSocket is truly not available in the browser
+    if (!envCaps.canUseWebSocket) {
+      logger.error('UNIFIED_COACH_DRAWER', '❌ WebSocket not available in browser', {
+        reason: 'WebSocket API not found',
+        environment: envCaps.environmentName
       });
 
-      const errorMessage = environmentDetectionService.getVoiceModeUnavailableMessage();
-      logger.error('UNIFIED_COACH_DRAWER', '❌ Error message to display', {
-        errorMessage,
-        messageLength: errorMessage?.length || 0,
-        isEmpty: !errorMessage || errorMessage.length === 0
-      });
-
+      const errorMessage = 'Le mode vocal nécessite les WebSockets qui ne sont pas disponibles dans ce navigateur.';
       setError(errorMessage);
       setVoiceState('error');
 
@@ -523,6 +520,14 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
       }, 3000);
 
       return;
+    }
+
+    // Log warning if in StackBlitz but continue anyway
+    if (envCaps.isStackBlitz || envCaps.isWebContainer) {
+      logger.warn('UNIFIED_COACH_DRAWER', '⚠️ Running in WebContainer environment', {
+        environment: envCaps.environmentName,
+        message: 'Attempting voice connection anyway - will fail gracefully if not supported'
+      });
     }
 
     try {
@@ -616,18 +621,25 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
   };
 
   const handleToggleCommunicationMode = () => {
-    if (communicationMode === 'text' && !caps.canUseVoiceMode) {
-      logger.warn('UNIFIED_COACH_DRAWER', 'Voice mode not available, staying in text mode');
-      setError(environmentDetectionService.getVoiceModeUnavailableMessage());
+    // Log the toggle attempt
+    logger.info('UNIFIED_COACH_DRAWER', '🎤 User toggling communication mode', {
+      from: communicationMode,
+      to: communicationMode === 'text' ? 'voice' : 'text',
+      canUseVoiceMode: caps.canUseVoiceMode
+    });
 
-      setTimeout(() => {
-        clearError();
-      }, 5000);
-
-      return;
-    }
-
+    // Always allow the toggle - let the actual connection attempt determine if it works
     toggleCommunicationMode();
+
+    // If switching to voice mode, automatically start the session
+    if (communicationMode === 'text') {
+      logger.info('UNIFIED_COACH_DRAWER', '🚀 Auto-starting voice session after toggle to voice mode');
+
+      // Small delay to let the state update
+      setTimeout(() => {
+        handleStartVoiceSession();
+      }, 100);
+    }
   };
 
   const handleRunDiagnostics = async () => {
