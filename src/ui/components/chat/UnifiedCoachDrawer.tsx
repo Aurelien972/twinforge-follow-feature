@@ -19,6 +19,7 @@ import { chatConversationService } from '../../../system/services/chatConversati
 import { textChatService } from '../../../system/services/textChatService';
 import { voiceCoachOrchestrator } from '../../../system/services/voiceCoachOrchestrator';
 import { environmentDetectionService } from '../../../system/services/environmentDetectionService';
+import { voiceConnectionDiagnostics } from '../../../system/services/voiceConnectionDiagnostics';
 import CoachChatInterface from '../coach/CoachChatInterface';
 import AudioWaveform from './AudioWaveform';
 import TextChatInput from './TextChatInput';
@@ -478,12 +479,39 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
   }, [voiceState, communicationMode, isProcessing, isSpeaking]);
 
   const handleStartVoiceSession = async () => {
-    logger.info('UNIFIED_COACH_DRAWER', '🚀 handleStartVoiceSession called');
+    logger.info('UNIFIED_COACH_DRAWER', '🚀 handleStartVoiceSession called', {
+      currentMode,
+      communicationMode,
+      environmentChecked,
+      timestamp: new Date().toISOString()
+    });
 
-    if (!caps.canUseVoiceMode) {
-      logger.error('UNIFIED_COACH_DRAWER', '❌ Voice mode not available in this environment');
+    // Detailed environment check logging
+    const envCaps = environmentDetectionService.getCapabilities();
+    logger.info('UNIFIED_COACH_DRAWER', '🔍 Environment capabilities check', {
+      canUseVoiceMode: envCaps.canUseVoiceMode,
+      canUseWebSocket: envCaps.canUseWebSocket,
+      isStackBlitz: envCaps.isStackBlitz,
+      isWebContainer: envCaps.isWebContainer,
+      environmentName: envCaps.environmentName,
+      limitations: envCaps.limitations,
+      recommendations: envCaps.recommendations
+    });
+
+    if (!envCaps.canUseVoiceMode) {
+      logger.error('UNIFIED_COACH_DRAWER', '❌ Voice mode not available in this environment', {
+        reason: 'Environment capabilities check failed',
+        environment: envCaps.environmentName,
+        limitations: envCaps.limitations
+      });
 
       const errorMessage = environmentDetectionService.getVoiceModeUnavailableMessage();
+      logger.error('UNIFIED_COACH_DRAWER', '❌ Error message to display', {
+        errorMessage,
+        messageLength: errorMessage?.length || 0,
+        isEmpty: !errorMessage || errorMessage.length === 0
+      });
+
       setError(errorMessage);
       setVoiceState('error');
 
@@ -501,35 +529,81 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
       setVoiceState('connecting');
       setShowReadyPrompt(false);
 
+      // Check microphone permissions first
+      logger.info('UNIFIED_COACH_DRAWER', '🎙️ Checking microphone permissions...');
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        logger.info('UNIFIED_COACH_DRAWER', '✅ Microphone permission granted');
+        stream.getTracks().forEach(track => track.stop());
+      } catch (permError) {
+        const permErrorMsg = permError instanceof Error ? permError.message : String(permError);
+        logger.error('UNIFIED_COACH_DRAWER', '❌ Microphone permission denied or error', {
+          error: permErrorMsg,
+          name: permError instanceof Error ? permError.name : undefined
+        });
+        throw new Error(`Microphone access denied: ${permErrorMsg}`);
+      }
+
       if (!voiceCoachOrchestrator.initialized) {
         logger.info('UNIFIED_COACH_DRAWER', '🔧 Initializing voiceCoachOrchestrator...');
         await voiceCoachOrchestrator.initialize();
         logger.info('UNIFIED_COACH_DRAWER', '✅ voiceCoachOrchestrator initialized');
+      } else {
+        logger.info('UNIFIED_COACH_DRAWER', '✅ voiceCoachOrchestrator already initialized');
       }
 
-      logger.info('UNIFIED_COACH_DRAWER', '🎤 Starting voice session...', { mode: currentMode });
+      logger.info('UNIFIED_COACH_DRAWER', '🎤 Starting voice session...', {
+        mode: currentMode,
+        modeConfig: modeConfigs[currentMode]?.displayName,
+        timestamp: new Date().toISOString()
+      });
+
       await voiceCoachOrchestrator.startVoiceSession(currentMode);
 
-      logger.info('UNIFIED_COACH_DRAWER', '✅✅✅ Voice session started successfully ✅✅✅');
+      logger.info('UNIFIED_COACH_DRAWER', '✅✅✅ Voice session started successfully ✅✅✅', {
+        mode: currentMode,
+        timestamp: new Date().toISOString()
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to start voice session';
+      const errorName = error instanceof Error ? error.name : 'UnknownError';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
       logger.error('UNIFIED_COACH_DRAWER', '❌ Failed to start voice session', {
         error: errorMessage,
-        stack: error instanceof Error ? error.stack : undefined
+        errorName,
+        stack: errorStack,
+        currentMode,
+        timestamp: new Date().toISOString()
       });
 
       setVoiceState('error');
       setError(errorMessage);
       setShowReadyPrompt(true);
 
-      if (errorMessage.includes('StackBlitz') || errorMessage.includes('WebContainer') || errorMessage.includes('WebSocket')) {
-        logger.warn('UNIFIED_COACH_DRAWER', '💡 Suggesting text mode as fallback');
+      // Check if it's an environment-related error
+      const isEnvError = errorMessage.includes('StackBlitz') ||
+                        errorMessage.includes('WebContainer') ||
+                        errorMessage.includes('WebSocket') ||
+                        errorMessage.includes('timeout') ||
+                        errorMessage.includes('network');
+
+      if (isEnvError) {
+        logger.warn('UNIFIED_COACH_DRAWER', '💡 Environment-related error detected, suggesting text mode', {
+          errorMessage,
+          willSwitchToText: true
+        });
 
         setTimeout(() => {
           setCommunicationMode('text');
           setVoiceState('idle');
           setShowReadyPrompt(false);
-        }, 3000);
+          clearError();
+        }, 5000);
+      } else {
+        logger.warn('UNIFIED_COACH_DRAWER', '💡 Non-environment error, keeping in voice mode for retry', {
+          errorMessage
+        });
       }
     }
   };
@@ -553,6 +627,37 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
     }
 
     toggleCommunicationMode();
+  };
+
+  const handleRunDiagnostics = async () => {
+    logger.info('UNIFIED_COACH_DRAWER', '🔬 Running voice connection diagnostics...');
+
+    try {
+      const results = await voiceConnectionDiagnostics.runAllTests();
+      voiceConnectionDiagnostics.printResults(results);
+
+      const allPassed = results.every(r => r.passed);
+      const failedTests = results.filter(r => !r.passed);
+
+      if (allPassed) {
+        setError('✅ All diagnostics passed! Voice mode should work.\n\nCheck console for detailed results.');
+      } else {
+        const failureMsg = failedTests.map(t => `❌ ${t.test}: ${t.message}`).join('\n');
+        setError(`⚠️ Some diagnostics failed:\n\n${failureMsg}\n\nCheck console for detailed results and troubleshooting steps.`);
+      }
+
+      setTimeout(() => {
+        clearError();
+      }, 10000);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      logger.error('UNIFIED_COACH_DRAWER', '❌ Diagnostics failed', { error: errorMsg });
+      setError(`❌ Diagnostics failed: ${errorMsg}`);
+
+      setTimeout(() => {
+        clearError();
+      }, 5000);
+    }
   };
 
   const scrollToBottom = (smooth = true) => {
@@ -795,6 +900,33 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
               </div>
 
               <div className="flex items-center gap-2">
+                {/* Diagnostics button (shown when voice has errors) */}
+                {(voiceState === 'error' || (!caps.canUseVoiceMode && !isTextMode)) && (
+                  <motion.button
+                    onClick={handleRunDiagnostics}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: '12px',
+                      background: 'rgba(239, 68, 68, 0.2)',
+                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      color: '#EF4444',
+                      fontWeight: '500'
+                    }}
+                    whileHover={{ scale: 1.02, background: 'rgba(239, 68, 68, 0.3)' }}
+                    whileTap={{ scale: 0.98 }}
+                    title="Exécuter les diagnostics de connexion vocale"
+                  >
+                    <SpatialIcon Icon={ICONS.AlertCircle} size={14} style={{ color: '#EF4444' }} />
+                    Diagnostics
+                  </motion.button>
+                )}
+
                 {/* Toggle communication mode (voice/text) */}
                 <motion.button
                   onClick={handleToggleCommunicationMode}

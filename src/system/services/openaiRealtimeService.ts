@@ -54,15 +54,32 @@ class OpenAIRealtimeService {
         model: config.model,
         voice: config.voice,
         temperature: config.temperature,
-        maxTokens: config.maxTokens
+        maxTokens: config.maxTokens,
+        timestamp: new Date().toISOString()
       });
 
       // Récupérer le token Supabase pour l'authentification
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+      logger.info('REALTIME_API', '🔍 Environment variables check', {
+        hasSupabaseUrl: !!supabaseUrl,
+        supabaseUrlLength: supabaseUrl?.length || 0,
+        hasSupabaseAnonKey: !!supabaseAnonKey,
+        supabaseAnonKeyLength: supabaseAnonKey?.length || 0,
+        supabaseUrlPreview: supabaseUrl ? `${supabaseUrl.substring(0, 30)}...` : 'undefined'
+      });
+
       if (!supabaseUrl || !supabaseAnonKey) {
-        throw new Error('Supabase configuration missing');
+        const missingVars = [];
+        if (!supabaseUrl) missingVars.push('VITE_SUPABASE_URL');
+        if (!supabaseAnonKey) missingVars.push('VITE_SUPABASE_ANON_KEY');
+
+        logger.error('REALTIME_API', '❌ Missing Supabase configuration', {
+          missingVariables: missingVars,
+          allEnvVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_'))
+        });
+        throw new Error(`Supabase configuration missing: ${missingVars.join(', ')}`);
       }
 
       // URL de notre edge function proxy
@@ -77,13 +94,31 @@ class OpenAIRealtimeService {
       logger.info('REALTIME_API', '🌐 WebSocket URL constructed', {
         originalUrl: supabaseUrl,
         wsUrl: wsUrl.replace(supabaseAnonKey, '[REDACTED]'),
-        model: config.model
+        model: config.model,
+        wsUrlStructure: {
+          protocol: wsUrl.split('://')[0],
+          host: wsUrl.split('://')[1]?.split('/')[0],
+          path: wsUrl.split('://')[1]?.split('?')[0].substring(wsUrl.split('://')[1]?.split('/')[0].length || 0),
+          hasApikey: wsUrl.includes('apikey='),
+          hasModel: wsUrl.includes('model=')
+        }
       });
+
+      // Test WebSocket availability
+      if (typeof WebSocket === 'undefined') {
+        logger.error('REALTIME_API', '❌ WebSocket not available in this environment');
+        throw new Error('WebSocket API is not available in this browser/environment');
+      }
+
+      logger.info('REALTIME_API', '✅ WebSocket API is available');
 
       // Créer la connexion WebSocket via notre edge function
       logger.info('REALTIME_API', '🔌 Creating WebSocket connection to edge function...');
       this.ws = new WebSocket(wsUrl);
-      logger.info('REALTIME_API', '✅ WebSocket object created');
+      logger.info('REALTIME_API', '✅ WebSocket object created', {
+        readyState: this.ws.readyState,
+        readyStateName: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][this.ws.readyState]
+      });
 
       // Note: WebSocket ne supporte pas les headers custom dans le constructeur
       // L'authentification Supabase se fait via le paramètre apikey dans l'URL
@@ -115,31 +150,83 @@ class OpenAIRealtimeService {
       logger.info('REALTIME_API', '✅ Event handlers attached, waiting for connection...');
 
       // Attendre la connexion
-      logger.info('REALTIME_API', '⏳ Waiting for WebSocket connection (timeout: 10s)...');
+      logger.info('REALTIME_API', '⏳ Waiting for WebSocket connection (timeout: 15s)...');
       await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          logger.error('REALTIME_API', '❌ CONNECTION TIMEOUT after 10 seconds');
-          logger.error('REALTIME_API', 'WebSocket state at timeout', {
-            readyState: this.ws?.readyState,
-            readyStateNames: {
-              0: 'CONNECTING',
-              1: 'OPEN',
-              2: 'CLOSING',
-              3: 'CLOSED'
-            }[this.ws?.readyState ?? 3]
-          });
-          reject(new Error('Connection timeout - WebSocket did not open within 10 seconds'));
-        }, 10000);
+        const startTime = Date.now();
+        let timeoutHandle: NodeJS.Timeout | null = null;
+        let errorOccurred = false;
+
+        const cleanup = () => {
+          if (timeoutHandle) {
+            clearTimeout(timeoutHandle);
+            timeoutHandle = null;
+          }
+        };
 
         const onConnect = () => {
-          logger.info('REALTIME_API', '✅ Connection promise resolved');
-          clearTimeout(timeout);
+          if (errorOccurred) return;
+
+          const duration = Date.now() - startTime;
+          logger.info('REALTIME_API', '✅ Connection promise resolved', {
+            durationMs: duration,
+            timestamp: new Date().toISOString()
+          });
+          cleanup();
           this.connectHandlers.delete(onConnect);
+          this.errorHandlers.delete(onError);
           resolve();
         };
 
+        const onError = (error: Error) => {
+          if (errorOccurred) return;
+          errorOccurred = true;
+
+          const duration = Date.now() - startTime;
+          logger.error('REALTIME_API', '❌ Connection error during wait', {
+            error: error.message,
+            durationMs: duration,
+            wsState: this.ws?.readyState
+          });
+          cleanup();
+          this.connectHandlers.delete(onConnect);
+          this.errorHandlers.delete(onError);
+          reject(error);
+        };
+
+        timeoutHandle = setTimeout(() => {
+          if (errorOccurred) return;
+          errorOccurred = true;
+
+          const duration = Date.now() - startTime;
+          logger.error('REALTIME_API', '❌ CONNECTION TIMEOUT after 15 seconds', {
+            durationMs: duration,
+            wsState: this.ws?.readyState,
+            wsStateName: this.ws?.readyState !== undefined
+              ? ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][this.ws.readyState]
+              : 'NO_WS',
+            timestamp: new Date().toISOString()
+          });
+
+          this.connectHandlers.delete(onConnect);
+          this.errorHandlers.delete(onError);
+
+          // Close the WebSocket if it's still trying to connect
+          if (this.ws && this.ws.readyState === WebSocket.CONNECTING) {
+            logger.warn('REALTIME_API', 'Closing stuck WebSocket connection');
+            this.ws.close();
+          }
+
+          reject(new Error('Connection timeout - WebSocket did not open within 15 seconds. Please check your network connection and try again.'));
+        }, 15000);
+
         this.connectHandlers.add(onConnect);
-        logger.info('REALTIME_API', '👂 Listening for connection event...');
+        this.errorHandlers.add(onError);
+        logger.info('REALTIME_API', '👂 Listening for connection and error events...', {
+          handlerCounts: {
+            connect: this.connectHandlers.size,
+            error: this.errorHandlers.size
+          }
+        });
       });
 
       logger.info('REALTIME_API', '✅✅✅ SUCCESSFULLY CONNECTED TO REALTIME API ✅✅✅');
