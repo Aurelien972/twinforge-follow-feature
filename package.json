@@ -8,13 +8,19 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "lock": "npm install --package-lock-only"
+    "lock": "npm install --package-lock-only",
+    "stripe:create:test": "node scripts/create-stripe-products.js --mode=test",
+    "stripe:create:live": "node scripts/create-stripe-products.js --mode=live",
+    "stripe:verify:test": "node scripts/verify-stripe-products.js --mode=test",
+    "stripe:verify:live": "node scripts/verify-stripe-products.js --mode=live",
+    "stripe:setup": "npm run stripe:create:test && npm run stripe:verify:test"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
     "@react-three/drei": "^9.115.0",
     "@react-three/fiber": "^8.18.0",
     "@supabase/supabase-js": "^2.54.0",
+    "stripe": "^17.4.0",
     "@tanstack/query-sync-storage-persister": "^5.90.2",
     "@tanstack/react-query": "^5.84.2",
     "@tanstack/react-query-persist-client": "^5.90.2",
