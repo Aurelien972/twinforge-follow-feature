@@ -152,13 +152,13 @@ class VoiceCoachOrchestrator {
       // Construire le message de bienvenue personnalisé selon le mode
       const modeWelcomeMessages: Record<string, string> = {
         training: `Salut ${firstName}! Je suis ton coach sportif personnel. Prêt à donner le meilleur de toi-même aujourd'hui?`,
-        nutrition: `Bonjour ${firstName}! Je suis ton coach nutrition. Comment puis-je t'aider à optimiser ton alimentation aujourd'hui?`,
-        fasting: `Salut ${firstName}! Je suis ton coach jeûne. Comment se passe ta session de jeûne?`,
-        general: `Bonjour ${firstName}! Je suis ton assistant personnel TwinForge. Comment puis-je t'aider aujourd'hui?`,
-        'body-scan': `Salut ${firstName}! Je suis ton coach corps. Prêt pour analyser ta progression physique?`
+        nutrition: `Salut ${firstName}! Nous voilà prêts à optimiser notre alimentation. Qu'est-ce que nous allons travailler aujourd'hui?`,
+        fasting: `Salut ${firstName}! Nous commençons une nouvelle session de jeûne ensemble. Comment nous sentons-nous?`,
+        general: `Salut ${firstName}! Nous sommes TwinCoach, ton compagnon de progression. Qu'est-ce que nous allons accomplir aujourd'hui?`,
+        'body-scan': `Salut ${firstName}! Regardons ensemble notre évolution corporelle. Prêt à découvrir nos progrès?`
       };
 
-      const welcomeMessage = modeWelcomeMessages[mode] || `Bonjour ${firstName}! Comment puis-je t'aider aujourd'hui?`;
+      const welcomeMessage = modeWelcomeMessages[mode] || `Bonjour ${firstName}! Nous sommes là pour t'accompagner. Que souhaitons-nous faire aujourd'hui?`;
 
       // Envoyer le message de bienvenue personnalisé automatique pour démarrer la conversation
       logger.info('VOICE_ORCHESTRATOR', '👋 Triggering personalized welcome message from coach', { firstName, mode });

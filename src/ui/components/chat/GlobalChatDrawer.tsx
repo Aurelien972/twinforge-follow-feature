@@ -456,7 +456,7 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
                     {modeConfig.displayName}
                   </h3>
                   <p className="text-white/60 text-xs">
-                    En ligne • Prêt à aider
+                    {currentMode === 'general' ? 'En ligne • Avec toi' : 'En ligne • Prêt à aider'}
                   </p>
                 </div>
               </div>
