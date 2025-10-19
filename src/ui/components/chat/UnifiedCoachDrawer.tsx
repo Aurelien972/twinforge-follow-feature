@@ -913,82 +913,23 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Diagnostics button (shown when voice has errors) */}
-                {(voiceState === 'error' || (!caps.canUseVoiceMode && !isTextMode)) && (
-                  <motion.button
-                    onClick={handleRunDiagnostics}
-                    style={{
-                      padding: '6px 12px',
-                      borderRadius: '12px',
-                      background: 'rgba(239, 68, 68, 0.2)',
-                      border: '1px solid rgba(239, 68, 68, 0.4)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      color: '#EF4444',
-                      fontWeight: '500'
-                    }}
-                    whileHover={{ scale: 1.02, background: 'rgba(239, 68, 68, 0.3)' }}
-                    whileTap={{ scale: 0.98 }}
-                    title="Exécuter les diagnostics de connexion vocale"
-                  >
-                    <SpatialIcon Icon={ICONS.AlertCircle} size={14} style={{ color: '#EF4444' }} />
-                    Diagnostics
-                  </motion.button>
-                )}
-
-                {/* Toggle communication mode (voice/text) */}
-                <motion.button
-                  onClick={handleToggleCommunicationMode}
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: isTextMode
-                      ? 'rgba(255, 255, 255, 0.08)'
-                      : `rgba(255, 255, 255, 0.15)`,
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    opacity: !caps.canUseVoiceMode && !isTextMode ? 0.5 : 1
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  title={
-                    !caps.canUseVoiceMode && !isTextMode
-                      ? 'Mode vocal indisponible dans cet environnement'
-                      : isTextMode
-                      ? 'Passer en mode vocal'
-                      : 'Passer en mode texte'
-                  }
-                >
-                  <SpatialIcon
-                    Icon={isTextMode ? ICONS.Mic : ICONS.MessageSquare}
-                    size={16}
-                    style={{
-                      color: isTextMode ? 'rgba(255, 255, 255, 0.7)' : modeColor,
-                      filter: isTextMode ? 'none' : `drop-shadow(0 0 8px ${modeColor})`
-                    }}
-                  />
-                </motion.button>
-
-                {/* Toggle transcript (only in voice mode) */}
+                {/* Toggle communication mode (voice/text) - Bouton micro pour realtime */}
                 {!isTextMode && (
                   <motion.button
-                    onClick={toggleTranscript}
+                    onClick={handleToggleCommunicationMode}
                     style={{
-                      width: '36px',
-                      height: '36px',
+                      width: '40px',
+                      height: '40px',
                       borderRadius: '50%',
-                      background: showTranscript
-                        ? `rgba(255, 255, 255, 0.15)`
-                        : 'rgba(255, 255, 255, 0.08)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      background: voiceState === 'listening' || voiceState === 'processing'
+                        ? `radial-gradient(circle at 30% 30%, color-mix(in srgb, ${modeColor} 30%, transparent), transparent 70%), rgba(255, 255, 255, 0.15)`
+                        : 'rgba(255, 255, 255, 0.1)',
+                      border: voiceState === 'listening' || voiceState === 'processing'
+                        ? `2px solid color-mix(in srgb, ${modeColor} 50%, transparent)`
+                        : '1px solid rgba(255, 255, 255, 0.15)',
+                      boxShadow: voiceState === 'listening' || voiceState === 'processing'
+                        ? `0 0 20px color-mix(in srgb, ${modeColor} 30%, transparent)`
+                        : 'none',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -996,53 +937,18 @@ const UnifiedCoachDrawer: React.FC<UnifiedCoachDrawerProps> = ({ chatButtonRef }
                     }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    title="Afficher/masquer la transcription"
+                    title={voiceState === 'listening' ? 'Écoute active' : 'Passer en mode texte'}
                   >
                     <SpatialIcon
-                      Icon={ICONS.FileText}
-                      size={16}
+                      Icon={voiceState === 'listening' || voiceState === 'processing' ? ICONS.Mic : ICONS.MicOff}
+                      size={18}
                       style={{
-                        color: showTranscript ? modeColor : 'rgba(255, 255, 255, 0.7)',
-                        filter: showTranscript ? `drop-shadow(0 0 8px ${modeColor})` : 'none'
+                        color: voiceState === 'listening' || voiceState === 'processing' ? modeColor : 'rgba(255, 255, 255, 0.7)',
+                        filter: voiceState === 'listening' || voiceState === 'processing' ? `drop-shadow(0 0 8px ${modeColor})` : 'none'
                       }}
                     />
                   </motion.button>
                 )}
-
-                {/* Scroll to Bottom Button */}
-                <AnimatePresence>
-                  {showScrollButton && isTextMode && (
-                    <motion.button
-                      className="scroll-to-bottom"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      onClick={() => scrollToBottom(true)}
-                      style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        background: 'rgba(255, 255, 255, 0.08)',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer'
-                      }}
-                      whileHover={{ scale: 1.05, background: 'rgba(255, 255, 255, 0.12)' }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <SpatialIcon
-                        Icon={ICONS.ArrowDown}
-                        size={16}
-                        style={{
-                          color: modeColor,
-                          filter: `drop-shadow(0 0 8px color-mix(in srgb, ${modeColor} 40%, transparent))`
-                        }}
-                      />
-                    </motion.button>
-                  )}
-                </AnimatePresence>
 
                 {/* Close Button */}
                 <motion.button

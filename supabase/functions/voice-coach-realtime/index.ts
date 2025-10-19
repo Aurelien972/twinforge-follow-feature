@@ -200,7 +200,12 @@ Deno.serve(async (req: Request) => {
     log('info', 'Incoming WebSocket request', {
       requestId,
       method: req.method,
-      url: url.pathname
+      url: url.pathname,
+      headers: {
+        upgrade: req.headers.get('upgrade'),
+        connection: req.headers.get('connection'),
+        secWebSocketKey: req.headers.get('sec-websocket-key') ? 'present' : 'missing'
+      }
     });
 
     // Vérifier l'authentification
@@ -247,15 +252,19 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const upgrade = req.headers.get('upgrade') || '';
-    if (upgrade.toLowerCase() !== 'websocket') {
+    // Vérifier que la requête est bien un upgrade WebSocket
+    const upgradeHeader = req.headers.get('upgrade');
+    if (!upgradeHeader || upgradeHeader.toLowerCase() !== 'websocket') {
       log('error', 'Not a WebSocket upgrade request', {
         requestId,
-        upgrade,
+        upgrade: upgradeHeader,
         method: req.method
       });
       return new Response(
-        JSON.stringify({ error: 'Expected WebSocket upgrade' }),
+        JSON.stringify({
+          error: 'Expected WebSocket upgrade request',
+          details: 'This endpoint only accepts WebSocket connections'
+        }),
         {
           status: 426,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
