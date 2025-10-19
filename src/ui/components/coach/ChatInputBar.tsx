@@ -349,6 +349,120 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
             </motion.button>
           )}
 
+          {/* Realtime Voice Button - RED */}
+          {voiceEnabled && (
+            <motion.button
+              onClick={handleRealtimeToggle}
+              className="chat-input-button flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+              style={{
+                background: isRealtimeActive
+                  ? 'radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.5) 0%, rgba(220, 38, 38, 0.8) 100%)'
+                  : realtimeState === 'error'
+                  ? 'radial-gradient(circle at 30% 30%, rgba(153, 27, 27, 0.5) 0%, rgba(127, 29, 29, 0.8) 100%)'
+                  : 'radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.3) 0%, rgba(239, 68, 68, 0.15) 100%)',
+                border: '2px solid rgba(239, 68, 68, 0.6)',
+                boxShadow: isRealtimeActive
+                  ? '0 0 20px rgba(239, 68, 68, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3)'
+                  : '0 0 12px rgba(239, 68, 68, 0.4)',
+                position: 'relative',
+                overflow: 'visible'
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={disabled || isProcessing || realtimeState === 'connecting'}
+            >
+              <AnimatePresence mode="wait">
+                {realtimeState === 'connecting' ? (
+                  <motion.div
+                    key="connecting"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  >
+                    <SpatialIcon
+                      Icon={ICONS.Loader}
+                      size={18}
+                      style={{ color: '#FFF' }}
+                    />
+                  </motion.div>
+                ) : realtimeState === 'speaking' ? (
+                  <motion.div
+                    key="speaking"
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: [0.8, 1.1, 0.8] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    <SpatialIcon
+                      Icon={ICONS.Volume2}
+                      size={18}
+                      style={{ color: '#10B981' }}
+                    />
+                  </motion.div>
+                ) : realtimeState === 'error' ? (
+                  <motion.div key="error">
+                    <SpatialIcon
+                      Icon={ICONS.X}
+                      size={18}
+                      style={{ color: '#DC2626' }}
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div key="mic">
+                    <SpatialIcon
+                      Icon={ICONS.Mic}
+                      size={18}
+                      style={{
+                        color: isRealtimeActive ? '#FFF' : '#EF4444',
+                        filter: isRealtimeActive ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))' : 'none'
+                      }}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {/* Pulsation pendant listening */}
+              {realtimeState === 'listening' && (
+                <>
+                  <motion.div
+                    style={{
+                      position: 'absolute',
+                      inset: -4,
+                      borderRadius: '50%',
+                      border: '2px solid rgba(239, 68, 68, 0.8)',
+                      pointerEvents: 'none'
+                    }}
+                    animate={{
+                      scale: [1, 1.4, 1],
+                      opacity: [0.8, 0, 0.8]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut'
+                    }}
+                  />
+                  <motion.div
+                    style={{
+                      position: 'absolute',
+                      inset: -8,
+                      borderRadius: '50%',
+                      border: '2px solid rgba(239, 68, 68, 0.6)',
+                      pointerEvents: 'none'
+                    }}
+                    animate={{
+                      scale: [1, 1.6, 1],
+                      opacity: [0.6, 0, 0.6]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: 0.4
+                    }}
+                  />
+                </>
+              )}
+            </motion.button>
+          )}
+
           {/* Text Input */}
           <div className="flex-1 relative">
             <textarea

@@ -315,25 +315,20 @@
    Remove all expensive effects for performance
    ========================================= */
 
-/* High-performance mode: Transparent header with rounded borders like bottom bar */
+/* High-performance mode: FULLY OPAQUE header, no transparency */
 .mode-high-performance .header-liquid-glass {
-  /* CRITICAL: Keep transparent background like bottom bar */
-  background: rgba(11, 14, 23, 0.95) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
+  /* CRITICAL: Direct opaque background - highest priority */
+  background: rgb(11, 14, 23) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   opacity: 1 !important;
-  /* CRITICAL: Preserve rounded corners explicitly */
-  border-radius: 20px !important;
   /* Force layer isolation */
   isolation: isolate !important;
-  /* Remove any inherited transparency issues */
+  /* Remove any inherited transparency */
   background-clip: padding-box !important;
   -webkit-background-clip: padding-box !important;
-  /* Force Safari to respect rounded corners */
-  -webkit-mask-image: -webkit-radial-gradient(white, black) !important;
-  mask-image: radial-gradient(white, black) !important;
 }
 
 /* CRITICAL: Disable border gradient in performance mode - it was causing transparency */

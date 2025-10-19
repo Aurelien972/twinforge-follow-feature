@@ -182,7 +182,7 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
         }}
       />
 
-      {/* Red Circle Icon */}
+      {/* Icon with mode color */}
       <motion.div
         animate={{ rotate: isOpen ? 180 : 0 }}
         transition={{ duration: 0.3 }}
@@ -193,18 +193,14 @@ const FloatingChatButton = React.forwardRef<HTMLButtonElement, FloatingChatButto
           justifyContent: 'center'
         }}
       >
-        <div
+        <SpatialIcon
+          Icon={ICONS.MessageSquare}
+          size={isDesktop ? 28 : 24}
           style={{
-            width: isDesktop ? 24 : 20,
-            height: isDesktop ? 24 : 20,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-            boxShadow: `
-              0 0 20px rgba(239, 68, 68, 0.6),
-              0 0 40px rgba(239, 68, 68, 0.3),
-              inset 0 1px 0 rgba(255, 255, 255, 0.3)
-            `,
-            border: '2px solid rgba(255, 255, 255, 0.2)'
+            color: modeColor,
+            filter: isStep2Active
+              ? `drop-shadow(0 0 16px rgba(59, 130, 246, 0.8))`
+              : `drop-shadow(0 0 14px color-mix(in srgb, ${modeColor} 60%, transparent))`
           }}
         />
       </motion.div>

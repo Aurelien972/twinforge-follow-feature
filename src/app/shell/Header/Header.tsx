@@ -40,6 +40,12 @@ export const Header = React.memo(() => {
           transformStyle: 'preserve-3d',
           WebkitPerspective: '1000px',
           perspective: '1000px',
+          background: isPerformanceMode
+            ? 'rgba(11, 14, 23, 0.95)'
+            : undefined,
+          backdropFilter: isPerformanceMode ? 'blur(10px)' : undefined,
+          WebkitBackdropFilter: isPerformanceMode ? 'blur(10px)' : undefined,
+          border: isPerformanceMode ? '1px solid rgba(255, 255, 255, 0.1)' : undefined,
         }}
         role="banner"
         aria-label="TwinForge Pont de Commandement"
