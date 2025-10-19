@@ -106,6 +106,16 @@ class WebPushService {
   }
 
   /**
+   * Check push permission (simple wrapper for component compatibility)
+   */
+  async checkPushPermission(): Promise<NotificationPermission> {
+    if (!('Notification' in window)) {
+      return 'denied';
+    }
+    return Notification.permission;
+  }
+
+  /**
    * Request notification permission from user
    */
   async requestPermission(): Promise<NotificationPermission> {

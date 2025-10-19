@@ -44,16 +44,33 @@ export const NotificationsSettingsTab: React.FC = () => {
 
   // Load data on mount
   useEffect(() => {
-    loadGlobalSettings(userId);
-    loadCategoryPreferences(userId);
-    loadPushSubscriptions(userId);
-    checkPushPermission();
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          loadGlobalSettings(userId),
+          loadCategoryPreferences(userId),
+          loadPushSubscriptions(userId),
+          checkPushPermission(),
+        ]);
+      } catch (err) {
+        console.error('Failed to load notification preferences:', err);
+      }
+    };
+
+    if (userId) {
+      loadData();
+    }
   }, [userId]);
 
   // Check push permission
   const checkPushPermission = async () => {
-    const permission = await webPushService.checkPushPermission();
-    setPushPermission(permission);
+    try {
+      const permission = await webPushService.checkPushPermission();
+      setPushPermission(permission);
+    } catch (err) {
+      console.error('Failed to check push permission:', err);
+      setPushPermission('denied');
+    }
   };
 
   // Handle push subscription toggle

@@ -62,11 +62,21 @@ export const PrivacySettingsTab: React.FC = () => {
 
   // Load data on mount
   useEffect(() => {
-    if (userId) {
-      loadPrivacyPreferences(userId);
-      loadExportRequests(userId);
-      loadDeletionRequest(userId);
-    }
+    const loadData = async () => {
+      if (!userId) return;
+
+      try {
+        await Promise.all([
+          loadPrivacyPreferences(userId),
+          loadExportRequests(userId),
+          loadDeletionRequest(userId),
+        ]);
+      } catch (err) {
+        console.error('Failed to load privacy settings:', err);
+      }
+    };
+
+    loadData();
   }, [userId]);
 
   // Handle data export
