@@ -10,6 +10,7 @@ import { scanAnalytics } from '../../../../../lib/utils/analytics';
 import { useProgressStore } from '../../../../../system/store/progressStore';
 import logger from '../../../../../lib/utils/logger';
 import type { CapturedPhotoEnhanced } from '../../../../../domain/types';
+import { getSignedUrl, PRIVATE_BUCKETS } from '../../../../../lib/storage/signedUrlService';
 
 interface ScanProcessingConfig {
   userId: string;
@@ -245,14 +246,17 @@ async function uploadPhotosToStorage(
         if (error) {
           throw new Error(`Upload failed for ${photo.type}: ${error.message}`);
         }
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('body-scans')
-          .getPublicUrl(filePath);
-        
+
+        // Get signed URL for private storage (1 hour expiry)
+        const signedUrl = await getSignedUrl(PRIVATE_BUCKETS.BODY_SCANS, filePath);
+
+        if (!signedUrl) {
+          throw new Error(`Failed to get signed URL for ${photo.type}`);
+        }
+
         return {
           view: photo.type,
-          url: publicUrl,
+          url: signedUrl,
           report: photo.captureReport
         };
       } catch (error) {

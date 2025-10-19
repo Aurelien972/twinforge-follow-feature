@@ -250,10 +250,10 @@ const MealScanFlowPage: React.FC = () => {
             userId
           );
 
-          if (uploadResult.success && uploadResult.publicUrl) {
-            photoUrl = uploadResult.publicUrl;
-            logger.info('MEAL_SCAN_SAVE', 'Photo uploaded successfully', {
-              publicUrl: photoUrl,
+          if (uploadResult.success && uploadResult.signedUrl) {
+            photoUrl = uploadResult.signedUrl;
+            logger.info('MEAL_SCAN_SAVE', 'Photo uploaded successfully with signed URL', {
+              hasSignedUrl: true,
               uploadPath: uploadResult.uploadPath,
               userId,
               timestamp: new Date().toISOString()

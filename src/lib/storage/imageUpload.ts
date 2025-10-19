@@ -1,9 +1,10 @@
 import { supabase } from '../../system/supabase/client';
 import logger from '../utils/logger';
+import { getSignedUrl, PRIVATE_BUCKETS } from './signedUrlService';
 
 export interface UploadResult {
   success: boolean;
-  publicUrl?: string;
+  signedUrl?: string;
   uploadPath?: string;
   error?: string;
 }
@@ -47,19 +48,27 @@ export async function uploadMealPhoto(file: File, userId: string): Promise<Uploa
       };
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('meal-photos')
-      .getPublicUrl(fileName);
+    // Get signed URL for private storage (1 hour expiry)
+    const signedUrl = await getSignedUrl(PRIVATE_BUCKETS.MEAL_PHOTOS, fileName);
 
-    logger.info('MEAL_PHOTO_UPLOAD', 'Meal photo uploaded successfully', {
+    if (!signedUrl) {
+      logger.error('MEAL_PHOTO_UPLOAD', 'Failed to get signed URL for meal photo', {
+        fileName
+      });
+      return {
+        success: false,
+        error: 'Failed to generate signed URL'
+      };
+    }
+
+    logger.info('MEAL_PHOTO_UPLOAD', 'Meal photo uploaded successfully with signed URL', {
       fileName,
-      publicUrl
+      hasSignedUrl: true
     });
 
     return {
       success: true,
-      publicUrl,
+      signedUrl,
       uploadPath: fileName
     };
   } catch (error) {

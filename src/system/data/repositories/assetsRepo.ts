@@ -4,48 +4,59 @@
  */
 
 import logger from '../../../lib/utils/logger';
+import { getSignedUrl, PRIVATE_BUCKETS } from '../../../lib/storage/signedUrlService';
 
-// Direct model URLs - no Supabase Storage lookup needed
-const MODEL_URLS = {
-  male: 'https://kwipydbtjagypocpvbwn.supabase.co/storage/v1/object/public/3d-models/M_character_uniq.glb',
-  female: 'https://kwipydbtjagypocpvbwn.supabase.co/storage/v1/object/public/3d-models/F_character_uniq_4.13.glb',
+// Base model paths in private storage
+const MODEL_PATHS = {
+  male: 'M_character_uniq.glb',
+  female: 'F_character_uniq_4.13.glb',
 };
 
 /**
- * Get model URL for gender - ALWAYS returns valid public URL (no 404s)
+ * Get model URL for gender - Returns signed URL for private 3D models
  */
-export function getModelUrlForGender(gender: 'male' | 'female'): string {
-  const url = MODEL_URLS[gender] || MODEL_URLS.male;
-  const modelFileName = url.split('/').pop();
+export async function getModelUrlForGender(gender: 'male' | 'female'): Promise<string> {
+  const modelPath = MODEL_PATHS[gender] || MODEL_PATHS.male;
 
-  logger.info('ASSETS_REPO', '📦 GETTING MODEL URL FOR GENDER', {
+  logger.info('ASSETS_REPO', '📦 GETTING SIGNED MODEL URL FOR GENDER', {
     inputGender: gender,
     inputGenderType: typeof gender,
-    resolvedUrl: url,
-    modelFileName,
+    modelPath,
     isMale: gender === 'male',
     isFemale: gender === 'female',
-    usedFallback: !MODEL_URLS[gender],
-    availableGenders: Object.keys(MODEL_URLS),
+    usedFallback: !MODEL_PATHS[gender],
+    availableGenders: Object.keys(MODEL_PATHS),
     timestamp: new Date().toISOString(),
-    philosophy: 'gender_to_url_mapping_diagnostic'
+    philosophy: 'private_storage_signed_url'
   });
 
-  return url;
+  // Get signed URL from private storage (1 hour expiry)
+  const signedUrl = await getSignedUrl(PRIVATE_BUCKETS.MODELS_3D, modelPath);
+
+  if (!signedUrl) {
+    logger.error('ASSETS_REPO', 'Failed to get signed URL for model', {
+      gender,
+      modelPath,
+      philosophy: 'signed_url_failure'
+    });
+    throw new Error(`Failed to get signed URL for ${gender} model`);
+  }
+
+  return signedUrl;
 }
 
 /**
  * Get fallback model URL - same as getModelUrlForGender (no custom models)
  */
-function getFallbackModelUrl(gender: 'male' | 'female'): string {
-  const url = getModelUrlForGender(gender);
-  
+async function getFallbackModelUrl(gender: 'male' | 'female'): Promise<string> {
+  const url = await getModelUrlForGender(gender);
+
   logger.debug('ASSETS_REPO', 'Using fallback model URL', {
     gender,
     fallbackUrl: url,
     reason: 'no_custom_models_implemented',
     timestamp: new Date().toISOString()
   });
-  
+
   return url;
 }

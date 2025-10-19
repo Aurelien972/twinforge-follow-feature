@@ -43,15 +43,15 @@ export async function loadAndPrepareModel(options: ModelLoadOptions): Promise<Lo
     throw new Error('Model loading was aborted before starting');
   }
 
-  const modelUrl = getModelUrlForGender(finalGender);
+  // Get signed URL for private 3D model storage
+  const modelUrl = await getModelUrlForGender(finalGender);
 
-  logger.info('MODEL_LOADER', '🎯 LOADING MODEL WITH FINAL GENDER', {
+  logger.info('MODEL_LOADER', '🎯 LOADING MODEL WITH FINAL GENDER AND SIGNED URL', {
     finalGenderParameter: finalGender,
     finalGenderType: typeof finalGender,
-    modelUrl,
-    modelFileName: modelUrl.split('/').pop(),
+    hasModelUrl: !!modelUrl,
     serverScanId,
-    philosophy: 'model_loading_with_gender_diagnostic'
+    philosophy: 'model_loading_with_signed_url'
   });
 
   let modelRoot = gltfCache.get(finalGender);

@@ -88,8 +88,7 @@ export type ConsentType =
   | 'terms_of_service'
   | 'privacy_policy'
   | 'marketing'
-  | 'analytics'
-  | 'third_party_sharing';
+  | 'analytics';
 
 export interface DataPrivacyConsent {
   id: string;
@@ -140,7 +139,6 @@ export type DataRetentionPreference = 'minimal' | 'standard' | 'extended';
 export interface PrivacyPreferences {
   data_retention_preference: DataRetentionPreference;
   analytics_tracking_enabled: boolean;
-  third_party_sharing_enabled: boolean;
   marketing_communications_enabled: boolean;
 }
 
@@ -254,7 +252,7 @@ export function isValidDataRetentionPreference(value: string): value is DataRete
 }
 
 export function isValidConsentType(value: string): value is ConsentType {
-  return ['terms_of_service', 'privacy_policy', 'marketing', 'analytics', 'third_party_sharing'].includes(value);
+  return ['terms_of_service', 'privacy_policy', 'marketing', 'analytics'].includes(value);
 }
 
 export function isValidExportableDataCategory(value: string): value is ExportableDataCategory {
@@ -296,7 +294,6 @@ export function getExportSizeFormatted(bytes: number | null): string {
 export const DEFAULT_PRIVACY_PREFERENCES: PrivacyPreferences = {
   data_retention_preference: 'standard',
   analytics_tracking_enabled: true,
-  third_party_sharing_enabled: false,
   marketing_communications_enabled: false,
 };
 
