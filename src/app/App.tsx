@@ -71,35 +71,32 @@ function AppContent() {
   React.useEffect(() => {
     const scrollToTop = () => {
       try {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Scroll immédiat vers le haut - pas de smooth pour éviter les problèmes de timing
+        document.documentElement.scrollTo(0, 0);
+        window.scrollTo(0, 0);
+
         const mainContent = document.getElementById('main-content');
-        if (mainContent) mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+        if (mainContent) mainContent.scrollTo(0, 0);
+
         const scrollableContainers = document.querySelectorAll('[data-scroll-container]');
-        scrollableContainers.forEach((c) =>
-          (c as HTMLElement).scrollTo({ top: 0, behavior: 'smooth' }),
-        );
-      } catch {}
+        scrollableContainers.forEach((c) => {
+          (c as HTMLElement).scrollTo(0, 0);
+        });
+      } catch (error) {
+        logger.warn('APP_NAVIGATION', 'Scroll error', { error });
+      }
     };
-    const timeoutId = setTimeout(scrollToTop, 100);
-    logger.debug('APP_NAVIGATION', 'Smooth scroll to top on route change', {
+
+    // Scroll immédiat sans timeout pour assurer la visibilité du header
+    scrollToTop();
+
+    logger.debug('APP_NAVIGATION', 'Scroll to top on route change', {
       newPath: location.pathname,
       previousScrollY: window.scrollY,
       pwa: { isInstallable, isInstalled, isUpdateAvailable },
       timestamp: new Date().toISOString(),
     });
-    return () => clearTimeout(timeoutId);
   }, [location.pathname]);
-
-  React.useEffect(() => {
-    if (location.pathname.includes('/meals/scan')) {
-      const timeoutId = setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        const mainContent = document.getElementById('main-content');
-        if (mainContent) mainContent.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 50);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [location.pathname, location.hash]);
   const { isGenerating, isGeneratingDetailedRecipes, cancelDetailedRecipeGeneration: cancelDetailedRecipes } = useMealPlanStore();
   const { isOpen, showModal, hideModal } = useExitModalStore();
 

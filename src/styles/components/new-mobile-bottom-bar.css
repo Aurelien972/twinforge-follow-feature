@@ -471,6 +471,7 @@
   -webkit-backdrop-filter: none !important;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2) !important;
   border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  opacity: 1 !important;
 }
 
 /* Add solid backdrop layer to completely block transparency */
@@ -483,11 +484,18 @@
   z-index: -1 !important;
   display: block !important;
   pointer-events: none !important;
+  opacity: 1 !important;
+  /* Force animation override */
+  animation: none !important;
+  padding: 0 !important;
+  -webkit-mask: none !important;
+  mask: none !important;
 }
 
 /* Remove decorative glow pseudo-element in performance mode */
 .mode-high-performance .new-mobile-bottom-bar-container::after {
   display: none !important;
+  opacity: 0 !important;
 }
 
 /* Simplify icon containers in performance mode - Keep round shape with solid style */
