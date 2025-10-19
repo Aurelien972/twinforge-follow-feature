@@ -633,7 +633,8 @@ html.mode-high-performance .forge-particle,
 html.mode-high-performance .bg-twinforge-visionos,
 html.performance-mode .bg-twinforge-visionos,
 .mode-high-performance .bg-twinforge-visionos,
-.performance-mode .bg-twinforge-visionos {
+.performance-mode .bg-twinforge-visionos,
+.bg-twinforge-visionos.performance-mode {
   background: var(--forge-deep) !important;
   background-image: none !important;
   background-color: var(--forge-deep) !important;
