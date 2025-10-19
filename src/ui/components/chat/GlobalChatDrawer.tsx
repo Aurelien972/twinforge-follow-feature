@@ -39,7 +39,8 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
     isTyping,
     setTyping,
     conversationId,
-    incrementUnread
+    incrementUnread,
+    voiceState
   } = useUnifiedCoachStore();
 
   const { navClose } = useFeedback();

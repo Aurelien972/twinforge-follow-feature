@@ -601,6 +601,10 @@ html.performance-mode .header-liquid-glass::after {
 
   /* Remove all colored glows and cyan shadows */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+
+  /* Force solid background - no gradients */
+  background: rgba(11, 14, 23, 0.95) !important;
+  background-image: none !important;
 }
 
 .performance-mode .floating-chat-button:hover,
@@ -632,6 +636,18 @@ html.performance-mode .header-liquid-glass::after {
 .performance-mode .floating-chat-button > div[style*="filter"],
 .performance-mode .floating-chat-button > div[style*="blur"] {
   display: none !important;
+}
+
+/* CRITICAL: Remove ALL radial gradients and colored glows from floating button */
+.performance-mode .floating-chat-button[style*="radial-gradient"] {
+  background: rgba(11, 14, 23, 0.95) !important;
+  background-image: none !important;
+}
+
+/* Remove corner highlight effect - the div with radial gradient */
+.performance-mode .floating-chat-button > div:first-child[style*="radial-gradient"] {
+  display: none !important;
+  opacity: 0 !important;
 }
 
 /* =========================================
