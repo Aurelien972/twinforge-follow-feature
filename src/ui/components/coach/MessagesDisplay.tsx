@@ -10,7 +10,7 @@ import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
 import CoachMessage from './CoachMessage';
 import CoachMessageRenderer from './CoachMessageRenderer';
 import TypingIndicator from './TypingIndicator';
-import AudioWaveform from './AudioWaveform';
+import AudioWaveform from '../chat/AudioWaveform';
 import SpatialIcon from '../../icons/SpatialIcon';
 import { ICONS } from '../../icons/registry';
 import type { ExtendedChatMessage } from '../../../domain/chatMessages';
@@ -171,6 +171,7 @@ const MessagesDisplay: React.FC<MessagesDisplayProps> = ({
               <AudioWaveform
                 frequencies={visualization.frequencies}
                 color={isSpeaking ? '#10B981' : '#EF4444'}
+                isActive={isRealtimeActive}
                 height={40}
               />
             )}

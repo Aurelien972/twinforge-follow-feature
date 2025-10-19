@@ -597,6 +597,7 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
 
             {/* Chat Interface - Scrollable Content + Fixed Input */}
             <div className="chat-interface-wrapper" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', minHeight: 0 }}>
+              {/* CoachChatInterface includes ChatInputBar with RED REALTIME button */}
               <CoachChatInterface
                 stepColor={modeColor}
                 onSendMessage={handleSendMessage}

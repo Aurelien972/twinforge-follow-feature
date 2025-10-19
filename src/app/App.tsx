@@ -19,6 +19,8 @@ import Sidebar from './shell/Sidebar';
 import NewMobileBottomBar from './shell/NewMobileBottomBar';
 import GlobalExitModal from '../ui/components/GlobalExitModal';
 import CentralActionsMenu from './shell/CentralActionsMenu';
+import FloatingChatButton from '../ui/components/chat/FloatingChatButton';
+import GlobalChatDrawer from '../ui/components/chat/GlobalChatDrawer';
 import { useVoiceCoachInitialization } from '../hooks/useVoiceCoachInitialization';
 
 function AppContent() {
@@ -28,6 +30,8 @@ function AppContent() {
   const location = useLocation();
   const { isAnyOpen, isOpen: checkIsOpen, close } = useOverlayStore();
   const isCentralMenuOpen = checkIsOpen('centralMenu');
+  const chatButtonRef = React.useRef<HTMLButtonElement>(null);
+
   // Initialiser le système Voice Coach
   useVoiceCoachInitialization();
 
@@ -257,7 +261,9 @@ function AppContent() {
         onClose={close}
       />
 
-      {/* Coach system is now integrated directly in pages */}
+      {/* Global Chat System with Realtime */}
+      <FloatingChatButton ref={chatButtonRef} />
+      <GlobalChatDrawer chatButtonRef={chatButtonRef} />
     </div>
   );
 }
