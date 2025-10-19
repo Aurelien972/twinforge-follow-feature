@@ -146,10 +146,10 @@ const MobileDrawer = React.memo(() => {
     } catch (error) {
       console.error('Logout error:', error);
       // Even on error, close drawer and navigate
-      setDrawer(false);
+      close();
       navigate('/', { replace: true });
     }
-  }, [navigate, setDrawer]);
+  }, [navigate, close]);
 
   return (
     <AnimatePresence>
