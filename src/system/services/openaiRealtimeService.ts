@@ -274,6 +274,12 @@ class OpenAIRealtimeService {
       logger.info('REALTIME_WEBRTC', '🔍 Verifying audio input configuration...');
       this.verifyAudioInput();
 
+      // IMPORTANT: Vérifier après un court délai pour s'assurer que les tracks sont stables
+      setTimeout(() => {
+        logger.info('REALTIME_WEBRTC', '🔍 Re-verifying audio input after connection stabilization...');
+        this.verifyAudioInput();
+      }, 1000);
+
       // Démarrer le monitoring périodique de la santé de la connexion
       this.startHealthCheck();
 
@@ -681,6 +687,9 @@ class OpenAIRealtimeService {
       return;
     }
 
+    // Reset audioInputActive avant de vérifier
+    this.audioInputActive = false;
+
     audioTracks.forEach((track, index) => {
       logger.info('REALTIME_WEBRTC_INPUT', `🎤 Audio track ${index} status:`, {
         label: track.label,
@@ -692,9 +701,13 @@ class OpenAIRealtimeService {
       });
 
       // Vérifier si le track est actif
-      if (track.readyState === 'live' && track.enabled && !track.muted) {
+      if (track.readyState === 'live' && track.enabled) {
         this.audioInputActive = true;
-        logger.info('REALTIME_WEBRTC_INPUT', '✅ Audio input is active and ready');
+        logger.info('REALTIME_WEBRTC_INPUT', '✅ Audio input is active and ready', {
+          trackId: track.id,
+          label: track.label,
+          muted: track.muted
+        });
       } else {
         logger.warn('REALTIME_WEBRTC_INPUT', '⚠️ Audio input may not be working correctly', {
           readyState: track.readyState,
@@ -703,6 +716,13 @@ class OpenAIRealtimeService {
         });
       }
     });
+
+    // Log final status
+    if (this.audioInputActive) {
+      logger.info('REALTIME_WEBRTC_INPUT', '✅✅✅ Audio input verification PASSED - Ready for speech detection');
+    } else {
+      logger.error('REALTIME_WEBRTC_INPUT', '❌❌❌ Audio input verification FAILED - Speech may not be detected');
+    }
   }
 
   /**

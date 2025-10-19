@@ -61,12 +61,18 @@ const CoachChatInterface: React.FC<CoachChatInterfaceProps> = ({
 
   const handleStartRecording = () => {
     logger.info('COACH_CHAT_INTERFACE', 'Voice-to-text recording started via ChatInputBar');
-    // Handled by ChatInputBar with openaiWhisperService
+    // Sync with store so UI reflects recording state
+    const store = useUnifiedCoachStore.getState();
+    store.setRecording(true);
+    logger.debug('COACH_CHAT_INTERFACE', 'Store isRecording set to TRUE');
   };
 
   const handleStopRecording = () => {
     logger.info('COACH_CHAT_INTERFACE', 'Voice-to-text recording stopped via ChatInputBar');
-    // Handled by ChatInputBar with openaiWhisperService
+    // Sync with store so UI reflects recording stopped
+    const store = useUnifiedCoachStore.getState();
+    store.setRecording(false);
+    logger.debug('COACH_CHAT_INTERFACE', 'Store isRecording set to FALSE');
   };
 
   /**
@@ -112,6 +118,11 @@ const CoachChatInterface: React.FC<CoachChatInterfaceProps> = ({
       setRealtimeError(undefined);
       voiceCoachOrchestrator.stopVoiceSession();
       logger.info('COACH_CHAT_INTERFACE', 'Realtime session stopped');
+
+      // IMPORTANT: Retour automatique au mode text après avoir arrêté realtime
+      const store = useUnifiedCoachStore.getState();
+      store.setInputMode('text');
+      logger.info('COACH_CHAT_INTERFACE', 'Returned to text mode after stopping Realtime');
     } catch (error) {
       logger.error('COACH_CHAT_INTERFACE', 'Error stopping Realtime session', { error });
     }
