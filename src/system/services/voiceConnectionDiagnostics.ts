@@ -23,33 +23,83 @@ export class VoiceConnectionDiagnostics {
     const results: DiagnosticResult[] = [];
 
     // Test 1: Environment variables
-    results.push(await this.testEnvironmentVariables());
+    const test1 = await this.testEnvironmentVariables();
+    results.push(test1);
+    this.logTestResult(1, test1);
 
     // Test 2: WebSocket API availability
-    results.push(await this.testWebSocketAPI());
+    const test2 = await this.testWebSocketAPI();
+    results.push(test2);
+    this.logTestResult(2, test2);
 
     // Test 3: Environment capabilities
-    results.push(await this.testEnvironmentCapabilities());
+    const test3 = await this.testEnvironmentCapabilities();
+    results.push(test3);
+    this.logTestResult(3, test3);
 
     // Test 4: Supabase edge function reachability (HTTP)
-    results.push(await this.testEdgeFunctionReachability());
+    const test4 = await this.testEdgeFunctionReachability();
+    results.push(test4);
+    this.logTestResult(4, test4);
 
     // Test 5: Microphone permissions
-    results.push(await this.testMicrophonePermissions());
+    const test5 = await this.testMicrophonePermissions();
+    results.push(test5);
+    this.logTestResult(5, test5);
 
     // Test 6: WebSocket connection (if all previous tests passed)
     const allPreviousPassed = results.every(r => r.passed);
     if (allPreviousPassed) {
-      results.push(await this.testWebSocketConnection());
+      const test6 = await this.testWebSocketConnection();
+      results.push(test6);
+      this.logTestResult(6, test6);
+    } else {
+      logger.warn('VOICE_DIAGNOSTICS', 'Skipping WebSocket connection test due to previous failures');
     }
+
+    const passedCount = results.filter(r => r.passed).length;
+    const failedCount = results.filter(r => !r.passed).length;
 
     logger.info('VOICE_DIAGNOSTICS', '✅ Diagnostics complete', {
       totalTests: results.length,
-      passed: results.filter(r => r.passed).length,
-      failed: results.filter(r => !r.passed).length
+      passed: passedCount,
+      failed: failedCount
     });
 
+    // Log all failed tests with full details
+    if (failedCount > 0) {
+      logger.error('VOICE_DIAGNOSTICS', '❌ Failed tests summary', {
+        failedTests: results
+          .filter(r => !r.passed)
+          .map(r => ({
+            test: r.test,
+            message: r.message,
+            details: r.details
+          }))
+      });
+    }
+
     return results;
+  }
+
+  /**
+   * Log individual test result with full details
+   */
+  private logTestResult(testNumber: number, result: DiagnosticResult): void {
+    const icon = result.passed ? '✅' : '❌';
+    const level = result.passed ? 'info' : 'error';
+
+    logger[level](
+      'VOICE_DIAGNOSTICS',
+      `${icon} Test ${testNumber}: ${result.test} - ${result.message}`,
+      {
+        testNumber,
+        testName: result.test,
+        passed: result.passed,
+        message: result.message,
+        details: result.details
+      }
+    );
   }
 
   /**

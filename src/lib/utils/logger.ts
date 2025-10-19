@@ -86,63 +86,92 @@ function shouldLog(level: LogLevel): boolean {
 
 /**
  * Create structured log payload with automatic context injection
+ * Supports both 3-param (category, message, context) and 2-param (message, context) signatures
  */
-function createLogPayload(level: LogLevel, message: string, context?: any) {
+function createLogPayload(level: LogLevel, categoryOrMessage: string, messageOrContext?: any, context?: any) {
   const autoContext = getCurrentContext();
-  
-  // Handle case where context is a string (common mistake)
-  if (context && typeof context !== 'object') {
-    message = `${message} — ${String(context)}`;
-    context = undefined;
+
+  let category: string | undefined;
+  let message: string;
+  let finalContext: any;
+
+  // Detect which signature is being used
+  if (context !== undefined) {
+    // 3-param signature: (level, category, message, context)
+    category = categoryOrMessage;
+    message = messageOrContext;
+    finalContext = context;
+  } else if (typeof messageOrContext === 'string') {
+    // 3-param signature: (level, category, message, undefined)
+    category = categoryOrMessage;
+    message = messageOrContext;
+    finalContext = undefined;
+  } else {
+    // 2-param signature: (level, message, context)
+    category = undefined;
+    message = categoryOrMessage;
+    finalContext = messageOrContext;
   }
-  
-  // Merge auto context with provided context
+
+  // Handle case where context is a string (common mistake)
+  if (finalContext && typeof finalContext !== 'object') {
+    message = `${message} — ${String(finalContext)}`;
+    finalContext = undefined;
+  }
+
+  // Build the full message with category prefix
+  const fullMessage = category ? `${category} — ${message}` : message;
+
+  // Merge auto context with provided context, and add category if present
   const mergedContext = {
     ...autoContext,
-    ...(context || {})
+    ...(category && { category }),
+    ...(finalContext || {})
   };
-  
+
   // Always add context property, even if empty, for debugging purposes
   const payload: Record<string, any> = {
     level,
-    message,
+    message: fullMessage,
     timestamp: new Date().toISOString(),
     context: mergedContext // Always include context
   };
-  
+
   return payload;
 }
 
 /**
- * Core logging functions with strict contract
+ * Core logging functions - support both 2-param and 3-param signatures
+ * 2-param: logger.info(message, context)
+ * 3-param: logger.info(category, message, context)
  */
-function trace(message: string, context?: Record<string, any>) {
+function trace(categoryOrMessage: string, messageOrContext?: any, context?: Record<string, any>) {
   if (!shouldLog('trace')) return;
-  const payload = createLogPayload('trace', message, context);
+  const payload = createLogPayload('trace', categoryOrMessage, messageOrContext, context);
   console.trace(JSON.stringify(payload, null, 2));
 }
 
-function debug(message: string, context?: Record<string, any>) {
+function debug(categoryOrMessage: string, messageOrContext?: any, context?: Record<string, any>) {
   if (!shouldLog('debug')) return;
-  const payload = createLogPayload('debug', message, context);
+  const payload = createLogPayload('debug', categoryOrMessage, messageOrContext, context);
   console.debug(JSON.stringify(payload, null, 2));
 }
 
-function info(message: string, context?: Record<string, any>) {
+function info(categoryOrMessage: string, messageOrContext?: any, context?: Record<string, any>) {
   if (!shouldLog('info')) return;
-  const payload = createLogPayload('info', message, context);
+  const payload = createLogPayload('info', categoryOrMessage, messageOrContext, context);
   console.log(JSON.stringify(payload, null, 2));
 }
 
-function warn(message: string, context?: Record<string, any>) {
+function warn(categoryOrMessage: string, messageOrContext?: any, context?: Record<string, any>) {
   if (!shouldLog('warn')) return;
-  const payload = createLogPayload('warn', message, context);
+  const payload = createLogPayload('warn', categoryOrMessage, messageOrContext, context);
   console.warn(JSON.stringify(payload, null, 2));
 }
 
-function error(message: string, context?: Record<string, any>) {
+function error(categoryOrMessage: string, messageOrContext?: any, context?: Record<string, any>) {
   if (!shouldLog('error')) return;
-  const payload = createLogPayload('error', message, context);
+  const payload = createLogPayload('error', categoryOrMessage, messageOrContext, context);
   console.error(JSON.stringify(payload, null, 2));
 }
 
