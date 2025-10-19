@@ -44,6 +44,8 @@ class OpenAIRealtimeService {
   private disconnectHandlers: Set<ConnectionHandler> = new Set();
   private audioElement: HTMLAudioElement | null = null;
   private localStream: MediaStream | null = null;
+  private audioPlaybackStarted = false;
+  private audioAutoplayBlocked = false;
 
   /**
    * Initialiser la connexion WebRTC à l'API Realtime via l'interface unifiée
@@ -107,19 +109,42 @@ class OpenAIRealtimeService {
       // Configurer l'élément audio pour la lecture
       this.audioElement = document.createElement('audio');
       this.audioElement.autoplay = true;
-      logger.info('REALTIME_WEBRTC', '🔊 Audio element created and configured');
+      this.audioElement.volume = 1.0; // Volume maximum par défaut
+
+      // IMPORTANT: Ajouter l'élément au DOM pour permettre la lecture
+      // L'élément est caché mais fonctionnel
+      this.audioElement.style.display = 'none';
+      document.body.appendChild(this.audioElement);
+
+      // Gérer les événements audio pour diagnostics
+      this.setupAudioEventHandlers();
+
+      logger.info('REALTIME_WEBRTC', '🔊 Audio element created, configured and added to DOM', {
+        autoplay: this.audioElement.autoplay,
+        volume: this.audioElement.volume,
+        muted: this.audioElement.muted
+      });
 
       // Gérer les tracks audio entrants (de l'API OpenAI)
-      this.peerConnection.ontrack = (event) => {
+      this.peerConnection.ontrack = async (event) => {
         logger.info('REALTIME_WEBRTC', '📥 Received remote audio track', {
           streamId: event.streams[0]?.id,
           trackKind: event.track.kind,
-          trackId: event.track.id
+          trackId: event.track.id,
+          trackEnabled: event.track.enabled,
+          trackMuted: event.track.muted,
+          trackReadyState: event.track.readyState
         });
 
         if (this.audioElement && event.streams[0]) {
           this.audioElement.srcObject = event.streams[0];
-          logger.info('REALTIME_WEBRTC', '✅ Audio stream connected to audio element');
+          logger.info('REALTIME_WEBRTC', '✅ Audio stream connected to audio element', {
+            streamActive: event.streams[0].active,
+            audioTracks: event.streams[0].getAudioTracks().length
+          });
+
+          // Tenter de démarrer la lecture audio
+          await this.ensureAudioPlayback();
         }
       };
 
@@ -456,9 +481,19 @@ class OpenAIRealtimeService {
 
     // Nettoyer l'élément audio
     if (this.audioElement) {
+      this.audioElement.pause();
       this.audioElement.srcObject = null;
+
+      // Retirer du DOM
+      if (this.audioElement.parentNode) {
+        this.audioElement.parentNode.removeChild(this.audioElement);
+      }
+
       this.audioElement = null;
     }
+
+    this.audioPlaybackStarted = false;
+    this.audioAutoplayBlocked = false;
 
     this.isConnected = false;
 
@@ -606,6 +641,199 @@ class OpenAIRealtimeService {
       default:
         return 3;
     }
+  }
+
+  /**
+   * Configuration des handlers d'événements audio pour diagnostics et gestion
+   */
+  private setupAudioEventHandlers(): void {
+    if (!this.audioElement) return;
+
+    // Événement: lecture démarrée avec succès
+    this.audioElement.onplay = () => {
+      logger.info('REALTIME_WEBRTC_AUDIO', '▶️ Audio playback started successfully', {
+        volume: this.audioElement?.volume,
+        muted: this.audioElement?.muted,
+        duration: this.audioElement?.duration
+      });
+      this.audioPlaybackStarted = true;
+      this.audioAutoplayBlocked = false;
+    };
+
+    // Événement: lecture en cours
+    this.audioElement.onplaying = () => {
+      logger.info('REALTIME_WEBRTC_AUDIO', '🔊 Audio is playing', {
+        currentTime: this.audioElement?.currentTime,
+        volume: this.audioElement?.volume
+      });
+    };
+
+    // Événement: pause (ne devrait pas arriver pour du streaming)
+    this.audioElement.onpause = () => {
+      logger.warn('REALTIME_WEBRTC_AUDIO', '⏸️ Audio playback paused (unexpected for streaming)', {
+        currentTime: this.audioElement?.currentTime
+      });
+    };
+
+    // Événement: erreur de lecture
+    this.audioElement.onerror = (error) => {
+      logger.error('REALTIME_WEBRTC_AUDIO', '❌ Audio playback error', {
+        error: this.audioElement?.error?.message,
+        code: this.audioElement?.error?.code,
+        networkState: this.audioElement?.networkState,
+        readyState: this.audioElement?.readyState
+      });
+    };
+
+    // Événement: données audio disponibles
+    this.audioElement.onloadeddata = () => {
+      logger.info('REALTIME_WEBRTC_AUDIO', '📦 Audio data loaded', {
+        duration: this.audioElement?.duration,
+        readyState: this.audioElement?.readyState
+      });
+    };
+
+    // Événement: métadonnées chargées
+    this.audioElement.onloadedmetadata = () => {
+      logger.info('REALTIME_WEBRTC_AUDIO', '📋 Audio metadata loaded');
+    };
+
+    // Événement: volume changé
+    this.audioElement.onvolumechange = () => {
+      logger.debug('REALTIME_WEBRTC_AUDIO', '🔊 Volume changed', {
+        volume: this.audioElement?.volume,
+        muted: this.audioElement?.muted
+      });
+    };
+  }
+
+  /**
+   * S'assurer que l'audio peut être lu (contourner les restrictions autoplay)
+   */
+  private async ensureAudioPlayback(): Promise<void> {
+    if (!this.audioElement || this.audioPlaybackStarted) {
+      return;
+    }
+
+    try {
+      logger.info('REALTIME_WEBRTC_AUDIO', '🎵 Attempting to start audio playback...');
+
+      // Tenter de lancer la lecture
+      const playPromise = this.audioElement.play();
+
+      if (playPromise !== undefined) {
+        await playPromise;
+        logger.info('REALTIME_WEBRTC_AUDIO', '✅ Audio playback started automatically');
+        this.audioPlaybackStarted = true;
+        this.audioAutoplayBlocked = false;
+      }
+    } catch (error) {
+      // L'autoplay peut être bloqué par le navigateur
+      if (error instanceof Error && error.name === 'NotAllowedError') {
+        logger.warn('REALTIME_WEBRTC_AUDIO', '⚠️ Autoplay blocked by browser', {
+          error: error.message,
+          solution: 'User interaction required to start audio'
+        });
+        this.audioAutoplayBlocked = true;
+
+        // Proposer à l'utilisateur de cliquer pour activer l'audio
+        this.notifyAutoplayBlocked();
+      } else {
+        logger.error('REALTIME_WEBRTC_AUDIO', '❌ Failed to start audio playback', {
+          error: error instanceof Error ? error.message : String(error)
+        });
+      }
+    }
+  }
+
+  /**
+   * Notifier que l'autoplay est bloqué (peut être utilisé par l'UI)
+   */
+  private notifyAutoplayBlocked(): void {
+    logger.warn('REALTIME_WEBRTC_AUDIO', '🚨 AUTOPLAY BLOCKED - User action required', {
+      message: 'The browser blocked audio autoplay. User must click to enable audio.',
+      action: 'Call enableAudioPlayback() after user interaction'
+    });
+
+    // Dispatcher un événement custom pour que l'UI puisse réagir
+    const event = new CustomEvent('voiceCoachAutoplayBlocked', {
+      detail: {
+        message: 'Cliquez pour activer l\'audio du coach',
+        action: 'enableAudioPlayback'
+      }
+    });
+    window.dispatchEvent(event);
+  }
+
+  /**
+   * Activer manuellement la lecture audio (après interaction utilisateur)
+   * Public API pour l'UI
+   */
+  async enableAudioPlayback(): Promise<boolean> {
+    if (!this.audioElement) {
+      logger.error('REALTIME_WEBRTC_AUDIO', '❌ No audio element available');
+      return false;
+    }
+
+    if (this.audioPlaybackStarted) {
+      logger.info('REALTIME_WEBRTC_AUDIO', '✅ Audio playback already started');
+      return true;
+    }
+
+    try {
+      logger.info('REALTIME_WEBRTC_AUDIO', '👆 User interaction - enabling audio playback...');
+      await this.audioElement.play();
+      this.audioPlaybackStarted = true;
+      this.audioAutoplayBlocked = false;
+      logger.info('REALTIME_WEBRTC_AUDIO', '✅ Audio playback enabled by user interaction');
+      return true;
+    } catch (error) {
+      logger.error('REALTIME_WEBRTC_AUDIO', '❌ Failed to enable audio playback', {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Diagnostics audio - Vérifier l'état de l'audio
+   * Public API pour debug
+   */
+  getAudioDiagnostics(): {
+    hasAudioElement: boolean;
+    isPlaybackStarted: boolean;
+    isAutoplayBlocked: boolean;
+    volume: number;
+    muted: boolean;
+    readyState: number;
+    networkState: number;
+    paused: boolean;
+    hasStream: boolean;
+    streamActive: boolean;
+    audioTracks: number;
+  } {
+    return {
+      hasAudioElement: !!this.audioElement,
+      isPlaybackStarted: this.audioPlaybackStarted,
+      isAutoplayBlocked: this.audioAutoplayBlocked,
+      volume: this.audioElement?.volume ?? 0,
+      muted: this.audioElement?.muted ?? false,
+      readyState: this.audioElement?.readyState ?? 0,
+      networkState: this.audioElement?.networkState ?? 0,
+      paused: this.audioElement?.paused ?? true,
+      hasStream: !!(this.audioElement?.srcObject),
+      streamActive: (this.audioElement?.srcObject as MediaStream)?.active ?? false,
+      audioTracks: (this.audioElement?.srcObject as MediaStream)?.getAudioTracks().length ?? 0
+    };
+  }
+
+  /**
+   * Logger les diagnostics audio dans la console
+   * Public API pour debug
+   */
+  logAudioDiagnostics(): void {
+    const diagnostics = this.getAudioDiagnostics();
+    logger.info('REALTIME_WEBRTC_AUDIO', '🔍 AUDIO DIAGNOSTICS', diagnostics);
   }
 }
 
