@@ -23,7 +23,10 @@
   backdrop-filter: blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate));
   -webkit-backdrop-filter: blur(var(--liquid-pill-blur)) saturate(var(--liquid-pill-saturate));
 
-  box-shadow: none;
+  box-shadow:
+    var(--liquid-pill-shadow),
+    0 0 24px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 
   isolation: isolate;
   transform: translateZ(0);
@@ -78,7 +81,11 @@
     radial-gradient(circle at 70% 70%, rgba(255,255,255,0.12) 0%, transparent 60%),
     var(--liquid-pill-bg);
   border-color: rgba(255,255,255,0.28);
-  box-shadow: none;
+  box-shadow:
+    var(--liquid-pill-shadow),
+    0 0 32px rgba(0, 0, 0, 0.2),
+    0 4px 20px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .chat-notification-bubble--desktop:hover {
@@ -199,5 +206,7 @@
 .chat-notification-bubble:focus-visible {
   outline: 3px solid rgba(24, 227, 255, 0.6);
   outline-offset: 4px;
-  box-shadow: none;
+  box-shadow:
+    var(--liquid-pill-shadow),
+    0 0 0 6px rgba(24, 227, 255, 0.2);
 }

@@ -5,7 +5,6 @@ import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import MobileDrawer from '../../../ui/shell/MobileDrawer';
 import { HeaderLogo } from './HeaderLogo';
-import { HeaderRealtimeButton } from './HeaderRealtimeButton';
 import { useFeedback } from '../../../hooks';
 import { BackButton } from '../../../ui/buttons';
 import { useOverlayStore } from '../../../system/store/overlayStore';
@@ -67,9 +66,6 @@ export const Header = React.memo(() => {
 
           {/* Right */}
           <div className="flex items-center gap-2 md:gap-3">
-            {/* Bouton Realtime - OpenAI Voice */}
-            <HeaderRealtimeButton />
-
             {/* Bouton Zap - Outils du Forgeron */}
             <motion.button
               type="button"
