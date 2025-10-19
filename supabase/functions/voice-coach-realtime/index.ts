@@ -25,7 +25,12 @@
  */
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { corsHeaders } from '../_shared/cors.ts';
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
+};
 
 const OPENAI_REALTIME_API = 'https://api.openai.com/v1/realtime';
 
@@ -94,15 +99,13 @@ async function createRealtimeSession(
     maxRetries
   });
 
-  // Configuration de la session
+  // Configuration de la session selon la spec OpenAI Realtime API
+  // Docs: https://platform.openai.com/docs/api-reference/realtime
   const sessionConfig = {
-    type: 'realtime',
     model,
     voice,
     modalities: ['text', 'audio'],
     instructions: instructions || 'You are a helpful fitness coach assistant.',
-    input_audio_format: 'pcm16',
-    output_audio_format: 'pcm16',
     input_audio_transcription: {
       model: 'whisper-1'
     },
@@ -116,27 +119,49 @@ async function createRealtimeSession(
     max_response_output_tokens: 4096
   };
 
-  // Créer le FormData avec SDP + session config
-  const formData = new FormData();
-  formData.append('sdp', sdpOffer);
-  formData.append('session', JSON.stringify(sessionConfig));
+  // Créer le payload JSON selon la spec OpenAI
+  const payload = {
+    model,
+    voice,
+    modalities: ['text', 'audio'],
+    instructions: sessionConfig.instructions,
+    input_audio_transcription: sessionConfig.input_audio_transcription,
+    turn_detection: sessionConfig.turn_detection,
+    temperature: sessionConfig.temperature,
+    max_response_output_tokens: sessionConfig.max_response_output_tokens
+  };
 
   log('info', 'Sending request to OpenAI', {
     url: `${OPENAI_REALTIME_API}/calls`,
-    sessionConfig: {
+    payload: {
       model,
       voice,
-      modalities: sessionConfig.modalities
+      modalities: payload.modalities
     },
     apiKeyPrefix: `${openaiApiKey.substring(0, 7)}...`,
     apiKeyLength: openaiApiKey.length
   });
 
   try {
+    // Pour l'API WebRTC, OpenAI attend un multipart/form-data avec:
+    // - sdp: le SDP offer du client
+    // - model, voice, instructions, etc. comme champs séparés (pas dans un objet "session")
+    const formData = new FormData();
+    formData.append('sdp', sdpOffer);
+    formData.append('model', payload.model);
+    formData.append('voice', payload.voice);
+    formData.append('modalities', JSON.stringify(payload.modalities));
+    formData.append('instructions', payload.instructions);
+    formData.append('input_audio_transcription', JSON.stringify(payload.input_audio_transcription));
+    formData.append('turn_detection', JSON.stringify(payload.turn_detection));
+    formData.append('temperature', String(payload.temperature));
+    formData.append('max_response_output_tokens', String(payload.max_response_output_tokens));
+
     const response = await fetch(`${OPENAI_REALTIME_API}/calls`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openaiApiKey}`,
+        // Ne pas définir Content-Type, fetch le fera automatiquement pour FormData
       },
       body: formData,
       signal: AbortSignal.timeout(30000), // 30 second timeout
