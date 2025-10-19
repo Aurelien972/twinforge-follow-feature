@@ -12,7 +12,7 @@ import { ICONS } from '../../icons/registry';
 import { useUnifiedCoachStore } from '../../../system/store/unifiedCoachStore';
 import { Z_INDEX, useOverlayStore } from '../../../system/store/overlayStore';
 import CoachChatInterface from '../coach/CoachChatInterface';
-import VoiceSessionMinimal from './VoiceSessionMinimal';
+// VoiceSessionMinimal removed - now integrated in ChatInputBar
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
 import logger from '../../../lib/utils/logger';
@@ -300,16 +300,8 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
     }
   };
 
-  // Si en mode voice-only, afficher l'interface minimale au lieu du drawer
-  // IMPORTANT: On n'affiche jamais les deux en même temps
-  if (isVoiceOnlyMode) {
-    return (
-      <AnimatePresence>
-        <VoiceSessionMinimal onClose={close} />
-      </AnimatePresence>
-    );
-  }
-
+  // Toujours afficher le drawer (plus de mode voice-only séparé)
+  // Les modes voice-to-text et realtime sont maintenant intégrés dans ChatInputBar
   return (
     <AnimatePresence>
       {isOpen && (
@@ -505,12 +497,12 @@ const GlobalChatDrawer: React.FC<GlobalChatDrawerProps> = ({ chatButtonRef }) =>
                   )}
                 </AnimatePresence>
 
-                {/* Minimize Button - Continue in background */}
-                {voiceState === 'listening' || voiceState === 'speaking' && (
+                {/* Minimize Button - Continue in background when in realtime mode */}
+                {(voiceState === 'listening' || voiceState === 'speaking' || voiceState === 'connecting') && (
                   <motion.button
                     className="minimize-button"
                     onClick={() => {
-                      logger.info('GLOBAL_CHAT_DRAWER', 'Minimizing chat with active voice session');
+                      logger.info('GLOBAL_CHAT_DRAWER', 'Minimizing chat with active realtime session');
                       navClose();
                       Haptics.tap();
                       handleClose();

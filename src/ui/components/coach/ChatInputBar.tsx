@@ -1,6 +1,7 @@
 /**
  * Chat Input Bar
  * Sticky input for text and voice messaging with coach
+ * Supports 3 modes: text, voice-to-text, and realtime
  */
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -10,7 +11,9 @@ import { ICONS } from '../../icons/registry';
 import { useFeedback } from '../../../hooks/useFeedback';
 import { Haptics } from '../../../utils/haptics';
 import { openaiWhisperService } from '../../../system/services/openaiWhisperService';
-import VoiceToTextOverlay from '../../components/chat/VoiceToTextOverlay';
+import CentralInputZone from '../../components/chat/CentralInputZone';
+
+type InputMode = 'text' | 'voice-to-text' | 'realtime';
 
 interface ChatInputBarProps {
   onSendMessage: (message: string) => void;
@@ -51,6 +54,20 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
   const [transcriptionError, setTranscriptionError] = useState<string | undefined>(undefined);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { click } = useFeedback();
+
+  // Déterminer le mode actif automatiquement
+  const [currentInputMode, setCurrentInputMode] = useState<InputMode>('text');
+
+  // Gérer le changement de mode automatique
+  useEffect(() => {
+    if (isRecording || isTranscribing) {
+      setCurrentInputMode('voice-to-text');
+    } else if (realtimeState !== 'idle' && realtimeState !== 'error') {
+      setCurrentInputMode('realtime');
+    } else {
+      setCurrentInputMode('text');
+    }
+  }, [isRecording, isTranscribing, realtimeState]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -131,35 +148,19 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
 
   const isRealtimeActive = realtimeState !== 'idle' && realtimeState !== 'error';
 
-  // Bloquer l'input texte complètement en mode Realtime pour forcer voice-only
-  const isTextInputBlocked = isRealtimeActive;
-
   return (
-    <>
-      {/* Voice to Text Overlay - Simple mobile-optimized UI */}
-      <AnimatePresence>
-        {(isRecording || isTranscribing) && (
-          <VoiceToTextOverlay
-            isRecording={isRecording}
-            isTranscribing={isTranscribing}
-            onStop={handleVoiceToggle}
-            stepColor={stepColor}
-          />
-        )}
-      </AnimatePresence>
-
-      <div
-        className="chat-input-bar-container"
-        style={{
-          position: 'relative',
-          width: '100%',
-          zIndex: 1,
-          pointerEvents: disabled ? 'none' : 'auto',
-          opacity: disabled ? 0.6 : 1,
-          margin: '0',
-          padding: '0'
-        }}
-      >
+    <div
+      className="chat-input-bar-container"
+      style={{
+        position: 'relative',
+        width: '100%',
+        zIndex: 1,
+        pointerEvents: disabled ? 'none' : 'auto',
+        opacity: disabled ? 0.6 : 1,
+        margin: '0',
+        padding: '0'
+      }}
+    >
       {/* Error Banners */}
       <AnimatePresence>
         {realtimeError && (
@@ -346,10 +347,10 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
           `,
           backdropFilter: 'blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate))',
           WebkitBackdropFilter: 'blur(var(--liquid-bottombar-blur)) saturate(var(--liquid-bottombar-saturate))',
-          border: isFocused
+          border: isFocused || currentInputMode !== 'text'
             ? `1.5px solid color-mix(in srgb, ${stepColor} 40%, transparent)`
             : '1.5px solid rgba(255, 255, 255, 0.15)',
-          boxShadow: isFocused
+          boxShadow: isFocused || currentInputMode !== 'text'
             ? `
                 0 4px 24px rgba(0, 0, 0, 0.25),
                 0 0 32px color-mix(in srgb, ${stepColor} 20%, transparent),
@@ -361,11 +362,14 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
                 inset 0 1px 0 rgba(255, 255, 255, 0.1)
               `,
           borderRadius: '18px',
-          padding: '6px 8px',
-          transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+          padding: currentInputMode === 'text' ? '6px 8px' : '0',
+          transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
+          overflow: 'hidden'
         }}
       >
-        <div className="flex items-center gap-2">
+        {/* Mode TEXT: afficher les contrôles classiques */}
+        {currentInputMode === 'text' && (
+          <div className="flex items-center gap-2">
           {/* Voice Button */}
           {voiceEnabled && (
             <motion.button
@@ -464,34 +468,26 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
             </motion.button>
           )}
 
-          {/* Text Input */}
-          <div className="flex-1 relative">
-            <textarea
-              ref={inputRef}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              placeholder={
-                isTextInputBlocked
-                  ? 'Mode vocal actif - Texte désactivé'
-                  : isRecording
-                  ? 'Enregistrement en cours...'
-                  : isTranscribing
-                  ? 'Transcription...'
-                  : placeholder
-              }
-              disabled={disabled || isRecording || isTranscribing || isTextInputBlocked}
-              rows={1}
-              className="chat-textarea w-full resize-none bg-transparent border-none outline-none text-white placeholder-white/40 text-sm leading-relaxed py-1.5 px-1.5"
-              style={{
-                maxHeight: '90px',
-                minHeight: '32px',
-                opacity: isTextInputBlocked ? 0.4 : 1
-              }}
-            />
-          </div>
+          {/* Text Input - Utiliser CentralInputZone */}
+          <CentralInputZone
+            mode="text"
+            message={message}
+            onMessageChange={setMessage}
+            onSubmit={handleSubmit}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            isFocused={isFocused}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            textareaRef={inputRef}
+            disabled={disabled}
+            isRecording={false}
+            isTranscribing={false}
+            onStopRecording={() => {}}
+            voiceState="idle"
+            onStopRealtime={() => {}}
+            stepColor={stepColor}
+          />
 
           {/* Dynamic Button: Realtime when empty, Send when typing */}
           {voiceEnabled && !message.trim() ? (
@@ -661,49 +657,33 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({
               />
             </motion.button>
           )}
-        </div>
+          </div>
+        )}
 
-        {/* Recording Indicator */}
-        <AnimatePresence>
-          {isRecording && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="recording-indicator mt-3 pt-3 border-t border-white/10"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="recording-dot" />
-                  <span className="text-xs text-white/70">Enregistrement en cours...</span>
-                </div>
-                <span className="text-xs text-white/50">Tap pour arrêter</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Processing Indicator */}
-        <AnimatePresence>
-          {isProcessing && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="processing-indicator mt-3 pt-3 border-t border-white/10"
-            >
-              <div className="flex items-center gap-2">
-                <div className="processing-spinner">
-                  <SpatialIcon Icon={ICONS.Loader} size={14} style={{ color: stepColor }} />
-                </div>
-                <span className="text-xs text-white/70">Traitement en cours...</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Mode VOICE-TO-TEXT ou REALTIME: afficher CentralInputZone avec le bon mode */}
+        {currentInputMode !== 'text' && (
+          <CentralInputZone
+            mode={currentInputMode}
+            message={message}
+            onMessageChange={setMessage}
+            onSubmit={handleSubmit}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            isFocused={isFocused}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            textareaRef={inputRef}
+            disabled={disabled}
+            isRecording={isRecording}
+            isTranscribing={isTranscribing}
+            onStopRecording={handleVoiceToggle}
+            voiceState={realtimeState}
+            onStopRealtime={handleRealtimeToggle}
+            stepColor={stepColor}
+          />
+        )}
       </div>
     </div>
-    </>
   );
 };
 

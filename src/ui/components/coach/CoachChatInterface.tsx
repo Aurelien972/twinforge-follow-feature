@@ -143,11 +143,15 @@ const CoachChatInterface: React.FC<CoachChatInterfaceProps> = ({
         onSendMessage={onSendMessage}
       />
 
-      {/* Chat Input Bar - Fixed at bottom with minimal spacing */}
-      <div className="chat-input-footer flex-shrink-0" style={{
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        padding: '8px 8px 0px 8px'
-      }}>
+      {/* Chat Input Bar - Fixed at bottom with dynamic height based on mode */}
+      <div
+        className="chat-input-footer flex-shrink-0"
+        style={{
+          borderTop: (voiceState !== 'idle' || isRecording) ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+          padding: (voiceState !== 'idle' || isRecording) ? '0' : '8px 8px 0px 8px',
+          transition: 'all 0.3s ease'
+        }}
+      >
         <ChatInputBar
           onSendMessage={onSendMessage}
           onStartVoiceRecording={handleStartRecording}

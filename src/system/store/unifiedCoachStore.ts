@@ -14,6 +14,7 @@ import type { NotificationId } from '../../utils/notificationTracker';
 export type ChatMode = 'training' | 'nutrition' | 'fasting' | 'general' | 'body-scan';
 export type CommunicationMode = 'text' | 'voice';
 export type VoiceState = 'idle' | 'connecting' | 'listening' | 'processing' | 'speaking' | 'error';
+export type InputMode = 'text' | 'voice-to-text' | 'realtime';
 
 export interface ChatModeConfig {
   id: ChatMode;
@@ -49,7 +50,8 @@ interface UnifiedCoachState {
   // Panel state
   isPanelOpen: boolean;
   communicationMode: CommunicationMode;
-  isVoiceOnlyMode: boolean; // New: Track if in voice-only minimal UI mode
+  isVoiceOnlyMode: boolean; // Deprecated - kept for backward compatibility
+  currentInputMode: InputMode; // New: Track current input mode (text/voice-to-text/realtime)
 
   // Chat mode
   currentMode: ChatMode;
@@ -140,9 +142,12 @@ interface UnifiedCoachState {
   showNotification: (notification: Omit<ChatNotification, 'isVisible'>) => void;
   hideNotification: () => void;
 
-  // Actions - Voice Only Mode
+  // Actions - Voice Only Mode (deprecated)
   enterVoiceOnlyMode: () => void;
   exitVoiceOnlyMode: () => void;
+
+  // Actions - Input Mode
+  setInputMode: (mode: InputMode) => void;
 }
 
 const DEFAULT_MODE_CONFIGS: Record<ChatMode, ChatModeConfig> = {
@@ -214,6 +219,7 @@ export const useUnifiedCoachStore = create<UnifiedCoachState>()(
       isPanelOpen: false,
       communicationMode: 'text',
       isVoiceOnlyMode: false,
+      currentInputMode: 'text',
 
       currentMode: 'general',
       modeConfigs: DEFAULT_MODE_CONFIGS,
@@ -585,15 +591,16 @@ export const useUnifiedCoachStore = create<UnifiedCoachState>()(
         }
       },
 
-      // Voice Only Mode actions
+      // Voice Only Mode actions (deprecated - kept for backward compatibility)
       enterVoiceOnlyMode: () => {
         set({
           isVoiceOnlyMode: true,
-          isPanelOpen: false, // Close the chat drawer
-          communicationMode: 'voice'
+          isPanelOpen: false,
+          communicationMode: 'voice',
+          currentInputMode: 'realtime'
         });
 
-        logger.info('UNIFIED_COACH', 'Entered voice-only mode', {
+        logger.info('UNIFIED_COACH', 'Entered voice-only mode (deprecated)', {
           timestamp: new Date().toISOString()
         });
       },
@@ -601,10 +608,21 @@ export const useUnifiedCoachStore = create<UnifiedCoachState>()(
       exitVoiceOnlyMode: () => {
         set({
           isVoiceOnlyMode: false,
-          isPanelOpen: true // Reopen chat drawer to show conversation
+          isPanelOpen: true,
+          currentInputMode: 'text'
         });
 
-        logger.info('UNIFIED_COACH', 'Exited voice-only mode', {
+        logger.info('UNIFIED_COACH', 'Exited voice-only mode (deprecated)', {
+          timestamp: new Date().toISOString()
+        });
+      },
+
+      // Input Mode actions
+      setInputMode: (mode: InputMode) => {
+        set({ currentInputMode: mode });
+
+        logger.debug('UNIFIED_COACH', 'Input mode changed', {
+          mode,
           timestamp: new Date().toISOString()
         });
       }
@@ -615,6 +633,7 @@ export const useUnifiedCoachStore = create<UnifiedCoachState>()(
       partialize: (state) => ({
         currentMode: state.currentMode,
         communicationMode: state.communicationMode,
+        currentInputMode: state.currentInputMode,
         closeOnNavigation: state.closeOnNavigation,
         showTranscript: state.showTranscript,
         messages: state.messages.slice(-50)
