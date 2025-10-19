@@ -202,7 +202,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
     tabs: [
       {
         value: 'subscription',
-        label: 'Abonnement & Tokens',
+        label: 'Forfaits',
         icon: 'CreditCard',
         description: 'Gérez votre abonnement et vos tokens pour les fonctionnalités IA',
         features: [
@@ -265,7 +265,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
       },
       {
         value: 'appareils',
-        label: 'Appareils Connectés',
+        label: 'Appareils',
         icon: 'Watch',
         description: 'Synchronisez vos trackers fitness',
         features: [
