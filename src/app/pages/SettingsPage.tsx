@@ -6,6 +6,7 @@ import GlassCard from '../../ui/cards/GlassCard';
 import UnderConstructionCard from '../components/UnderConstructionCard';
 import ConnectedDevicesTab from './Settings/ConnectedDevicesTab';
 import GeneralSettingsTab from './Settings/GeneralSettingsTab';
+import PreferencesSettingsTab from './Settings/PreferencesSettingsTab';
 import { PLACEHOLDER_PAGES_CONFIG } from '../../config/placeholderPagesConfig';
 
 /**
@@ -50,8 +51,10 @@ const SettingsPage: React.FC = () => {
           <Tabs.Panel key={tab.value} value={tab.value}>
             {tab.value === 'appareils' ? (
               <ConnectedDevicesTab />
-            ) : tab.value === 'general' ? (
+            ) : tab.value === 'performance' ? (
               <GeneralSettingsTab />
+            ) : tab.value === 'preferences' ? (
+              <PreferencesSettingsTab />
             ) : (
               <GlassCard className="p-6">
                 <UnderConstructionCard

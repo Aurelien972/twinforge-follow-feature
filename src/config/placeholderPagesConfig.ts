@@ -201,16 +201,29 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
     circuit: 'settings',
     tabs: [
       {
-        value: 'general',
-        label: 'Général',
-        icon: 'Settings',
-        description: 'Thème, langue, unités et mode performance',
+        value: 'performance',
+        label: 'Performance',
+        icon: 'Zap',
+        description: 'Optimisez les performances visuelles selon votre appareil',
         features: [
-          'Mode Performance pour iPhone 10',
-          'Préférences utilisateur',
-          'Thème et apparence',
+          'Mode Ultra Performance pour iPhone 8-10',
+          'Mode Équilibré pour iPhone 11-12',
+          'Mode Premium pour iPhone 13+',
+          'Détection automatique de l\'appareil',
+          'Optimisations GPU adaptatives'
+        ]
+      },
+      {
+        value: 'preferences',
+        label: 'Préférences',
+        icon: 'User',
+        description: 'Personnalisez votre expérience utilisateur',
+        features: [
+          'Choix de la voix du coach vocal',
+          'Préférences d\'interface',
           'Langue et région',
-          'Unités de mesure'
+          'Unités de mesure',
+          'Mode nuit/jour (à venir)'
         ]
       },
       {

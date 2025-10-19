@@ -1,0 +1,364 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import GlassCard from '../../../ui/cards/GlassCard';
+import SpatialIcon from '../../../ui/icons/SpatialIcon';
+import { ICONS } from '../../../ui/icons/registry';
+import { useToast } from '../../../ui/components/ToastProvider';
+import { useUserStore } from '../../../system/store/userStore';
+import type { VoiceType } from '../../../system/store/voiceCoachStore';
+
+const AVAILABLE_VOICES: Array<{
+  id: VoiceType;
+  name: string;
+  description: string;
+  personality: string;
+  sampleText: string;
+}> = [
+  {
+    id: 'alloy',
+    name: 'Alloy',
+    description: 'Voix neutre et équilibrée',
+    personality: 'Professionnelle, claire et posée',
+    sampleText: 'Bonjour, je suis Alloy. Je vous accompagne dans votre entraînement avec une voix claire et professionnelle.'
+  },
+  {
+    id: 'echo',
+    name: 'Echo',
+    description: 'Voix masculine dynamique',
+    personality: 'Énergique et motivante',
+    sampleText: 'Salut ! Je suis Echo. Prêt à donner le meilleur de toi-même ? Allez, on y va !'
+  },
+  {
+    id: 'shimmer',
+    name: 'Shimmer',
+    description: 'Voix féminine chaleureuse',
+    personality: 'Encourageante et bienveillante',
+    sampleText: 'Bonjour, je suis Shimmer. Je suis là pour t\'encourager à chaque étape de ton parcours.'
+  },
+  {
+    id: 'fable',
+    name: 'Fable',
+    description: 'Voix masculine posée',
+    personality: 'Calme et rassurante',
+    sampleText: 'Bonjour, je suis Fable. Prenons le temps ensemble de progresser à ton rythme.'
+  },
+  {
+    id: 'onyx',
+    name: 'Onyx',
+    description: 'Voix masculine profonde',
+    personality: 'Autoritaire et confiante',
+    sampleText: 'Je suis Onyx. Concentre-toi sur tes objectifs et dépasse tes limites.'
+  },
+  {
+    id: 'nova',
+    name: 'Nova',
+    description: 'Voix féminine énergique',
+    personality: 'Dynamique et inspirante',
+    sampleText: 'Coucou, c\'est Nova ! Tu es prêt à briller aujourd\'hui ? On fonce ensemble !'
+  }
+];
+
+const PreferencesSettingsTab: React.FC = () => {
+  const { profile, updateProfile } = useUserStore();
+  const { showToast } = useToast();
+  const [selectedVoice, setSelectedVoice] = useState<VoiceType>(
+    (profile?.preferences?.voice_coach_voice as VoiceType) || 'alloy'
+  );
+  const [isPlaying, setIsPlaying] = useState<VoiceType | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
+
+  useEffect(() => {
+    return () => {
+      stopAudio();
+      if (audioContextRef.current?.state !== 'closed') {
+        audioContextRef.current?.close();
+      }
+    };
+  }, []);
+
+  const stopAudio = () => {
+    if (audioSourceRef.current) {
+      try {
+        audioSourceRef.current.stop();
+        audioSourceRef.current.disconnect();
+      } catch (e) {
+        // Already stopped
+      }
+      audioSourceRef.current = null;
+    }
+    setIsPlaying(null);
+  };
+
+  const playVoicePreview = async (voiceId: VoiceType) => {
+    stopAudio();
+
+    const voice = AVAILABLE_VOICES.find(v => v.id === voiceId);
+    if (!voice) return;
+
+    setIsPlaying(voiceId);
+
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext();
+      }
+
+      const sampleRate = 24000;
+      const duration = 3;
+      const numSamples = sampleRate * duration;
+      const audioBuffer = audioContextRef.current.createBuffer(1, numSamples, sampleRate);
+      const channelData = audioBuffer.getChannelData(0);
+
+      const frequencies = voiceId === 'onyx' ? [120, 240] :
+                         voiceId === 'echo' ? [180, 360] :
+                         voiceId === 'fable' ? [140, 280] :
+                         voiceId === 'shimmer' ? [220, 440] :
+                         voiceId === 'nova' ? [260, 520] :
+                         [160, 320];
+
+      for (let i = 0; i < numSamples; i++) {
+        const t = i / sampleRate;
+        const envelope = Math.exp(-t * 0.8);
+        channelData[i] = envelope * (
+          0.4 * Math.sin(2 * Math.PI * frequencies[0] * t) +
+          0.3 * Math.sin(2 * Math.PI * frequencies[1] * t) +
+          0.2 * Math.sin(2 * Math.PI * frequencies[0] * 1.5 * t) +
+          0.1 * Math.sin(2 * Math.PI * frequencies[1] * 1.5 * t)
+        ) * 0.3;
+      }
+
+      const source = audioContextRef.current.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioContextRef.current.destination);
+
+      source.onended = () => {
+        setIsPlaying(null);
+      };
+
+      audioSourceRef.current = source;
+      source.start();
+
+      showToast({
+        type: 'info',
+        title: `Aperçu: ${voice.name}`,
+        message: voice.sampleText,
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Error playing voice preview:', error);
+      setIsPlaying(null);
+      showToast({
+        type: 'error',
+        title: 'Erreur',
+        message: 'Impossible de lire l\'aperçu audio',
+        duration: 3000,
+      });
+    }
+  };
+
+  const handleVoiceSelect = async (voiceId: VoiceType) => {
+    setSelectedVoice(voiceId);
+    setIsSaving(true);
+
+    try {
+      await updateProfile({
+        preferences: {
+          ...profile?.preferences,
+          voice_coach_voice: voiceId,
+        }
+      });
+
+      showToast({
+        type: 'success',
+        title: 'Voix enregistrée',
+        message: `${AVAILABLE_VOICES.find(v => v.id === voiceId)?.name} sera utilisée pour le coach vocal`,
+        duration: 3000,
+      });
+    } catch (error) {
+      showToast({
+        type: 'error',
+        title: 'Erreur',
+        message: 'Impossible de sauvegarder la préférence de voix',
+        duration: 3000,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-xl font-bold text-white mb-2">
+          Voix du Coach Vocal
+        </h3>
+        <p className="text-sm text-slate-400">
+          Choisissez la voix qui vous accompagnera pendant vos entraînements.
+          Cliquez sur le bouton de lecture pour écouter un aperçu.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {AVAILABLE_VOICES.map((voice) => {
+          const isSelected = selectedVoice === voice.id;
+          const isCurrentlyPlaying = isPlaying === voice.id;
+
+          return (
+            <motion.div
+              key={voice.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <GlassCard
+                className={`p-4 cursor-pointer transition-all duration-300 ${
+                  isSelected
+                    ? 'ring-2 ring-cyan-400/50 bg-gradient-to-br from-cyan-500/10 to-blue-500/10'
+                    : 'hover:bg-white/5'
+                } ${isSaving ? 'opacity-50 pointer-events-none' : ''}`}
+                onClick={() => !isSaving && handleVoiceSelect(voice.id)}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0">
+                    <SpatialIcon
+                      Icon={ICONS.Mic}
+                      size={24}
+                      color={isSelected ? '#18E3FF' : '#60A5FA'}
+                      variant="pure"
+                    />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-base font-semibold text-white">
+                        {voice.name}
+                      </h4>
+                      {isSelected && (
+                        <div className="flex items-center gap-1 text-xs text-cyan-400">
+                          <SpatialIcon
+                            Icon={ICONS.Check}
+                            size={14}
+                            color="#18E3FF"
+                            variant="pure"
+                          />
+                          <span>Sélectionnée</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-sm text-slate-400 mb-2">
+                      {voice.description}
+                    </p>
+
+                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                      <SpatialIcon
+                        Icon={ICONS.Sparkles}
+                        size={12}
+                        color="#94A3B8"
+                        variant="pure"
+                      />
+                      <span>{voice.personality}</span>
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isCurrentlyPlaying) {
+                          stopAudio();
+                        } else {
+                          playVoicePreview(voice.id);
+                        }
+                      }}
+                      className={`mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        isCurrentlyPlaying
+                          ? 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'
+                          : 'bg-white/10 text-white hover:bg-white/15'
+                      }`}
+                      disabled={isSaving}
+                    >
+                      <SpatialIcon
+                        Icon={isCurrentlyPlaying ? ICONS.X : ICONS.Play}
+                        size={16}
+                        color={isCurrentlyPlaying ? '#18E3FF' : '#FFFFFF'}
+                        variant="pure"
+                      />
+                      <span>
+                        {isCurrentlyPlaying ? 'Arrêter l\'aperçu' : 'Écouter un aperçu'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </GlassCard>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      <GlassCard className="p-6">
+        <div className="flex items-start gap-3">
+          <SpatialIcon
+            Icon={ICONS.Info}
+            size={20}
+            color="#60A5FA"
+            variant="pure"
+          />
+          <div className="flex-1">
+            <h4 className="text-sm font-semibold text-white mb-2">
+              À propos du Coach Vocal
+            </h4>
+            <ul className="text-xs text-slate-400 leading-relaxed space-y-2">
+              <li className="flex items-start gap-2">
+                <span className="text-cyan-400 mt-0.5">•</span>
+                <span>
+                  Le coach vocal utilise la technologie OpenAI Realtime pour vous guider en temps réel pendant vos entraînements
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-cyan-400 mt-0.5">•</span>
+                <span>
+                  Chaque voix a sa propre personnalité pour s'adapter à votre style d'entraînement
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-cyan-400 mt-0.5">•</span>
+                <span>
+                  Les aperçus audio sont des simulations. La voix réelle sera utilisée lors de vos séances d'entraînement
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-cyan-400 mt-0.5">•</span>
+                <span>
+                  Vous pouvez changer de voix à tout moment selon vos préférences
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </GlassCard>
+
+      <GlassCard className="p-6 bg-gradient-to-br from-blue-500/5 to-purple-500/5">
+        <div className="flex items-start gap-3">
+          <SpatialIcon
+            Icon={ICONS.Lightbulb}
+            size={20}
+            color="#A78BFA"
+            variant="pure"
+          />
+          <div className="flex-1">
+            <h4 className="text-sm font-semibold text-white mb-2">
+              Autres préférences à venir
+            </h4>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Nous travaillons sur de nouvelles options de personnalisation :
+              thème sombre/clair, unités de mesure, langue de l'interface, et bien plus encore.
+              Restez à l'écoute !
+            </p>
+          </div>
+        </div>
+      </GlassCard>
+    </div>
+  );
+};
+
+export default PreferencesSettingsTab;

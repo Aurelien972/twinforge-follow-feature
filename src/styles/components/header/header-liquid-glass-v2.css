@@ -329,32 +329,32 @@
   display: none !important;
 }
 
-/* Simplify Zap button (Outils du Forgeron) in performance mode */
+/* Simplify Zap button (Outils du Forgeron) in performance mode - Keep round shape with simple solid style */
 .mode-high-performance .central-action-button {
-  background: rgba(247, 147, 30, 0.15) !important;
+  background: rgba(247, 147, 30, 0.2) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  border: 2px solid rgba(247, 147, 30, 0.4) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  border: 2px solid rgba(247, 147, 30, 0.5) !important;
+  box-shadow: 0 2px 10px rgba(247, 147, 30, 0.25), 0 2px 6px rgba(0, 0, 0, 0.15) !important;
 }
 
 /* Remove animated corner squares in performance mode */
-.mode-high-performance .central-action-button > div[style*="position: absolute"] {
+.mode-high-performance .central-action-button > div[style*="position: absolute"][style*="width: 6px"] {
   display: none !important;
 }
 
 /* Remove pulsing glow effect in performance mode */
-.mode-high-performance .central-action-button > div[class*="absolute inset-0"] {
+.mode-high-performance .central-action-button > div.absolute.inset-0.rounded-full {
   display: none !important;
 }
 
-/* Simplify hamburger menu button in performance mode */
+/* Simplify hamburger menu button in performance mode - Keep round shape with better visibility */
 .mode-high-performance .user-panel-toggle {
-  background: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Disable all animations in performance mode */
@@ -362,21 +362,21 @@
 .mode-high-performance .central-action-button *,
 .mode-high-performance .user-panel-toggle * {
   animation: none !important;
-  transition: background-color 0.15s ease, transform 0.15s ease !important;
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease !important;
 }
 
-/* Simplify hover states in performance mode */
+/* Simplify hover states in performance mode - Keep subtle interactions */
 @media (hover: hover) and (pointer: fine) {
   .mode-high-performance .central-action-button:hover {
-    background: rgba(247, 147, 30, 0.25) !important;
-    transform: translateZ(0) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    background: rgba(247, 147, 30, 0.3) !important;
+    transform: scale(1.03) translateZ(0) !important;
+    box-shadow: 0 2px 12px rgba(247, 147, 30, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
   }
 
   .mode-high-performance .user-panel-toggle:hover {
-    background: rgba(255, 255, 255, 0.18) !important;
-    transform: translateZ(0) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    background: rgba(255, 255, 255, 0.22) !important;
+    transform: scale(1.03) translateZ(0) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
   }
 }
 
