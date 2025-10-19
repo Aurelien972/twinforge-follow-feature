@@ -329,13 +329,22 @@
   /* Remove any inherited transparency */
   background-clip: padding-box !important;
   -webkit-background-clip: padding-box !important;
+  /* Ensure no background blending */
+  background-blend-mode: normal !important;
+  mix-blend-mode: normal !important;
 }
 
-/* CRITICAL: Disable border gradient in performance mode - it was causing transparency */
+/* CRITICAL: Force solid backdrop layer with ::before instead of disabling it */
 .mode-high-performance .header-liquid-glass::before {
-  display: none !important;
-  content: none !important;
-  opacity: 0 !important;
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgb(11, 14, 23) !important;
+  border-radius: inherit !important;
+  z-index: -1 !important;
+  display: block !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
 }
 
 /* Remove decorative glow pseudo-element in performance mode */

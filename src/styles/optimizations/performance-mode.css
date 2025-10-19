@@ -410,6 +410,14 @@
 
   /* Keep border for definition */
   border: 1px solid rgba(255, 255, 255, 0.10) !important;
+
+  /* Ensure no transparency leaks */
+  opacity: 1 !important;
+  isolation: isolate !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+  background-blend-mode: normal !important;
+  mix-blend-mode: normal !important;
 }
 
 /* Force solid backdrop layer */
@@ -423,6 +431,7 @@
   display: block !important;
   pointer-events: none !important;
   animation: none !important;
+  opacity: 1 !important;
 }
 
 /* Remove decorative glow */
