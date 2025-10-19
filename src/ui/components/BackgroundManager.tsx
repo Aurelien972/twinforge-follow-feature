@@ -79,11 +79,16 @@ export const BackgroundManager: React.FC = () => {
     }
   }, [isPerformanceMode, mode]);
 
-  // En mode performance, ne rien render (pas de particules dans le DOM)
+  // En mode performance, render fond uni statique SANS classe bg-twinforge-visionos
   if (isPerformanceMode) {
     return (
       <div
-        className="bg-twinforge-visionos performance-mode"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'var(--forge-deep)',
+          zIndex: -1,
+        }}
         aria-hidden="true"
       />
     );
