@@ -47,28 +47,6 @@ const SubscriptionTab: React.FC = () => {
     }
   };
 
-  const handleSubscribe = async (planType: string) => {
-    if (isCreatingSession) return;
-    setIsCreatingSession(true);
-    try {
-      const result = await TokenService.createCheckoutSession('subscription', planType);
-      if (result?.url) {
-        window.location.href = result.url;
-      } else {
-        throw new Error('Failed to create checkout session');
-      }
-    } catch (error) {
-      console.error('Error creating checkout session:', error);
-      showToast({
-        type: 'error',
-        title: 'Erreur',
-        message: 'Impossible de créer la session de paiement',
-        duration: 3000,
-      });
-      setIsCreatingSession(false);
-    }
-  };
-
   const handlePurchaseTokens = async (packId: string) => {
     if (isCreatingSession) return;
     setIsCreatingSession(true);
@@ -91,60 +69,6 @@ const SubscriptionTab: React.FC = () => {
     }
   };
 
-  const handleManageSubscription = async () => {
-    if (isCreatingSession) return;
-    setIsCreatingSession(true);
-    try {
-      const result = await TokenService.createPortalSession();
-      if (result?.url) {
-        window.location.href = result.url;
-      } else {
-        throw new Error('Failed to create portal session');
-      }
-    } catch (error) {
-      console.error('Error creating portal session:', error);
-      showToast({
-        type: 'error',
-        title: 'Erreur',
-        message: 'Impossible d\'accéder au portail de gestion',
-        duration: 3000,
-      });
-      setIsCreatingSession(false);
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'text-emerald-400';
-      case 'trialing':
-        return 'text-blue-400';
-      case 'canceled':
-      case 'past_due':
-      case 'unpaid':
-        return 'text-red-400';
-      default:
-        return 'text-slate-400';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'Actif';
-      case 'trialing':
-        return 'Essai';
-      case 'canceled':
-        return 'Annulé';
-      case 'past_due':
-        return 'Paiement en retard';
-      case 'unpaid':
-        return 'Impayé';
-      default:
-        return status;
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -157,6 +81,8 @@ const SubscriptionTab: React.FC = () => {
     );
   }
 
+  const pack19 = pricingConfig?.tokenPacks?.pack_19;
+
   return (
     <div className="space-y-6">
       <GlassCard className="p-6">
@@ -165,7 +91,7 @@ const SubscriptionTab: React.FC = () => {
           <div className="flex-1">
             <h3 className="text-xl font-bold text-white mb-1">Solde de Tokens</h3>
             <p className="text-sm text-slate-400">
-              Les tokens sont utilisés pour les fonctionnalités IA de TwinForgeFit
+              Les tokens alimentent toutes les fonctionnalités avancées de TwinForgeFit
             </p>
           </div>
         </div>
@@ -180,7 +106,7 @@ const SubscriptionTab: React.FC = () => {
               {tokenBalance ? TokenService.formatTokenAmount(tokenBalance.balance) : '0'}
             </div>
             <div className="text-xs text-slate-500 mt-1">
-              1 token = 0.001€ de coût IA
+              Votre réserve d'énergie numérique
             </div>
           </div>
 
@@ -188,104 +114,70 @@ const SubscriptionTab: React.FC = () => {
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-slate-500">Statut</span>
               <SpatialIcon
-                Icon={subscription?.status === 'active' ? ICONS.Check : ICONS.AlertCircle}
+                Icon={ICONS.Check}
                 size={16}
-                color={subscription?.status === 'active' ? '#10B981' : '#F59E0B'}
+                color="#10B981"
                 variant="pure"
               />
             </div>
-            <div className={`text-2xl font-bold ${subscription ? getStatusColor(subscription.status) : 'text-slate-400'}`}>
-              {subscription ? getStatusLabel(subscription.status) : 'Essai Gratuit'}
+            <div className="text-2xl font-bold text-emerald-400">
+              Essai Gratuit
             </div>
-            {subscription && (
-              <div className="text-xs text-slate-500 mt-1">
-                Renouvellement le {format(new Date(subscription.currentPeriodEnd), 'dd MMMM yyyy', { locale: fr })}
-              </div>
-            )}
+            <div className="text-xs text-slate-500 mt-1">
+              15 000 tokens offerts pour découvrir l'app
+            </div>
           </div>
         </div>
-
-        {subscription && (
-          <div className="flex gap-3">
-            <button
-              onClick={handleManageSubscription}
-              disabled={isCreatingSession}
-              className="flex-1 px-4 py-3 bg-blue-500/20 text-blue-400 rounded-xl font-medium hover:bg-blue-500/30 transition-all border border-blue-500/30 disabled:opacity-50"
-            >
-              Gérer mon abonnement
-            </button>
-          </div>
-        )}
       </GlassCard>
 
-      {!subscription && pricingConfig && (
+      {pack19 && (
         <div>
-          <h3 className="text-xl font-bold text-white mb-4">Abonnements Mensuels</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(pricingConfig.subscriptionPlans).map(([key, plan]) => (
-              <GlassCard key={key} className="p-5">
-                <div className="mb-4">
-                  <h4 className="text-lg font-bold text-white mb-1">{plan.name}</h4>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-bold text-white">
-                      {TokenService.formatCurrency(plan.price_eur)}
-                    </span>
-                    <span className="text-sm text-slate-500">/mois</span>
-                  </div>
+          <h3 className="text-xl font-bold text-white mb-4">Recharger mes Tokens</h3>
+          <div className="max-w-md mx-auto">
+            <GlassCard className="p-6">
+              <div className="text-center mb-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 mb-4">
+                  <SpatialIcon Icon={ICONS.Coins} size={32} color="#10B981" variant="pure" />
                 </div>
+                <h4 className="text-2xl font-bold text-white mb-2">Pack Standard</h4>
+                <p className="text-sm text-slate-400 mb-4">
+                  Rechargez votre réserve de tokens pour continuer à utiliser toutes les fonctionnalités
+                </p>
+              </div>
 
-                <div className="mb-4 py-3 px-4 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-                  <div className="text-2xl font-bold text-emerald-400">
-                    {TokenService.formatTokenAmount(plan.tokens_per_month)} tokens
-                  </div>
-                  <div className="text-xs text-slate-400 mt-1">par mois</div>
+              <div className="mb-6 py-4 px-5 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                <div className="flex items-baseline justify-center gap-2 mb-1">
+                  <span className="text-4xl font-bold text-emerald-400">
+                    {TokenService.formatTokenAmount(pack19.tokens)}
+                  </span>
+                  <span className="text-lg text-slate-400">tokens</span>
                 </div>
-
-                <button
-                  onClick={() => handleSubscribe(key)}
-                  disabled={isCreatingSession}
-                  className="w-full px-4 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-all disabled:opacity-50"
-                >
-                  S'abonner
-                </button>
-              </GlassCard>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {pricingConfig && (
-        <div>
-          <h3 className="text-xl font-bold text-white mb-4">Achats de Tokens</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {Object.entries(pricingConfig.tokenPacks).map(([key, pack]) => (
-              <GlassCard key={key} className="p-4">
-                <div className="mb-3">
-                  <div className="text-xl font-bold text-white mb-1">
-                    {TokenService.formatTokenAmount(pack.tokens)}
-                  </div>
-                  <div className="text-xs text-slate-500">tokens</div>
+                <div className="text-xs text-center text-slate-500">
+                  ≈ 100 analyses complètes ou 8 générations de plan repas
                 </div>
+              </div>
 
-                {pack.bonus_percent > 0 && (
-                  <div className="mb-3 px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-medium rounded-md inline-block">
-                    +{pack.bonus_percent}% bonus
-                  </div>
-                )}
-
-                <div className="text-lg font-bold text-white mb-3">
-                  {TokenService.formatCurrency(pack.price_eur)}
+              <div className="text-center mb-6">
+                <div className="text-3xl font-bold text-white mb-1">
+                  {TokenService.formatCurrency(pack19.price_eur)}
                 </div>
+                <div className="text-xs text-slate-500">
+                  Paiement unique • Tokens permanents
+                </div>
+              </div>
 
-                <button
-                  onClick={() => handlePurchaseTokens(key)}
-                  disabled={isCreatingSession}
-                  className="w-full px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg font-medium hover:bg-blue-500/30 transition-all border border-blue-500/30 disabled:opacity-50 text-sm"
-                >
-                  Acheter
-                </button>
-              </GlassCard>
-            ))}
+              <button
+                onClick={() => handlePurchaseTokens('pack_19')}
+                disabled={isCreatingSession}
+                className="w-full px-6 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/25"
+              >
+                {isCreatingSession ? 'Chargement...' : 'Reforger mes Tokens'}
+              </button>
+
+              <div className="mt-4 text-center text-xs text-slate-500">
+                Paiement sécurisé via Stripe
+              </div>
+            </GlassCard>
           </div>
         </div>
       )}
@@ -331,36 +223,60 @@ const SubscriptionTab: React.FC = () => {
       )}
 
       <GlassCard className="p-6">
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 mb-4">
           <SpatialIcon Icon={ICONS.Info} size={20} color="#60A5FA" variant="pure" />
           <div className="flex-1">
-            <h4 className="text-sm font-semibold text-white mb-2">À propos des Tokens</h4>
-            <ul className="text-xs text-slate-400 leading-relaxed space-y-2">
-              <li className="flex items-start gap-2">
-                <span className="text-blue-400 mt-0.5">•</span>
-                <span>
-                  Les tokens sont utilisés pour toutes les fonctionnalités IA: analyses corporelles, génération de repas, coaching vocal, et plus encore.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-emerald-400 mt-0.5">•</span>
-                <span>
-                  Avec un abonnement, vos tokens se renouvellent automatiquement chaque mois.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-400 mt-0.5">•</span>
-                <span>
-                  Achetez des packs de tokens ponctuellement si vous dépassez votre allocation mensuelle.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400 mt-0.5">•</span>
-                <span>
-                  Essai gratuit: 100 tokens offerts pour découvrir TwinForgeFit (valeur de 0.10€).
-                </span>
-              </li>
-            </ul>
+            <h4 className="text-sm font-semibold text-white mb-3">Comment fonctionnent les Tokens ?</h4>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+              <SpatialIcon Icon={ICONS.Zap} size={16} color="#60A5FA" variant="pure" />
+            </div>
+            <div className="flex-1">
+              <h5 className="text-sm font-semibold text-white mb-1">Carburant de vos fonctionnalités</h5>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Les tokens sont l'unité d'énergie qui alimente toutes les fonctionnalités avancées : analyses corporelles détaillées, génération de plans nutritionnels personnalisés, coaching vocal interactif, et bien plus encore. Chaque action consomme une quantité proportionnelle de tokens selon sa complexité.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <SpatialIcon Icon={ICONS.Coins} size={16} color="#10B981" variant="pure" />
+            </div>
+            <div className="flex-1">
+              <h5 className="text-sm font-semibold text-white mb-1">Démarrage gratuit généreux</h5>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                À votre inscription, vous recevez 15 000 tokens offerts pour découvrir l'application. C'est suffisant pour réaliser plusieurs analyses complètes, générer des plans repas, et tester toutes les fonctionnalités. Aucune carte bancaire requise pour commencer.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+              <SpatialIcon Icon={ICONS.ShoppingCart} size={16} color="#A78BFA" variant="pure" />
+            </div>
+            <div className="flex-1">
+              <h5 className="text-sm font-semibold text-white mb-1">Recharge simple et transparente</h5>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Besoin de plus de tokens ? Rechargez à tout moment avec notre pack standard à 19€. Les tokens achetés sont permanents et ne s'épuisent jamais. Vous gardez le contrôle total de vos dépenses, sans abonnement contraignant.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
+              <SpatialIcon Icon={ICONS.BarChart} size={16} color="#FBBF24" variant="pure" />
+            </div>
+            <div className="flex-1">
+              <h5 className="text-sm font-semibold text-white mb-1">Consommation optimisée et transparente</h5>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Chaque fonctionnalité affiche sa consommation en tokens avant utilisation. Les opérations simples (analyse de repas) coûtent environ 2 000 tokens, tandis que les générations complexes (plan repas complet) utilisent environ 25 000 tokens. Consultez l'historique pour suivre vos dépenses.
+              </p>
+            </div>
           </div>
         </div>
       </GlassCard>

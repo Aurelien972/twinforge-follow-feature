@@ -86,7 +86,7 @@ const TokenBalanceWidget: React.FC = () => {
             {TokenService.formatTokenAmount(balance.balance)} tokens
           </div>
           <div className="text-xxs text-white/50 truncate">
-            Cliquer pour gérer
+            Reforger
           </div>
         </div>
         <SpatialIcon

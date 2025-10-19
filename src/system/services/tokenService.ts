@@ -276,12 +276,12 @@ export class TokenService {
 
   static getOperationTypeLabel(operationType: string): string {
     const labels: Record<string, string> = {
-      'chat-completion': 'Chat IA',
-      'image-generation': 'Génération d\'image',
+      'chat-completion': 'Assistant conversationnel',
+      'image-generation': 'Génération d\'illustration',
       'audio-transcription': 'Transcription audio',
-      'voice-realtime': 'Voix en temps réel',
+      'voice-realtime': 'Coach vocal en temps réel',
       'body-scan-analysis': 'Analyse corporelle',
-      'meal-analysis': 'Analyse de repas',
+      'meal-analysis': 'Analyse nutritionnelle',
       'training-analysis': 'Analyse d\'entraînement',
       'recipe-generation': 'Génération de recette',
       'insight-generation': 'Génération d\'insights',
