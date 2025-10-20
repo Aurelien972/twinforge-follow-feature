@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ConditionalMotion } from '../../../lib/motion';
 import GlassCard from '../../../ui/cards/GlassCard';
-import GradientText from '../../../ui/components/GradientText';
 import TokenIcon from '../../../ui/icons/TokenIcon';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
@@ -117,7 +116,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
             borderColor: 'rgba(255, 255, 255, 0.1)',
           }}
         >
-          <div className="text-2xl font-bold mb-1 text-white">
+          <div className="text-2xl font-bold mb-1 text-white force-visible-text">
             {TokenService.formatTokenAmount(tokensPerMonth)}
           </div>
           <div className="text-xs text-slate-400">tokens / mois</div>
@@ -269,7 +268,7 @@ const PlansTab: React.FC = () => {
             </div>
           </div>
           <div className="text-right">
-            <div className="text-4xl font-bold mb-1 text-white">
+            <div className="text-4xl font-bold mb-1 text-white force-visible-text">
               {tokenBalance ? TokenService.formatTokenAmount(tokenBalance.balance) : '0'}
             </div>
             <div className="text-xs text-slate-500">
@@ -289,16 +288,8 @@ const PlansTab: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {Object.entries(plans).map(([planId, plan]) => {
             if (!plan) {
-              console.warn(`[PlansTab] Plan ${planId} is undefined`);
               return null;
             }
-            console.log(`[PlansTab] Rendering plan ${planId}:`, {
-              name: plan.name,
-              price_eur: plan.price_eur,
-              tokens_per_month: plan.tokens_per_month,
-              monthly_tokens: plan.monthly_tokens,
-              fullPlan: plan
-            });
             return (
               <PlanCard
                 key={planId}

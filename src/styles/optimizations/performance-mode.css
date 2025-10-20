@@ -271,28 +271,41 @@
 }
 
 /* =========================================
-   GRADIENT TEXT COMPONENT - Universal solution
+   FORCE VISIBLE TEXT - MAXIMUM PRIORITY
    ========================================= */
 
-/* CRITICAL: GradientText component must ALWAYS be visible */
-.performance-mode .gradient-text-component,
-body.performance-mode .gradient-text-component,
-.performance-mode .gradient-text-component[style] {
-  /* Preserve inline gradient - DO NOT OVERRIDE */
-  background: inherit !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-
-  /* Force visibility */
+/* CRITICAL: Force all text-white to be visible in performance mode */
+.performance-mode .text-white,
+body.performance-mode .text-white,
+.performance-mode [class*="text-white"],
+body.performance-mode [class*="text-white"] {
+  color: #ffffff !important;
   opacity: 1 !important;
   visibility: visible !important;
-  display: inline-block !important;
-
-  /* Remove effects that could hide text */
+  display: inherit !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: none !important;
   filter: none !important;
   transform: none !important;
-  text-shadow: none !important;
+}
+
+/* ULTRA-CRITICAL: Special class for token balance - NEVER HIDE */
+.force-visible-text,
+.performance-mode .force-visible-text,
+body.performance-mode .force-visible-text,
+.performance-mode .force-visible-text[style],
+body.performance-mode .force-visible-text[style] {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  filter: none !important;
+  transform: none !important;
 }
 
 /* =========================================
