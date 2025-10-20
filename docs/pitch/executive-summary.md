@@ -47,7 +47,7 @@ TwinForge is the first **modular AI wellness platform** that unifies activity tr
 
 ## The Solution: TwinForge Platform
 
-### Five Integrated "Forges"
+### Six Integrated "Forges"
 
 #### 1. Energy Forge (Activity Tracking)
 **Voice-First Innovation**:
@@ -96,12 +96,22 @@ TwinForge is the first **modular AI wellness platform** that unifies activity tr
 
 **Key Differentiation**: No special hardware. Phone camera = professional body scan.
 
+#### 6. Training Forge (Workout Programs)
+**AI-Powered Coaching**:
+- Generate custom training programs across 5 disciplines (Force, Endurance, Calisthenics, Functional, Competitions)
+- Real-time session tracking with AI-generated illustrations
+- Equipment detection and exercise adaptation
+- Progressive overload recommendations
+- Performance analytics and plateau detection
+
+**Key Differentiation**: Multi-discipline AI coaching that adapts to your equipment, goals, and recovery status.
+
 ---
 
 ## Technology Moats
 
 ### 1. Modular Architecture
-Each Forge is independent but deeply integrated via centralized profile data. Users can adopt one feature or all five - maximum flexibility.
+Each Forge is independent but deeply integrated via centralized profile data and Central Brain intelligence. Users can adopt one feature or all six - maximum flexibility.
 
 ### 2. Spatial Forge (AI Layer)
 Proprietary AI orchestration system:
@@ -136,47 +146,58 @@ Smart cost management:
 
 ## Business Model
 
-### Pricing Strategy (Planned)
+### Token-Based Pricing Strategy
 
-**Free Tier**:
-- Limited activity entries (3/week)
-- Limited meal scans (5/week)
-- Basic fasting timer
-- No recipe generation
+TwinForge uses a **hybrid monetization model** combining subscription tiers with AI token consumption. This ensures fair usage pricing where users pay for the AI compute they actually use.
 
-**Premium ($9.99/month or $79.99/year)**:
-- Unlimited activities, meals, fasting sessions
-- Full Culinary Forge (unlimited recipes, meal plans, shopping lists)
-- Body scanning (2 scans/month)
-- Advanced insights and trend analysis
-- Priority support
+#### 7-Tier Subscription System
 
-**Pro ($19.99/month or $159.99/year)**:
-- Everything in Premium
-- Central Brain (holistic recommendations)
-- Training Workshop (personalized programs + video streaming)
-- Unlimited body scans
-- Data export + API access
+| Tier | Price/Month | AI Tokens | Key Features | Target User |
+|------|-------------|-----------|--------------|-------------|
+| **Essential** | $9.99 | 50,000 | Basic tracking, 1 Forge, manual entry | Beginners, casual users |
+| **Pro** | $19.99 | 150,000 | All 6 Forges, AI analysis, wearables | Active users, fitness enthusiasts |
+| **Elite** | $29.99 | 300,000 | Advanced insights, trend analysis | Serious athletes, health optimizers |
+| **Champion** | $49.99 | 600,000 | Training programs, meal planning | Competitive athletes, performance-focused |
+| **Master** | $79.99 | 1,000,000 | **Central Brain full access** | Elite athletes, coaches, biohackers |
+| **Legend** | $149.99 | 2,500,000 | API access, multi-user management | Coaches with clients, influencers |
+| **Titan** | $299.99 | Unlimited | White-glove service, dedicated support | Professional athletes, celebrities |
 
-### Revenue Projections (Conservative)
+**Token System Details**:
+- Each AI operation consumes tokens (meal scan: 5K-10K, training session: 15K-25K, body scan: 20K-30K)
+- Unused tokens expire monthly (no rollover)
+- Pay-as-you-go top-ups available: 50K ($14.99), 150K ($39.99), 300K ($69.99), 600K ($119.99)
+- Average AI cost per user: $0.10-0.30/month with 90%+ gross margins
+
+**Typical Usage**:
+- **Pro tier user**: 15-20 meal scans + 8-10 training sessions + 1 body scan = ~120K tokens/month
+- **Elite tier user**: 25-30 meal scans + 12-15 training sessions + 2 body scans + weekly AI reports = ~280K tokens/month
+- **Master tier user**: Unlimited usage with Central Brain correlations across all Forges
+
+### Revenue Projections (Updated)
 
 **Year 1**:
-- Target: 10,000 users (5% conversion to Premium)
-- Revenue: $60,000 ARR
-- Costs: $30,000 (AI + infrastructure)
-- Gross Margin: 50%
+- Target: 10,000 users
+- Conversion: 12% paid (1,200 users)
+- Average tier: Pro ($19.99)
+- Revenue: $288K ARR ($24K MRR)
+- Costs: $60,000 (AI + infrastructure + Stripe fees)
+- **Gross Margin: 79%**
 
 **Year 2**:
-- Target: 100,000 users (10% conversion)
-- Revenue: $1.2M ARR
-- Costs: $240,000
-- Gross Margin: 80%
+- Target: 100,000 users
+- Conversion: 15% paid (15,000 users)
+- Average tier: Elite ($29.99) as users upgrade
+- Revenue: $5.4M ARR ($450K MRR)
+- Costs: $900,000 (AI + infrastructure + support team)
+- **Gross Margin: 83%**
 
 **Year 3**:
-- Target: 500,000 users (15% conversion)
-- Revenue: $9M ARR
-- Costs: $1.8M
-- Gross Margin: 80%
+- Target: 500,000 users
+- Conversion: 18% paid (90,000 users)
+- Average tier: Elite-Champion mix ($35 average)
+- Revenue: $37.8M ARR ($3.15M MRR)
+- Costs: $6M (AI + infrastructure + team)
+- **Gross Margin: 84%**
 
 ### Additional Revenue Streams (Future)
 
