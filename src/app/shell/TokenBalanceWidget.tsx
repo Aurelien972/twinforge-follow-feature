@@ -5,12 +5,14 @@ import SpatialIcon from '../../ui/icons/SpatialIcon';
 import { ICONS } from '../../ui/icons/registry';
 import { TokenService, type TokenBalance } from '../../system/services/tokenService';
 import { useFeedback } from '@/hooks';
+import { useOverlayStore } from '../../system/store/overlayStore';
 
 const TokenBalanceWidget: React.FC = () => {
   const [balance, setBalance] = useState<TokenBalance | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { sidebarClick } = useFeedback();
+  const { close } = useOverlayStore();
 
   useEffect(() => {
     loadBalance();
@@ -40,6 +42,7 @@ const TokenBalanceWidget: React.FC = () => {
 
   const handleClick = () => {
     sidebarClick();
+    close(); // Ferme le drawer mobile s'il est ouvert
     navigate('/settings?tab=account');
   };
 

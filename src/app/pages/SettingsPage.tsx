@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Tabs from '../../ui/tabs/TabsComponent';
 import PageHeader from '../../ui/page/PageHeader';
@@ -18,7 +19,19 @@ import { PLACEHOLDER_PAGES_CONFIG } from '../../config/placeholderPagesConfig';
  */
 const SettingsPage: React.FC = () => {
   const config = PLACEHOLDER_PAGES_CONFIG.settings;
-  const [activeTab, setActiveTab] = useState(config.tabs[0].value);
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const initialTab = tabFromUrl && config.tabs.find(t => t.value === tabFromUrl)
+    ? tabFromUrl
+    : config.tabs[0].value;
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Update active tab when URL changes
+  useEffect(() => {
+    if (tabFromUrl && config.tabs.find(t => t.value === tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl, config.tabs]);
 
   const activeTabConfig = config.tabs.find(tab => tab.value === activeTab) || config.tabs[0];
 
@@ -41,7 +54,8 @@ const SettingsPage: React.FC = () => {
       />
 
       <Tabs
-        defaultValue={config.tabs[0].value}
+        value={activeTab}
+        defaultValue={initialTab}
         className="w-full settings-tabs"
         onValueChange={(value) => setActiveTab(value)}
       >
