@@ -76,14 +76,6 @@
   border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-/* CRITICAL: Prevent glass-card background from affecting gradient text children */
-.performance-mode .glass-card *[style*="linear-gradient"],
-.performance-mode .glass-base *[style*="linear-gradient"],
-.performance-mode .glass-card-cta *[style*="linear-gradient"] {
-  /* Preserve inline gradient backgrounds on text elements */
-  background: inherit !important;
-}
-
 /* =========================================
    SKELETON CONTAINERS FIX
    Conteneurs de squelettes doivent rester semi-transparents
@@ -271,54 +263,19 @@
 }
 
 /* =========================================
-   FORCE VISIBLE TEXT - MAXIMUM PRIORITY
+   TOKEN BALANCE - Preserve gradient display in Plans tab
    ========================================= */
 
-/* CRITICAL: Force all text-white to be visible in performance mode */
-.performance-mode .text-white,
-body.performance-mode .text-white,
-.performance-mode [class*="text-white"],
-body.performance-mode [class*="text-white"] {
-  color: #ffffff !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: inherit !important;
-  -webkit-text-fill-color: #ffffff !important;
-  text-shadow: none !important;
-  filter: none !important;
-  transform: none !important;
-}
-
-/* ULTRA-CRITICAL: Special class for token balance - NEVER HIDE */
-.force-visible-text,
-.performance-mode .force-visible-text,
-body.performance-mode .force-visible-text,
-.performance-mode .force-visible-text[style],
-body.performance-mode .force-visible-text[style],
-html.performance-mode .force-visible-text,
-html body.performance-mode .force-visible-text,
-[data-performance-mode] .force-visible-text,
-.force-visible-text * {
-  color: #ffffff !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-  -webkit-text-fill-color: #ffffff !important;
-  background: none !important;
-  -webkit-background-clip: initial !important;
-  background-clip: initial !important;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-  filter: none !important;
-  transform: none !important;
-  position: relative !important;
-  z-index: 9999 !important;
-  pointer-events: auto !important;
-  font-weight: 700 !important;
-  text-rendering: optimizeLegibility !important;
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-  mix-blend-mode: normal !important;
-  isolation: isolate !important;
+/* CRITICAL: Token balance must remain visible with gradient in performance mode */
+.performance-mode [style*="-webkit-background-clip: text"],
+.performance-mode [style*="background-clip: text"],
+.performance-mode [style*="-webkit-text-fill-color: transparent"],
+.performance-mode [style*="backgroundClip"][style*="text"] {
+  /* Preserve gradient text effect for token balance */
+  background: inherit !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 /* =========================================

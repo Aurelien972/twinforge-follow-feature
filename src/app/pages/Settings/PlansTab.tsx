@@ -116,16 +116,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
             borderColor: 'rgba(255, 255, 255, 0.1)',
           }}
         >
-          <div
-            className="text-2xl font-bold mb-1 force-visible-text"
-            style={{
-              color: '#ffffff',
-              opacity: 1,
-              visibility: 'visible',
-              display: 'block',
-              WebkitTextFillColor: '#ffffff',
-            }}
-          >
+          <div className="text-2xl font-bold text-white mb-1">
             {TokenService.formatTokenAmount(tokensPerMonth)}
           </div>
           <div className="text-xs text-slate-400">tokens / mois</div>
@@ -264,14 +255,6 @@ const PlansTab: React.FC = () => {
   const plans = pricingConfig?.subscriptionPlans || {};
   const pack19 = pricingConfig?.tokenPacks?.pack_19;
 
-  console.log('=================== PLANSTAB DEBUG ===================');
-  console.log('[PlansTab] Token Balance:', tokenBalance);
-  console.log('[PlansTab] Balance value:', tokenBalance?.balance);
-  console.log('[PlansTab] Formatted Balance:', tokenBalance ? TokenService.formatTokenAmount(tokenBalance.balance) : 'NO BALANCE');
-  console.log('[PlansTab] PricingConfig:', pricingConfig);
-  console.log('[PlansTab] Plans object:', plans);
-  console.log('====================================================');
-
   return (
     <div className="space-y-6">
       {/* Current Balance */}
@@ -286,13 +269,12 @@ const PlansTab: React.FC = () => {
           </div>
           <div className="text-right">
             <div
-              className="text-4xl font-bold mb-1 force-visible-text"
+              className="text-3xl font-bold mb-1"
               style={{
-                color: '#ffffff',
-                opacity: 1,
-                visibility: 'visible',
-                display: 'block',
-                WebkitTextFillColor: '#ffffff',
+                background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
               }}
             >
               {tokenBalance ? TokenService.formatTokenAmount(tokenBalance.balance) : '0'}
@@ -314,22 +296,16 @@ const PlansTab: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {Object.entries(plans).map(([planId, plan]) => {
             if (!plan) {
+              console.warn(`Plan ${planId} is undefined`);
               return null;
             }
-            const tokens = plan.tokens_monthly || 0;
-            console.log(`[PlansTab] Plan ${planId}:`, {
-              tokens_monthly: plan.tokens_monthly,
-              rendering: tokens,
-              formatted: TokenService.formatTokenAmount(tokens),
-              fullPlan: plan
-            });
             return (
               <PlanCard
                 key={planId}
                 planId={planId}
                 name={plan.name || planId}
                 priceEur={plan.price_eur || 0}
-                tokensPerMonth={tokens}
+                tokensPerMonth={plan.tokens_per_month || 0}
                 isCurrentPlan={currentPlanType === planId}
                 isFree={planId === 'free'}
                 onSelect={handleSelectPlan}
