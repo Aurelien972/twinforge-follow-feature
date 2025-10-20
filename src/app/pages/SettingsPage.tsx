@@ -55,18 +55,18 @@ const SettingsPage: React.FC = () => {
 
         {config.tabs.map((tab) => (
           <Tabs.Panel key={tab.value} value={tab.value}>
-            {tab.value === 'account' ? (
-              <SubscriptionManagementTab />
+            {tab.value === 'preferences' ? (
+              <PreferencesSettingsTab />
+            ) : tab.value === 'notifications' ? (
+              <NotificationsSettingsTab />
             ) : tab.value === 'appareils' ? (
               <ConnectedDevicesTab />
             ) : tab.value === 'performance' ? (
               <GeneralSettingsTab />
-            ) : tab.value === 'preferences' ? (
-              <PreferencesSettingsTab />
-            ) : tab.value === 'notifications' ? (
-              <NotificationsSettingsTab />
             ) : tab.value === 'confidentialite' ? (
               <PrivacySettingsTab />
+            ) : tab.value === 'account' ? (
+              <SubscriptionManagementTab />
             ) : (
               <GlassCard className="p-6">
                 <UnderConstructionCard

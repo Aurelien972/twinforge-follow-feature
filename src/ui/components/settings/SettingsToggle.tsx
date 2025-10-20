@@ -50,12 +50,12 @@ export const SettingsToggle: React.FC<SettingsToggleProps> = ({
         <ConditionalMotion
           className="settings-toggle-thumb"
           animate={{
-            x: enabled ? 24 : 0,
+            x: enabled ? 20 : 0,
           }}
           transition={{
             type: 'spring',
-            stiffness: 500,
-            damping: 30,
+            stiffness: 700,
+            damping: 35,
           }}
         />
       </button>
