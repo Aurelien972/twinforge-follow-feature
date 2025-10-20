@@ -80,43 +80,66 @@
 }
 
 /* =========================================
-   MODE ÉQUILIBRÉ - Fond statique avec particules
-   Désactive l'animation du fond mais conserve les particules
+   MODE ÉQUILIBRÉ - Fond COMPLÈTEMENT statique
+   Les 3 radiaux sont FIGÉS - AUCUN mouvement
    ========================================= */
 
 body.mode-balanced .bg-twinforge-visionos,
 .mode-balanced .bg-twinforge-visionos,
 html.mode-balanced .bg-twinforge-visionos {
-  /* Fond identique au défaut MAIS sans animation */
+  /* CRITIQUE: Désactiver TOUTE animation - cosmic-forge-pulse inclus */
   animation: none !important;
   animation-name: none !important;
   animation-play-state: paused !important;
+  animation-duration: 0s !important;
 
-  /* Background size FIXE pour éviter le clignotement */
+  /* Background size FIXE pour figer complètement les radiaux */
   background-size: 400% 300%, 350% 250%, 100% 100% !important;
+  background-position: 20% 80%, 80% 20%, 50% 50% !important;
+  background-attachment: scroll !important;
 
-  /* Désactiver will-change pour économie GPU */
+  /* Désactiver will-change pour économie GPU - aucun changement prévu */
   will-change: auto !important;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+  transform: none !important;
+  backface-visibility: visible !important;
+  perspective: none !important;
 }
 
-/* En mode Équilibré, les particules sont DESACTIVEES - fond statique uniquement */
+/* En mode Équilibré, les particules sont COMPLÈTEMENT désactivées */
 body.mode-balanced .cosmic-forge-particles,
 .mode-balanced .cosmic-forge-particles,
-html.mode-balanced .cosmic-forge-particles {
+html.mode-balanced .cosmic-forge-particles,
+[data-mode="balanced"] .cosmic-forge-particles {
+  /* Cacher complètement le conteneur */
   display: none !important;
   opacity: 0 !important;
   visibility: hidden !important;
+  pointer-events: none !important;
+  /* Retirer du layout */
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
 }
 
 body.mode-balanced .forge-particle,
 .mode-balanced .forge-particle,
-html.mode-balanced .forge-particle {
+html.mode-balanced .forge-particle,
+[data-mode="balanced"] .forge-particle {
+  /* Particules complètement désactivées */
   display: none !important;
   animation: none !important;
+  animation-name: none !important;
+  animation-play-state: paused !important;
   opacity: 0 !important;
   visibility: hidden !important;
+  pointer-events: none !important;
+  /* Retirer du layout */
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  transform: none !important;
+  will-change: auto !important;
 }
 
 /* =========================================
@@ -642,10 +665,12 @@ html.performance-mode .bg-twinforge-visionos,
   animation-name: none !important;
 }
 
-/* Spécificité maximale pour mode balanced */
+/* Spécificité maximale pour mode balanced - FOND COMPLÈTEMENT FIGÉ */
 html.mode-balanced .bg-twinforge-visionos,
-.mode-balanced .bg-twinforge-visionos {
-  /* Fond identique au mode quality MAIS sans animation */
+.mode-balanced .bg-twinforge-visionos,
+body.mode-balanced .bg-twinforge-visionos,
+[data-mode="balanced"] .bg-twinforge-visionos {
+  /* Fond identique au mode quality MAIS COMPLÈTEMENT STATIQUE */
   background:
     radial-gradient(ellipse 400% 300% at 20% 80%,
       color-mix(in srgb, var(--nebula-hot-core) 2.5%, transparent) 0%,
@@ -656,7 +681,21 @@ html.mode-balanced .bg-twinforge-visionos,
       color-mix(in srgb, var(--nebula-cold-edge) 1.5%, transparent) 35%,
       transparent 65%),
     radial-gradient(circle at 50% 50%, var(--forge-medium) 0%, var(--forge-deep) 40%, var(--forge-void) 100%) !important;
+
+  /* CRITIQUE: Background figé - AUCUN mouvement */
   background-size: 400% 300%, 350% 250%, 100% 100% !important;
+  background-position: 20% 80%, 80% 20%, 50% 50% !important;
+  background-attachment: scroll !important;
+
+  /* TOUTES animations désactivées */
   animation: none !important;
   animation-name: none !important;
+  animation-play-state: paused !important;
+  animation-duration: 0s !important;
+
+  /* Optimisations GPU désactivées */
+  will-change: auto !important;
+  transform: none !important;
+  backface-visibility: visible !important;
+  perspective: none !important;
 }
