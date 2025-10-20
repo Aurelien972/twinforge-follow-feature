@@ -116,7 +116,16 @@ const PlanCard: React.FC<PlanCardProps> = ({
             borderColor: 'rgba(255, 255, 255, 0.1)',
           }}
         >
-          <div className="text-2xl font-bold mb-1 text-white force-visible-text">
+          <div
+            className="text-2xl font-bold mb-1 force-visible-text"
+            style={{
+              color: '#ffffff',
+              opacity: 1,
+              visibility: 'visible',
+              display: 'block',
+              WebkitTextFillColor: '#ffffff',
+            }}
+          >
             {TokenService.formatTokenAmount(tokensPerMonth)}
           </div>
           <div className="text-xs text-slate-400">tokens / mois</div>
@@ -255,6 +264,9 @@ const PlansTab: React.FC = () => {
   const plans = pricingConfig?.subscriptionPlans || {};
   const pack19 = pricingConfig?.tokenPacks?.pack_19;
 
+  console.log('[PlansTab] Token Balance:', tokenBalance);
+  console.log('[PlansTab] Formatted Balance:', tokenBalance ? TokenService.formatTokenAmount(tokenBalance.balance) : 'NO BALANCE');
+
   return (
     <div className="space-y-6">
       {/* Current Balance */}
@@ -268,7 +280,16 @@ const PlansTab: React.FC = () => {
             </div>
           </div>
           <div className="text-right">
-            <div className="text-4xl font-bold mb-1 text-white force-visible-text">
+            <div
+              className="text-4xl font-bold mb-1 force-visible-text"
+              style={{
+                color: '#ffffff',
+                opacity: 1,
+                visibility: 'visible',
+                display: 'block',
+                WebkitTextFillColor: '#ffffff',
+              }}
+            >
               {tokenBalance ? TokenService.formatTokenAmount(tokenBalance.balance) : '0'}
             </div>
             <div className="text-xs text-slate-500">
@@ -290,13 +311,15 @@ const PlansTab: React.FC = () => {
             if (!plan) {
               return null;
             }
+            const tokens = plan.tokens_monthly || 0;
+            console.log(`[PlansTab] Plan ${planId}: tokens_monthly=${plan.tokens_monthly}, rendering=${tokens}`);
             return (
               <PlanCard
                 key={planId}
                 planId={planId}
                 name={plan.name || planId}
                 priceEur={plan.price_eur || 0}
-                tokensPerMonth={plan.tokens_monthly || 0}
+                tokensPerMonth={tokens}
                 isCurrentPlan={currentPlanType === planId}
                 isFree={planId === 'free'}
                 onSelect={handleSelectPlan}
