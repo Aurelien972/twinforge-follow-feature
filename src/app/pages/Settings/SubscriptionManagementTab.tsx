@@ -8,6 +8,7 @@ import { useToast } from '../../../ui/components/ToastProvider';
 import { TokenService, type TokenBalance, type PricingConfig, type UserSubscription, type TokenTransaction } from '../../../system/services/tokenService';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { usePerformanceMode } from '../../../system/context/PerformanceModeContext';
 
 interface PlanConfig {
   color: string;
@@ -209,6 +210,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
 
 const SubscriptionManagementTab: React.FC = () => {
   const { showToast } = useToast();
+  const { mode } = usePerformanceMode();
   const [tokenBalance, setTokenBalance] = useState<TokenBalance | null>(null);
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [pricingConfig, setPricingConfig] = useState<PricingConfig | null>(null);
@@ -216,6 +218,8 @@ const SubscriptionManagementTab: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingSession, setIsCreatingSession] = useState(false);
   const [showAllTransactions, setShowAllTransactions] = useState(false);
+
+  const isUltraPerformance = mode === 'high-performance';
 
   useEffect(() => {
     loadData();
@@ -349,7 +353,10 @@ const SubscriptionManagementTab: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div
             className="rounded-xl p-5 border"
-            style={{
+            style={isUltraPerformance ? {
+              background: 'rgba(247, 147, 30, 0.15)',
+              borderColor: 'rgba(247, 147, 30, 0.3)',
+            } : {
               background: 'linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(253, 200, 48, 0.05))',
               borderColor: 'rgba(247, 147, 30, 0.3)',
               boxShadow: '0 4px 16px rgba(247, 147, 30, 0.1)'
@@ -359,12 +366,17 @@ const SubscriptionManagementTab: React.FC = () => {
               <span className="text-xs text-slate-400 font-medium">Tokens Disponibles</span>
               <TokenIcon size={24} variant="success" withGlow={false} />
             </div>
-            <div className="text-4xl font-bold mb-1" style={{
-              background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}>
+            <div
+              className="text-4xl font-bold mb-1"
+              style={isUltraPerformance ? {
+                color: '#F7931E'
+              } : {
+                background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}
+            >
               {tokenBalance ? TokenService.formatTokenAmount(tokenBalance.balance) : '0'}
             </div>
             <div className="text-xs text-slate-500">
