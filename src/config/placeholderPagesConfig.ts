@@ -202,18 +202,45 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
     circuit: 'settings',
     tabs: [
       {
-        value: 'account',
-        label: 'Forfaits',
-        icon: 'CreditCard',
-        description: 'Gérez vos forfaits, abonnement et tokens',
-        color: '#10B981',
+        value: 'preferences',
+        label: 'Préférences',
+        icon: 'User',
+        description: 'Personnalisez votre expérience utilisateur',
+        color: '#8B5CF6',
         features: [
-          'Solde de tokens en temps réel',
-          'Forfaits mensuels de 9€ à 99€',
-          'Changement de forfait flexible',
-          'Pack de tokens supplémentaires',
-          'Historique des transactions',
-          'Annulation à tout moment'
+          'Choix du thème clair/sombre',
+          'Choix de la voix du coach vocal',
+          'Préférences d\'interface',
+          'Langue et région',
+          'Unités de mesure'
+        ]
+      },
+      {
+        value: 'notifications',
+        label: 'Notifications',
+        icon: 'Bell',
+        description: 'Alertes et rappels personnalisés',
+        color: '#EC4899',
+        features: [
+          'Notifications personnalisées',
+          'Horaires de rappel',
+          'Canaux de notification',
+          'Sons et vibrations'
+        ]
+      },
+      {
+        value: 'appareils',
+        label: 'Appareils',
+        icon: 'Watch',
+        description: 'Synchronisez vos trackers fitness',
+        color: '#06B6D4',
+        features: [
+          'Strava, Garmin, Fitbit, Apple Health',
+          'Polar, Wahoo, WHOOP, Oura',
+          'Synchronisation automatique',
+          'Données de santé et fitness',
+          'Historique de synchronisation',
+          'Mode simulation pour développement'
         ]
       },
       {
@@ -231,33 +258,6 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         ]
       },
       {
-        value: 'preferences',
-        label: 'Préférences',
-        icon: 'User',
-        description: 'Personnalisez votre expérience utilisateur',
-        color: '#8B5CF6',
-        features: [
-          'Choix de la voix du coach vocal',
-          'Préférences d\'interface',
-          'Langue et région',
-          'Unités de mesure',
-          'Mode nuit/jour (à venir)'
-        ]
-      },
-      {
-        value: 'notifications',
-        label: 'Notifications',
-        icon: 'Bell',
-        description: 'Alertes et rappels personnalisés',
-        color: '#EC4899',
-        features: [
-          'Notifications personnalisées',
-          'Horaires de rappel',
-          'Canaux de notification',
-          'Sons et vibrations'
-        ]
-      },
-      {
         value: 'confidentialite',
         label: 'Confidentialité',
         icon: 'Shield',
@@ -271,18 +271,18 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
         ]
       },
       {
-        value: 'appareils',
-        label: 'Appareils',
-        icon: 'Watch',
-        description: 'Synchronisez vos trackers fitness',
-        color: '#06B6D4',
+        value: 'account',
+        label: 'Forfaits',
+        icon: 'CreditCard',
+        description: 'Gérez vos forfaits, abonnement et tokens',
+        color: '#10B981',
         features: [
-          'Strava, Garmin, Fitbit, Apple Health',
-          'Polar, Wahoo, WHOOP, Oura',
-          'Synchronisation automatique',
-          'Données de santé et fitness',
-          'Historique de synchronisation',
-          'Mode simulation pour développement'
+          'Solde de tokens en temps réel',
+          'Forfaits mensuels de 9€ à 99€',
+          'Changement de forfait flexible',
+          'Pack de tokens supplémentaires',
+          'Historique des transactions',
+          'Annulation à tout moment'
         ]
       }
     ]

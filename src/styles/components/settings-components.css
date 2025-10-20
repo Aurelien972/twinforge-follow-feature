@@ -123,20 +123,21 @@
 
 .settings-toggle-switch {
   position: relative;
-  width: 48px;
+  width: 52px;
   height: 28px;
   border-radius: 14px;
   border: 2px solid var(--glass-border);
-  background: var(--glass-bg-subtle);
+  background: rgba(71, 85, 105, 0.4);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .settings-toggle-switch:hover:not(:disabled) {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(24, 227, 255, 0.1);
 }
 
 .settings-toggle-switch:disabled {
@@ -145,19 +146,26 @@
 }
 
 .settings-toggle-switch.enabled {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: linear-gradient(135deg, #18E3FF, #0EA5E9);
+  border-color: #18E3FF;
+  box-shadow: 0 2px 8px rgba(24, 227, 255, 0.25);
+}
+
+.settings-toggle-switch.enabled:hover:not(:disabled) {
+  box-shadow: 0 2px 12px rgba(24, 227, 255, 0.35), 0 0 0 3px rgba(24, 227, 255, 0.15);
 }
 
 .settings-toggle-thumb {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
 /* =============================================

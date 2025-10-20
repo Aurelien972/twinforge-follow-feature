@@ -64,6 +64,7 @@ type Profile = UserProfile & {
   displayName?: string;
   phoneNumber?: string;
   country?: string;
+  country_timezone?: string;
   avatarStatus?: 'none' | 'pending' | 'ready' | 'error';
   avatarUrl?: string;
   avatarOnboardingCompleted?: boolean;

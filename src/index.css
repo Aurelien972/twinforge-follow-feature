@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme System */
+@import './styles/theme/theme-variables.css';
+
 /* Forge Pipeline System - Unified CSS Variables & GPU Optimizations */
 @import './styles/pipeline/forge-pipeline-variables.css';
 @import './styles/pipeline/forge-pipeline-gpu-optimized.css';

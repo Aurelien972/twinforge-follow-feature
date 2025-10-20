@@ -1,0 +1,78 @@
+:root {
+  --theme-transition-duration: 0.3s;
+  --theme-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme='dark'] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+
+  --glass-bg-subtle: rgba(15, 23, 42, 0.6);
+  --glass-gradient-subtle: linear-gradient(135deg, rgba(30, 41, 59, 0.4), rgba(51, 65, 85, 0.3));
+  --glass-gradient-hover: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(51, 65, 85, 0.4));
+  --glass-border: rgba(148, 163, 184, 0.2);
+  --glass-border-hover: rgba(148, 163, 184, 0.3);
+
+  --accent: #18E3FF;
+  --accent-hover: #0EA5E9;
+  --accent-rgb: 24, 227, 255;
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme='light'] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-tertiary: #e2e8f0;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+
+  --glass-bg-subtle: rgba(255, 255, 255, 0.7);
+  --glass-gradient-subtle: linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.9));
+  --glass-gradient-hover: linear-gradient(135deg, rgba(248, 250, 252, 0.98), rgba(241, 245, 249, 0.95));
+  --glass-border: rgba(100, 116, 139, 0.15);
+  --glass-border-hover: rgba(100, 116, 139, 0.25);
+
+  --accent: #0EA5E9;
+  --accent-hover: #0284C7;
+  --accent-rgb: 14, 165, 233;
+
+  --success: #16a34a;
+  --warning: #ea580c;
+  --error: #dc2626;
+  --info: #2563eb;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-easing),
+              color var(--theme-transition-duration) var(--theme-transition-easing);
+}
+
+.theme-transition * {
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-easing),
+              border-color var(--theme-transition-duration) var(--theme-transition-easing),
+              color var(--theme-transition-duration) var(--theme-transition-easing),
+              box-shadow var(--theme-transition-duration) var(--theme-transition-easing) !important;
+}

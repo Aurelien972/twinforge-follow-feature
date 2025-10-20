@@ -8,3 +8,4 @@ export { SettingsInfoCard } from './SettingsInfoCard';
 export type { SettingsInfoCardType } from './SettingsInfoCard';
 export { SettingsButton } from './SettingsButton';
 export type { SettingsButtonVariant } from './SettingsButton';
+export { ThemeSelector } from './ThemeSelector';
