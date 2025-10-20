@@ -40,7 +40,7 @@ const TokenBalanceWidget: React.FC = () => {
 
   const handleClick = () => {
     sidebarClick();
-    navigate('/settings?tab=plans');
+    navigate('/settings?tab=account');
   };
 
   if (isLoading) {
