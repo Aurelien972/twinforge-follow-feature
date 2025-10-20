@@ -91,32 +91,85 @@ export class WearableDataService {
   }
 
   async triggerSync(deviceId: string, dataTypes?: HealthDataType[]): Promise<void> {
+    const startTime = Date.now();
+
+    logger.info('WEARABLE_SYNC', 'Starting sync request', {
+      deviceId,
+      dataTypes,
+      timestamp: new Date().toISOString(),
+    });
+
     const { data: session } = await supabase.auth.getSession();
     if (!session.session) {
+      logger.error('WEARABLE_SYNC', 'Sync failed: Not authenticated', { deviceId });
       throw new Error('Not authenticated');
     }
 
-    const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/wearable-sync`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.session.access_token}`,
-        },
-        body: JSON.stringify({
+    logger.debug('WEARABLE_SYNC', 'Session verified', {
+      deviceId,
+      userId: session.session.user.id,
+    });
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/wearable-sync`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.session.access_token}`,
+          },
+          body: JSON.stringify({
+            deviceId,
+            dataTypes,
+          }),
+        }
+      );
+
+      const duration = Date.now() - startTime;
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let error;
+        try {
+          error = JSON.parse(errorText);
+        } catch {
+          error = { error: errorText };
+        }
+
+        logger.error('WEARABLE_SYNC', 'Sync failed with HTTP error', {
           deviceId,
-          dataTypes,
-        }),
+          status: response.status,
+          statusText: response.statusText,
+          error,
+          duration,
+        });
+
+        throw new Error(error.error || 'Sync failed');
       }
-    );
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Sync failed');
+      const result = await response.json();
+
+      logger.info('WEARABLE_SYNC', 'Sync completed successfully', {
+        deviceId,
+        dataTypes,
+        duration,
+        result,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      const duration = Date.now() - startTime;
+
+      logger.error('WEARABLE_SYNC', 'Sync request failed', {
+        deviceId,
+        dataTypes,
+        duration,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        errorStack: error instanceof Error ? error.stack : undefined,
+      });
+
+      throw error;
     }
-
-    logger.info('WEARABLE', 'Sync triggered successfully', { deviceId, dataTypes });
   }
 
   async getHealthData(

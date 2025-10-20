@@ -126,8 +126,15 @@ const NewMobileBottomBar: React.FC = () => {
 
   const handleButtonClick = (button: typeof BOTTOM_BAR_BUTTONS[0]) => {
     if (button.route) {
-      navigate(button.route);
-      close();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+
+      setTimeout(() => {
+        navigate(button.route);
+        close();
+      }, 100);
     }
   };
 

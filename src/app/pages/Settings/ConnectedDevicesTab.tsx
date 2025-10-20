@@ -13,6 +13,7 @@ import { useWearableSync } from '../../../hooks/useWearableSync';
 import { PROVIDER_CONFIGS, MVP_PROVIDERS } from '../../../domain/connectedDevices';
 import type { ConnectedDevice, Provider } from '../../../domain/connectedDevices';
 import logger from '../../../lib/utils/logger';
+import WearableConnectionStatus from '../../../ui/components/wearable/WearableConnectionStatus';
 import '../../../styles/components/connected-devices.css';
 
 const ConnectedDevicesTab: React.FC = () => {
@@ -74,10 +75,20 @@ const ConnectedDevicesTab: React.FC = () => {
 
     const authUrl = new URL(config.authUrl);
     authUrl.searchParams.set('response_type', 'code');
-    authUrl.searchParams.set('client_id', 'YOUR_CLIENT_ID');
+
+    const clientId = provider === 'google_fit'
+      ? import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID
+      : 'YOUR_CLIENT_ID';
+
+    authUrl.searchParams.set('client_id', clientId);
     authUrl.searchParams.set('redirect_uri', redirectUri);
     authUrl.searchParams.set('state', state);
     authUrl.searchParams.set('scope', config.scopes.join(' '));
+
+    if (provider === 'google_fit') {
+      authUrl.searchParams.set('access_type', 'offline');
+      authUrl.searchParams.set('prompt', 'consent');
+    }
 
     logger.info('[CONNECTED_DEVICES] Redirecting to OAuth provider', {
       provider,
@@ -134,24 +145,28 @@ const ConnectedDevicesTab: React.FC = () => {
     return badges[status];
   };
 
+  const isDevelopment = import.meta.env.MODE === 'development';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
-      <div className="devices-header" style={{ marginBottom: '2rem' }}>
-        <button
-          onClick={handleToggleSimulator}
-          className={`simulation-toggle ${showSimulator ? 'active' : ''}`}
-          style={{ marginLeft: 'auto' }}
-        >
-          <div className="simulation-toggle-content">
-            <SpatialIcon Icon={ICONS.Wrench} size={18} />
-            <span>{showSimulator ? 'Mode Simulation ON' : 'Mode Dev'}</span>
-          </div>
-        </button>
-      </div>
+      {isDevelopment && (
+        <div className="devices-header" style={{ marginBottom: '2rem' }}>
+          <button
+            onClick={handleToggleSimulator}
+            className={`simulation-toggle ${showSimulator ? 'active' : ''}`}
+            style={{ marginLeft: 'auto' }}
+          >
+            <div className="simulation-toggle-content">
+              <SpatialIcon Icon={ICONS.Wrench} size={18} />
+              <span>{showSimulator ? 'Mode Simulation ON' : 'Mode Dev'}</span>
+            </div>
+          </button>
+        </div>
+      )}
 
       <AnimatePresence>
         {showSimulator && (
@@ -174,6 +189,10 @@ const ConnectedDevicesTab: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <div style={{ marginBottom: '2rem' }}>
+        <WearableConnectionStatus variant="detailed" showSyncButton={true} />
+      </div>
 
       {loading ? (
         <div className="devices-loading">
