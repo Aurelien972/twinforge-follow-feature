@@ -5,15 +5,36 @@ interface TokenIconProps {
   variant?: 'normal' | 'warning' | 'critical' | 'success';
   className?: string;
   withGlow?: boolean;
+  customColor?: string;
 }
 
 const TokenIcon: React.FC<TokenIconProps> = ({
   size = 32,
   variant = 'normal',
   className = '',
-  withGlow = true
+  withGlow = true,
+  customColor
 }) => {
   const getColors = () => {
+    if (customColor) {
+      const hexToRgb = (hex: string) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : { r: 255, g: 107, b: 53 };
+      };
+      const rgb = hexToRgb(customColor);
+      return {
+        gradientStart: customColor,
+        gradientMid: customColor,
+        gradientEnd: customColor,
+        borderColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`,
+        glowColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`
+      };
+    }
+
     switch (variant) {
       case 'critical':
         return {
@@ -80,19 +101,19 @@ const TokenIcon: React.FC<TokenIconProps> = ({
           `}
         </style>
 
-        <linearGradient id={`tokenGradient-${variant}`} x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={`tokenGradient-${variant}-${customColor || 'default'}`} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor={colors.gradientStart} />
           <stop offset="50%" stopColor={colors.gradientMid} />
           <stop offset="100%" stopColor={colors.gradientEnd} />
         </linearGradient>
 
-        <linearGradient id={`borderGradient-${variant}`} x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={`borderGradient-${variant}-${customColor || 'default'}`} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor={colors.gradientStart} stopOpacity="0.8" />
           <stop offset="50%" stopColor={colors.gradientMid} stopOpacity="0.9" />
           <stop offset="100%" stopColor={colors.gradientEnd} stopOpacity="0.8" />
         </linearGradient>
 
-        <filter id={`innerGlow-${variant}`}>
+        <filter id={`innerGlow-${variant}-${customColor || 'default'}`}>
           <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
           <feMerge>
             <feMergeNode in="coloredBlur"/>
@@ -100,7 +121,7 @@ const TokenIcon: React.FC<TokenIconProps> = ({
           </feMerge>
         </filter>
 
-        <radialGradient id={`shine-${variant}`} cx="30%" cy="30%">
+        <radialGradient id={`shine-${variant}-${customColor || 'default'}`} cx="30%" cy="30%">
           <stop offset="0%" stopColor="rgba(255, 255, 255, 0.3)" />
           <stop offset="60%" stopColor="rgba(255, 255, 255, 0.1)" />
           <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
@@ -111,7 +132,7 @@ const TokenIcon: React.FC<TokenIconProps> = ({
         cx={center}
         cy={center}
         r={radius}
-        fill={`url(#shine-${variant})`}
+        fill={`url(#shine-${variant}-${customColor || 'default'})`}
         opacity="0.6"
       />
 
@@ -120,9 +141,9 @@ const TokenIcon: React.FC<TokenIconProps> = ({
         cy={center}
         r={radius}
         fill="rgba(0, 0, 0, 0.25)"
-        stroke={`url(#borderGradient-${variant})`}
+        stroke={`url(#borderGradient-${variant}-${customColor || 'default'})`}
         strokeWidth="3"
-        filter={`url(#innerGlow-${variant})`}
+        filter={`url(#innerGlow-${variant}-${customColor || 'default'})`}
       />
 
       <text
@@ -130,8 +151,8 @@ const TokenIcon: React.FC<TokenIconProps> = ({
         y={center + 2}
         className="token-text"
         fontSize="48"
-        fill={`url(#tokenGradient-${variant})`}
-        filter={`url(#innerGlow-${variant})`}
+        fill={`url(#tokenGradient-${variant}-${customColor || 'default'})`}
+        filter={`url(#innerGlow-${variant}-${customColor || 'default'})`}
       >
         T
       </text>

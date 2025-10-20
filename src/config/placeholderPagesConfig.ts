@@ -202,31 +202,18 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
     circuit: 'settings',
     tabs: [
       {
-        value: 'plans',
-        label: 'Forfaits',
+        value: 'account',
+        label: 'Mon Compte',
         icon: 'CreditCard',
-        description: 'Choisissez le forfait adapté à vos besoins',
+        description: 'Gérez vos forfaits, abonnement et tokens',
         color: '#10B981',
         features: [
+          'Solde de tokens en temps réel',
           'Forfaits mensuels de 9€ à 99€',
-          'Tokens renouvelés automatiquement',
           'Changement de forfait flexible',
           'Pack de tokens supplémentaires',
-          'Annulation à tout moment'
-        ]
-      },
-      {
-        value: 'subscription',
-        label: 'Abonnement',
-        icon: 'FileText',
-        description: 'Gérez votre abonnement actuel et historique',
-        color: '#3B82F6',
-        features: [
-          'Informations de l\'abonnement',
           'Historique des transactions',
-          'Gestion de l\'abonnement Stripe',
-          'Suivi de consommation',
-          'Portail client Stripe'
+          'Annulation à tout moment'
         ]
       },
       {
