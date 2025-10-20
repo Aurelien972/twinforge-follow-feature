@@ -271,55 +271,28 @@
 }
 
 /* =========================================
-   TOKEN BALANCE - Preserve gradient display in Plans tab
+   GRADIENT TEXT COMPONENT - Universal solution
    ========================================= */
 
-/* CRITICAL: Token balance must remain visible with gradient in performance mode */
-/* Ultra-specific rule for token-balance-gradient class */
-.performance-mode .token-balance-gradient,
-.performance-mode .token-balance-gradient[style],
-body.performance-mode .token-balance-gradient {
-  /* Force preserve the exact gradient */
-  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
-
-  /* Ensure text is fully visible - MAXIMUM PRIORITY */
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: inline-block !important;
-
-  /* Prevent any filter or transform that might hide it */
-  filter: none !important;
-  transform: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Fallback: Target ALL gradient text elements across the app */
-.performance-mode .text-3xl.font-bold.mb-1[style*="linear-gradient"],
-.performance-mode .text-3xl.font-bold[style*="linear-gradient"],
-.performance-mode div[style*="linear-gradient"][style*="WebkitBackgroundClip"],
-.performance-mode div[style*="linear-gradient"][style*="WebkitTextFillColor"],
-.performance-mode [style*="WebkitBackgroundClip"][style*="text"],
-.performance-mode [style*="WebkitTextFillColor"][style*="transparent"],
-.performance-mode [style*="backgroundClip"][style*="text"] {
-  /* Force preserve gradient text effect - HIGHEST PRIORITY */
+/* CRITICAL: GradientText component must ALWAYS be visible */
+.performance-mode .gradient-text-component,
+body.performance-mode .gradient-text-component,
+.performance-mode .gradient-text-component[style] {
+  /* Preserve inline gradient - DO NOT OVERRIDE */
   background: inherit !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 
-  /* Ensure text is fully visible */
+  /* Force visibility */
   opacity: 1 !important;
   visibility: visible !important;
   display: inline-block !important;
 
-  /* Prevent any filter or transform that might hide it */
+  /* Remove effects that could hide text */
   filter: none !important;
   transform: none !important;
+  text-shadow: none !important;
 }
 
 /* =========================================
