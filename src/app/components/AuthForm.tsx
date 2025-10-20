@@ -155,11 +155,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
           setSession(data.session);
           await fetchProfile();
           success();
-          
+
           setTimeout(() => {
-            navigate('/', { replace: true });
+            navigate('/app', { replace: true });
           }, 500);
-          
+
           onSuccess?.();
         } else {
           setError('Veuillez vérifier votre email pour confirmer votre compte');
@@ -176,11 +176,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
         setSession(data.session);
         await fetchProfile();
         success();
-        
+
         setTimeout(() => {
-          navigate('/', { replace: true });
+          navigate('/app', { replace: true });
         }, 500);
-        
+
         onSuccess?.();
       }
     } catch (error: any) {

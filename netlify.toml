@@ -28,7 +28,39 @@
 [build.processing.images]
   compress = true
 
-# SPA routing - redirect all requests to index.html
+# Public pages - serve directly
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/auth"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/legal"
+  to = "/index.html"
+  status = 200
+
+# Protected app routes - serve through React Router
+[[redirects]]
+  from = "/app/*"
+  to = "/index.html"
+  status = 200
+
+# Fallback for any other route
 [[redirects]]
   from = "/*"
   to = "/index.html"

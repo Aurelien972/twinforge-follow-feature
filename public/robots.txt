@@ -1,0 +1,15 @@
+# TwinForge - Robots.txt
+# https://twinforgefit.ai
+
+User-agent: *
+Allow: /
+Allow: /auth
+Allow: /privacy
+Allow: /terms
+Allow: /legal
+
+# Block protected app routes from indexing
+Disallow: /app/
+
+# Sitemap
+Sitemap: https://twinforgefit.ai/sitemap.xml
