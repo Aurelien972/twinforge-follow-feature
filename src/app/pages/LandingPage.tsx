@@ -13,6 +13,14 @@ export default function LandingPage() {
   const { click } = useFeedback();
   const { session } = useUserStore();
 
+  // Add landing page body class
+  useEffect(() => {
+    document.body.classList.add('bg-halo-crucible');
+    return () => {
+      document.body.classList.remove('bg-halo-crucible');
+    };
+  }, []);
+
   // Redirect authenticated users to app
   useEffect(() => {
     if (session) {

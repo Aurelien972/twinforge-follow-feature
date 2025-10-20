@@ -11,6 +11,14 @@ export default function AuthPage() {
 
   const mode = searchParams.get('mode') || 'login';
 
+  // Add landing page body class for auth page
+  useEffect(() => {
+    document.body.classList.add('bg-halo-crucible');
+    return () => {
+      document.body.classList.remove('bg-halo-crucible');
+    };
+  }, []);
+
   useEffect(() => {
     if (session) {
       logger.debug('AUTH_PAGE', 'User already authenticated, redirecting to app');

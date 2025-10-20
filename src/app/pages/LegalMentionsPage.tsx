@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PublicHeader from '../components/PublicHeader';
 import PublicFooter from '../components/PublicFooter';
@@ -7,6 +7,14 @@ import SpatialIcon from '../../ui/icons/SpatialIcon';
 import { ICONS } from '../../ui/icons/registry';
 
 export default function LegalMentionsPage() {
+  // Add landing page body class
+  useEffect(() => {
+    document.body.classList.add('bg-halo-crucible');
+    return () => {
+      document.body.classList.remove('bg-halo-crucible');
+    };
+  }, []);
+
   const sections = [
     {
       id: 'editor',
