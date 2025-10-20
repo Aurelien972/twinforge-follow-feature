@@ -10,6 +10,7 @@ import PreferencesSettingsTab from './Settings/PreferencesSettingsTab';
 import { NotificationsSettingsTab } from './Settings/NotificationsSettingsTab';
 import { PrivacySettingsTab } from './Settings/PrivacySettingsTab';
 import SubscriptionTab from './Settings/SubscriptionTab';
+import PlansTab from './Settings/PlansTab';
 import { PLACEHOLDER_PAGES_CONFIG } from '../../config/placeholderPagesConfig';
 
 /**
@@ -55,7 +56,9 @@ const SettingsPage: React.FC = () => {
 
         {config.tabs.map((tab) => (
           <Tabs.Panel key={tab.value} value={tab.value}>
-            {tab.value === 'subscription' ? (
+            {tab.value === 'plans' ? (
+              <PlansTab />
+            ) : tab.value === 'subscription' ? (
               <SubscriptionTab />
             ) : tab.value === 'appareils' ? (
               <ConnectedDevicesTab />

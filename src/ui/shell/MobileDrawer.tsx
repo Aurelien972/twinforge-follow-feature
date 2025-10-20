@@ -10,6 +10,7 @@ import { navFor } from '../../app/shell/navigation';
 import { supabase } from '../../system/supabase/client';
 import { useOverlayStore, Z_INDEX } from '../../system/store/overlayStore';
 import logger from '../../lib/utils/logger';
+import TokenBalanceWidget from '../../app/shell/TokenBalanceWidget';
 
 const Section = React.memo(({ title, children, type }: { title: string; children: React.ReactNode; type?: 'primary' | 'twin' | 'forge-category' }) => {
   const shouldHaveTopSpace = type === 'forge-category';
@@ -331,6 +332,11 @@ const MobileDrawer = React.memo(() => {
                   </h3>
                 </div>
                 <div className="space-y-0.5">
+                  {/* Token Balance Widget */}
+                  <div className="mb-2 px-0.5">
+                    <TokenBalanceWidget />
+                  </div>
+
                   {/* Bouton Profil */}
                   <Link
                     to="/profile"

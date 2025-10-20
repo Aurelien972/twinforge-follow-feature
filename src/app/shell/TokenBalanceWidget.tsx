@@ -40,7 +40,7 @@ const TokenBalanceWidget: React.FC = () => {
 
   const handleClick = () => {
     sidebarClick();
-    navigate('/settings?tab=subscription');
+    navigate('/settings?tab=plans');
   };
 
   if (isLoading) {
@@ -59,87 +59,56 @@ const TokenBalanceWidget: React.FC = () => {
 
   const variant = getVariant();
   const isLow = balance.balance < 200;
+  const isCritical = balance.balance < 50;
 
-  const getBackgroundGradient = () => {
-    switch (variant) {
-      case 'critical':
-        return 'linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(220, 38, 38, 0.08))';
-      case 'warning':
-        return 'linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.08))';
-      default:
-        return 'linear-gradient(135deg, rgba(255, 107, 53, 0.12), rgba(253, 200, 48, 0.08))';
-    }
-  };
-
-  const getBorderColor = () => {
-    switch (variant) {
-      case 'critical':
-        return 'rgba(239, 68, 68, 0.35)';
-      case 'warning':
-        return 'rgba(245, 158, 11, 0.35)';
-      default:
-        return 'rgba(247, 147, 30, 0.35)';
-    }
+  const getWidgetClassName = () => {
+    const baseClass = 'sidebar-token-widget';
+    if (isCritical) return `${baseClass} sidebar-token-widget--critical`;
+    if (isLow) return `${baseClass} sidebar-token-widget--low`;
+    return baseClass;
   };
 
   return (
     <button
       onClick={handleClick}
-      className="w-full px-3 py-3 rounded-xl transition-all group hover:bg-white/5 relative"
-      style={{
-        background: getBackgroundGradient(),
-        border: `1.5px solid ${getBorderColor()}`,
-        animation: isLow ? 'pulse-subtle 3s ease-in-out infinite' : 'none'
-      }}
+      className={getWidgetClassName()}
     >
-      <style>
-        {`
-          @keyframes pulse-subtle {
-            0%, 100% {
-              opacity: 1;
-              transform: scale(1);
-            }
-            50% {
-              opacity: 0.95;
-              transform: scale(0.995);
-            }
-          }
-        `}
-      </style>
-      <div className="flex items-center gap-3">
-        <div className="flex-shrink-0">
+      <div className="sidebar-token-widget-content">
+        <div className="sidebar-token-widget-icon">
           <TokenIcon
-            size={36}
+            size={24}
             variant={variant}
-            withGlow={true}
+            withGlow={isLow}
           />
         </div>
-        <div className="flex-1 text-left min-w-0">
-          <div className="text-sm font-bold text-white truncate" style={{
-            textShadow: isLow ? '0 0 8px rgba(255, 255, 255, 0.3)' : 'none'
-          }}>
+        <div className="sidebar-token-widget-info">
+          <div className="sidebar-token-widget-balance">
             {TokenService.formatTokenAmount(balance.balance)}
           </div>
-          <div className="text-xxs text-white/60 truncate mt-0.5">
+          <div className="sidebar-token-widget-label">
             {isLow ? 'Recharger mes tokens' : 'Tokens disponibles'}
           </div>
         </div>
-        <div className="flex-shrink-0 flex items-center gap-1">
+        <div className="flex items-center gap-1">
           {isLow && (
-            <SpatialIcon
-              Icon={ICONS.AlertCircle}
-              size={14}
-              className="opacity-70"
-              style={{
-                color: variant === 'critical' ? '#EF4444' : '#F59E0B'
-              }}
-            />
+            <div className="sidebar-token-widget-alert">
+              <SpatialIcon
+                Icon={ICONS.AlertCircle}
+                size={12}
+                className="opacity-70"
+                style={{
+                  color: isCritical ? '#EF4444' : '#F59E0B'
+                }}
+              />
+            </div>
           )}
-          <SpatialIcon
-            Icon={ICONS.ChevronRight}
-            size={14}
-            className="opacity-40 group-hover:opacity-70 transition-opacity"
-          />
+          <div className="sidebar-token-widget-arrow">
+            <SpatialIcon
+              Icon={ICONS.ChevronRight}
+              size={12}
+              className="opacity-40"
+            />
+          </div>
         </div>
       </div>
     </button>
