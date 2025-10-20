@@ -17,7 +17,7 @@ interface TokenResponse {
   refresh_token?: string;
   expires_in?: number;
   token_type: string;
-  scope?: string;
+  scope?: string
 }
 
 const PROVIDER_TOKEN_URLS: Record<string, string> = {
@@ -30,6 +30,7 @@ const PROVIDER_TOKEN_URLS: Record<string, string> = {
   oura: 'https://api.ouraring.com/oauth/token',
   suunto: 'https://cloudapi.suunto.com/oauth/token',
   coros: 'https://open.coros.com/oauth2/accesstoken',
+  google_fit: 'https://oauth2.googleapis.com/token',
 };
 
 Deno.serve(async (req: Request) => {
@@ -96,8 +97,25 @@ Deno.serve(async (req: Request) => {
       .single();
 
     if (flowError || !authFlow) {
+      console.error('OAuth callback - State verification failed:', {
+        state,
+        provider,
+        flowError: flowError?.message,
+        errorCode: flowError?.code,
+        hint: flowError?.hint,
+      });
+
+      // Provide more helpful error messages
+      let errorMessage = 'État de sécurité invalide ou expiré';
+      if (flowError?.code === 'PGRST116') {
+        errorMessage = 'La session OAuth a expiré. Veuillez réessayer de connecter votre appareil.';
+      }
+
       return new Response(
-        JSON.stringify({ error: 'Invalid or expired state parameter' }),
+        JSON.stringify({
+          error: errorMessage,
+          technical: flowError?.message || 'State not found in database',
+        }),
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -241,6 +259,7 @@ async function getProviderUserId(provider: string, accessToken: string): Promise
     oura: 'https://api.ouraring.com/v2/usercollection/personal_info',
     suunto: 'https://cloudapi.suunto.com/v2/user',
     coros: 'https://open.coros.com/oauth2/userinfo',
+    google_fit: 'https://www.googleapis.com/oauth2/v2/userinfo',
   };
 
   const endpoint = userEndpoints[provider];
@@ -272,6 +291,7 @@ async function getProviderUserId(provider: string, accessToken: string): Promise
       oura: 'id',
       suunto: 'username',
       coros: 'openId',
+      google_fit: 'id',
     };
 
     const idField = idFields[provider];
