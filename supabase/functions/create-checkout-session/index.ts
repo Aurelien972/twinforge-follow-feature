@@ -66,11 +66,30 @@ Deno.serve(async (req: Request) => {
       token_pack_id: body.token_pack_id,
     });
 
-    const { data: pricingConfig } = await supabase
+    if (!body.mode || (body.mode !== "subscription" && body.mode !== "payment")) {
+      throw new Error("Invalid mode: must be 'subscription' or 'payment'");
+    }
+
+    if (body.mode === "subscription" && !body.plan_type) {
+      throw new Error("plan_type is required for subscription mode");
+    }
+
+    if (body.mode === "payment" && !body.token_pack_id) {
+      throw new Error("token_pack_id is required for payment mode");
+    }
+
+    const { data: pricingConfig, error: configError } = await supabase
       .from("token_pricing_config")
       .select("subscription_plans, token_packs")
       .eq("is_active", true)
       .single();
+
+    if (configError) {
+      console.error("CREATE_CHECKOUT_SESSION", "Failed to fetch pricing config", {
+        error: configError.message,
+      });
+      throw new Error(`Failed to fetch pricing configuration: ${configError.message}`);
+    }
 
     if (!pricingConfig) {
       throw new Error("Pricing configuration not found");
@@ -100,17 +119,28 @@ Deno.serve(async (req: Request) => {
     }
 
     if (body.mode === "subscription") {
-      if (!body.plan_type) {
-        throw new Error("plan_type is required for subscription mode");
-      }
-
-      const plan = pricingConfig.subscription_plans[body.plan_type];
+      const plan = pricingConfig.subscription_plans[body.plan_type!];
       if (!plan) {
+        console.error("CREATE_CHECKOUT_SESSION", "Plan not found", {
+          plan_type: body.plan_type,
+          available_plans: Object.keys(pricingConfig.subscription_plans),
+        });
         throw new Error(`Plan not found: ${body.plan_type}`);
       }
 
+      console.log("CREATE_CHECKOUT_SESSION", "Plan details", {
+        plan_type: body.plan_type,
+        price_eur: plan.price_eur,
+        tokens_per_month: plan.tokens_per_month,
+        stripe_price_id: plan.stripe_price_id,
+      });
+
       if (!plan.stripe_price_id) {
-        throw new Error(`Stripe price ID not configured for plan: ${body.plan_type}`);
+        console.error("CREATE_CHECKOUT_SESSION", "Stripe price ID not configured", {
+          plan_type: body.plan_type,
+          plan: plan,
+        });
+        throw new Error(`Stripe price ID not configured for plan: ${body.plan_type}. Please run the Stripe product creation script first.`);
       }
 
       sessionParams.line_items = [
@@ -127,14 +157,21 @@ Deno.serve(async (req: Request) => {
         },
       };
     } else if (body.mode === "payment") {
-      if (!body.token_pack_id) {
-        throw new Error("token_pack_id is required for payment mode");
-      }
-
-      const pack = pricingConfig.token_packs[body.token_pack_id];
+      const pack = pricingConfig.token_packs[body.token_pack_id!];
       if (!pack) {
+        console.error("CREATE_CHECKOUT_SESSION", "Token pack not found", {
+          token_pack_id: body.token_pack_id,
+          available_packs: Object.keys(pricingConfig.token_packs),
+        });
         throw new Error(`Token pack not found: ${body.token_pack_id}`);
       }
+
+      console.log("CREATE_CHECKOUT_SESSION", "Token pack details", {
+        pack_id: body.token_pack_id,
+        tokens: pack.tokens,
+        price_eur: pack.price_eur,
+        bonus_percent: pack.bonus_percent,
+      });
 
       sessionParams.line_items = [
         {
@@ -161,13 +198,13 @@ Deno.serve(async (req: Request) => {
           pack_id: body.token_pack_id,
         },
       };
-    } else {
-      throw new Error("Invalid mode: must be 'subscription' or 'payment'");
     }
 
     console.log("CREATE_CHECKOUT_SESSION", "Creating Stripe session", {
       user_id: user.id,
       mode: body.mode,
+      has_customer_id: !!customerId,
+      session_params_keys: Object.keys(sessionParams),
     });
 
     const stripeResponse = await fetch("https://api.stripe.com/v1/checkout/sessions", {

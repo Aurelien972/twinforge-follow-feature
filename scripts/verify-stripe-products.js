@@ -103,7 +103,8 @@ async function verifyStripeProducts() {
 
     console.log(`\n📦 Vérification du plan: ${planKey}`);
     console.log(`   Prix configuré: ${planData.price_eur}€/mois`);
-    console.log(`   Tokens: ${planData.tokens_monthly?.toLocaleString() || 'N/A'}`);
+    const tokensAmount = planData.tokens_per_month || planData.tokens_monthly;
+    console.log(`   Tokens: ${tokensAmount?.toLocaleString() || 'N/A'}`);
 
     if (!priceId) {
       console.log('   ❌ Price ID manquant dans Supabase');

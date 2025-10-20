@@ -207,7 +207,7 @@ async function handleSubscriptionChange(supabase: any, event: StripeEvent) {
     for (const [key, plan] of Object.entries(plans)) {
       if ((plan as any).stripe_price_id === priceId) {
         planType = key;
-        tokensQuota = (plan as any).tokens_monthly;
+        tokensQuota = (plan as any).tokens_per_month || (plan as any).tokens_monthly || 150000;
         break;
       }
     }

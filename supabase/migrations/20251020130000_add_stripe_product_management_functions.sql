@@ -188,7 +188,7 @@ BEGIN
         'plan_key', v_plan_key,
         'plan_data', v_plan_data,
         'price_eur', (v_plan_data->>'price_eur')::numeric,
-        'tokens_monthly', (v_plan_data->>'tokens_monthly')::integer
+        'tokens_per_month', COALESCE((v_plan_data->>'tokens_per_month')::integer, (v_plan_data->>'tokens_monthly')::integer)
       );
     END IF;
   END LOOP;

@@ -154,8 +154,11 @@ async function createStripeProducts() {
     }
 
     try {
+      // Support both tokens_monthly and tokens_per_month for backward compatibility
+      const tokensAmount = planData.tokens_per_month || planData.tokens_monthly;
+
       console.log(`\n🔨 Création du produit: ${planConfig.name} (${planKey})`);
-      console.log(`   Prix: ${planData.price_eur}€/mois | Tokens: ${planData.tokens_monthly.toLocaleString()}`);
+      console.log(`   Prix: ${planData.price_eur}€/mois | Tokens: ${tokensAmount.toLocaleString()}`);
 
       // Create Stripe Product
       const product = await stripe.products.create({
@@ -163,7 +166,7 @@ async function createStripeProducts() {
         description: planConfig.description,
         metadata: {
           plan_key: planKey,
-          tokens_monthly: planData.tokens_monthly.toString(),
+          tokens_per_month: tokensAmount.toString(),
           environment: mode,
           created_by: 'create-stripe-products-script',
           features: planConfig.features.join(', ')
@@ -182,7 +185,7 @@ async function createStripeProducts() {
         },
         metadata: {
           plan_key: planKey,
-          tokens_monthly: planData.tokens_monthly.toString(),
+          tokens_per_month: tokensAmount.toString(),
           environment: mode,
         },
       });
@@ -194,7 +197,7 @@ async function createStripeProducts() {
         price_id: price.id,
         name: planConfig.name,
         amount: planData.price_eur,
-        tokens: planData.tokens_monthly
+        tokens: tokensAmount
       };
 
       createdProducts.push({
