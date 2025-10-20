@@ -117,9 +117,9 @@ const PlanCard: React.FC<PlanCardProps> = ({
             borderColor: 'rgba(255, 255, 255, 0.1)',
           }}
         >
-          <GradientText className="text-2xl font-bold mb-1">
+          <div className="text-2xl font-bold mb-1 text-white">
             {TokenService.formatTokenAmount(tokensPerMonth)}
-          </GradientText>
+          </div>
           <div className="text-xs text-slate-400">tokens / mois</div>
         </div>
 
@@ -269,9 +269,9 @@ const PlansTab: React.FC = () => {
             </div>
           </div>
           <div className="text-right">
-            <GradientText className="text-3xl font-bold mb-1">
+            <div className="text-4xl font-bold mb-1 text-white">
               {tokenBalance ? TokenService.formatTokenAmount(tokenBalance.balance) : '0'}
-            </GradientText>
+            </div>
             <div className="text-xs text-slate-500">
               Renouvelé chaque mois
             </div>
@@ -305,7 +305,7 @@ const PlansTab: React.FC = () => {
                 planId={planId}
                 name={plan.name || planId}
                 priceEur={plan.price_eur || 0}
-                tokensPerMonth={plan.monthly_tokens || plan.tokens_per_month || 0}
+                tokensPerMonth={plan.tokens_monthly || 0}
                 isCurrentPlan={currentPlanType === planId}
                 isFree={planId === 'free'}
                 onSelect={handleSelectPlan}
