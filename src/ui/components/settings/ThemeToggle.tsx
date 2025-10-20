@@ -53,11 +53,7 @@ export const ThemeToggle: React.FC = () => {
               className={`theme-toggle-option ${isActive ? 'active' : ''}`}
               aria-pressed={isActive}
             >
-              <ConditionalMotion
-                className="theme-toggle-option-content"
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.1 }}
-              >
+              <div className="theme-toggle-option-content">
                 <div className="theme-toggle-option-icon">
                   <Icon size={20} />
                 </div>
@@ -66,13 +62,9 @@ export const ThemeToggle: React.FC = () => {
                   <span className="theme-toggle-option-description">{option.description}</span>
                 </div>
                 {isActive && (
-                  <ConditionalMotion
-                    className="theme-toggle-option-indicator"
-                    layoutId="theme-active-indicator"
-                    transition={{ type: 'spring', stiffness: 500, damping: 40 }}
-                  />
+                  <div className="theme-toggle-option-indicator" />
                 )}
-              </ConditionalMotion>
+              </div>
             </button>
           );
         })}
