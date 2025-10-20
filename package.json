@@ -13,7 +13,12 @@
     "stripe:create:live": "node scripts/create-stripe-products.js --mode=live",
     "stripe:verify:test": "node scripts/verify-stripe-products.js --mode=test",
     "stripe:verify:live": "node scripts/verify-stripe-products.js --mode=live",
-    "stripe:setup": "npm run stripe:create:test && npm run stripe:verify:test"
+    "stripe:setup": "npm run stripe:create:test && npm run stripe:verify:test",
+    "ios:build": "npm run build && npx cap sync ios",
+    "ios:open": "npx cap open ios",
+    "ios:run": "npm run ios:build && npm run ios:open",
+    "cap:sync": "npx cap sync",
+    "cap:update": "npx cap update"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

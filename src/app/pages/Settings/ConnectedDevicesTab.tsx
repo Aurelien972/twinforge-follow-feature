@@ -14,6 +14,8 @@ import { PROVIDER_CONFIGS, MVP_PROVIDERS } from '../../../domain/connectedDevice
 import type { ConnectedDevice, Provider } from '../../../domain/connectedDevices';
 import logger from '../../../lib/utils/logger';
 import WearableConnectionStatus from '../../../ui/components/wearable/WearableConnectionStatus';
+import { supabase } from '../../../system/supabase/client';
+import { AppleHealthCard } from './components/AppleHealthCard';
 import '../../../styles/components/connected-devices.css';
 
 const ConnectedDevicesTab: React.FC = () => {
@@ -40,7 +42,7 @@ const ConnectedDevicesTab: React.FC = () => {
     setShowSimulator(newState);
   };
 
-  const handleConnectDevice = (provider: Provider) => {
+  const handleConnectDevice = async (provider: Provider) => {
     logger.info('[CONNECTED_DEVICES] Connect device initiated', {
       provider,
       showSimulator,
@@ -50,6 +52,7 @@ const ConnectedDevicesTab: React.FC = () => {
     const config = PROVIDER_CONFIGS[provider];
     if (!config) {
       logger.error('[CONNECTED_DEVICES] Provider config not found', { provider });
+      alert('Configuration du provider introuvable');
       return;
     }
 
@@ -63,39 +66,72 @@ const ConnectedDevicesTab: React.FC = () => {
     }
 
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const state = crypto.randomUUID();
     const redirectUri = `${supabaseUrl}/functions/v1/wearable-oauth-callback?provider=${provider}`;
 
-    logger.info('[CONNECTED_DEVICES] Building OAuth URL', {
-      provider,
-      supabaseUrl,
-      redirectUri,
-      state,
-    });
+    try {
+      logger.info('[CONNECTED_DEVICES] Creating OAuth flow in database', {
+        provider,
+        redirectUri,
+      });
 
-    const authUrl = new URL(config.authUrl);
-    authUrl.searchParams.set('response_type', 'code');
+      // Call RPC function to create auth flow and get state
+      const { data: flowData, error: flowError } = await supabase.rpc(
+        'create_device_auth_flow',
+        {
+          p_provider: provider,
+          p_redirect_uri: redirectUri,
+        }
+      );
 
-    const clientId = provider === 'google_fit'
-      ? import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID
-      : 'YOUR_CLIENT_ID';
+      if (flowError) {
+        logger.error('[CONNECTED_DEVICES] Failed to create auth flow', {
+          provider,
+          error: flowError,
+        });
+        alert('Erreur lors de l\'initialisation de la connexion. Veuillez réessayer.');
+        return;
+      }
 
-    authUrl.searchParams.set('client_id', clientId);
-    authUrl.searchParams.set('redirect_uri', redirectUri);
-    authUrl.searchParams.set('state', state);
-    authUrl.searchParams.set('scope', config.scopes.join(' '));
+      const state = flowData.state;
+      const expiresAt = flowData.expires_at;
 
-    if (provider === 'google_fit') {
-      authUrl.searchParams.set('access_type', 'offline');
-      authUrl.searchParams.set('prompt', 'consent');
+      logger.info('[CONNECTED_DEVICES] Auth flow created successfully', {
+        provider,
+        state,
+        expiresAt,
+      });
+
+      // Build OAuth URL with the state from database
+      const authUrl = new URL(config.authUrl);
+      authUrl.searchParams.set('response_type', 'code');
+
+      const clientId = provider === 'google_fit'
+        ? import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID
+        : 'YOUR_CLIENT_ID';
+
+      authUrl.searchParams.set('client_id', clientId);
+      authUrl.searchParams.set('redirect_uri', redirectUri);
+      authUrl.searchParams.set('state', state);
+      authUrl.searchParams.set('scope', config.scopes.join(' '));
+
+      if (provider === 'google_fit') {
+        authUrl.searchParams.set('access_type', 'offline');
+        authUrl.searchParams.set('prompt', 'consent');
+      }
+
+      logger.info('[CONNECTED_DEVICES] Redirecting to OAuth provider', {
+        provider,
+        authUrl: authUrl.toString(),
+      });
+
+      window.location.href = authUrl.toString();
+    } catch (error) {
+      logger.error('[CONNECTED_DEVICES] Unexpected error during OAuth initialization', {
+        provider,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      alert('Une erreur inattendue s\'est produite. Veuillez réessayer.');
     }
-
-    logger.info('[CONNECTED_DEVICES] Redirecting to OAuth provider', {
-      provider,
-      authUrl: authUrl.toString(),
-    });
-
-    window.location.href = authUrl.toString();
   };
 
   const handleSync = async (deviceId: string) => {
@@ -192,6 +228,11 @@ const ConnectedDevicesTab: React.FC = () => {
 
       <div style={{ marginBottom: '2rem' }}>
         <WearableConnectionStatus variant="detailed" showSyncButton={true} />
+      </div>
+
+      {/* Apple Health Card */}
+      <div style={{ marginBottom: '2rem' }}>
+        <AppleHealthCard />
       </div>
 
       {loading ? (

@@ -22,6 +22,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { setSession, fetchProfile } = useUserStore();
@@ -91,7 +92,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
   const handleGoogleAuth = async () => {
     setGoogleLoading(true);
     setError(null);
-    
+
     click();
 
     try {
@@ -119,13 +120,50 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
       });
 
     } catch (error: any) {
-      logger.error('AUTH', 'Google authentication error', { 
+      logger.error('AUTH', 'Google authentication error', {
         error: error.message,
         timestamp: new Date().toISOString()
       });
       errorSound();
       setError(error.message || 'Erreur lors de la connexion avec Google');
       setGoogleLoading(false);
+    }
+  };
+
+  const handleAppleAuth = async () => {
+    setAppleLoading(true);
+    setError(null);
+
+    click();
+
+    try {
+      logger.info('AUTH', 'Starting Apple OAuth flow', {
+        timestamp: new Date().toISOString()
+      });
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      logger.info('AUTH', 'Apple OAuth redirect initiated', {
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error: any) {
+      logger.error('AUTH', 'Apple authentication error', {
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+      errorSound();
+      setError(error.message || 'Erreur lors de la connexion avec Apple');
+      setAppleLoading(false);
     }
   };
 
@@ -155,11 +193,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
           setSession(data.session);
           await fetchProfile();
           success();
-
+          
           setTimeout(() => {
-            navigate('/app', { replace: true });
+            navigate('/', { replace: true });
           }, 500);
-
+          
           onSuccess?.();
         } else {
           setError('Veuillez vérifier votre email pour confirmer votre compte');
@@ -176,11 +214,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
         setSession(data.session);
         await fetchProfile();
         success();
-
+        
         setTimeout(() => {
-          navigate('/app', { replace: true });
+          navigate('/', { replace: true });
         }, 500);
-
+        
         onSuccess?.();
       }
     } catch (error: any) {
@@ -451,7 +489,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                 {/* Bouton Principal */}
                 <button
                   type="submit"
-                  disabled={loading || googleLoading}
+                  disabled={loading || googleLoading || appleLoading}
                   className="w-full auth-submit-button mb-4"
                   style={{
                     position: 'relative',
@@ -512,7 +550,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                       />
                     )}
                     <span>
-                      {loading || googleLoading ? 'Forge en cours...' : (isSignUp ? 'Créer ma Forge' : 'Accéder à ma Forge')}
+                      {loading || googleLoading || appleLoading ? 'Forge en cours...' : (isSignUp ? 'Créer ma Forge' : 'Accéder à ma Forge')}
                     </span>
                   </div>
                 </button>
@@ -531,11 +569,76 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                   <div className="flex-1 h-px bg-white/20"></div>
                 </div>
 
+                {/* Bouton Apple Auth */}
+                <button
+                  type="button"
+                  onClick={handleAppleAuth}
+                  disabled={appleLoading || loading || googleLoading}
+                  className="w-full auth-apple-button mb-4"
+                  style={{
+                    position: 'relative',
+                    zIndex: 106,
+                    pointerEvents: 'auto',
+                    cursor: 'pointer',
+                    background: `
+                      linear-gradient(135deg,
+                        rgba(0, 0, 0, 0.95),
+                        rgba(20, 20, 20, 0.9)
+                      )
+                    `,
+                    backdropFilter: buttonBackdropFilter,
+                    boxShadow: mode === 'high-performance'
+                      ? '0 6px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1)'
+                      : mode === 'balanced'
+                      ? '0 7px 28px rgba(0, 0, 0, 0.5), 0 0 32px rgba(255, 255, 255, 0.05), inset 0 1.5px 0 rgba(255,255,255,0.15)'
+                      : `
+                          0 8px 32px rgba(0, 0, 0, 0.6),
+                          0 0 40px rgba(255, 255, 255, 0.08),
+                          inset 0 2px 0 rgba(255,255,255,0.2)
+                        `,
+                    border: '2px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '999px',
+                    padding: '0.75rem 1.5rem',
+                    minHeight: '48px',
+                    color: 'white',
+                    fontWeight: '600',
+                    fontSize: '1rem',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading && !appleLoading && !googleLoading) {
+                      e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  }}
+                >
+                  <div className="flex items-center justify-center gap-3">
+                    {appleLoading ? (
+                      <SpatialIcon
+                        Icon={ICONS.Loader2}
+                        size={18}
+                        style={{ color: 'white' }}
+                        className="animate-spin"
+                      />
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                        <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                      </svg>
+                    )}
+                    <span>
+                      {appleLoading ? 'Redirection...' :
+                       isSignUp ? 'Créer un compte avec Apple' : 'Se connecter avec Apple'}
+                    </span>
+                  </div>
+                </button>
+
                 {/* Bouton Google Auth */}
                 <button
                   type="button"
                   onClick={handleGoogleAuth}
-                  disabled={googleLoading || loading}
+                  disabled={googleLoading || loading || appleLoading}
                   className="w-full auth-google-button mb-4"
                   style={{
                     position: 'relative',
@@ -568,7 +671,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     transition: 'all 0.2s ease'
                   }}
                   onMouseEnter={(e) => {
-                    if (!loading && !googleLoading) {
+                    if (!loading && !googleLoading && !appleLoading) {
                       e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
                     }
                   }}
@@ -611,7 +714,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                   <button
                     type="button"
                     onClick={handleToggleMode}
-                    disabled={loading || googleLoading}
+                    disabled={loading || googleLoading || appleLoading}
                     className="text-white/70 hover:text-white text-sm transition-colors auth-toggle-button"
                     style={{
                       position: 'relative',
