@@ -5,8 +5,6 @@ import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import { useToast } from '../../../ui/components/ToastProvider';
 import { useUserStore } from '../../../system/store/userStore';
-import { ThemeToggle } from '../../../ui/components/settings';
-import { useThemeStore } from '../../../system/store/themeStore';
 import type { VoiceType } from '../../../system/store/voiceCoachStore';
 
 const AVAILABLE_VOICES: Array<{
@@ -73,7 +71,6 @@ const AVAILABLE_VOICES: Array<{
 const PreferencesSettingsTab: React.FC = () => {
   const { profile, updateProfile } = useUserStore();
   const { showToast } = useToast();
-  const { initializeTheme } = useThemeStore();
   const [selectedVoice, setSelectedVoice] = useState<VoiceType>(
     (profile?.preferences?.voice_coach_voice as VoiceType) || 'alloy'
   );
@@ -81,13 +78,6 @@ const PreferencesSettingsTab: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
-
-  // Initialize theme with user's country on mount
-  useEffect(() => {
-    if (profile?.country) {
-      initializeTheme(profile.country);
-    }
-  }, [profile?.country, initializeTheme]);
 
   useEffect(() => {
     return () => {
@@ -230,40 +220,6 @@ const PreferencesSettingsTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Theme Selection Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <GlassCard className="p-6">
-          <div className="flex items-start gap-3 mb-6">
-            <SpatialIcon
-              Icon={ICONS.Sun}
-              size={24}
-              color="#18E3FF"
-              variant="pure"
-            />
-            <div className="flex-1">
-              <h4 className="text-base font-semibold text-white mb-1">
-                Apparence
-              </h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Choisissez le thème de l'application
-              </p>
-            </div>
-          </div>
-
-          <ThemeToggle />
-
-          <div className="mt-4 p-3 rounded-lg bg-white/5 border border-white/10">
-            <p className="text-xs text-slate-400 leading-relaxed">
-              <span className="text-cyan-400 font-semibold">Mode Automatique :</span> Le thème change automatiquement selon l'heure de la journée dans votre pays (renseigné dans l'onglet Identité de votre profil).
-            </p>
-          </div>
-        </GlassCard>
-      </motion.div>
-
       <div>
         <h3 className="text-xl font-bold text-white mb-2">
           Voix du Coach Vocal
@@ -424,26 +380,6 @@ const PreferencesSettingsTab: React.FC = () => {
         </div>
       </GlassCard>
 
-      <GlassCard className="p-6 bg-gradient-to-br from-blue-500/5 to-purple-500/5">
-        <div className="flex items-start gap-3">
-          <SpatialIcon
-            Icon={ICONS.Lightbulb}
-            size={20}
-            color="#A78BFA"
-            variant="pure"
-          />
-          <div className="flex-1">
-            <h4 className="text-sm font-semibold text-white mb-2">
-              Autres préférences à venir
-            </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Nous travaillons sur de nouvelles options de personnalisation :
-              thème sombre/clair, unités de mesure, langue de l'interface, et bien plus encore.
-              Restez à l'écoute !
-            </p>
-          </div>
-        </div>
-      </GlassCard>
     </div>
   );
 };

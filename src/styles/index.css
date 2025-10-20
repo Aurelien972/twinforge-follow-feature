@@ -27,7 +27,6 @@
    PHASE 2: SYSTÈME DE DESIGN CENTRALISÉ
    ========================================= */
 @import './glassV2/variables.css';
-@import './glassV2/theme-variables.css';
 @import './glassV2/core.css';
 @import './glassV2/brand.css';
 @import './glassV2/adaptive.css';
@@ -90,7 +89,6 @@
 @import './components/meal-scan-results.css';
 @import './components/page-header-responsive.css';
 @import './components/settings-components.css';
-@import './components/theme-toggle.css';
 @import '../ui/components/skeletons/skeletons.css';
 
 /* =========================================
