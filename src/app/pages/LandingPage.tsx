@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useFeedback } from '../../hooks';
@@ -6,10 +6,19 @@ import SpatialIcon from '../../ui/icons/SpatialIcon';
 import { ICONS } from '../../ui/icons/registry';
 import GlassCard from '../../ui/cards/GlassCard';
 import TwinForgeLogo from '../../ui/components/branding/TwinForgeLogo';
+import { useUserStore } from '../../system/store/userStore';
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const { click } = useFeedback();
+  const { session } = useUserStore();
+
+  // Redirect authenticated users to app
+  useEffect(() => {
+    if (session) {
+      navigate('/app', { replace: true });
+    }
+  }, [session, navigate]);
 
   const handleGetStarted = () => {
     click();
