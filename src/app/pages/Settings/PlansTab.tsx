@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { ConditionalMotion } from '../../../lib/motion';
 import GlassCard from '../../../ui/cards/GlassCard';
 import TokenIcon from '../../../ui/icons/TokenIcon';
 import SpatialIcon from '../../../ui/icons/SpatialIcon';
@@ -68,7 +68,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
   };
 
   return (
-    <motion.div
+    <ConditionalMotion
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="relative"
@@ -148,7 +148,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
           </div>
         )}
       </GlassCard>
-    </motion.div>
+    </ConditionalMotion>
   );
 };
 
