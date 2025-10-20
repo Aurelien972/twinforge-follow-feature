@@ -264,8 +264,13 @@ const PlansTab: React.FC = () => {
   const plans = pricingConfig?.subscriptionPlans || {};
   const pack19 = pricingConfig?.tokenPacks?.pack_19;
 
+  console.log('=================== PLANSTAB DEBUG ===================');
   console.log('[PlansTab] Token Balance:', tokenBalance);
+  console.log('[PlansTab] Balance value:', tokenBalance?.balance);
   console.log('[PlansTab] Formatted Balance:', tokenBalance ? TokenService.formatTokenAmount(tokenBalance.balance) : 'NO BALANCE');
+  console.log('[PlansTab] PricingConfig:', pricingConfig);
+  console.log('[PlansTab] Plans object:', plans);
+  console.log('====================================================');
 
   return (
     <div className="space-y-6">
@@ -312,7 +317,12 @@ const PlansTab: React.FC = () => {
               return null;
             }
             const tokens = plan.tokens_monthly || 0;
-            console.log(`[PlansTab] Plan ${planId}: tokens_monthly=${plan.tokens_monthly}, rendering=${tokens}`);
+            console.log(`[PlansTab] Plan ${planId}:`, {
+              tokens_monthly: plan.tokens_monthly,
+              rendering: tokens,
+              formatted: TokenService.formatTokenAmount(tokens),
+              fullPlan: plan
+            });
             return (
               <PlanCard
                 key={planId}
