@@ -263,6 +263,22 @@
 }
 
 /* =========================================
+   TOKEN BALANCE - Preserve gradient display in Plans tab
+   ========================================= */
+
+/* CRITICAL: Token balance must remain visible with gradient in performance mode */
+.performance-mode [style*="-webkit-background-clip: text"],
+.performance-mode [style*="background-clip: text"],
+.performance-mode [style*="-webkit-text-fill-color: transparent"],
+.performance-mode [style*="backgroundClip"][style*="text"] {
+  /* Preserve gradient text effect for token balance */
+  background: inherit !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* =========================================
    PAGE HEADER ICONS - Keep visible with simplified effects
    ========================================= */
 
