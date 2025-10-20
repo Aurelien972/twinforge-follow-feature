@@ -101,22 +101,22 @@ html.mode-balanced .bg-twinforge-visionos {
   backface-visibility: hidden;
 }
 
-/* En mode Équilibré, les particules restent actives */
+/* En mode Équilibré, les particules sont DESACTIVEES - fond statique uniquement */
 body.mode-balanced .cosmic-forge-particles,
 .mode-balanced .cosmic-forge-particles,
 html.mode-balanced .cosmic-forge-particles {
-  display: block !important;
-  opacity: 0.4 !important;
-  visibility: visible !important;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 body.mode-balanced .forge-particle,
 .mode-balanced .forge-particle,
 html.mode-balanced .forge-particle {
-  display: block !important;
-  animation: ember-rise var(--duration, 20s) linear infinite !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+  display: none !important;
+  animation: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 /* =========================================

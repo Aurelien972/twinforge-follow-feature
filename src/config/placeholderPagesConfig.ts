@@ -203,7 +203,7 @@ export const PLACEHOLDER_PAGES_CONFIG: Record<string, PageConfig> = {
     tabs: [
       {
         value: 'account',
-        label: 'Mon Compte',
+        label: 'Forfaits',
         icon: 'CreditCard',
         description: 'Gérez vos forfaits, abonnement et tokens',
         color: '#10B981',

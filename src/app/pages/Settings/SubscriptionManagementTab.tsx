@@ -109,23 +109,31 @@ const PlanCard: React.FC<PlanCardProps> = ({
       className="relative"
     >
       <GlassCard
-        className={`p-5 transition-all cursor-pointer hover:scale-[1.02] ${
-          isCurrentPlan ? 'ring-2 ring-white/30' : ''
+        className={`p-5 transition-all cursor-pointer ${
+          isCurrentPlan
+            ? 'ring-2 scale-[1.05] shadow-2xl'
+            : 'hover:scale-[1.02]'
         }`}
         style={{
-          background: `${planConfig.gradient.replace('linear-gradient', 'linear-gradient(135deg, ')}20, ${planConfig.gradient.split(', ')[1]}10)`,
-          borderColor: planConfig.borderColor,
+          background: isCurrentPlan
+            ? `${planConfig.gradient.replace('linear-gradient', 'linear-gradient(135deg, ')}35, ${planConfig.gradient.split(', ')[1]}20)`
+            : `${planConfig.gradient.replace('linear-gradient', 'linear-gradient(135deg, ')}20, ${planConfig.gradient.split(', ')[1]}10)`,
+          borderColor: isCurrentPlan
+            ? `${planConfig.color}80`
+            : planConfig.borderColor,
+          boxShadow: isCurrentPlan
+            ? `0 0 40px ${planConfig.color}40, 0 8px 32px rgba(0, 0, 0, 0.3)`
+            : undefined,
         }}
         onClick={() => !isCurrentPlan && !isLoading && onSelect(planId)}
       >
-        {isCurrentPlan && (
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
-            Plan Actuel
-          </div>
-        )}
 
         <div className="text-center mb-4">
-          <h3 className="text-lg font-bold text-white mb-1">{planConfig.label}</h3>
+          <h3 className={`text-lg font-bold text-white mb-1 ${
+            isCurrentPlan ? 'text-xl' : ''
+          }`}>
+            {planConfig.label}
+          </h3>
           {isFree && (
             <p className="text-xs text-slate-400">Découvrez l'application</p>
           )}
@@ -161,6 +169,17 @@ const PlanCard: React.FC<PlanCardProps> = ({
           </div>
           <div className="text-xs text-slate-400">tokens / mois</div>
         </div>
+
+        {isCurrentPlan && (
+          <div className="mt-4 py-2 px-4 rounded-lg text-center font-bold text-sm" style={{
+            background: `linear-gradient(135deg, ${planConfig.color}30, ${planConfig.color}20)`,
+            border: `2px solid ${planConfig.color}60`,
+            color: '#ffffff',
+            textShadow: `0 0 8px ${planConfig.color}`,
+          }}>
+            ✓ Plan Actuel
+          </div>
+        )}
 
         {!isCurrentPlan && !isFree && (
           <button
@@ -293,6 +312,34 @@ const SubscriptionManagementTab: React.FC = () => {
 
   const currentPlanType = subscription?.planType || 'free';
   const plans = pricingConfig?.subscriptionPlans || {};
+
+  // Calculer les jours restants pour l'essai gratuit (14 jours)
+  const calculateTrialDaysRemaining = () => {
+    if (!subscription || subscription.status !== 'trialing') return null;
+
+    const trialEndDate = subscription.trialEnd ? new Date(subscription.trialEnd) : null;
+    if (!trialEndDate) return null;
+
+    const now = new Date();
+    const diffTime = trialEndDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays > 0 ? diffDays : 0;
+  };
+
+  const trialDaysRemaining = calculateTrialDaysRemaining();
+
+  // Ordre des forfaits du plus petit au plus grand
+  const planOrder = ['starter_9', 'pro_19', 'premium_29', 'elite_39', 'expert_49', 'master_59', 'ultimate_99', 'free'];
+  const sortedPlans = Object.entries(plans)
+    .sort(([aId], [bId]) => {
+      const aIndex = planOrder.indexOf(aId);
+      const bIndex = planOrder.indexOf(bId);
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    });
+
   const pack19 = pricingConfig?.tokenPacks?.pack_19;
   const displayedTransactions = showAllTransactions ? transactions : transactions.slice(0, 5);
 
@@ -329,19 +376,23 @@ const SubscriptionManagementTab: React.FC = () => {
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs text-slate-400 font-medium">Statut</span>
               <SpatialIcon
-                Icon={ICONS.Check}
+                Icon={subscription?.status === 'active' ? ICONS.Check : ICONS.Clock}
                 size={20}
-                color="#10B981"
+                color={subscription?.status === 'active' ? '#10B981' : '#3B82F6'}
                 variant="pure"
               />
             </div>
-            <div className="text-3xl font-bold text-emerald-400 mb-1">
+            <div className={`text-3xl font-bold mb-1 ${
+              subscription?.status === 'active' ? 'text-emerald-400' : 'text-blue-400'
+            }`}>
               {subscription?.status === 'active' ? 'Actif' : 'Essai Gratuit'}
             </div>
             <div className="text-xs text-slate-500">
               {subscription?.status === 'active'
                 ? `Renouvellement le ${format(new Date(subscription.currentPeriodEnd), 'dd/MM/yyyy', { locale: fr })}`
-                : '15 000 tokens offerts pour découvrir l\'app'
+                : trialDaysRemaining !== null
+                  ? `${trialDaysRemaining} ${trialDaysRemaining > 1 ? 'jours restants' : 'jour restant'} sur 14`
+                  : '15 000 tokens offerts pour découvrir l\'app'
               }
             </div>
           </div>
@@ -355,7 +406,7 @@ const SubscriptionManagementTab: React.FC = () => {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Object.entries(plans).map(([planId, plan]) => {
+          {sortedPlans.map(([planId, plan]) => {
             if (!plan) {
               console.warn(`Plan ${planId} is undefined`);
               return null;

@@ -67,10 +67,14 @@ export const TAB_COLORS: Record<string, string> = {
   'programmes': '#18E3FF',  // Cyan pour programmes
   'exercices': '#06B6D4',   // Cyan pour exercices
 
-  // Settings
-  'general': '#8B5CF6',     // Violet pour général
+  // Settings - Couleurs harmonisées avec les pages correspondantes
+  'account': '#10B981',       // Vert pour forfaits
+  'performance': '#F59E0B',   // Jaune/Orange pour performance
+  'preferences': '#8B5CF6',   // Violet pour préférences
+  'general': '#8B5CF6',       // Violet pour général (legacy)
   'notifications': '#EC4899', // Rose pour notifications
   'confidentialite': '#3B82F6', // Bleu pour confidentialité
+  'appareils': '#06B6D4',     // Cyan pour appareils connectés
 
   // Notifications
   'recentes': '#EC4899',    // Rose pour récentes
