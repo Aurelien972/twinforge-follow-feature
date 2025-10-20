@@ -17,7 +17,7 @@ interface TokenResponse {
   refresh_token?: string;
   expires_in?: number;
   token_type: string;
-  scope?: string
+  scope?: string;
 }
 
 const PROVIDER_TOKEN_URLS: Record<string, string> = {
