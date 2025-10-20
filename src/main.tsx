@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import React, { lazy, useEffect, useRef, useState, Suspense } from 'react';
 import App from './app/App.tsx';
 import './styles/index.css';
@@ -10,14 +10,9 @@ import { logSupabaseConfig } from './system/supabase/client';
 import logger from './lib/utils/logger';
 import { logMealScannerFeatureFlags } from './config/featureFlags';
 import { supabase } from './system/supabase/client';
+import { AuthForm } from './app/components/AuthForm';
 import { LoadingFallback } from './app/components/LoadingFallback';
 import { useUserStore } from './system/store/userStore';
-
-const LandingPage = lazy(() => import('./app/pages/LandingPage'));
-const AuthPage = lazy(() => import('./app/pages/AuthPage'));
-const PrivacyPolicyPage = lazy(() => import('./app/pages/PrivacyPolicyPage'));
-const TermsOfServicePage = lazy(() => import('./app/pages/TermsOfServicePage'));
-const LegalMentionsPage = lazy(() => import('./app/pages/LegalMentionsPage'));
 
 const Home = lazy(() => import('./app/pages/Home'));
 const Profile = lazy(() => import('./app/pages/Profile'));
@@ -41,36 +36,38 @@ const VitalPage = lazy(() => import('./app/pages/VitalPage'));
 const DevCachePage = lazy(() => import('./app/pages/DevCachePage'));
 const LogoGalleryPage = lazy(() => import('./app/pages/LogoGalleryPage'));
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function AuthWrapper({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showAuthForm, setShowAuthForm] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const initRef = useRef(false);
   const { setSession, setAuthReady } = useUserStore();
-
+  
   useEffect(() => {
     if (initRef.current) return;
     initRef.current = true;
 
     const initializeAuth = async () => {
       try {
-        logger.debug('AUTH', 'Checking authentication for protected route');
-
+        logger.debug('AUTH', 'Starting authentication initialization');
+        
         const { data: { session } } = await supabase.auth.getSession();
-
+        
         if (session?.user) {
-          logger.debug('AUTH', 'User authenticated');
-          setIsAuthenticated(true);
+          logger.debug('AUTH', 'Found existing session');
+          setUser(session.user);
+          setShowAuthForm(false);
           setSession(session);
           setAuthReady(true);
         } else {
-          logger.debug('AUTH', 'User not authenticated, redirecting to landing');
-          setIsAuthenticated(false);
+          logger.debug('AUTH', 'No session found, showing auth form');
+          setShowAuthForm(true);
           setSession(null);
           setAuthReady(false);
         }
       } catch (error) {
-        logger.error('AUTH', 'Error checking authentication', { error });
-        setIsAuthenticated(false);
+        logger.error('AUTH', 'Error during initialization', { error });
+        setShowAuthForm(true);
         setSession(null);
         setAuthReady(false);
       } finally {
@@ -80,23 +77,46 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
     initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      logger.debug('AUTH', 'Auth state changed in protected route', { event, hasSession: !!session });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      logger.debug('AUTH', 'Auth state changed', { event, hasSession: !!session });
 
       if (event === 'SIGNED_OUT') {
-        setIsAuthenticated(false);
+        logger.info('AUTH', 'User signed out, redirecting to auth form');
+        setUser(null);
+        setShowAuthForm(true);
         setSession(null);
         setAuthReady(false);
-        window.location.href = '/';
+        setIsLoading(false);
         return;
       }
 
+      // Handle email confirmation and token refresh
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        if (session?.user) {
+          logger.info('AUTH', 'Session established or updated', { event, userId: session.user.id });
+          setUser(session.user);
+          setShowAuthForm(false);
+          setSession(session);
+          setAuthReady(true);
+          setIsLoading(false);
+
+          // Force refresh to ensure UI is properly updated after email confirmation
+          if (event === 'SIGNED_IN' && window.location.pathname === '/') {
+            logger.debug('AUTH', 'Refreshing app after email confirmation');
+            window.location.reload();
+          }
+          return;
+        }
+      }
+
       if (session?.user) {
-        setIsAuthenticated(true);
+        setUser(session.user);
+        setShowAuthForm(false);
         setSession(session);
         setAuthReady(true);
       } else {
-        setIsAuthenticated(false);
+        setUser(null);
+        setShowAuthForm(true);
         setSession(null);
         setAuthReady(false);
       }
@@ -107,11 +127,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (isLoading) {
-    return <LoadingFallback title="Vérification" subtitle="Chargement de votre espace..." />;
+    return <LoadingFallback title="Bienvenue sur TwinForge" subtitle="Vérification de votre session..." />;
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+  if (showAuthForm) {
+    return <AuthForm onSuccess={() => window.location.href = '/'} />;
   }
 
   return <>{children}</>;
@@ -121,27 +141,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Suspense fallback={<LoadingFallback />}><LandingPage /></Suspense>
-  },
-  {
-    path: "/auth",
-    element: <Suspense fallback={<LoadingFallback />}><AuthPage /></Suspense>
-  },
-  {
-    path: "/privacy",
-    element: <Suspense fallback={<LoadingFallback />}><PrivacyPolicyPage /></Suspense>
-  },
-  {
-    path: "/terms",
-    element: <Suspense fallback={<LoadingFallback />}><TermsOfServicePage /></Suspense>
-  },
-  {
-    path: "/legal",
-    element: <Suspense fallback={<LoadingFallback />}><LegalMentionsPage /></Suspense>
-  },
-  {
-    path: "/app",
-    element: <ProtectedRoute><App /></ProtectedRoute>,
+    element: <AuthWrapper><App /></AuthWrapper>,
     children: [
       {
         index: true,

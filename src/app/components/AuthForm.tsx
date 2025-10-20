@@ -200,7 +200,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
           
           onSuccess?.();
         } else {
-          setError('Veuillez vérifier votre email pour confirmer votre compte');
+          setError('CONFIRMATION_REQUIRED');
         }
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -308,7 +308,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: animationDuration * 0.875, delay: shouldAnimate ? 0.2 : 0, ease: "easeOut" }}
                 style={{
-                  filter: mode === 'quality' ? 'drop-shadow(0 0 16px color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.1))' : 'drop-shadow(0 0 8px color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent))'
+                  filter: mode === 'quality' ? 'drop-shadow(0 0 16px color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.1))' : 'drop-shadow(0 0 8px color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent))',
+                  transform: 'scale(1.3)'
                 }}
               >
                 <TwinForgeLogo variant="desktop" isHovered={false} />
@@ -317,10 +318,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
 
             <div style={{ position: 'relative', zIndex: 103, pointerEvents: 'auto' }}>
               <h1 className="text-xl font-bold text-white mb-2 text-center">
-                {isSignUp ? 'Rejoindre TwinForge' : 'Connexion TwinForge'}
+                {isSignUp ? 'Créez votre Forge' : 'Connexion à votre Forge'}
               </h1>
               <p className="text-white/70 text-sm text-center mb-4">
-                {isSignUp ? 'Créez votre Forge Spatiale' : 'Accédez à votre Forge Spatiale'}
+                {isSignUp ? 'Forgez votre corps et votre santé' : 'Accédez à votre Forgerie'}
               </p>
             </div>
 
@@ -370,8 +371,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
                         className="glass-input w-full auth-input"
-                        placeholder="Votre nom dans la forge"
+                        placeholder="Ex: Jean Forgeron"
                         required={isSignUp}
+                        autoComplete="name"
                         style={{
                           position: 'relative',
                           zIndex: 107,
@@ -404,6 +406,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     className="glass-input w-full auth-input"
                     placeholder="votre@email.com"
                     required
+                    autoComplete="email"
                     style={{
                       position: 'relative',
                       zIndex: 107,
@@ -432,9 +435,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="glass-input w-full auth-input"
-                    placeholder="Votre mot de passe sécurisé"
+                    placeholder="Minimum 6 caractères"
                     required
                     minLength={6}
+                    autoComplete={isSignUp ? 'new-password' : 'current-password'}
                     style={{
                       position: 'relative',
                       zIndex: 107,
@@ -446,7 +450,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                   />
                 </div>
 
-                {/* Message d'Erreur */}
+                {/* Message d'Erreur ou Information */}
                 <AnimatePresence>
                   {error && (
                     <motion.div
@@ -464,22 +468,39 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                       <GlassCard
                         className="p-3"
                         style={{
-                          background: 'rgba(239, 68, 68, 0.15)',
-                          borderColor: 'rgba(239, 68, 68, 0.4)',
+                          background: error === 'CONFIRMATION_REQUIRED'
+                            ? 'rgba(59, 130, 246, 0.15)'
+                            : 'rgba(239, 68, 68, 0.15)',
+                          borderColor: error === 'CONFIRMATION_REQUIRED'
+                            ? 'rgba(59, 130, 246, 0.4)'
+                            : 'rgba(239, 68, 68, 0.4)',
                           backdropFilter: errorCardBackdrop,
-                          boxShadow: mode === 'high-performance' ? '0 0 12px rgba(239, 68, 68, 0.25)' : '0 0 20px rgba(239, 68, 68, 0.3)',
+                          boxShadow: mode === 'high-performance'
+                            ? (error === 'CONFIRMATION_REQUIRED' ? '0 0 12px rgba(59, 130, 246, 0.25)' : '0 0 12px rgba(239, 68, 68, 0.25)')
+                            : (error === 'CONFIRMATION_REQUIRED' ? '0 0 20px rgba(59, 130, 246, 0.3)' : '0 0 20px rgba(239, 68, 68, 0.3)'),
                           position: 'relative',
                           zIndex: 107,
                           pointerEvents: 'auto'
                         }}
                       >
                         <div className="flex items-start gap-2">
-                          <SpatialIcon 
-                            Icon={ICONS.AlertTriangle} 
-                            size={14} 
-                            className="text-red-300 mt-0.5" 
+                          <SpatialIcon
+                            Icon={error === 'CONFIRMATION_REQUIRED' ? ICONS.Mail : ICONS.AlertTriangle}
+                            size={16}
+                            className={error === 'CONFIRMATION_REQUIRED' ? 'text-blue-300 mt-0.5' : 'text-red-300 mt-0.5'}
                           />
-                          <p className="text-red-200 text-sm leading-relaxed">{error}</p>
+                          <div className="flex-1">
+                            <p className={`text-sm leading-relaxed font-medium ${error === 'CONFIRMATION_REQUIRED' ? 'text-blue-200' : 'text-red-200'}`}>
+                              {error === 'CONFIRMATION_REQUIRED'
+                                ? 'Email de confirmation envoyé !'
+                                : error}
+                            </p>
+                            {error === 'CONFIRMATION_REQUIRED' && (
+                              <p className="text-xs text-blue-300/70 mt-1">
+                                Consultez votre boîte de réception et vos spams. Cliquez sur le lien pour activer votre Forge.
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </GlassCard>
                     </motion.div>
@@ -496,39 +517,68 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                     zIndex: 106,
                     pointerEvents: 'auto',
                     cursor: 'pointer',
-                    background: `
-                      linear-gradient(135deg,
-                        color-mix(in srgb, var(--brand-primary) 80%, transparent),
-                        color-mix(in srgb, var(--color-plasma-cyan) 60%, transparent)
-                      )
-                    `,
-                    backdropFilter: buttonBackdropFilter,
-                    boxShadow: mode === 'high-performance'
-                      ? '0 8px 24px color-mix(in srgb, var(--brand-primary) 30%, transparent), inset 0 2px 0 rgba(255,255,255,0.3)'
+                    background: mode === 'high-performance'
+                      ? 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)'
                       : mode === 'balanced'
                       ? `
-                          0 10px 32px color-mix(in srgb, var(--brand-primary) 35%, transparent),
-                          0 0 48px color-mix(in srgb, var(--brand-primary) 25%, transparent),
-                          inset 0 2px 0 rgba(255,255,255,0.35)
+                          linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%),
+                          linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)
                         `
                       : `
-                          0 12px 40px color-mix(in srgb, var(--brand-primary) 40%, transparent),
-                          0 0 60px color-mix(in srgb, var(--brand-primary) 30%, transparent),
-                          0 0 100px color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent),
-                          inset 0 3px 0 rgba(255,255,255,0.4)
+                          linear-gradient(135deg, #FF6B35 0%, #F89442 25%, #F7931E 50%, #FCBB45 75%, #FDC830 100%),
+                          radial-gradient(circle at 50% 0%, rgba(255,255,255,0.3) 0%, transparent 70%)
                         `,
-                    border: '2px solid color-mix(in srgb, var(--brand-primary) 60%, transparent)',
+                    backgroundBlendMode: mode === 'quality' ? 'normal, overlay' : 'normal',
+                    backdropFilter: buttonBackdropFilter,
+                    boxShadow: mode === 'high-performance'
+                      ? `
+                          0 8px 24px rgba(255, 107, 53, 0.4),
+                          inset 0 1px 0 rgba(255,255,255,0.4),
+                          inset 0 -1px 0 rgba(0,0,0,0.2)
+                        `
+                      : mode === 'balanced'
+                      ? `
+                          0 10px 32px rgba(255, 107, 53, 0.5),
+                          0 0 48px rgba(247, 147, 30, 0.3),
+                          inset 0 2px 0 rgba(255,255,255,0.5),
+                          inset 0 -2px 0 rgba(0,0,0,0.25),
+                          inset -2px 0 4px rgba(0,0,0,0.1),
+                          inset 2px 0 4px rgba(255,255,255,0.1)
+                        `
+                      : `
+                          0 12px 40px rgba(255, 107, 53, 0.6),
+                          0 0 60px rgba(247, 147, 30, 0.4),
+                          0 0 100px rgba(253, 200, 48, 0.2),
+                          inset 0 3px 0 rgba(255,255,255,0.6),
+                          inset 0 -3px 0 rgba(0,0,0,0.3),
+                          inset -3px 0 6px rgba(0,0,0,0.15),
+                          inset 3px 0 6px rgba(255,255,255,0.15),
+                          0 2px 8px rgba(255, 107, 53, 0.8)
+                        `,
+                    border: mode === 'high-performance'
+                      ? '2px solid rgba(255, 107, 53, 0.6)'
+                      : '2px solid rgba(255, 107, 53, 0.8)',
                     borderRadius: '999px',
                     padding: '0.75rem 1.5rem',
                     minHeight: '48px',
                     color: 'white',
                     fontWeight: 'bold',
                     fontSize: '1rem',
+                    textShadow: mode === 'quality' ? '0 2px 4px rgba(0,0,0,0.3)' : '0 1px 2px rgba(0,0,0,0.2)',
                     transition: 'all 0.2s ease'
                   }}
                   onMouseEnter={(e) => {
                     if (!loading && !googleLoading) {
                       e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+                      if (mode === 'quality') {
+                        e.currentTarget.style.boxShadow = `
+                          0 16px 48px rgba(255, 107, 53, 0.7),
+                          0 0 80px rgba(247, 147, 30, 0.5),
+                          0 0 120px rgba(253, 200, 48, 0.3),
+                          inset 0 3px 0 rgba(255,255,255,0.7),
+                          inset 0 -3px 0 rgba(0,0,0,0.3)
+                        `;
+                      }
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -627,7 +677,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                         <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                       </svg>
                     )}
-                    <span>
+                    <span style={{ color: mode === 'high-performance' ? 'white' : undefined }}>
                       {appleLoading ? 'Redirection...' :
                        isSignUp ? 'Créer un compte avec Apple' : 'Se connecter avec Apple'}
                     </span>
@@ -695,8 +745,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                       </svg>
                     )}
-                    <span>
-                      {googleLoading ? 'Redirection...' : 
+                    <span style={{ color: mode === 'high-performance' ? 'white' : undefined }}>
+                      {googleLoading ? 'Redirection...' :
                        isSignUp ? 'Créer un compte avec Google' : 'Se connecter avec Google'}
                     </span>
                   </div>
