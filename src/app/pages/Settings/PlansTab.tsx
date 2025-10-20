@@ -175,6 +175,13 @@ const PlansTab: React.FC = () => {
       setTokenBalance(balance);
       setSubscription(sub);
       setPricingConfig(config);
+
+      if (config?.subscriptionPlans) {
+        console.log('Loaded subscription plans:', config.subscriptionPlans);
+        Object.entries(config.subscriptionPlans).forEach(([planId, plan]) => {
+          console.log(`Plan ${planId}:`, plan);
+        });
+      }
     } catch (error) {
       console.error('Error loading plans data:', error);
       showToast({
@@ -287,19 +294,25 @@ const PlansTab: React.FC = () => {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Object.entries(plans).map(([planId, plan]) => (
-            <PlanCard
-              key={planId}
-              planId={planId}
-              name={plan.name || planId}
-              priceEur={plan.price_eur}
-              tokensPerMonth={plan.tokens_per_month}
-              isCurrentPlan={currentPlanType === planId}
-              isFree={planId === 'free'}
-              onSelect={handleSelectPlan}
-              isLoading={isCreatingSession}
-            />
-          ))}
+          {Object.entries(plans).map(([planId, plan]) => {
+            if (!plan) {
+              console.warn(`Plan ${planId} is undefined`);
+              return null;
+            }
+            return (
+              <PlanCard
+                key={planId}
+                planId={planId}
+                name={plan.name || planId}
+                priceEur={plan.price_eur || 0}
+                tokensPerMonth={plan.tokens_per_month || 0}
+                isCurrentPlan={currentPlanType === planId}
+                isFree={planId === 'free'}
+                onSelect={handleSelectPlan}
+                isLoading={isCreatingSession}
+              />
+            );
+          })}
         </div>
       </div>
 

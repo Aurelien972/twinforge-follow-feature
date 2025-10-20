@@ -260,7 +260,10 @@ export class TokenService {
     }
   }
 
-  static formatTokenAmount(tokens: number): string {
+  static formatTokenAmount(tokens: number | undefined | null): string {
+    if (tokens === undefined || tokens === null || isNaN(tokens)) {
+      return '0';
+    }
     if (tokens >= 1000) {
       return `${(tokens / 1000).toFixed(1)}k`;
     }
