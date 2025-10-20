@@ -45,18 +45,17 @@ export const SettingsToggle: React.FC<SettingsToggleProps> = ({
         aria-label={label}
         onClick={handleToggle}
         disabled={disabled || loading}
-        className={`settings-toggle-switch ${enabled ? 'enabled' : ''}`}
+        className={`settings-toggle-switch ${enabled ? 'enabled' : 'disabled'}`}
       >
         <ConditionalMotion
           className="settings-toggle-thumb"
           animate={{
-            x: enabled ? 26 : 0,
+            x: enabled ? 24 : 0,
           }}
           transition={{
             type: 'spring',
-            stiffness: 550,
-            damping: 28,
-            mass: 0.8,
+            stiffness: 500,
+            damping: 30,
           }}
         />
       </button>

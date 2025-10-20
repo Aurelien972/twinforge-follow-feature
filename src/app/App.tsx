@@ -22,8 +22,6 @@ import CentralActionsMenu from './shell/CentralActionsMenu';
 import FloatingChatButton from '../ui/components/chat/FloatingChatButton';
 import GlobalChatDrawer from '../ui/components/chat/GlobalChatDrawer';
 import { useVoiceCoachInitialization } from '../hooks/useVoiceCoachInitialization';
-import { useThemeAutoSwitch } from '../hooks/useThemeAutoSwitch';
-import { useThemeStore } from '../system/store/themeStore';
 
 function AppContent() {
   const { isInstallable, isInstalled } = usePWAInstall();
@@ -36,13 +34,6 @@ function AppContent() {
 
   // Initialiser le système Voice Coach
   useVoiceCoachInitialization();
-
-  // Initialiser le système de thème
-  useThemeAutoSwitch();
-
-  useEffect(() => {
-    useThemeStore.getState().initializeTheme();
-  }, []);
 
   useGlobalEscapeKey();
 

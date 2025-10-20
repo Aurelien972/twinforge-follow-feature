@@ -5,7 +5,6 @@ import SpatialIcon from '../../../ui/icons/SpatialIcon';
 import { ICONS } from '../../../ui/icons/registry';
 import { useToast } from '../../../ui/components/ToastProvider';
 import { useUserStore } from '../../../system/store/userStore';
-import { ThemeSelector } from '../../../ui/components/settings';
 import type { VoiceType } from '../../../system/store/voiceCoachStore';
 
 const AVAILABLE_VOICES: Array<{
@@ -14,38 +13,13 @@ const AVAILABLE_VOICES: Array<{
   description: string;
   personality: string;
   sampleText: string;
-  isRecommended?: boolean;
 }> = [
   {
-    id: 'nova',
-    name: 'Nova',
-    description: 'Voix dynamique et jeune',
-    personality: 'Énergique et moderne',
-    sampleText: 'Hey ! Je suis Nova. Ensemble, on va déchirer cet entraînement !',
-    isRecommended: true
-  },
-  {
-    id: 'onyx',
-    name: 'Onyx',
-    description: 'Voix profonde et posée',
-    personality: 'Calme et rassurante',
-    sampleText: 'Salut, je suis Onyx. Je t\'accompagne avec calme et détermination vers tes objectifs.',
-    isRecommended: true
-  },
-  {
-    id: 'fable',
-    name: 'Fable',
-    description: 'Voix expressive britannique',
-    personality: 'Élégante et inspirante',
-    sampleText: 'Bonjour, je suis Fable. Laisse-moi t\'accompagner dans ton parcours avec style et élégance.',
-    isRecommended: true
-  },
-  {
-    id: 'shimmer',
-    name: 'Shimmer',
-    description: 'Voix féminine chaleureuse',
-    personality: 'Encourageante et bienveillante',
-    sampleText: 'Bonjour, je suis Shimmer. Je suis là pour t\'encourager à chaque étape de ton parcours.'
+    id: 'alloy',
+    name: 'Alloy',
+    description: 'Voix neutre et équilibrée',
+    personality: 'Professionnelle, claire et posée',
+    sampleText: 'Bonjour, je suis Alloy. Je vous accompagne dans votre entraînement avec une voix claire et professionnelle.'
   },
   {
     id: 'echo',
@@ -55,11 +29,32 @@ const AVAILABLE_VOICES: Array<{
     sampleText: 'Salut ! Je suis Echo. Prêt à donner le meilleur de toi-même ? Allez, on y va !'
   },
   {
-    id: 'alloy',
-    name: 'Alloy',
-    description: 'Voix neutre et équilibrée',
-    personality: 'Professionnelle, claire et posée',
-    sampleText: 'Bonjour, je suis Alloy. Je vous accompagne dans votre entraînement avec une voix claire et professionnelle.'
+    id: 'shimmer',
+    name: 'Shimmer',
+    description: 'Voix féminine chaleureuse',
+    personality: 'Encourageante et bienveillante',
+    sampleText: 'Bonjour, je suis Shimmer. Je suis là pour t\'encourager à chaque étape de ton parcours.'
+  },
+  {
+    id: 'fable',
+    name: 'Fable',
+    description: 'Voix expressive britannique (Nouveau)',
+    personality: 'Élégante et inspirante',
+    sampleText: 'Bonjour, je suis Fable. Laisse-moi t\'accompagner dans ton parcours avec style et élégance.'
+  },
+  {
+    id: 'onyx',
+    name: 'Onyx',
+    description: 'Voix profonde et posée (Nouveau)',
+    personality: 'Calme et rassurante',
+    sampleText: 'Salut, je suis Onyx. Je t\'accompagne avec calme et détermination vers tes objectifs.'
+  },
+  {
+    id: 'nova',
+    name: 'Nova',
+    description: 'Voix dynamique et jeune (Nouveau)',
+    personality: 'Énergique et moderne',
+    sampleText: 'Hey ! Je suis Nova. Ensemble, on va déchirer cet entraînement !'
   }
 ];
 
@@ -215,33 +210,6 @@ const PreferencesSettingsTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <GlassCard className="p-6">
-          <div className="flex items-start gap-3 mb-6">
-            <SpatialIcon
-              Icon={ICONS.Palette}
-              size={24}
-              color="#A78BFA"
-              variant="pure"
-            />
-            <div className="flex-1">
-              <h4 className="text-base font-semibold text-white mb-1">
-                Apparence
-              </h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Choisissez le thème de l'application
-              </p>
-            </div>
-          </div>
-
-          <ThemeSelector />
-        </GlassCard>
-      </motion.div>
-
       <div>
         <h3 className="text-xl font-bold text-white mb-2">
           Voix du Coach Vocal
@@ -265,26 +233,19 @@ const PreferencesSettingsTab: React.FC = () => {
               transition={{ duration: 0.3 }}
             >
               <GlassCard
-                className={`p-4 cursor-pointer transition-all duration-300 relative ${
+                className={`p-4 cursor-pointer transition-all duration-300 ${
                   isSelected
                     ? 'ring-2 ring-cyan-400/50 bg-gradient-to-br from-cyan-500/10 to-blue-500/10'
-                    : voice.isRecommended
-                    ? 'ring-1 ring-cyan-400/20 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 hover:ring-cyan-400/30'
                     : 'hover:bg-white/5'
                 } ${isSaving ? 'opacity-50 pointer-events-none' : ''}`}
                 onClick={() => !isSaving && handleVoiceSelect(voice.id)}
               >
-                {voice.isRecommended && !isSelected && (
-                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/30">
-                    <span className="text-[10px] font-semibold text-cyan-400 uppercase tracking-wide">Recommandé</span>
-                  </div>
-                )}
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0">
                     <SpatialIcon
                       Icon={ICONS.Mic}
                       size={24}
-                      color={isSelected ? '#18E3FF' : voice.isRecommended ? '#22D3EE' : '#60A5FA'}
+                      color={isSelected ? '#18E3FF' : '#60A5FA'}
                       variant="pure"
                     />
                   </div>
