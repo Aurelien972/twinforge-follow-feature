@@ -275,7 +275,30 @@
    ========================================= */
 
 /* CRITICAL: Token balance must remain visible with gradient in performance mode */
-/* Target ALL gradient text elements across the app, especially token balance */
+/* Ultra-specific rule for token-balance-gradient class */
+.performance-mode .token-balance-gradient,
+.performance-mode .token-balance-gradient[style],
+body.performance-mode .token-balance-gradient {
+  /* Force preserve the exact gradient */
+  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+
+  /* Ensure text is fully visible - MAXIMUM PRIORITY */
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+
+  /* Prevent any filter or transform that might hide it */
+  filter: none !important;
+  transform: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Fallback: Target ALL gradient text elements across the app */
 .performance-mode .text-3xl.font-bold.mb-1[style*="linear-gradient"],
 .performance-mode .text-3xl.font-bold[style*="linear-gradient"],
 .performance-mode div[style*="linear-gradient"][style*="WebkitBackgroundClip"],

@@ -269,12 +269,13 @@ const PlansTab: React.FC = () => {
           </div>
           <div className="text-right">
             <div
-              className="text-3xl font-bold mb-1"
+              className="text-3xl font-bold mb-1 token-balance-gradient"
               style={{
                 background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
+                color: 'transparent',
               }}
             >
               {tokenBalance ? TokenService.formatTokenAmount(tokenBalance.balance) : '0'}
